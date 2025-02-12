@@ -1,15 +1,20 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { StoreItemService } from './store-item.service';
+// import { User } from 'src/user/entities/user.entity';
 import { CreateStoreItemDto } from './dto/create-store-item.dto';
 import { UpdateStoreItemDto } from './dto/update-store-item.dto';
+// import { UserInfo } from '../utils/userInfo.decorator';
 
 @Controller('store-item')
 export class StoreItemController {
   constructor(private readonly storeItemService: StoreItemService) {}
 
   @Post()
-  create(@Body() createStoreItemDto: CreateStoreItemDto) {
-    return this.storeItemService.create(createStoreItemDto);
+  create(
+    // @UserInfo() user: User,
+    @Body() createStoreItemDto: CreateStoreItemDto,
+  ) {
+    return this.storeItemService.addShopItem(createStoreItemDto);
   }
 
   @Get()
