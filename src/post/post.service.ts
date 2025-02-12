@@ -29,10 +29,15 @@ export class PostService {
     return posts;
   }
 
-  async findPost(id: number): Promise<Post[]> {
-    const post = await this.postRepository.findBy({
-      id: id,
+  async findPost(id: number): Promise<Post> {
+    const post = await this.postRepository.findOne({
+      where: {
+        id: id,
+      },
     });
+    if (!post) {
+      throw new NotFoundException(`게시글을 찾을 수 없습니다.`);
+    }
 
     return post;
   }
