@@ -5,7 +5,9 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
  * 
  * 이벤트 정보를 저장하는 데이터 모델로, 제목, 내용, 이미지, 생성/수정 날짜 및 만료 날짜를 포함합니다.
  */
-@Entity()
+@Entity({
+  name: 'event',
+})
 export class Event {
   /** 기본 키 (자동 증가) */
   @PrimaryGeneratedColumn()
