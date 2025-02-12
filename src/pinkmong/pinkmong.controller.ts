@@ -1,45 +1,52 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Param, Body } from '@nestjs/common';
 import { PinkmongService } from './pinkmong.service';
-import { CreatePinkmongDto } from './dto/create-pinkmong.dto';
-import { UpdatePinkmongDto } from './dto/update-pinkmong.dto';
 
 @Controller('pinkmong')
 export class PinkmongController {
   constructor(private readonly pinkmongService: PinkmongService) {}
 
+  /**
+   * 핑크몽 생성 API
+   * [POST] /pinkmong
+   */
   @Post()
-  create(@Body() createPinkmongDto: CreatePinkmongDto) {
-    return this.pinkmongService.create(createPinkmongDto);
+  createPinkmong(@Body() body) {
+    return this.pinkmongService.createPinkmong(body);
   }
 
-  @Get()
-  findAll() {
-    return this.pinkmongService.findAll();
+  /**
+   * 특정 핑크몽 조회 API
+   * [GET] /pinkmong/:pinkmongId
+   */
+  @Get(':pinkmongId')
+  getPinkmong(@Param('pinkmongId') pinkmongId: number) {
+    return this.pinkmongService.getPinkmong(pinkmongId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pinkmongService.findOne(+id);
+  /**
+   * 모든 핑크몽 조회 API
+   * [GET] /pinkmong/pinkmongs
+   */
+  @Get('pinkmongs')
+  getAllPinkmongs() {
+    return this.pinkmongService.getAllPinkmongs();
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updatePinkmongDto: UpdatePinkmongDto,
-  ) {
-    return this.pinkmongService.update(+id, updatePinkmongDto);
+  /**
+   * 핑크몽 수정 API
+   * [PATCH] /pinkmong/:pinkmongId
+   */
+  @Patch(':pinkmongId')
+  updatePinkmong(@Param('pinkmongId') pinkmongId: number, @Body() body) {
+    return this.pinkmongService.updatePinkmong(pinkmongId, body);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.pinkmongService.remove(+id);
+  /**
+   * 핑크몽 삭제 API
+   * [DELETE] /pinkmong/:pinkmongId
+   */
+  @Delete(':pinkmongId')
+  deletePinkmong(@Param('pinkmongId') pinkmongId: number) {
+    return this.pinkmongService.deletePinkmong(pinkmongId);
   }
 }
