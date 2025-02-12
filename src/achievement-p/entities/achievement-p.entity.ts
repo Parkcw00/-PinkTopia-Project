@@ -20,7 +20,7 @@ export class AchievementP {
   user: User;
 
   @Column({ type: 'int', nullable: false })
-  userId: number;
+  user_id: number;
 
   @ManyToOne(
     () => SubAchievement,
@@ -33,7 +33,7 @@ export class AchievementP {
   sub_achievement: SubAchievement;
 
   @Column({ type: 'int', nullable: false })
-  subAchievementId: number; // camelCase 스타일로 변경
+  sub_achievement_id: number; // camelCase 스타일로 변경
 
   @Column({ type: 'boolean', default: false, nullable: false }) // default 값 수정
   complete: boolean;

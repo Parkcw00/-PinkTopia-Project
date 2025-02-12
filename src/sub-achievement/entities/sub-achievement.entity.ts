@@ -39,13 +39,13 @@ export class SubAchievement {
   mission_type: SubAchievementMissionType;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updated_at: Date;
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   @DeleteDateColumn()
-  deletedAt: Date;
+  deleted_at: Date;
 
   @OneToMany(
     () => AchievementP,
