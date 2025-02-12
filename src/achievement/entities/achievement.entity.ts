@@ -35,15 +35,15 @@ export class Achievement {
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   @CreateDateColumn()
-  updatedAt: Date;
+  updated_at: Date;
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   @DeleteDateColumn()
-  deletedAt: Date;
+  deleted_at: Date;
 
   @OneToMany(
     () => SubAchievement,
