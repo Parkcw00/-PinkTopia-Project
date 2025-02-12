@@ -27,13 +27,13 @@ export class Event {
 
   /** 생성된 날짜 (자동 설정) */
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   /** 수정된 날짜 (자동 업데이트) */
   @UpdateDateColumn()
-  updatedAt: Date;
+  updated_at: Date;
 
   /** 이벤트 만료 날짜 (선택 사항) */
   @Column({ type: 'timestamp', nullable: true })
-  expirationAt?: Date;
+  expiration_at?: Date;
 }
