@@ -22,7 +22,26 @@ import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 
 @Module({
-  imports: [PostModule, CommentModule, UserModule, EventModule, PinkmongModule, AchievementModule, AchievementCheckListModule, AchievementCompleteModule, ItemModule, InventoryModule, CollectionModule, CatchPinkmongModule, SubAchievementModule, AchievementPModule, ChattingModule, ChattingroomModule, RankingModule, DirectionModule],
+  imports: [
+    PostModule,
+    CommentModule,
+    UserModule,
+    EventModule,
+    PinkmongModule,
+    AchievementModule,
+    AchievementCheckListModule,
+    AchievementCompleteModule,
+    ItemModule,
+    InventoryModule,
+    CollectionModule,
+    CatchPinkmongModule,
+    SubAchievementModule,
+    AchievementPModule,
+    ChattingModule,
+    ChattingroomModule,
+    RankingModule,
+    DirectionModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

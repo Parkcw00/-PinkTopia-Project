@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { DirectionService } from './direction.service';
 import { CreateDirectionDto } from './dto/create-direction.dto';
 import { UpdateDirectionDto } from './dto/update-direction.dto';
@@ -23,7 +31,10 @@ export class DirectionController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDirectionDto: UpdateDirectionDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateDirectionDto: UpdateDirectionDto,
+  ) {
     return this.directionService.update(+id, updateDirectionDto);
   }
 
