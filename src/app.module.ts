@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PostModule } from './post/post.module';
+import { StoreItemModule } from './store-item/store-item.module';
 import { DirectionModule } from './direction/direction.module';
 import { RankingModule } from './ranking/ranking.module';
 import { ChattingroomModule } from './chattingroom/chattingroom.module';
@@ -22,7 +23,7 @@ import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 
 @Module({
-  imports: [PostModule, CommentModule, UserModule, EventModule, PinkmongModule, AchievementModule, AchievementCheckListModule, AchievementCompleteModule, ItemModule, InventoryModule, CollectionModule, CatchPinkmongModule, SubAchievementModule, AchievementPModule, ChattingModule, ChattingroomModule, RankingModule, DirectionModule],
+  imports: [PostModule, CommentModule, UserModule, EventModule, PinkmongModule, AchievementModule, AchievementCheckListModule, AchievementCompleteModule, ItemModule, InventoryModule, CollectionModule, CatchPinkmongModule, SubAchievementModule, AchievementPModule, ChattingModule, ChattingroomModule, RankingModule, DirectionModule, StoreItemModule],
   controllers: [AppController],
   providers: [AppService],
 })
