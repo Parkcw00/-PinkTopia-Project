@@ -24,6 +24,7 @@ import * as Joi from 'joi';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { AchievementCModule } from './achievement-c/achievement-c.module';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -73,6 +74,7 @@ const typeOrmModuleOptions = {
     EventModule,
     PinkmongModule,
     AchievementModule,
+    AchievementCModule,
     ItemModule,
     InventoryModule,
     CollectionModule,
