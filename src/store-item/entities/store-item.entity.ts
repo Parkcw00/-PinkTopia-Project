@@ -24,7 +24,7 @@ export class StoreItem {
   potion: boolean;
 
   @Column({ type: 'int', nullable: false })
-  potion_time: number;
+  potion_time?: number;
 
   @Column({ type: 'int', nullable: false })
   gem_price: number;

@@ -19,9 +19,53 @@ import { CommentModule } from './comment/comment.module';
 import { UserModule } from './user/user.module';
 import { ChatmemberModule } from './chatmember/chatmember.module';
 import { ChatblacklistModule } from './chatblacklist/chatblacklist.module';
+import * as Joi from 'joi';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+
+const typeOrmModuleOptions = {
+  useFactory: async (
+    configService: ConfigService,
+  ): Promise<TypeOrmModuleOptions> => ({
+    namingStrategy: new SnakeNamingStrategy(),
+    type: 'mysql',
+    username: configService.get('DB_USERNAME'),
+    password: configService.get('DB_PASSWORD'),
+    host: configService.get('DB_HOST'),
+    port: configService.get('DB_PORT'),
+    database: configService.get('DB_NAME'),
+    entities: [__dirname + '/**/entities/*.{ts,js}'], // 이곳에서 자신의 작업물의 엔티티 등록  -  경로 잘못??
+    // entities: [
+    //   process.env.NODE_ENV === 'production'
+    //     ? 'dist/**/*.entity.js' // 배포 환경에서는 dist 폴더 사용
+    //     : 'src/**/*.entity.ts',  // 개발 환경에서는 src 사용
+    // ],
+    /// 개발, dev 인
+    synchronize: configService.get('DB_SYNC'), //true, // 기존 테이블이 있다면 자동으로 수정됨
+    // migrationsRun: true, // 앱 실행 시 마이그레이션 적용
+
+    logging: true,
+  }),
+  inject: [ConfigService],
+};
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: Joi.object({
+        // JWT_SECRET_KEY: Joi.string().required(),
+        DB_USERNAME: Joi.string().required(),
+        DB_PASSWORD: Joi.string().required(),
+        DB_HOST: Joi.string().required(),
+        DB_PORT: Joi.number().required(),
+        DB_NAME: Joi.string().required(),
+        DB_SYNC: Joi.boolean().required(),
+      }),
+    }),
+
+    TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     PostModule,
     CommentModule,
     UserModule,
