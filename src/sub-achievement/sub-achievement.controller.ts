@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { SubAchievementService } from './sub-achievement.service';
 import { CreateSubAchievementDto } from './dto/create-sub-achievement.dto';
 import { UpdateSubAchievementDto } from './dto/update-sub-achievement.dto';
@@ -23,7 +31,10 @@ export class SubAchievementController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSubAchievementDto: UpdateSubAchievementDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateSubAchievementDto: UpdateSubAchievementDto,
+  ) {
     return this.subAchievementService.update(+id, updateSubAchievementDto);
   }
 
