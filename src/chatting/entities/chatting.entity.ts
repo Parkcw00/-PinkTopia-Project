@@ -11,7 +11,7 @@ export class Chatting {
   message: string;
 
   @Column()
-  image: string;
+  image?: string;
 
   @Column()
   created_at: Date;
