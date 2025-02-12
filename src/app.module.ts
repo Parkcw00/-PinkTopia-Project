@@ -17,6 +17,8 @@ import { PinkmongModule } from './pinkmong/pinkmong.module';
 import { EventModule } from './event/event.module';
 import { CommentModule } from './comment/comment.module';
 import { UserModule } from './user/user.module';
+import { ChatmemberModule } from './chatmember/chatmember.module';
+import { ChatblacklistModule } from './chatblacklist/chatblacklist.module';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { UserModule } from './user/user.module';
     ChattingroomModule,
     RankingModule,
     DirectionModule,
+    ChatmemberModule,
+    ChatblacklistModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,8 +1,12 @@
+import { Pinkmong } from 'src/pinkmong/entities/pinkmong.entity';
+import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -17,5 +21,17 @@ export class Collection {
   name: string; // 핑크몽 이름
 
   @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
+  created_at: Date;
+
+  @ManyToOne(() => Pinkmong, (pinkmong) => pinkmong.collection)
+  @JoinColumn({ name: 'pinkmong_id' })
+  pinkmong: Pinkmong;
+  @Column({ type: 'int', nullable: false })
+  pinkmong_id: number;
+
+  @ManyToOne(() => User, (user) => user.collection)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+  @Column({ type: 'int', nullable: false })
+  user_id: number;
 }

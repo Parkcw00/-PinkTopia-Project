@@ -1,4 +1,13 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Item } from 'src/item/entities/item.entity';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity({ name: 'store_items' })
 export class StoreItem {
@@ -31,4 +40,7 @@ export class StoreItem {
 
   @DeleteDateColumn()
   deleted_at: Date;
+
+  @OneToMany(() => Item, (item) => item.store_item) // 카드 엔티티와 1:n 관계 설정
+  item: Item[];
 }
