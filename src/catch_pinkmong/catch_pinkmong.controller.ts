@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { CatchPinkmongService } from './catch_pinkmong.service';
 import { CreateCatchPinkmongDto } from './dto/create-catch_pinkmong.dto';
 import { UpdateCatchPinkmongDto } from './dto/update-catch_pinkmong.dto';
@@ -23,7 +31,10 @@ export class CatchPinkmongController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCatchPinkmongDto: UpdateCatchPinkmongDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCatchPinkmongDto: UpdateCatchPinkmongDto,
+  ) {
     return this.catchPinkmongService.update(+id, updateCatchPinkmongDto);
   }
 
