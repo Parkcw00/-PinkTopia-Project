@@ -29,7 +29,10 @@ export class SubAchievement {
   achievement_id: number;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
-  conditions: string; // `linestring` → `varchar`로 변경
+  title: string; 
+
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  conditions: string; 
 
   @Column({
     type: 'enum',

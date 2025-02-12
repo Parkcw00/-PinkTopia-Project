@@ -7,7 +7,6 @@ import { RankingModule } from './ranking/ranking.module';
 import { ChattingroomModule } from './chattingroom/chattingroom.module';
 import { ChattingModule } from './chatting/chatting.module';
 import { AchievementPModule } from './achievement-p/achievement-p.module';
-import { AchievementCModule } from './achievement-c/achievement-c.module';
 import { SubAchievementModule } from './sub-achievement/sub-achievement.module';
 import { CatchPinkmongModule } from './catch_pinkmong/catch_pinkmong.module';
 import { CollectionModule } from './collection/collection.module';
@@ -74,7 +73,6 @@ const typeOrmModuleOptions = {
     EventModule,
     PinkmongModule,
     AchievementModule,
-    AchievementCModule,
     ItemModule,
     InventoryModule,
     CollectionModule,
