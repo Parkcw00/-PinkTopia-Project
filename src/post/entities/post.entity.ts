@@ -1,19 +1,27 @@
+import { User } from 'src/user/entities/user.entity';
+import { Comment } from 'src/comment/entities/comment.entity';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity({
-  name: 'posts',
+  name: 'post',
 })
 export class Post {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ManyToOne(() => User, (user) => user.post)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
   @Column({ type: 'bigint' })
   user_id: number;
 
@@ -27,11 +35,14 @@ export class Post {
   content: string;
 
   @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn({ type: 'timestamp' })
-  updatedAt: Date;
+  updated_at: Date;
 
   @DeleteDateColumn({ type: 'timestamp' })
-  deletedAt: Date;
+  deleted_at: Date;
+
+  @OneToMany(() => Comment, (comment) => comment.post)
+  comment: Comment[];
 }
