@@ -18,6 +18,7 @@ export class SubAchievement {
   @PrimaryGeneratedColumn()
   id: number;
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   @ManyToOne(() => Achievement, (achievement) => achievement.sub_achievement, {
     onDelete: 'CASCADE',
   })
@@ -48,6 +49,7 @@ export class SubAchievement {
 
   @OneToMany(
     () => AchievementP,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     (achievement_p) => achievement_p.sub_achievement,
   ) // 카드 엔티티와 1:n 관계 설정
   achievement_p: AchievementP[];
