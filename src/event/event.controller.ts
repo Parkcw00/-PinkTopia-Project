@@ -1,42 +1,60 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Param, Body } from '@nestjs/common';
 import { EventService } from './event.service';
-import { CreateEventDto } from './dto/create-event.dto';
-import { UpdateEventDto } from './dto/update-event.dto';
 
+/**
+ * EventController
+ * 
+ * 이벤트 관련 API 엔드포인트를 관리하는 컨트롤러
+ */
 @Controller('event')
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
+  /**
+   * 이벤트 생성 API
+   * [POST] /event
+   */
   @Post()
-  create(@Body() createEventDto: CreateEventDto) {
-    return this.eventService.create(createEventDto);
+  createEvent(@Body() body: { title: string; content: string; image?: string }) {
+    return this.eventService.createEvent(body.title, body.content, body.image);
   }
 
-  @Get()
-  findAll() {
-    return this.eventService.findAll();
+  /**
+   * 특정 이벤트 조회 API
+   * [GET] /event/:eventId
+   */
+  @Get(':eventId')
+  getEvent(@Param('eventId') eventId: number) {
+    return this.eventService.getEvent(eventId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.eventService.findOne(+id);
+  /**
+   * 모든 이벤트 조회 API
+   * [GET] /event/events
+   */
+  @Get('events')
+  getAllEvents() {
+    return this.eventService.getAllEvents();
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateEventDto: UpdateEventDto) {
-    return this.eventService.update(+id, updateEventDto);
+  /**
+   * 이벤트 수정 API
+   * [PATCH] /event/:eventId
+   */
+  @Patch(':eventId')
+  updateEvent(
+    @Param('eventId') eventId: number,
+    @Body() body: { title?: string; content?: string; image?: string },
+  ) {
+    return this.eventService.updateEvent(eventId, body.title, body.content, body.image);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.eventService.remove(+id);
+  /**
+   * 이벤트 삭제 API
+   * [DELETE] /event/:eventId
+   */
+  @Delete(':eventId')
+  deleteEvent(@Param('eventId') eventId: number) {
+    return this.eventService.deleteEvent(eventId);
   }
 }
