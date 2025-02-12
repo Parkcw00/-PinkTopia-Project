@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { AchievementCService } from './achievement-c.service';
 import { CreateAchievementCDto } from './dto/create-achievement-c.dto';
 import { UpdateAchievementCDto } from './dto/update-achievement-c.dto';
@@ -23,7 +31,10 @@ export class AchievementCController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAchievementCDto: UpdateAchievementCDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateAchievementCDto: UpdateAchievementCDto,
+  ) {
     return this.achievementCService.update(+id, updateAchievementCDto);
   }
 
