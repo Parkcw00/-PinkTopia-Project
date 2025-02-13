@@ -40,6 +40,10 @@ export class Event {
   updated_at: Date;
 
   /** 이벤트 만료 날짜 (선택 사항) */
-  @Column({ type: 'timestamp', nullable: true })
-  expiration_at?: Date;
+  @Column({ type: 'date', nullable: true })
+  expiration_at?: String;
+
+  /** 이벤트 상태 (active: 진행 중, closed: 종료됨) */
+  @Column({ type: 'enum', enum: ['active', 'closed'], default: 'active' })
+  status: string;
 }
