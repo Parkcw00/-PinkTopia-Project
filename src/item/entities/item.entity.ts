@@ -6,14 +6,16 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 
 @Entity({ name: 'items' })
+@Unique(['inventory_id', 'store_item_id'])
 export class Item {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'int', nullable: false })
+  @Column({ type: 'int', nullable: false, default: 1 })
   count: number;
 
   @ManyToOne(() => Inventory, (inventory) => inventory.item, {
