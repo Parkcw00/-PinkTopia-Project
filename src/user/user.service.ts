@@ -3,20 +3,17 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import nodemailer from 'nodemailer';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
+    private readonly userRepository: UserRepository,
     private configService: ConfigService,
   ) {}
 
@@ -29,16 +26,12 @@ export class UserService {
       throw new BadRequestException('입력한 비밀번호가 일치하지 않습니다.');
     }
 
-    const existNickName = await this.userRepository.findOne({
-      where: { nickname },
-    });
-    if (existNickName) {
+    const existNickname = await this.userRepository.findNickname(nickname);
+    if (existNickname) {
       throw new BadRequestException('이미 존재하는 닉네임입니다.');
     }
 
-    const existEmail = await this.userRepository.findOne({
-      where: { email },
-    });
+    const existEmail = await this.userRepository.findEmail(email);
     if (existEmail) {
       throw new BadRequestException('이미 존재하는 이메일입니다.');
     }
@@ -48,13 +41,8 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(password, Number(saltRounds));
 
     try {
-      await this.userRepository.save({
-        nickname,
-        email,
-        password: hashedPassword,
-        ...(birthday && { birthday }),
-      });
-      return { message: `이메일 인증을 진행해 주세요.` };
+      await this.userRepository.signUp(nickname, email, hashedPassword, birthday)
+      return { message: `${email}로 이메일 인증을 진행해 주세요.` };
     } catch (err) {
       throw new InternalServerErrorException(
         '유저 정보 저장 중 오류가 발생하였습니다.',
