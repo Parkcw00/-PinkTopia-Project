@@ -39,6 +39,12 @@ export class UserController {
     return this.userService.sendCode(body.email);
   }
 
+  // 이메일 인증
+  @Post('/auth/verify-code')
+  async verifyCode(@Body() body: {email: string, verificationCode: string}) {
+    return this.userService.verifyCode(body.email, body.verificationCode)
+  }
+
   @Get()
   findAll() {
     return this.userService.findAll();

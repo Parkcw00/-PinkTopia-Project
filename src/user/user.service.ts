@@ -63,7 +63,12 @@ export class UserService {
     }
   }
 
+  // 이메일 인증 코드 전송
   async sendCode(email: string) {
+    if(!email) {
+      throw new BadRequestException('이메일을 입력해 주세요');
+    }
+
     const existEmail = await this.userRepository.findEmail(email);
     if (!existEmail) {
       throw new BadRequestException('존재하는지 않는 이메일입니다.');
@@ -77,6 +82,32 @@ export class UserService {
       console.log(err);
       throw new InternalServerErrorException(
         '이메일 전송 중 오류가 발생하였습니다.',
+      );
+    }
+  }
+
+  // 이메일 인증
+  async verifyCode(email: string, verificationCode: string) {
+    if(!email) {
+      throw new BadRequestException('이메일을 입력해 주세요');
+    }
+    if(!verificationCode) {
+      throw new BadRequestException('인증코드를 입력해 주세요');
+    }
+    const existEmail = await this.userRepository.findEmail(email);
+    if (!existEmail) {
+      throw new BadRequestException('존재하는지 않는 이메일입니다.');
+    }
+    if(existEmail.verification_code !== verificationCode) {
+      throw new BadRequestException('인증번호가 일치하지 않습니다.')
+    }
+
+    try {
+      await this.userRepository.successVerification(email);
+      return {message: `이메일 인증 성공. 가입이 완료되었습니다.`}
+    } catch (err) {
+      throw new InternalServerErrorException(
+        '이메일 인증 중 오류가 발생하였습니다.',
       );
     }
   }
