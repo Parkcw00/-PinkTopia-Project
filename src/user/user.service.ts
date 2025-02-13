@@ -74,8 +74,13 @@ export class UserService {
   }
 
   async getRanking() {
-    return this.userRepository.findUsersByCollectionPoint();
+    return await this.userRepository.findUsersByCollectionPoint();
   }
+
+  async getRankingAchievement() {
+    return await this.userRepository.findUsersByAchievement();
+  }
+
   // 인증 코드 메일 보내는 메서드
   private async sendVerificationCode(email: string) {
     const EMAIL_SERVICE = this.configService.get<string>('EMAIL_SERVICE');
