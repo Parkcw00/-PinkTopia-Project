@@ -45,7 +45,7 @@ export class PinkmongService {
     const pinkmong = await this.pinkmongRepository.findOne({ where: { id: pinkmongId } });
     if (!pinkmong) throw new NotFoundException({ message: '핑크몽이 존재하지 않습니다.' });
 
-    await this.pinkmongRepository.softRemove(pinkmong);
+    await this.pinkmongRepository.remove(pinkmong);
     return { message: '핑크몽 삭제가 완료 되었습니다.' };
   }
 }

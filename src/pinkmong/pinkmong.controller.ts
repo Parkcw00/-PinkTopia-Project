@@ -15,6 +15,15 @@ export class PinkmongController {
   }
 
   /**
+   * 모든 핑크몽 조회 API
+   * [GET] /pinkmong/pinkmongs
+   */
+  @Get('pinkmongs')
+  getAllPinkmongs() {
+    return this.pinkmongService.getAllPinkmongs();
+  }
+
+  /**
    * 특정 핑크몽 조회 API
    * [GET] /pinkmong/:pinkmongId
    */
@@ -23,14 +32,6 @@ export class PinkmongController {
     return this.pinkmongService.getPinkmong(pinkmongId);
   }
 
-  /**
-   * 모든 핑크몽 조회 API
-   * [GET] /pinkmong/pinkmongs
-   */
-  @Get('pinkmongs')
-  getAllPinkmongs() {
-    return this.pinkmongService.getAllPinkmongs();
-  }
 
   /**
    * 핑크몽 수정 API
