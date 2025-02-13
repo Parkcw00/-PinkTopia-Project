@@ -19,7 +19,7 @@ export class PostController {
   @ApiOperation({ summary: '게시글 생성' })
   @Post()
   createPost(@Body() createPostDto: CreatePostDto) {
-    return this.postService.create(1, createPostDto);
+    return this.postService.createPost(1, createPostDto);
   }
 
   @ApiOperation({ summary: '게시글들 조회' })
@@ -30,19 +30,19 @@ export class PostController {
 
   @ApiOperation({ summary: '게시글 조회' })
   @Get(':id')
-  findPost(@Param('id') id: string) {
+  findPost(@Param('id') id: number) {
     return this.postService.findPost(+id);
   }
 
   @ApiOperation({ summary: '게시글 수정' })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
+  update(@Param('id') id: number, @Body() updatePostDto: UpdatePostDto) {
     return this.postService.updatePost(1, +id, updatePostDto);
   }
 
   @ApiOperation({ summary: '게시글 삭제' })
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.postService.deletePost(1, +id);
   }
 }
