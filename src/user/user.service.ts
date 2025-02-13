@@ -7,7 +7,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import nodemailer from 'nodemailer';
+import * as nodemailer from 'nodemailer';
 import { UserRepository } from './user.repository';
 
 @Injectable()
@@ -56,9 +56,20 @@ export class UserService {
   }
 
   async sendCode(email: string) {
-    const existEmail = await this.userRepository.findEmail(email)
+    const existEmail = await this.userRepository.findEmail(email);
     if (!existEmail) {
       throw new BadRequestException('존재하는지 않는 이메일입니다.');
+    }
+
+    try {
+      const verificationCode = await this.sendVerificationCode(email);
+      await this.userRepository.updateVerificationCode(email, verificationCode);
+      return { message: `${email}로 인증코드를 발송하였습니다.` };
+    } catch (err) {
+      console.log(err);
+      throw new InternalServerErrorException(
+        '이메일 전송 중 오류가 발생하였습니다.',
+      );
     }
   }
 

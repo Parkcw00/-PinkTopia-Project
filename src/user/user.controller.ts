@@ -35,8 +35,8 @@ export class UserController {
 
   // 이메일 인증코드 전송
   @Post('/auth/send-code')
-  async sendCode(@Body() email: string) {
-    return this.userService.sendCode(email);
+  async sendCode(@Body() body:{email: string}) {
+    return this.userService.sendCode(body.email);
   }
 
   @Get()

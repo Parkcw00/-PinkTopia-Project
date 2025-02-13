@@ -70,4 +70,9 @@ export class UserRepository {
       ...(birthday && { birthday }),
     });
   }
+
+  // 이메일 인증코드 업데이트
+  async updateVerificationCode(email: string, verificationCode: string) {
+    return await this.userRepository.update({email}, { verification_code: verificationCode });
+  }
 }
