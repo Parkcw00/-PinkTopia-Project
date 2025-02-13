@@ -23,8 +23,13 @@ export class EventService {
    * @ param image - 이벤트 이미지 URL (선택 사항)
    * @ returns 생성 완료 메시지
    */
-  async createEvent(title: string, content: string, image?: string) {
-    const event = this.eventRepository.create({ title, content, image });
+  async createEvent(title: string, content: string, image?: string, expiration_at?: string) {
+    let expirationDate: Date | null = null;
+
+    if (expiration_at) {
+      expirationDate = new Date(expiration_at); // ✅ 날짜 문자열을 Date 객체로 변환
+    }
+    const event = this.eventRepository.create({ title, content, image, expiration_at });
     await this.eventRepository.save(event);
     return { message: '이벤트 생성이 완료 되었습니다.' };
   }
@@ -116,17 +121,27 @@ async closeEvent(eventId: number) {
    * returns 수정 완료 메시지
    * throws NotFoundException - 이벤트가 존재하지 않을 경우 예외 발생
    */
-  async updateEvent(eventId: number, title?: string, content?: string, image?: string) {
+  async updateEvent(eventId: number, title?: string, content?: string, image?: string, expiration_at?: string) {
+    // console.log(`📢 업데이트 요청: eventId=${eventId}, expiration_at=${expiration_at}`);
+  
     const event = await this.eventRepository.findOne({ where: { id: eventId } });
     if (!event) throw new NotFoundException({ message: '이벤트가 존재하지 않습니다.' });
-
+  
     event.title = title ?? event.title;
     event.content = content ?? event.content;
     event.image = image ?? event.image;
-
+  
+    // ✅ expiration_at을 직접 업데이트 (널 값이 들어가지 않도록 체크)
+    if (expiration_at !== undefined) {
+      // console.log(`🔍 업데이트할 expiration_at: ${expiration_at}`);
+      event.expiration_at = expiration_at;  // ✅ 강제로 적용
+    }
+  
     await this.eventRepository.save(event);
-    return { message: '이벤트 수정 성공' };
+    // console.log(`✅ 이벤트 수정 완료: ${JSON.stringify(event)}`);
+    return { message: '이벤트 수정 성공', event };
   }
+  
 
  /** 이벤트 완전 삭제 (DB에서 삭제) */
  async deleteEvent(eventId: number) {

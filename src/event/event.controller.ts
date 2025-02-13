@@ -15,8 +15,8 @@ export class EventController {
    * [POST] /event
    */
   @Post()
-  createEvent(@Body() body: { title: string; content: string; image?: string }) {
-    return this.eventService.createEvent(body.title, body.content, body.image);
+  createEvent(@Body() body: { title: string; content: string; image?: string, expiration_at?: string }) {
+    return this.eventService.createEvent(body.title, body.content, body.image, body.expiration_at);
   }
 
 
@@ -61,9 +61,17 @@ closeEvent(@Param('eventId') eventId: number) {
   @Patch(':eventId')
   updateEvent(
     @Param('eventId') eventId: number,
-    @Body() body: { title?: string; content?: string; image?: string },
+    @Body() body: { title?: string; content?: string; image?: string; expiration_at?: string },
   ) {
-    return this.eventService.updateEvent(eventId, body.title, body.content, body.image);
+    // console.log(`📢 컨트롤러 요청: eventId=${eventId}, expiration_at=${body.expiration_at}`);
+  
+    return this.eventService.updateEvent(
+      eventId, 
+      body.title, 
+      body.content, 
+      body.image, 
+      body.expiration_at  // ✅ expiration_at 전달 추가
+    );
   }
 
 /** 이벤트 완전 삭제 (DB에서 삭제) */
