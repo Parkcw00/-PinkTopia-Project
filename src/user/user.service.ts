@@ -41,7 +41,12 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(password, Number(saltRounds));
 
     try {
-      await this.userRepository.signUp(nickname, email, hashedPassword, birthday)
+      await this.userRepository.signUp(
+        nickname,
+        email,
+        hashedPassword,
+        birthday,
+      );
       return { message: `${email}로 이메일 인증을 진행해 주세요.` };
     } catch (err) {
       throw new InternalServerErrorException(
@@ -73,13 +78,19 @@ export class UserService {
     return `This action removes a #${id} user`;
   }
 
+  async getRanking() {
+    return await this.userRepository.findUsersByCollectionPoint();
+  }
+
+  async getRankingAchievement() {
+    return await this.userRepository.findUsersByAchievement();
+  }
+
   // 인증 코드 메일 보내는 메서드
   private async sendVerificationCode(email: string) {
     const EMAIL_SERVICE = this.configService.get<string>('EMAIL_SERVICE');
-    const NODEMAILER_USER =
-      this.configService.get<string>('NODEMAILER_USER');
-    const NODEMAILER_PASS =
-      this.configService.get<string>('NODEMAILER_PASS');
+    const NODEMAILER_USER = this.configService.get<string>('NODEMAILER_USER');
+    const NODEMAILER_PASS = this.configService.get<string>('NODEMAILER_PASS');
     const transporter = nodemailer.createTransport({
       service: EMAIL_SERVICE,
       auth: {
