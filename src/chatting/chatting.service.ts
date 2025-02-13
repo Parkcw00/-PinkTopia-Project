@@ -11,16 +11,4 @@ export class ChattingService {
   findAll() {
     return `This action returns all chatting`;
   }
-
-  findOne(id: number) {
-    return `This action returns a #${id} chatting`;
-  }
-
-  update(id: number, updateChattingDto: UpdateChattingDto) {
-    return `This action updates a #${id} chatting`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} chatting`;
-  }
 }
