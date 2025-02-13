@@ -17,6 +17,14 @@ export class UserService {
     private configService: ConfigService,
   ) {}
 
+  async getRanking() {
+    return await this.userRepository.findUsersByCollectionPoint();
+  }
+
+  async getRankingAchievement() {
+    return await this.userRepository.findUsersByAchievement();
+  }
+
   // 회원가입
   async signUp(createUserDto: CreateUserDto) {
     const { nickname, email, password, confirmedPassword, birthday } =
@@ -87,14 +95,6 @@ export class UserService {
 
   remove(id: number) {
     return `This action removes a #${id} user`;
-  }
-
-  async getRanking() {
-    return await this.userRepository.findUsersByCollectionPoint();
-  }
-
-  async getRankingAchievement() {
-    return await this.userRepository.findUsersByAchievement();
   }
 
   // 인증 코드 메일 보내는 메서드
