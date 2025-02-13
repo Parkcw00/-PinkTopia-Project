@@ -10,33 +10,39 @@ import {
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('게시글CRUD')
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}
-
+  @ApiOperation({ summary: '게시글 생성' })
   @Post()
-  create(@Body() createPostDto: CreatePostDto) {
-    return this.postService.create(createPostDto);
+  createPost(@Body() createPostDto: CreatePostDto) {
+    return this.postService.createPost(1, createPostDto);
   }
 
+  @ApiOperation({ summary: '게시글들 조회' })
   @Get()
-  findAll() {
-    return this.postService.findAll();
+  findPosts() {
+    return this.postService.findPosts();
   }
 
+  @ApiOperation({ summary: '게시글 조회' })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postService.findOne(+id);
+  findPost(@Param('id') id: number) {
+    return this.postService.findPost(+id);
   }
 
+  @ApiOperation({ summary: '게시글 수정' })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.update(+id, updatePostDto);
+  update(@Param('id') id: number, @Body() updatePostDto: UpdatePostDto) {
+    return this.postService.updatePost(1, +id, updatePostDto);
   }
 
+  @ApiOperation({ summary: '게시글 삭제' })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.postService.deletePost(1, +id);
   }
 }
