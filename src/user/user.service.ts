@@ -50,7 +50,12 @@ export class UserService {
     }
   }
 
-  async sendCode(email: string) {}
+  async sendCode(email: string) {
+    const existEmail = await this.userRepository.findEmail(email)
+    if (!existEmail) {
+      throw new BadRequestException('존재하는지 않는 이메일입니다.');
+    }
+  }
 
   findAll() {
     return `This action returns all user`;
