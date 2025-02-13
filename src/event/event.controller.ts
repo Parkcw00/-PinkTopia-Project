@@ -19,6 +19,26 @@ export class EventController {
     return this.eventService.createEvent(body.title, body.content, body.image);
   }
 
+
+/** 모든 이벤트 조회 (진행 중 + 종료된 이벤트) */
+@Get('events')
+getAllEvents() {
+  return this.eventService.getAllEvents();
+}
+
+
+/** 진행 중인 이벤트 조회 */
+@Get('active')
+getActiveEvents() {
+  return this.eventService.getActiveEvents();
+}
+
+/** 종료된 이벤트 조회 */
+@Get('closed')
+getClosedEvents() {
+  return this.eventService.getClosedEvents();
+}
+
   /**
    * 특정 이벤트 조회 API
    * [GET] /event/:eventId
@@ -28,14 +48,11 @@ export class EventController {
     return this.eventService.getEvent(eventId);
   }
 
-  /**
-   * 모든 이벤트 조회 API
-   * [GET] /event/events
-   */
-  @Get('events')
-  getAllEvents() {
-    return this.eventService.getAllEvents();
-  }
+/** 이벤트 종료 */
+@Patch('close/:eventId')
+closeEvent(@Param('eventId') eventId: number) {
+  return this.eventService.closeEvent(eventId);
+}
 
   /**
    * 이벤트 수정 API
@@ -49,12 +66,9 @@ export class EventController {
     return this.eventService.updateEvent(eventId, body.title, body.content, body.image);
   }
 
-  /**
-   * 이벤트 삭제 API
-   * [DELETE] /event/:eventId
-   */
-  @Delete(':eventId')
-  deleteEvent(@Param('eventId') eventId: number) {
-    return this.eventService.deleteEvent(eventId);
-  }
+/** 이벤트 완전 삭제 (DB에서 삭제) */
+@Delete(':eventId')
+deleteEvent(@Param('eventId') eventId: number) {
+  return this.eventService.deleteEvent(eventId);
+}
 }
