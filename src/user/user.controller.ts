@@ -15,9 +15,16 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  // 회원가입
+  @Post('/auth/sign-up')
+  async signUp(@Body() createUserDto: CreateUserDto) {
+    return this.userService.signUp(createUserDto);
+  }
+
+  // 이메일 인증코드 전송
+  @Post('/auth/send-code')
+  async sendCode(@Body() email: string) {
+    return this.userService.sendCode(email);
   }
 
   @Get()
@@ -38,5 +45,11 @@ export class UserController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
+  }
+
+  // 랭킹 api
+  @Get('ranking')
+  getRanking() {
+    return this.userService.getRanking();
   }
 }
