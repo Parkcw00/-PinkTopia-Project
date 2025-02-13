@@ -17,12 +17,30 @@ export class UserRepository {
   ) {}
 
   //랭킹조회
-  async findUsersByCollectionPoint(): Promise<User[]> {
-    return this.userRepository.find({
+  async findUsersByCollectionPoint(): Promise<Partial<User>[]> {
+    return await this.userRepository.find({
+      select: ['nickname', 'collection_point'],
       order: {
-        collection_point: 'ASC',
+        collection_point: 'DESC',
       },
     });
+  }
+
+  async findUsersByAchievement(): Promise<
+    { nickname: string; achievementCount: number }[]
+  > {
+    const users = await this.userRepository.find({
+      relations: ['achievement_c'],
+      order: {
+        achievement_c: {
+          id: 'DESC',
+        },
+      },
+    });
+    return users.map((user) => ({
+      nickname: user.nickname,
+      achievementCount: user.achievement_c.length, // 달성 업적의 개수 계산
+    }));
   }
   // 닉네임으로 찾기
   async findNickname(nickname: string) {

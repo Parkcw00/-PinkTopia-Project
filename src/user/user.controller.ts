@@ -15,6 +15,18 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  // 포인트랭킹api
+  @Get('ranking/point')
+  async getRanking() {
+    return await this.userService.getRanking();
+  }
+
+  // 달성 업적 랭킹api
+  @Get('ranking/achievement')
+  async getRankingAchievement() {
+    return await this.userService.getRankingAchievement();
+  }
+
   // 회원가입
   @Post('/auth/sign-up')
   async signUp(@Body() createUserDto: CreateUserDto) {
@@ -45,11 +57,5 @@ export class UserController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(+id);
-  }
-
-  // 랭킹 api
-  @Get('ranking')
-  getRanking() {
-    return this.userService.getRanking();
   }
 }
