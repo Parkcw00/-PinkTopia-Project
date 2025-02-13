@@ -29,11 +29,11 @@ export class StoreItemController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateStoreItemDto: UpdateStoreItemDto) {
-    return this.storeItemService.update(+id, updateStoreItemDto);
+    return this.storeItemService.updateStoreItem(+id, updateStoreItemDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.storeItemService.remove(+id);
+    return this.storeItemService.deleteStoreItem(+id);
   }
 }

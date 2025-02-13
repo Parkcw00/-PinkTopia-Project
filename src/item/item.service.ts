@@ -1,26 +1,81 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
+import { ItemRepository } from './item.repository';
+import { StoreItemRepository } from '../store-item/store-item.repository';
+import { StoreItem } from '../store-item/entities/store-item.entity';
+// import { UserInfo } from 'src/auth/user-info.decorator';
 
 @Injectable()
 export class ItemService {
-  create(createItemDto: CreateItemDto) {
-    return 'This action adds a new item';
+  constructor(
+    private readonly itemRepository: ItemRepository,
+    private readonly storeItemRepository: StoreItemRepository,
+  ) {}
+
+  async findStoreItemById(storeItemId: number): Promise<StoreItem | null> {
+    return this.storeItemRepository.findOne(storeItemId);
   }
 
-  findAll() {
-    return `This action returns all item`;
+  async purchaseItem(/*userInfo: UserInfo,*/ createItemDto: CreateItemDto) {
+    const { storeItemId } = createItemDto;
+    const storeItem = await this.storeItemRepository.findOne(storeItemId);
+    if (!storeItem) {
+      throw new NotFoundException('상점에 존재하지 않는 아이템입니다.');
+    }
+    return this.itemRepository.buyItem(createItemDto);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} item`;
+  async findAll() {
+    return await this.itemRepository.findAll();
   }
 
-  update(id: number, updateItemDto: UpdateItemDto) {
-    return `This action updates a #${id} item`;
+  async findOne(id: number) {
+    return await this.itemRepository.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} item`;
+  // async update(id: number, updateItemDto: UpdateItemDto) {
+  //   const item = await this.itemRepository.findOne(id);
+  // if (!item) {
+  //   throw new NotFoundException('아이템을 찾을 수 없습니다.');
+  // }
+
+  // // 수량 감소 로직
+  // if (updateItemDto.count && item.count < updateItemDto.count) {
+  //   throw new Error('아이템 수량이 부족합니다.');
+  // }
+
+  // item.count -= updateItemDto.count || 0;
+
+  // return this.itemRepository.updateItem(id, { ...updateItemDto, count: item.count });
+  // }
+
+  async sellItem(id: number) {
+    const item = await this.itemRepository.findOne(id);
+    if (!item) {
+      throw new NotFoundException('아이템을 찾을 수 없습니다.');
+    }
+
+    const storeItem = await this.storeItemRepository.findOne(item.store_item.id);
+    if (!storeItem) {
+      throw new NotFoundException('상점에 존재하지 않는 아이템입니다.');
+    }
+
+    // 수량 감소 로직
+    if (item.count <= 0) {
+      throw new Error('현재 보유한 아이템 수량이 부족합니다.');
+    }
+
+    item.count -= 1;
+    const refundAmount = storeItem.gem_price * 0.5;
+
+    if (item.count === 0) {
+      await this.itemRepository.deleteItem(id);
+    } else {
+      await this.itemRepository.updateItem(id, { count: item.count });
+    }
+
+    return { refundAmount };
   }
+
 }

@@ -2,15 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateStoreItemDto } from './dto/create-store-item.dto';
 import { UpdateStoreItemDto } from './dto/update-store-item.dto';
 import { StoreItem } from './entities/store-item.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import { StoreItemRepository } from './store-item.repository';
 // import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class StoreItemService {
   constructor(
-    @InjectRepository(StoreItem)
-    private storeItemRepository: Repository<StoreItem>,
+    private storeItemRepository: StoreItemRepository,
     // @InjectRepository(User)
     // private userRepository: Repository<User>,
     ) {}
@@ -26,9 +24,9 @@ export class StoreItemService {
     //   );
     // }
 
-    const storeItem = this.storeItemRepository.create(createStoreItemDto);
+    const storeItem = await this.storeItemRepository.addShopItem(createStoreItemDto);
 
-    return this.storeItemRepository.save(storeItem);
+    return storeItem;
   }
 
   async findAll(): Promise<StoreItem[]> {
@@ -41,7 +39,7 @@ export class StoreItemService {
     //     '조회할 수 있는 권한이 존재하지 않습니다.',
     //   );
     // }
-    return this.storeItemRepository.find();
+    return this.storeItemRepository.findAll();
   }
 
   async findOne(id: number): Promise<StoreItem> {
@@ -55,14 +53,14 @@ export class StoreItemService {
     //   );
     // }
 
-    const storeItem = await this.storeItemRepository.findOne({ where: { id } });
+    const storeItem = await this.storeItemRepository.findOne(id);
     if (!storeItem) {
       throw new NotFoundException('존재하지 않는 상점 아이템입니다.');
     }
     return storeItem;
   }
 
-  async update(id: number, updateStoreItemDto: UpdateStoreItemDto) {
+  async updateStoreItem(id: number, updateStoreItemDto: UpdateStoreItemDto): Promise<StoreItem | null> {
     // const checkMember = await this.userRepository.findOne({
     //   where: { id: userId },
     // });
@@ -72,15 +70,15 @@ export class StoreItemService {
     //   );
     // }
 
-    const storeItem = await this.storeItemRepository.findOne({ where: { id } });
+    const storeItem = await this.storeItemRepository.findOne(id);
     if (!storeItem) {
       throw new NotFoundException('존재하지 않는 상점 아이템입니다.');
     }
 
-    return this.storeItemRepository.update(id, updateStoreItemDto);
+    return this.storeItemRepository.updateStoreItem(id, updateStoreItemDto);
   }
 
-      async remove(id: number) {  
+      async deleteStoreItem(id: number) {  
     // const checkMember = await this.userRepository.findOne({
     //   where: { id: userId },
     // });
@@ -90,11 +88,11 @@ export class StoreItemService {
     //   );
     // }
 
-    const storeItem = await this.storeItemRepository.findOne({ where: { id } });
+    const storeItem = await this.storeItemRepository.findOne(id);
     if (!storeItem) {
       throw new NotFoundException('존재하지 않는 상점 아이템입니다.');
     }
 
-    return this.storeItemRepository.delete(id);
+    return this.storeItemRepository.deleteStoreItem(id);
   }
 }
