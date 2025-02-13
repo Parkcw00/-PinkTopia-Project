@@ -22,21 +22,21 @@ export class CommentController {
 
   @Get()
   findAll() {
-    return this.commentService.findAll();
+    return this.commentService.findComments();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.commentService.findOne(+id);
+    return this.commentService.findComment(+id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
-    return this.commentService.update(+id, updateCommentDto);
+    return this.commentService.updateComment(+id, updateCommentDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.commentService.remove(+id);
+    return this.commentService.deleteComment(+id);
   }
 }
