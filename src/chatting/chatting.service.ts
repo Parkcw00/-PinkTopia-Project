@@ -1,14 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { CreateChattingDto } from './dto/create-chatting.dto';
-import { UpdateChattingDto } from './dto/update-chatting.dto';
+import { ChattingRepository } from './chatting.repository';
 
 @Injectable()
 export class ChattingService {
-  create(createChattingDto: CreateChattingDto) {
-    return 'This action adds a new chatting';
+  constructor(private readonly chattingRepository: ChattingRepository) {}
+
+  create(chatting_room_id: string, createChattingDto: CreateChattingDto) {
+    return this.chattingRepository.create(chatting_room_id, createChattingDto);
   }
 
-  findAll() {
-    return `This action returns all chatting`;
+  findAll(chatting_room_id: string) {
+    return this.chattingRepository.findAll(chatting_room_id);
   }
 }
