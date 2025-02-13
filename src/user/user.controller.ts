@@ -27,22 +27,29 @@ export class UserController {
     return await this.userService.getRankingAchievement();
   }
 
-  // 회원가입
+  // 회원가입, 이메일 인증코드 전송
   @Post('/auth/sign-up')
   async signUp(@Body() createUserDto: CreateUserDto) {
-    return this.userService.signUp(createUserDto);
+    await this.userService.signUp(createUserDto);
+    return await this.userService.sendCode(createUserDto.email, createUserDto.password);
   }
 
-  // 이메일 인증코드 전송
+  // 이메일 인증코드 전송(회원가입시 인증 안하고 페이지 종료한 클라이언트용)
   @Post('/auth/send-code')
-  async sendCode(@Body() body:{email: string}) {
-    return this.userService.sendCode(body.email);
+  async sendCode(@Body() body:{email: string, password: string}) {
+    return this.userService.sendCode(body.email, body.password);
   }
 
   // 이메일 인증
   @Post('/auth/verify-code')
   async verifyCode(@Body() body: {email: string, verificationCode: string}) {
     return this.userService.verifyCode(body.email, body.verificationCode)
+  }
+
+  // 로그인
+  @Post('/auth/login')
+  async logIn(@Body() body: {email: string, password: string}){
+    return this.userService.logIn(body.email, body.password)
   }
 
   @Get()

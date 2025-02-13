@@ -55,7 +55,6 @@ export class UserService {
         hashedPassword,
         birthday,
       );
-      return { message: `${email}로 이메일 인증을 진행해 주세요.` };
     } catch (err) {
       throw new InternalServerErrorException(
         '유저 정보 저장 중 오류가 발생하였습니다.',
@@ -64,14 +63,26 @@ export class UserService {
   }
 
   // 이메일 인증 코드 전송
-  async sendCode(email: string) {
+  async sendCode(email: string, password: string) {
     if(!email) {
       throw new BadRequestException('이메일을 입력해 주세요');
+    }
+    if(!password) {
+      throw new BadRequestException('비밀번호를 입력해 주세요');
     }
 
     const existEmail = await this.userRepository.findEmail(email);
     if (!existEmail) {
       throw new BadRequestException('존재하는지 않는 이메일입니다.');
+    }
+    
+    const isPasswordMatched = bcrypt.compareSync(password, existEmail.password)
+    if(!isPasswordMatched) {
+      throw new BadRequestException('일치하지 않는 사용자입니다.');
+    }
+
+    if(existEmail.email_verify === true) {
+      throw new BadRequestException('이미 인증을 완료한 사용자입니다.')
     }
 
     try {
@@ -79,7 +90,6 @@ export class UserService {
       await this.userRepository.updateVerificationCode(email, verificationCode);
       return { message: `${email}로 인증코드를 발송하였습니다.` };
     } catch (err) {
-      console.log(err);
       throw new InternalServerErrorException(
         '이메일 전송 중 오류가 발생하였습니다.',
       );
@@ -98,6 +108,9 @@ export class UserService {
     if (!existEmail) {
       throw new BadRequestException('존재하는지 않는 이메일입니다.');
     }
+    if(existEmail.email_verify === true) {
+      throw new BadRequestException('이미 인증을 완료한 사용자입니다.')
+    }
     if(existEmail.verification_code !== verificationCode) {
       throw new BadRequestException('인증번호가 일치하지 않습니다.')
     }
@@ -109,6 +122,26 @@ export class UserService {
       throw new InternalServerErrorException(
         '이메일 인증 중 오류가 발생하였습니다.',
       );
+    }
+  }
+
+  // 로그인
+  async logIn(email: string, password: string) {
+    if(!email) {
+      throw new BadRequestException('이메일을 입력해 주세요');
+    }
+    if(!password) {
+      throw new BadRequestException('비밀번호를 입력해 주세요');
+    }
+
+    const existEmail = await this.userRepository.findEmail(email);
+    if (!existEmail) {
+      throw new BadRequestException('존재하는지 않는 이메일입니다.');
+    }
+    
+    const isPasswordMatched = bcrypt.compareSync(password, existEmail.password)
+    if(!isPasswordMatched) {
+      throw new BadRequestException('비밀번호가 틀렸습니다.');
     }
   }
 
