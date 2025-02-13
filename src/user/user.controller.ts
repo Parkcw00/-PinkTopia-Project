@@ -34,7 +34,7 @@ export class UserController {
     return await this.userService.sendCode(createUserDto.email, createUserDto.password);
   }
 
-  // 이메일 인증코드 전송(회원가입시 인증 안하고 페이지 종료한 클라이언트용)
+  // 이메일 인증코드 전송(인증코드 재전송, 회원가입은 하고 인증 안한 사용자용)
   @Post('/auth/send-code')
   async sendCode(@Body() body:{email: string, password: string}) {
     return this.userService.sendCode(body.email, body.password);
