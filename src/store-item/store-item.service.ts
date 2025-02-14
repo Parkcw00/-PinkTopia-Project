@@ -78,7 +78,7 @@ export class StoreItemService {
     return this.storeItemRepository.updateStoreItem(id, updateStoreItemDto);
   }
 
-      async deleteStoreItem(id: number) {  
+  async deleteStoreItem(id: number) {  
     // const checkMember = await this.userRepository.findOne({
     //   where: { id: userId },
     // });
