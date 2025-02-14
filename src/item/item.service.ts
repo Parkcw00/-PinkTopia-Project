@@ -18,13 +18,13 @@ export class ItemService {
     const { storeItemId, inventoryId, count } = createItemDto;
 
     // StoreItem 테이블에서 아이템 확인
-    const storeItem = await this.storeItemRepository.findOne(storeItemId);
+    const storeItem = await this.storeItemRepository.storeItemFindOne(storeItemId);
     if (!storeItem) {
         throw new NotFoundException('상점에 존재하지 않는 아이템입니다.');
     }
 
     // Inventory 테이블에서 인벤토리 확인
-    const inventory = await this.inventoryRepository.findOne(inventoryId);
+    const inventory = await this.inventoryRepository.findOneByInventoryId(inventoryId);
     if (!inventory) {
         throw new NotFoundException('존재하지 않는 인벤토리입니다.');
     }
@@ -51,12 +51,12 @@ export class ItemService {
   }
 
   async sellItem(id: number) {
-    const item = await this.itemRepository.findOne(id);
+    const item = await this.itemRepository.findOneByItemId(id);
     if (!item) {
       throw new NotFoundException('아이템을 찾을 수 없습니다.');
     }
 
-    const storeItem = await this.storeItemRepository.findOne(item.store_item.id);
+    const storeItem = await this.storeItemRepository.storeItemFindOne(id);
     if (!storeItem) {
       throw new NotFoundException('상점에 존재하지 않는 아이템입니다.');
     }

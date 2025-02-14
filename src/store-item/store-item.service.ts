@@ -53,7 +53,7 @@ export class StoreItemService {
     //   );
     // }
 
-    const storeItem = await this.storeItemRepository.findOne(id);
+    const storeItem = await this.storeItemRepository.storeItemFindOne(id);
     if (!storeItem) {
       throw new NotFoundException('존재하지 않는 상점 아이템입니다.');
     }
@@ -70,7 +70,7 @@ export class StoreItemService {
     //   );
     // }
 
-    const storeItem = await this.storeItemRepository.findOne(id);
+    const storeItem = await this.storeItemRepository.storeItemFindOne(id);
     if (!storeItem) {
       throw new NotFoundException('존재하지 않는 상점 아이템입니다.');
     }
@@ -88,7 +88,7 @@ export class StoreItemService {
     //   );
     // }
 
-    const storeItem = await this.storeItemRepository.findOne(id);
+    const storeItem = await this.storeItemRepository.storeItemFindOne(id);
     if (!storeItem) {
       throw new NotFoundException('존재하지 않는 상점 아이템입니다.');
     }

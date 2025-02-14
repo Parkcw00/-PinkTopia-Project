@@ -19,7 +19,7 @@ export class StoreItemRepository {
     }
 
     // 상점 아이템 조회
-    async findOne(id: number): Promise<StoreItem | null> {
+    async storeItemFindOne(id: number): Promise<StoreItem | null> {
         return this.storeItemRepository.findOne({ where: { id } });
     }
     
@@ -34,7 +34,7 @@ export class StoreItemRepository {
     async updateStoreItem(id: number, updateStoreItemDto: UpdateStoreItemDto): Promise<StoreItem | null> {
         const storeItem = plainToInstance(StoreItem, updateStoreItemDto);
         await this.storeItemRepository.update(id, storeItem);
-        return this.findOne(id);
+        return this.storeItemFindOne(id);
     }
 
     // 상점 아이템 삭제 

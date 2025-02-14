@@ -30,5 +30,9 @@ export class InventoryRepository {
         return this.itemRepository.findOne({ where: { id } });
     }
 
+    async findOneByInventoryId(id: number) {
+        return this.inventoryRepository.findOne({ where: { id } });
+    }
+
 
 }
