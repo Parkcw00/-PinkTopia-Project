@@ -42,6 +42,7 @@ export class UserRepository {
       achievementCount: user.achievement_c.length, // 달성 업적의 개수 계산
     }));
   }
+  
   // 닉네임으로 찾기
   async findNickname(nickname: string) {
     return await this.userRepository.findOne({
@@ -69,5 +70,18 @@ export class UserRepository {
       password,
       ...(birthday && { birthday }),
     });
+  }
+
+  // 이메일 인증코드 업데이트
+  async updateVerificationCode(email: string, verificationCode: string) {
+    return await this.userRepository.update(
+      { email },
+      { verification_code: verificationCode },
+    );
+  }
+
+  // 이메일 인증성공 후 email_verify true로 변경
+  async successVerification(email: string) {
+    return await this.userRepository.update({ email }, { email_verify: true });
   }
 }
