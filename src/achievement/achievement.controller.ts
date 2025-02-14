@@ -31,45 +31,25 @@ export class AchievementController {
   async findAll() {
    return  await this.achievementService.findAll();    
   }
-/*
+
   // 활성화 목록 조회
   @Get('active')
-  async findAllActive() {
-    const activeAchievements = await this.achievementService.findAllActive();
-    if (!activeAchievements || activeAchievements.length === 0) {
-      throw new NotFoundException('활성화된 업적이 없습니다.');
-    }
-    return activeAchievements;
+  async findAllActive() {    
+    return await this.achievementService.findAllActive();
   }
 
   // 카테고리별 조회회
   // 'achievement/?category=OOO'
   @Get('by-category')
   async findByCategory(@Query('category') category?: string) {
-    if (!category) {
-      throw new BadRequestException('category 값이 없습니다.');
-    }
-    
-    const filteredAchievements = await this.achievementService.findCategory(category);
-    if (!filteredAchievements || filteredAchievements.length === 0) {
-      throw new NotFoundException(`"${category}" 카테고리에 해당하는 업적이 없습니다.`);
-    }
-
-    return filteredAchievements;
+    // category ?? '' → undefined일 경우 빈 문자열을 기본값으로 설정.
+    return await this.achievementService.findCategory(category ?? '');
   }
-
-  // 상세 조회회
+  
+  // 상세 조회
   @Get(':achievementId')
   async findOne(@Param('achievementId') achievementId: string) {
-    const id = Number(achievementId);
-if (!id) {
-  throw new BadRequestException('achievementId 값이 없거나 형식이 맞지 않습니다');
-}
-    const achievement = await this.achievementService.findOne(id);
-    if (!achievement) {
-      throw new NotFoundException(`ID ${id}에 해당하는 업적을 찾을 수 없습니다.`);
-    }
-    return achievement;
+    return await this.achievementService.findOne(achievementId);
   }
 
   // 수정
@@ -77,36 +57,15 @@ if (!id) {
   async update(
     @Param('achievementId') achievementId: string,      
     @Body() updateAchievementDto: UpdateAchievementDto,
-  ) {const id = Number(achievementId);
-  if (!id) {
-    throw new BadRequestException('achievementId 값이 없거나 타이에 맞지 않습니다');
-  }
-    if (!updateAchievementDto || Object.keys(updateAchievementDto).length === 0) {
-      throw new BadRequestException('수정할 데이터를 입력하세요.');
+  ) {  
+    return await this.achievementService.update(achievementId, updateAchievementDto);
     }
-
-    const updatedAchievement = await this.achievementService.update(id, updateAchievementDto);
-    if (!updatedAchievement) {
-      throw new NotFoundException(`ID ${id}에 해당하는 업적을 수정할 수 없습니다.`);
-    }
-
-    return updatedAchievement;
-  }
 
 
   // 삭제
   @Delete(':achievementId')
   async remove(@Param('achievementId') achievementId: string      ) {
-    const id = Number(achievementId);
-  if (!id) {
-    throw new BadRequestException('achievementId 값이 없거나 타이에 맞지 않습니다');
+    return await this.achievementService.remove(achievementId);
   }
-  const deleted = await this.achievementService.remove(id);
-    if (!deleted) {
-      throw new NotFoundException(`ID ${id}에 해당하는 업적을 삭제할 수 없습니다.`);
-    }
 
-    return { message: `ID ${id} 업적이 성공적으로 삭제되었습니다.` };
-  }
-    */
 }

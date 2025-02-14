@@ -11,22 +11,17 @@ import {User} from '../user/entities/user.entity';
 export class AchievementPRepository {
   constructor(
     @InjectRepository(AchievementP)
-    private readonly repository: Repository<AchievementP>,
-
-    private readonly userEntity: User,
-    private readonly entityC: Repository<AchievementC>,
-        private readonly entityP: Repository<AchievementP>,
-
-
-
+    private readonly entity: Repository<AchievementP>
   ) {}
 
-  async findById(id: number): Promise<AchievementP | null> {
-    return this.repository.findOne({ where: { id } });
-  }
+  
+    // 하나만 조회
+    async findOne(id: number): Promise<AchievementP | null>{
+      return await this.entity.findOne({ where: { id } });
+    }
+    
 
-  async updateAchievementP(id: number, data: Partial<AchievementP>): Promise<AchievementP | null> {
-    await this.repository.update(id, data);
-    return this.findById(id);
-  }
+  async updateP(id: number): Promise<void> {
+    await this.entity.update(id, {complete:true});
+}
 }

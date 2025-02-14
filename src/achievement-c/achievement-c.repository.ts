@@ -12,9 +12,18 @@ export class AchievementCRepository {
     private readonly entityP: Repository<AchievementP>,
   ) {}
 
+  // 존재여부확인. 유저id, 업적id
+  async isExists(user_id:number, achievement_id:number): Promise<AchievementC | null>{
+    return await this.entityC.findOne({ where: { user_id, achievement_id} });
+  }
+  // 생성
   async create(data: Partial<AchievementC>): Promise<AchievementC> {
     const achievementC = await this.entityC.create(data);
     return await this.entityC.save(achievementC);
+  }
+    // 반드시 save()를 호출해야 데이터베이스에 저장됨.
+  async save(achievement: AchievementC): Promise<AchievementC> {
+    return await this.entityC.save(achievement);
   }
 
 // 완료타이틀로 상세목록 조회

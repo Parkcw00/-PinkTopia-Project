@@ -8,7 +8,14 @@ export class AchievementCService {
   constructor(private readonly repository: AchievementCRepository,) {}
   
   async create(createAchievementCDto: CreateAchievementCDto) {
-    return await this.repository.create(createAchievementCDto);
+    if (!createAchievementCDto) {
+      throw new BadRequestException('올바른 데이터를 입력하세요.');
+    }
+
+    // 유저id, 업적id로 검색 -> 겹치나 확인
+    const isExists = await this.repository.isExists(createAchievementCDto.user_id, createAchievementCDto.achievement_id);
+    const creatC = await this.repository.create(createAchievementCDto);
+    return await this.repository.save(creatC);
   }
 
   // 완료업적 하나 조회
@@ -46,9 +53,6 @@ export class AchievementCService {
   async findAll() {
     return await this.repository.findAll()
   }
-
-
-
 
 
   async remove(id: string) {

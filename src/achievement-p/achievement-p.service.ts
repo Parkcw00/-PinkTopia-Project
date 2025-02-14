@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAchievementPDto } from './dto/create-achievement-p.dto';
 import { UpdateAchievementPDto } from './dto/update-achievement-p.dto';
 
@@ -11,41 +11,25 @@ export class AchievementPService {
   
 
 
-  create(createAchievementPDto: CreateAchievementPDto) {
-    return 'This action adds a new achievementP';
-  }
-
-  findAll() {
-    return `This action returns all achievementP`;
-  }
-
-  findOne(id:string) {
-    return `This action returns a #${id} achievementP`;
-  }
-
-  update(id: string, updateAchievementPDto: UpdateAchievementPDto) {
-    return `This action updates a #${id} achievementP`;
-/**
-    const id = Number(achievementId);
-  if (!id) {
-    throw new BadRequestException('achievementId 값이 없거나 타이에 맞지 않습니다');
-  }
-    if (!updateAchievementPDto || Object.keys(updateAchievementPDto).length === 0) {
-      throw new BadRequestException('수정할 데이터를 입력하세요.');
+  async update(id: string) : Promise<{message:string}>{
+    const idA = Number(id);
+    if (!idA) {
+      throw new BadRequestException('achievementId 값이 없거나 형식이 맞지 않습니다');
     }
-
-    const updatedAchievementP = this.achievementPService.update(id, updateAchievementPDto);
-    if (!updatedAchievementP) {
-      throw new NotFoundException(`ID ${id}에 해당하는 업적을 수정할 수 없습니다.`);
+    const isExists = await this.repository.findOne(idA)
+    if(!isExists){
+      throw new NotFoundException(`ID ${id}에 해당하는 업적이 존재하지 않습니다.`);
     }
-    return updatedAchievementP; */
+    if(isExists.complete){
+      throw new NotFoundException(`이미 달성한 업적입니다.`);
+    }
+    await this.repository.updateP(idA)
 
-
-
-
+     // 업데이트 후 다시 조회하여 확인
+  const isUpdated = await this.repository.findOne(idA);
+  if (!isUpdated?.complete) {
+    throw new NotFoundException(`업데이트 실패`);
   }
-
-  remove(id: number) {
-    return `This action removes a #${id} achievementP`;
+    return {message : '서브업적 달성!'}
   }
 }
