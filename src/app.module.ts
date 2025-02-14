@@ -24,6 +24,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AchievementCModule } from './achievement-c/achievement-c.module';
+import { UploadModule } from './upload/upload.module';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -86,6 +87,7 @@ const typeOrmModuleOptions = {
     DirectionModule,
     ChatmemberModule,
     ChatblacklistModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
