@@ -1,3 +1,14 @@
+db 사용하면 레퍼지토리 만들어주기!
+3레이어로 만들어쓰기
+
+싱글톤
+싱글톤은 1클레스 1기능
+하나의 인스턴스생성
+
+테스트코드 실행(둘 중하나)
+npm run test achievement-c.repository
+npx jest src/achievement/achievement-c.repository.spec.ts
+
 깃허브 규칙
 
 - 카멜케이스(camelCase)
@@ -6,3 +17,7 @@
 - 클래스는 파스칼케이스
 - 첫 글자도 대문자 표기, 이어지는 단어의 첫 글자도 대문자로 표기해주세요.
 - 예) ‘GoodPerson’, ‘UserClass’
+
+
+npm  우회 설치 <- 검색
+--legacy-peer-deps

@@ -5,23 +5,20 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   OneToMany,
+  Unique,
 } from 'typeorm';
 import { AchievementCategory } from '../enums/achievement-category.enum'; // Enum 파일 import
 import { SubAchievement } from 'src/sub-achievement/entities/sub-achievement.entity';
 import { AchievementC } from 'src/achievement-c/entities/achievement-c.entity';
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 @Entity({ name: 'achievement' })
+@Unique(['title'])
 export class Achievement {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   @PrimaryGeneratedColumn()
   id: number;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   @Column({ type: 'varchar', length: 255, nullable: false })
   title: string;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   @Column({
     type: 'enum',
     enum: AchievementCategory,
@@ -29,19 +26,23 @@ export class Achievement {
   })
   category: AchievementCategory;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   @Column({ type: 'varchar', length: 255, nullable: false })
   reward: string;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  
+  @Column({ type: 'text', nullable: false }) 
+  content: string; 
+
+  // 만료일 컬럼 추가
+  @CreateDateColumn()
+  expiration_at: Date;
+
   @CreateDateColumn()
   updated_at: Date;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   @CreateDateColumn()
   created_at: Date;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   @DeleteDateColumn()
   deleted_at: Date;
 

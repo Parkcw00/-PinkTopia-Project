@@ -12,6 +12,7 @@ export class SubAchievementService {
     return `This action returns all subAchievement`;
   }
 
+
   findOne(id: number) {
     return `This action returns a #${id} subAchievement`;
   }
