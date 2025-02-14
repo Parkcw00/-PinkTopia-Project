@@ -78,8 +78,9 @@ export class UserGuard implements CanActivate {
         id: decoded.id, // JWT 생성 시 sub에 user.id 저장
         email: decoded.email, // 이메일 정보도 저장
       };
-
-      response.setHeader('Authorization', `Bearer ${accessToken}`);
+      if (refreshToken) {
+        response.setHeader('Authorization', `Bearer ${accessToken}`);
+      }
     } catch (err) {
       throw new InternalServerErrorException(
         '오류가 발생하였습니다.',
