@@ -161,14 +161,6 @@ export class UserService {
         '관리자에게 문의해 주세요',
       );
     }
-    accessTokenExpiresIn = accessTokenExpiresIn.slice(
-      0,
-      accessTokenExpiresIn.length - 1,
-    );
-    refreshTokenExpiresIn = refreshTokenExpiresIn.slice(
-      0,
-      refreshTokenExpiresIn.length - 1,
-    );
 
     const accessToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
@@ -178,6 +170,15 @@ export class UserService {
       secret: this.configService.get<string>('REFRESH_TOKEN_SECRET_KEY'),
       expiresIn: refreshTokenExpiresIn,
     });
+
+    accessTokenExpiresIn = accessTokenExpiresIn.slice(
+      0,
+      accessTokenExpiresIn.length - 1,
+    );
+    refreshTokenExpiresIn = refreshTokenExpiresIn.slice(
+      0,
+      refreshTokenExpiresIn.length - 1,
+    );
     res.cookie('accessToken', accessToken, {
       maxAge:
         1000 *
