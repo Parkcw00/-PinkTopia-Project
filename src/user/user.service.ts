@@ -182,22 +182,6 @@ export class UserService {
     return res.status(200).json({ message: '로그인이 되었습니다.' });
   }
 
-  findAll() {
-    return `This action returns all user`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
-
   // 인증 코드 메일 보내는 메서드
   private async sendVerificationCode(email: string) {
     const EMAIL_SERVICE = this.configService.get<string>('EMAIL_SERVICE');

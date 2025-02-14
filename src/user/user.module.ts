@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
@@ -8,7 +8,9 @@ import { Chatting } from 'src/chatting/entities/chatting.entity';
 import { AchievementC } from 'src/achievement-c/entities/achievement-c.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { UserGuard } from './guards/user-guard';
 
+@Global()
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Chatting, AchievementC]),
@@ -28,6 +30,7 @@ import { ConfigService } from '@nestjs/config';
     }),
   ],
   controllers: [UserController],
-  providers: [UserService, UserRepository],
+  providers: [UserService, UserRepository, UserGuard],
+  exports: [UserGuard, JwtModule, UserRepository]
 })
 export class UserModule {}
