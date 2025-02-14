@@ -17,21 +17,20 @@ export class Collection {
   @PrimaryGeneratedColumn() // 기본키 생성
   id: number; // 타입 지정(숫자타입)
 
-  @Column({ type: 'varchar', length: 50, nullable: false })
-  name: string; // 핑크몽 이름
-
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
   @ManyToOne(() => Pinkmong, (pinkmong) => pinkmong.collection)
   @JoinColumn({ name: 'pinkmong_id' })
   pinkmong: Pinkmong;
+
   @Column({ type: 'int', nullable: false })
   pinkmong_id: number;
 
   @ManyToOne(() => User, (user) => user.collection)
   @JoinColumn({ name: 'user_id' })
   user: User;
+
   @Column({ type: 'int', nullable: false })
   user_id: number;
 }
