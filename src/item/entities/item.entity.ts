@@ -9,7 +9,7 @@ import {
   Unique,
 } from 'typeorm';
 
-@Entity({ name: 'items' })
+@Entity({ name: 'item' })
 @Unique(['inventory_id', 'store_item_id'])
 export class Item {
   @PrimaryGeneratedColumn()
