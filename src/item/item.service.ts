@@ -34,16 +34,16 @@ export class ItemService {
     const item = await this.itemRepository.findOneByInventoryIdAndStoreItemId(inventoryId, storeItemId);
     if (item) {
         // 수량 증가 시 최대 수량 확인
-        if (storeItem.potion && item.count + count > 99) {
-            throw new Error('아이템 수량은 최대 99개까지만 구매할 수 있습니다.');
+        if (item.count + count >= 100) {
+            throw new NotFoundException('아이템 수량은 최대 99개까지만 구매할 수 있습니다.');
         }
         item.count += count;
         await this.itemRepository.updateItem(item.id, { count: item.count });
         return item;
     } else {
         // 새로운 아이템 생성 시 최대 수량 확인
-        if (storeItem.potion && count > 99) {
-            throw new Error('아이템 수량은 최대 99개까지만 구매할 수 있습니다.');
+        if (count >= 100) {
+            throw new NotFoundException('아이템 수량은 최대 99개까지만 구매할 수 있습니다.');
         }
         return await this.itemRepository.buyItem(createItemDto);
     }
