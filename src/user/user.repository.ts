@@ -42,6 +42,7 @@ export class UserRepository {
       achievementCount: user.achievement_c.length, // 달성 업적의 개수 계산
     }));
   }
+  
   // 닉네임으로 찾기
   async findNickname(nickname: string) {
     return await this.userRepository.findOne({

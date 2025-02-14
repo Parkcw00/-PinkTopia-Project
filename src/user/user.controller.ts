@@ -6,10 +6,12 @@ import {
   Patch,
   Param,
   Delete,
+  Res,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Response } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -48,8 +50,8 @@ export class UserController {
 
   // 로그인
   @Post('/auth/login')
-  async logIn(@Body() body: {email: string, password: string}){
-    return this.userService.logIn(body.email, body.password)
+  async logIn(@Body() body: {email: string, password: string}, @Res() res: Response){
+    return this.userService.logIn(body.email, body.password, res)
   }
 
   @Get()
