@@ -32,12 +32,6 @@ export class CommentController {
     return this.commentService.findComments(post_id);
   }
 
-  @ApiOperation({ summary: '댓글 조회' })
-  @Get(':post_id/comments/:id')
-  findOne(@Param('id') id: number) {
-    return this.commentService.findComment(+id);
-  }
-
   @ApiOperation({ summary: '댓글 수정' })
   @Patch(':post_id/comments/:id')
   update(@Param('id') id: number, @Body() updateCommentDto: UpdateCommentDto) {

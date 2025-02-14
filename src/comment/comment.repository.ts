@@ -19,8 +19,8 @@ export class CommentRepository {
     return await this.commentRepository.save(newComment);
   }
 
-  async findComments(): Promise<Comment[]> {
-    return await this.commentRepository.find();
+  async findComments(post_id: number): Promise<Comment[]> {
+    return await this.commentRepository.find({ where: { post_id } });
   }
 
   async findComment(id: number): Promise<Comment | null> {
