@@ -31,7 +31,6 @@ export class UserGuard implements CanActivate {
     const refreshTokenKey = this.configService.get<string>(
       'REFRESH_TOKEN_SECRET_KEY',
     );
-    try {
       // 둘 다 존재하지 않는 경우
       if (!accessToken && !refreshToken) {
         throw new UnauthorizedException('로그인을 진행해 주세요');
@@ -73,7 +72,7 @@ export class UserGuard implements CanActivate {
       if (!existuser) {
         throw new BadRequestException('인증되지 않은 사용자 입니다.');
       }
-
+      try {
       reqest.user  = {
         id: decoded.id, // JWT 생성 시 sub에 user.id 저장
         email: decoded.email, // 이메일 정보도 저장
