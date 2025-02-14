@@ -27,6 +27,10 @@ export class ItemRepository {
         return await this.itemRepository.findOne({ where: { id } });
     }
 
+    async findOneByInventoryIdAndStoreItemId(inventoryId: number, storeItemId: number) {
+        return await this.itemRepository.findOne({ where: { inventory_id: inventoryId, store_item_id: storeItemId } });
+    }
+
     async buyItem(createItemDto: CreateItemDto): Promise<Item> {
         const item = plainToInstance(Item, createItemDto);
         item.store_item_id = createItemDto.storeItemId;

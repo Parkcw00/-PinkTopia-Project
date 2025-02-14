@@ -10,13 +10,13 @@ import {
 import { ItemService } from './item.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
-import { userInfo } from 'os';
+// import { userInfo } from 'os';
 
 @Controller('item')
 export class ItemController {
   constructor(private readonly itemService: ItemService) {}
 
-  @Post() 
+  @Post() // 아이템 구매
   purchaseItem(
     // @userInfo() userInfo: UserInfo,
     @Body() createItemDto: CreateItemDto) {
@@ -39,7 +39,10 @@ export class ItemController {
   // }
 
   @Delete(':id')
-  sellItem(@Param('id') id: string) {
-    return this.itemService.sellItem(+id);
+  sellItem(
+    @Param('id') id: string,
+    @Body() updateItemDto: UpdateItemDto
+  ) {
+    return this.itemService.sellItem(+id, updateItemDto);
   }
 }
