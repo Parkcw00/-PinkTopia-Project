@@ -156,10 +156,8 @@ export class UserService {
       'REFRESH_TOKEN_EXPIRES_IN',
     );
     if (!accessTokenExpiresIn || !refreshTokenExpiresIn) {
-      console.log('token 환경 변수가 설정되지 않았습니다.')
-      throw new InternalServerErrorException(
-        '관리자에게 문의해 주세요',
-      );
+      console.log('token 환경 변수가 설정되지 않았습니다.');
+      throw new InternalServerErrorException('관리자에게 문의해 주세요');
     }
 
     const accessToken = this.jwtService.sign(payload, {
@@ -170,29 +168,15 @@ export class UserService {
       secret: this.configService.get<string>('REFRESH_TOKEN_SECRET_KEY'),
       expiresIn: refreshTokenExpiresIn,
     });
-
-    accessTokenExpiresIn = accessTokenExpiresIn.slice(
-      0,
-      accessTokenExpiresIn.length - 1,
-    );
     refreshTokenExpiresIn = refreshTokenExpiresIn.slice(
       0,
       refreshTokenExpiresIn.length - 1,
     );
-    res.cookie('accessToken', accessToken, {
-      maxAge:
-        1000 *
-        60 *
-        +accessTokenExpiresIn,
-      httpOnly: true,
-    });
+    
+
+    res.setHeader('Authorization', `Bearer ${accessToken}`);
     res.cookie('refreshToken', refreshToken, {
-      maxAge:
-        1000 *
-        60 *
-        60 *
-        24 *
-        +refreshTokenExpiresIn,
+      maxAge: 1000 * 60 * 60 * 24 * +refreshTokenExpiresIn,
       httpOnly: true,
     });
     return res.status(200).json({ message: '로그인이 되었습니다.' });
