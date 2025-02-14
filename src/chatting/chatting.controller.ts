@@ -6,6 +6,7 @@ import { CreateChattingDto } from './dto/create-chatting.dto';
 export class ChattingController {
   constructor(private readonly chattingService: ChattingService) {}
 
+  // 조회랑 채팅 생성 전부 유저 인증이 필요함
   @Post('chatting')
   create(
     @Param('chattingroomId') chatting_room_id: string,
