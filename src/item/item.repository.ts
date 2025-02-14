@@ -23,6 +23,7 @@ export class ItemRepository {
 
     async buyItem(createItemDto: CreateItemDto): Promise<Item> {
         const item = plainToInstance(Item, createItemDto);
+        item.store_item_id = createItemDto.storeItemId;
         return this.itemRepository.save(item);
     }
 
