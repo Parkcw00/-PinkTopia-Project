@@ -56,4 +56,11 @@ export class UserController {
   async logIn(@Body() body: {email: string, password: string}, @Res() res: Response){
     return this.userService.logIn(body.email, body.password, res)
   }
+
+  // 로그아웃
+  @UseGuards(UserGuard)
+  @Post('/auth/logout')
+  async logOut(@Request() req, @Res() res: Response){
+    return this.userService.logOut(req.user, res);
+  }
 }

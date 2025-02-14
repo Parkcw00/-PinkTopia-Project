@@ -182,6 +182,18 @@ export class UserService {
     return res.status(200).json({ message: '로그인이 되었습니다.' });
   }
 
+  // 로그아웃
+
+  async logOut(user: Request, @Res() res: Response) {
+    const accessToken = this.jwtService.sign(user, {
+      secret: this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
+      expiresIn: '0m',
+    });
+    res.setHeader('Authorization', `Bearer ${accessToken}`);
+    res.clearCookie('refreshToken');
+    return res.status(200).json({ message: '로그아웃이 되었습니다.' });
+  }
+
   // 인증 코드 메일 보내는 메서드
   private async sendVerificationCode(email: string) {
     const EMAIL_SERVICE = this.configService.get<string>('EMAIL_SERVICE');
