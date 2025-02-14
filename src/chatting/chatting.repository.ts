@@ -13,6 +13,7 @@ export class ChattingRepository {
 
   async create(chatting_room_id: string, createChattingDto: CreateChattingDto) {
     const chatting = this.chattingRepository.create({
+      user_id: 1,
       chatting_room_id: Number(chatting_room_id),
       ...createChattingDto,
     });
@@ -20,8 +21,20 @@ export class ChattingRepository {
   }
 
   async findAll(chatting_room_id: string) {
-    return await this.chattingRepository.find({
+    const results = await this.chattingRepository.find({
       where: { chatting_room_id: Number(chatting_room_id) },
+      relations: ['user'],
+      select: {
+        user: {
+          nickname: true,
+        },
+        message: true,
+      },
     });
+
+    return results.map((result) => ({
+      message: result.message,
+      nickname: result.user.nickname,
+    }));
   }
 }
