@@ -15,7 +15,11 @@ export class Item {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'int', nullable: false, default: 1 })
+  @Column({ 
+    type: 'int', 
+    nullable: false, 
+    default: 1
+  })
   count: number;
 
   @ManyToOne(() => Inventory, (inventory) => inventory.item, {
