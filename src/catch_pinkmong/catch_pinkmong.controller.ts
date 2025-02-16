@@ -22,7 +22,7 @@ export class CatchPinkmongController {
     return this.catchPinkmongService.appearPinkmong(userId);
   }
 
-  @Get('feeding/:catchId/:itemId')
+  @Get('catchpinkmong/feeding/:itemId')
   feeding(
     @Param('catchId', ParseIntPipe) catchId: number,
     @Param('itemId', ParseIntPipe) itemId: number,
