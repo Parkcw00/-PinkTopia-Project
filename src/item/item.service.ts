@@ -5,7 +5,6 @@ import { StoreItemRepository } from '../store-item/store-item.repository';
 import { Item } from './entities/item.entity';
 import { InventoryRepository } from '../inventory/inventory.repository';
 import { UpdateItemDto } from './dto/update-item.dto';
-// import { UserInfo } from 'src/auth/user-info.decorator';
 
 @Injectable()
 export class ItemService {
@@ -15,7 +14,7 @@ export class ItemService {
     private readonly inventoryRepository: InventoryRepository,
   ) {}
 
-  async purchaseItem(/*userInfo: UserInfo,*/ createItemDto: CreateItemDto): Promise<Item> {
+  async purchaseItem(userId: number, createItemDto: CreateItemDto): Promise<Item> {
     const { storeItemId, inventoryId, count } = createItemDto;
 
     // StoreItem 테이블에서 아이템 확인
@@ -57,7 +56,7 @@ export class ItemService {
     return await this.itemRepository.findOne(id);
   }
 
-  async sellItem(id: number, updateItemDto: UpdateItemDto) {
+  async sellItem(userId: number, id: number, updateItemDto: UpdateItemDto) {
     const sellCount = updateItemDto.count;
 
     const item = await this.itemRepository.findOneByItemId(id);
