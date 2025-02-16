@@ -4,9 +4,13 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Chatting } from 'src/chatting/entities/chatting.entity';
 import { AchievementC } from 'src/achievement-c/entities/achievement-c.entity';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserRepository {
+  findOneByUserId(userId: number) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Chatting)
@@ -83,5 +87,15 @@ export class UserRepository {
   // 이메일 인증성공 후 email_verify true로 변경
   async successVerification(email: string) {
     return await this.userRepository.update({ email }, { email_verify: true });
+  }
+
+  async findUserId(id: number) {
+    return await this.userRepository.findOne({
+      where: { id },
+    });
+  }
+
+  async updateUser(id: number, updateUserDto: UpdateUserDto) {
+    return await this.userRepository.update(id, updateUserDto);
   }
 }

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateItemDto {
 
@@ -17,4 +17,9 @@ export class CreateItemDto {
     @IsNumber()
     @ApiProperty({ example: '5' })
     count: number;
+
+    @IsNotEmpty()
+    @IsString()
+    @ApiProperty({ example: 'gem' })
+    paymentMethod: 'gem' | 'dia';
 }
