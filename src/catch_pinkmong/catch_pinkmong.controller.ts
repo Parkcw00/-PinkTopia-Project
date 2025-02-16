@@ -22,13 +22,16 @@ export class CatchPinkmongController {
     return this.catchPinkmongService.appearPinkmong(userId);
   }
 
-  // @Get()
-  // feeding() {
-  //   return this.catchPinkmongService.feeding();
-  // }
+  @Get('feeding/:catchId/:itemId')
+  feeding(
+    @Param('catchId', ParseIntPipe) catchId: number,
+    @Param('itemId', ParseIntPipe) itemId: number,
+  ) {
+    return this.catchPinkmongService.feeding(catchId, itemId);
+  }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.catchPinkmongService.remove(+id);
+  @Post(':id')
+  giveup(@Param('id') id: string) {
+    return this.catchPinkmongService.giveup(+id);
   }
 }
