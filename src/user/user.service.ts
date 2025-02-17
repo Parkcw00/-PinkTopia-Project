@@ -12,13 +12,14 @@ import * as nodemailer from 'nodemailer';
 import { UserRepository } from './user.repository';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
-
+import { InventoryService } from 'src/inventory/inventory.service';
 @Injectable()
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
     private configService: ConfigService,
+    private readonly inventoryService: InventoryService,
   ) {}
 
   async getRanking() {
@@ -53,12 +54,17 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(password, Number(saltRounds));
 
     try {
-      await this.userRepository.signUp(
+      const user =await this.userRepository.signUp(
         nickname,
         email,
         hashedPassword,
         birthday,
       );
+
+      await this.inventoryService.createInventory({
+        user_id: user.id, 
+      });
+
     } catch (err) {
       throw new InternalServerErrorException(
         '유저 정보 저장 중 오류가 발생하였습니다.',
