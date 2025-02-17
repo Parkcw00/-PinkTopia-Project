@@ -21,7 +21,7 @@ export class AchievementC {
   user: User;
 
   @Column({ type: 'int', nullable: false })
-  userId: number;
+  user_id: number;
 
   @ManyToOne(() => Achievement, (achievement) => achievement.achievement_c, {
     onDelete: 'CASCADE',
@@ -30,8 +30,8 @@ export class AchievementC {
   achievement: Achievement;
 
   @Column({ type: 'int', nullable: false })
-  achievementId: number;
+  achievement_id: number;
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 }

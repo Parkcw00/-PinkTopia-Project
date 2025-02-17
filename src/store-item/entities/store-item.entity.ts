@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: 'store_items' })
+@Entity({ name: 'store_item' })
 export class StoreItem {
   @PrimaryGeneratedColumn()
   id: number;
@@ -24,7 +24,7 @@ export class StoreItem {
   potion: boolean;
 
   @Column({ type: 'int', nullable: false })
-  potion_time: number;
+  potion_time?: number;
 
   @Column({ type: 'int', nullable: false })
   gem_price: number;

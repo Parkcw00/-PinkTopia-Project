@@ -2,10 +2,12 @@ import { User } from 'src/user/entities/user.entity';
 import { ChattingRoom } from 'src/chattingroom/entities/chattingroom.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
 @Entity({
@@ -16,15 +18,18 @@ export class Chatting {
   id: number;
 
   @Column()
-  message: string;
+  message?: string;
 
   @Column()
   image?: string;
 
-  @Column()
+  @Column({ type: 'enum', enum: ['text', 'image'] })
+  type: 'text' | 'image';
+
+  @CreateDateColumn()
   created_at: Date;
 
-  @Column()
+  @DeleteDateColumn()
   deleted_at: Date;
 
   @ManyToOne(() => User, (user) => user.chatting)

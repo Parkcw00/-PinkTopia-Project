@@ -1,45 +1,18 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, Request } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
-import { CreateInventoryDto } from './dto/create-inventory.dto';
-import { UpdateInventoryDto } from './dto/update-inventory.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UserGuard } from 'src/user/guards/user-guard';
 
+@ApiTags('인벤토리 CRUD')
 @Controller('inventory')
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) {}
 
-  @Post()
-  create(@Body() createInventoryDto: CreateInventoryDto) {
-    return this.inventoryService.create(createInventoryDto);
-  }
-
+  @ApiOperation({ summary: '유저의 인벤토리에 있는 아이템 조회' })
+  @UseGuards(UserGuard)
   @Get()
-  findAll() {
-    return this.inventoryService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.inventoryService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateInventoryDto: UpdateInventoryDto,
-  ) {
-    return this.inventoryService.update(+id, updateInventoryDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.inventoryService.remove(+id);
+  findItemsInInventory(@Request() req) {
+    const userId = req.user.id;
+    return this.inventoryService.findItemsByUserId(userId);
   }
 }

@@ -1,8 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 /**
  * Event 엔티티 정의
- * 
+ *
  * 이벤트 정보를 저장하는 데이터 모델로, 제목, 내용, 이미지, 생성/수정 날짜 및 만료 날짜를 포함합니다.
  */
 @Entity({
@@ -27,13 +33,17 @@ export class Event {
 
   /** 생성된 날짜 (자동 설정) */
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   /** 수정된 날짜 (자동 업데이트) */
   @UpdateDateColumn()
-  updatedAt: Date;
+  updated_at: Date;
 
   /** 이벤트 만료 날짜 (선택 사항) */
-  @Column({ type: 'timestamp', nullable: true })
-  expirationAt?: Date;
+  @Column({ type: 'date', nullable: true })
+  expiration_at?: String;
+
+  /** 이벤트 상태 (active: 진행 중, closed: 종료됨) */
+  @Column({ type: 'enum', enum: ['active', 'closed'], default: 'active' })
+  status: string;
 }
