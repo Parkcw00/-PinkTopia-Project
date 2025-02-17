@@ -2,12 +2,23 @@ import { Injectable, NotFoundException,BadRequestException } from '@nestjs/commo
 import { CreateAchievementCDto } from './dto/create-achievement-c.dto';
 import { UpdateAchievementCDto } from './dto/update-achievement-c.dto';
 import {AchievementCRepository} from './achievement-c.repository'
+import { IsDate } from 'class-validator';
 
 @Injectable()
 export class AchievementCService {
   constructor(private readonly repository: AchievementCRepository,) {}
   
-  async create(createAchievementCDto: CreateAchievementCDto) {
+  async create(req: { user: { id: number}}, createAchievementCDto: CreateAchievementCDto) {
+    // 권한 확인
+    if (!req.user || !req.user.id) {
+      throw new BadRequestException('유효한 사용자 정보가 없습니다.');
+    }
+    const isManager= await this.repository.isManager(req.user.id)
+    if (!isManager){
+        throw new NotFoundException('관리자가 아닙니다.');
+    }
+
+
     if (!createAchievementCDto) {
       throw new BadRequestException('올바른 데이터를 입력하세요.');
     }

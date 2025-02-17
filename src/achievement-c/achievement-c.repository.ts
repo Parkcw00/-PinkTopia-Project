@@ -3,6 +3,7 @@ import { DeleteResult, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {AchievementC} from './entities/achievement-c.entity';
 import {AchievementP} from '../achievement-p/entities/achievement-p.entity';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class AchievementCRepository {
@@ -11,12 +12,27 @@ export class AchievementCRepository {
     private readonly entityC: Repository<AchievementC>,
     @InjectRepository(AchievementP)
     private readonly entityP: Repository<AchievementP>,
+    @InjectRepository(User)
+    private readonly entityU: Repository<User>,
   ) {}
 
   // 존재여부확인. 유저id, 업적id
   async isExists(user_id:number, achievement_id:number): Promise<AchievementC | null>{
     return await this.entityC.findOne({ where: { user_id, achievement_id} });
   }
+
+  // 관리자권한확인
+  async isManager(user_id:number): Promise<boolean>{
+    const user = await this.entityU.findOne({
+      where: { id: user_id },
+      select: ['role'],
+    });
+  
+    return user?.role === true; // role이 true이면 관리자, 아니면 false 반환
+  }
+  
+
+
   // 생성
   async create(data: Partial<AchievementC>): Promise<AchievementC> {
     const achievementC = await this.entityC.create(data);

@@ -2,6 +2,9 @@ import {
   Controller,
   Get,
   Post,
+  Res,
+  UseGuards,
+  Request,
   Body,
   Patch,
   Param,
@@ -11,6 +14,7 @@ import {
 import { AchievementCService } from './achievement-c.service';
 import { CreateAchievementCDto } from './dto/create-achievement-c.dto';
 import { UpdateAchievementCDto } from './dto/update-achievement-c.dto';
+import { UserGuard } from '../user/guards/user-guard';
 
 
 @Controller('achievementC')
@@ -18,9 +22,10 @@ export class AchievementCController {
   constructor(private readonly achievementCService: AchievementCService) {}
 
 // 완료 업적 추가 - 보상주기(유저테이블 수정)
+  @UseGuards(UserGuard)
   @Post()
-  async create(@Body() createAchievementCDto: CreateAchievementCDto) {
-    return await this.achievementCService.create(createAchievementCDto);
+  async create(@Request() req, @Body() createAchievementCDto: CreateAchievementCDto) {
+    return await this.achievementCService.create(req.user, createAchievementCDto);
   }
 
 // 완료 업적 상세 조회
