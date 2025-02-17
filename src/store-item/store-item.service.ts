@@ -10,7 +10,7 @@ export class StoreItemService {
     private storeItemRepository: StoreItemRepository,
     ) {}
 
-  async addShopItem(createStoreItemDto: CreateStoreItemDto): Promise<StoreItem> {
+  async addShopItem(req: Request, createStoreItemDto: CreateStoreItemDto): Promise<StoreItem> {
     const storeItem = await this.storeItemRepository.addShopItem(createStoreItemDto);
     return storeItem;
   }
@@ -27,7 +27,7 @@ export class StoreItemService {
     return storeItem;
   }
 
-  async updateStoreItem(id: number, updateStoreItemDto: UpdateStoreItemDto): Promise<StoreItem | null> {
+  async updateStoreItem(req: Request, id: number, updateStoreItemDto: UpdateStoreItemDto): Promise<StoreItem | null> {
     const storeItem = await this.storeItemRepository.storeItemFindOne(id);
     if (!storeItem) {
       throw new NotFoundException('존재하지 않는 상점 아이템입니다.');
@@ -36,7 +36,7 @@ export class StoreItemService {
     return this.storeItemRepository.updateStoreItem(id, updateStoreItemDto);
   }
 
-  async deleteStoreItem(id: number) {  
+  async deleteStoreItem(req: Request, id: number) {  
     const storeItem = await this.storeItemRepository.storeItemFindOne(id);
     if (!storeItem) {
       throw new NotFoundException('존재하지 않는 상점 아이템입니다.');
