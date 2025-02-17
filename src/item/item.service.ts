@@ -6,7 +6,6 @@ import { Item } from './entities/item.entity';
 import { InventoryRepository } from '../inventory/inventory.repository';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { UserRepository } from 'src/user/user.repository';
-import { string } from 'joi';
 import { CreateItemWithInventoryDto } from './dto/create-item-with-inventory.dto';
 
 @Injectable()

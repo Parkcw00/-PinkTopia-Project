@@ -13,24 +13,8 @@ export class InventoryService {
     private readonly userRepository: UserRepository,
   ) {}
 
-  create(createItemDto: CreateItemDto & { inventoryId: number }) {
-    return this.itemRepository.buyItem(createItemDto);
-  }
-
   createInventory(createInventoryDto: CreateInventoryDto) {
     return this.inventoryRepository.createInventory(createInventoryDto);
-  }
-
-  findAll() {
-    return this.itemRepository.findAll();
-  }
-
-  findOne(id: number) {
-    return this.itemRepository.findOne(id);
-  }
-
-  findOneByUserId(userId: number) {
-    return this.inventoryRepository.findOneByUserId(userId);
   }
 
   async findItemsByUserId(userId: number) {
@@ -43,6 +27,9 @@ export class InventoryService {
       id: item.id,
       count: item.count,
       storeItemName: item.store_item.name,
+      storeItemImage: item.store_item.item_image,
+      potion: item.store_item.potion,
+      potionTime: item.store_item.potion_time,
     }));
   }
 }
