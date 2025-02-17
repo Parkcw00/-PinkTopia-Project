@@ -61,15 +61,32 @@ export class UserGuard implements CanActivate {
 
     // access token만 존재하지 않는 경우, refresh token 존재, 만료기간
     if (!accessToken && refreshToken && refreshDecoded.exp < currentTime) {
-        response.clearCookie('refreshToken');
-        throw new UnauthorizedException('다시 로그인 해주세요.');
+      response.clearCookie('refreshToken');
+      throw new UnauthorizedException('다시 로그인 해주세요.');
     }
 
-    // 위 조건 통과하는 애들 access token만 존재(만료x) or refresh token만 존재(만료x) or 둘다 존재(만료여부 모름)
+    // 둘 다 존재, 둘다 만료기간 지난것
+    if (
+      refreshToken &&
+      refreshDecoded.exp < currentTime &&
+      accessToken < currentTime
+    ) {
+      response.clearCookie('refreshToken');
+      throw new UnauthorizedException('다시 로그인 해주세요.');
+    }
+
+    // 위 조건 통과하는 애들 access token만 존재(만료x) or refresh token만 존재(만료x) or 둘다 존재(refresh token 만료x)
     // 이 중 access token 재부여할건? refreshToken만 and 만료xrefreshToken과 만료된 accessToken 가진것
     // new access token 발급
-    if (!accessToken && refreshToken || (accessDecoded.exp < currentTime && refreshDecoded.exp > currentTime)) {
-      const payload = { id: refreshDecoded.id, email: refreshDecoded.email, role: refreshDecoded.role };
+    if (
+      (!accessToken && refreshToken) ||
+      (accessDecoded.exp < currentTime && refreshDecoded.exp > currentTime)
+    ) {
+      const payload = {
+        id: refreshDecoded.id,
+        email: refreshDecoded.email,
+        role: refreshDecoded.role,
+      };
       newAccessToken = await this.makeAccessToken(payload);
       accessToken = newAccessToken;
     }
@@ -85,12 +102,17 @@ export class UserGuard implements CanActivate {
     if (this.userService.logOutUsers[existUser.id]) {
       throw new UnauthorizedException('다시 로그인 해주세요.');
     }
-    const existUserrole = existUser.role === true ? 1 : existUser.role === false ? 0 : existUser.role;
+    const existUserrole =
+      existUser.role === true
+        ? 1
+        : existUser.role === false
+          ? 0
+          : existUser.role;
     try {
       reqest.user = {
         id: decoded.id, // JWT 생성 시 sub에 user.id 저장
         email: decoded.email, // 이메일 정보도 저장
-        role: existUserrole,  // ✅ AdminGuard에서 사용할 role 값 저장
+        role: existUserrole, // ✅ AdminGuard에서 사용할 role 값 저장
       };
       if (newAccessToken) {
         response.setHeader('Authorization', `Bearer ${accessToken}`);
