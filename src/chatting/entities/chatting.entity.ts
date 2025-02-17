@@ -3,12 +3,10 @@ import { ChattingRoom } from 'src/chattingroom/entities/chattingroom.entity';
 import {
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-  CreateDateColumn,
   DeleteDateColumn,
 } from 'typeorm';
 
