@@ -75,16 +75,13 @@ export class CollectionService {
     await this.collectionRepository.save(newCollection);
 
     return {
-      message: `${pinkmong.name}이(가) 도감에 등록되었습니다!`,
+      message: `${pinkmong.name}이(가) 도감에 등록되었습니다.`,
     };
   }
 
-  /**
-   * 전체 도감(컬렉션) 데이터를 조회합니다.
-   *
-   * @returns 모든 컬렉션 레코드를 유저와 핑크몽 관계 정보와 함께 반환합니다.
-   */
   async findCollections(): Promise<Collection[]> {
+    // 핑크몽 테이블에서 등록되어있는 모든 핑크몽을 조회
+    // 그리고 유저가 보유한 핑크몽
     // 유저와 핑크몽 관계도 같이 로드하여 전체 도감 데이터를 조회합니다.
     return await this.collectionRepository.find({
       relations: ['user', 'pinkmong'],
