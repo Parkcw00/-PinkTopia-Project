@@ -104,11 +104,9 @@ export class CatchPinkmongService {
       where: { id: catchId },
       relations: ['user', 'pinkmong', 'inventory'],
     });
-
     if (!catchRecord) {
       throw new NotFoundException('해당 몬스터는 이미 잡혔거나 도망쳤습니다.');
     }
-
     const { user, pinkmong, inventory } = catchRecord;
     if (!inventory) {
       throw new NotFoundException('해당 유저의 인벤토리를 찾을 수 없습니다.');
@@ -153,20 +151,15 @@ export class CatchPinkmongService {
 
       // 나중에 등급이 나오면 퍼센트 감소 ====================
 
-      // 1번은 별젤리 10%
-
-      2: 0.15, // 초콜릿 25%
-      3: 0.27, // 핑크과자 37%
-      4: 0.35, // 사탕단지 45%
+      // 1번은 스웨디시젤리 10%
+      2: 0.15, // 핑크과자 25%
+      3: 0.27, // 37%
+      4: 0.35, // 45%
     };
-    // 별젤리
-    // 기본 아이템인지 확인 (기본 아이템 ID를 1로 가정)
-    const isBaseItem = item.id === 1;
+    //스웨디시젤리
+    const isBaseItem = item.id === 1; // 기본 베이스 아이템의 id를 1로 가정
 
-    // 기본 아이템이면 추가 확률 없음, 특정 아이템이면 추가 확률 적용
     const bonus = isBaseItem ? 0 : getChanceIncrease[item.id] || 0;
-
-    // 기본 확률과 추가 확률을 합산하여 최종 확률 결정
     const finalCatchRate = baseCatchRate + bonus;
 
     // 잡기 실패: 확률 계산 결과 실패하면, feeding 시도 횟수를 업데이트

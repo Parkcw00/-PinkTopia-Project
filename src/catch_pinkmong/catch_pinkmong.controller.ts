@@ -16,13 +16,12 @@ import { UpdateCatchPinkmongDto } from './dto/update-catch_pinkmong.dto';
 @Controller('catch-pinkmong')
 export class CatchPinkmongController {
   constructor(private readonly catchPinkmongService: CatchPinkmongService) {}
-
   @Post('catchpinkmong/:userId')
   catchPinkmong(@Param('userId', ParseIntPipe) userId: number) {
     return this.catchPinkmongService.appearPinkmong(userId);
   }
 
-  @Get('catchpinkmong/feeding/:itemId')
+  @Get('feeding/:catchId/:itemId')
   feeding(
     @Param('catchId', ParseIntPipe) catchId: number,
     @Param('itemId', ParseIntPipe) itemId: number,
