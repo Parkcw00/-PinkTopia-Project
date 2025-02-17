@@ -1,5 +1,11 @@
-import { Type } from "class-transformer";
-import { IsDate, IsOptional, IsString, Length } from "class-validator";
+import { Type } from 'class-transformer';
+import {
+  IsDate,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Length,
+} from 'class-validator';
 
 export class UpdateUserDto {
   @IsOptional()
@@ -17,4 +23,12 @@ export class UpdateUserDto {
   @Type(() => Date)
   @IsDate({ message: '생일 형식이 올바르지 않습니다.' })
   birthday?: Date;
+
+  @IsOptional()
+  @IsNumber()
+  pink_gem?: number;
+
+  @IsOptional()
+  @IsNumber()
+  pink_dia?: number;
 }
