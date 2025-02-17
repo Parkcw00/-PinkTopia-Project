@@ -15,6 +15,8 @@ import { Response } from 'express';
 import { InventoryService } from 'src/inventory/inventory.service';
 @Injectable()
 export class UserService {
+  logOutUsers: { [key: number]: boolean } = {};
+
   constructor(
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
@@ -188,17 +190,21 @@ export class UserService {
       maxAge: 1000 * 60 * 60 * 24 * +refreshTokenExpiresIn,
       httpOnly: true,
     });
+    if(this.logOutUsers[existEmail.id]) {
+      delete this.logOutUsers[existEmail.id]
+    }
     return res.status(200).json({ message: '로그인이 되었습니다.' });
   }
 
   // 로그아웃
-  async logOut(user: Request, @Res() res: Response) {
+  async logOut(user: any, @Res() res: Response) {
     const accessToken = this.jwtService.sign(user, {
       secret: this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
       expiresIn: '0m',
     });
     res.setHeader('Authorization', `Bearer ${accessToken}`);
     res.clearCookie('refreshToken');
+    this.logOutUsers[user.id] = true;
     return res.status(200).json({ message: '로그아웃이 되었습니다.' });
   }
 
