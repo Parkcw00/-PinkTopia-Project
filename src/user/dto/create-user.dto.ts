@@ -1,3 +1,4 @@
+import { Type } from "class-transformer";
 import { IsDate, IsEmail, IsNotEmpty, IsOptional, IsString, Length } from "class-validator";
 
 export class CreateUserDto {
@@ -20,6 +21,7 @@ export class CreateUserDto {
   confirmedPassword: string;
 
   @IsOptional()
+  @Type(() => Date)
   @IsDate({ message: '생일 형식이 올바르지 않습니다.' })
   birthday?: Date;
 }
