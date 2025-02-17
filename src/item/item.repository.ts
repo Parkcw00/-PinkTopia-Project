@@ -6,6 +6,8 @@ import { CreateItemDto } from "./dto/create-item.dto";
 import { UpdateItemDto } from "./dto/update-item.dto";
 import { plainToInstance } from "class-transformer";
 import { Inventory } from "src/inventory/entities/inventory.entity";
+import { CreateItemWithInventoryDto } from "./dto/create-item-with-inventory.dto";
+
 @Injectable()
 export class ItemRepository {
     constructor(
@@ -31,7 +33,7 @@ export class ItemRepository {
         return await this.itemRepository.findOne({ where: { inventory_id: inventoryId, store_item_id: storeItemId } });
     }
 
-    async buyItem(createItemDto: CreateItemDto): Promise<Item> {
+    async buyItem(createItemDto: CreateItemWithInventoryDto): Promise<Item> {
         const item = plainToInstance(Item, createItemDto);
         item.store_item_id = createItemDto.storeItemId;
         item.inventory_id = createItemDto.inventoryId;
@@ -46,5 +48,12 @@ export class ItemRepository {
 
     async deleteItem(id: number): Promise<void> {
         await this.itemRepository.delete(id);
+    }
+
+    async findItemsByInventoryId(inventoryId: number): Promise<Item[]> {
+        return await this.itemRepository.find({
+            where: { inventory_id: inventoryId },
+            relations: ['store_item'],
+        });
     }
 }

@@ -12,7 +12,7 @@ import * as nodemailer from 'nodemailer';
 import { UserRepository } from './user.repository';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
-
+import { InventoryService } from 'src/inventory/inventory.service';
 @Injectable()
 export class UserService {
   logOutUsers: { [key: number]: boolean } = {};
@@ -21,6 +21,7 @@ export class UserService {
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
     private configService: ConfigService,
+    private readonly inventoryService: InventoryService,
   ) {}
 
   async getRanking() {
@@ -55,12 +56,17 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(password, Number(saltRounds));
 
     try {
-      await this.userRepository.signUp(
+      const user =await this.userRepository.signUp(
         nickname,
         email,
         hashedPassword,
         birthday,
       );
+
+      await this.inventoryService.createInventory({
+        user_id: user.id, 
+      });
+
     } catch (err) {
       throw new InternalServerErrorException(
         '유저 정보 저장 중 오류가 발생하였습니다.',
@@ -154,7 +160,7 @@ export class UserService {
       throw new BadRequestException('비밀번호가 틀렸습니다.');
     }
 
-    const payload = { id: existEmail.id, email: existEmail.email };
+    const payload = { id: existEmail.id, email: existEmail.email, role: existEmail.role };
     let accessTokenExpiresIn = this.configService.get<string>(
       'ACCESS_TOKEN_EXPIRES_IN',
     );
@@ -324,5 +330,8 @@ export class UserService {
     await transporter.sendMail(mailOptions);
 
     return verificationCode;
+
+    
   }
+
 }

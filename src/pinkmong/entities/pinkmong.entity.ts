@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  DeleteDateColumn,
 } from 'typeorm';
 
 /**
@@ -62,7 +63,7 @@ export class Pinkmong {
   updated_at: Date;
 
   /** 삭제된 날짜 (소프트 삭제 처리) */
-  @Column({ type: 'timestamp', nullable: true })
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deleted_at?: Date;
 
   @OneToMany(() => CatchPinkmong, (catch_pinkmong) => catch_pinkmong.pinkmong)

@@ -1,5 +1,7 @@
-import { Controller, Post, Get, Patch, Delete, Param, Body } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { EventService } from './event.service';
+import { UserGuard } from '../user/guards/user-guard';
+import { AdminGuard } from '../user/guards/admin.guard';
 
 /**
  * EventController
@@ -15,7 +17,9 @@ export class EventController {
    * [POST] /event
    */
   @Post()
+  @UseGuards(UserGuard,AdminGuard)
   createEvent(@Body() body: { title: string; content: string; image?: string, expiration_at?: string }) {
+    console.log(AdminGuard)
     return this.eventService.createEvent(body.title, body.content, body.image, body.expiration_at);
   }
 
@@ -50,6 +54,7 @@ getClosedEvents() {
 
 /** 이벤트 종료 */
 @Patch('close/:eventId')
+@UseGuards(UserGuard, AdminGuard)
 closeEvent(@Param('eventId') eventId: number) {
   return this.eventService.closeEvent(eventId);
 }
@@ -59,6 +64,7 @@ closeEvent(@Param('eventId') eventId: number) {
    * [PATCH] /event/:eventId
    */
   @Patch(':eventId')
+  @UseGuards(UserGuard, AdminGuard)
   updateEvent(
     @Param('eventId') eventId: number,
     @Body() body: { title?: string; content?: string; image?: string; expiration_at?: string },
@@ -76,6 +82,7 @@ closeEvent(@Param('eventId') eventId: number) {
 
 /** 이벤트 완전 삭제 (DB에서 삭제) */
 @Delete(':eventId')
+@UseGuards(UserGuard, AdminGuard)
 deleteEvent(@Param('eventId') eventId: number) {
   return this.eventService.deleteEvent(eventId);
 }

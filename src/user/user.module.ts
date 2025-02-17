@@ -9,6 +9,7 @@ import { AchievementC } from 'src/achievement-c/entities/achievement-c.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserGuard } from './guards/user-guard';
+import { InventoryModule } from 'src/inventory/inventory.module';
 
 @Global()
 @Module({
@@ -28,6 +29,7 @@ import { UserGuard } from './guards/user-guard';
       }),
       inject: [ConfigService],
     }),
+    InventoryModule,
   ],
   controllers: [UserController, UsersController],
   providers: [UserService, UserRepository, UserGuard],
