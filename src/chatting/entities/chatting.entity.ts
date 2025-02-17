@@ -2,6 +2,8 @@ import { User } from 'src/user/entities/user.entity';
 import { ChattingRoom } from 'src/chattingroom/entities/chattingroom.entity';
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,

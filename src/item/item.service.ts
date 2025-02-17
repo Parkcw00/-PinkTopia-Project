@@ -6,7 +6,7 @@ import { Item } from './entities/item.entity';
 import { InventoryRepository } from '../inventory/inventory.repository';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { UserRepository } from 'src/user/user.repository';
-import { string } from 'joi';
+import { CreateItemWithInventoryDto } from './dto/create-item-with-inventory.dto';
 
 @Injectable()
 export class ItemService {
@@ -18,18 +18,12 @@ export class ItemService {
   ) {}
 
   async purchaseItem(userId: number, createItemDto: CreateItemDto): Promise<{item: Item, message: string}> {
-    const { storeItemId, inventoryId, count, paymentMethod } = createItemDto;
+    const { storeItemId, count, paymentMethod } = createItemDto;
 
     // StoreItem 테이블에서 아이템 확인
     const storeItem = await this.storeItemRepository.storeItemFindOne(storeItemId);
     if (!storeItem) {
         throw new NotFoundException('상점에 존재하지 않는 아이템입니다.');
-    }
-
-    // Inventory 테이블에서 인벤토리 확인
-    const inventory = await this.inventoryRepository.findOneByInventoryId(inventoryId);
-    if (!inventory) {
-        throw new NotFoundException('존재하지 않는 인벤토리입니다.');
     }
 
     // 유저가 가지고 있는 gem과 다이아몬드 확인
@@ -59,8 +53,14 @@ export class ItemService {
       throw new NotFoundException('유효하지 않은 결제 수단입니다.');
     }
 
+    // 유저의 인벤토리 가져오기
+    const inventory = await this.inventoryRepository.findOneByUserId(userId);
+    if (!inventory) {
+      throw new NotFoundException('유저의 인벤토리를 찾을 수 없습니다.');
+    }
+
     // 기존 아이템 확인 및 처리
-    const item = await this.itemRepository.findOneByInventoryIdAndStoreItemId(inventoryId, storeItemId);
+    const item = await this.itemRepository.findOneByInventoryIdAndStoreItemId(inventory.id, storeItemId);
     if (item) {
         if (item.count + count >= 100) {
             throw new NotFoundException('아이템 수량은 최대 99개까지만 구매할 수 있습니다.');
@@ -72,8 +72,11 @@ export class ItemService {
         if (count >= 100) {
             throw new NotFoundException('아이템 수량은 최대 99개까지만 구매할 수 있습니다.');
         }
-        const item = await this.itemRepository.buyItem(createItemDto);
-        return { item: item, message: `${storeItem.name} ${count}개를 구매하였습니다. 남아있는 젬 ${user.pink_gem}개, 남아있는 다이아몬드 ${user.pink_dia}개`};
+        const newItem = await this.itemRepository.buyItem({
+          ...createItemDto,
+          inventoryId: Number(inventory.id),
+        } as CreateItemWithInventoryDto);
+        return { item: newItem, message: `${storeItem.name} ${count}개를 구매하였습니다. 남아있는 젬 ${user.pink_gem}개, 남아있는 다이아몬드 ${user.pink_dia}개`};
     }
   }
 
