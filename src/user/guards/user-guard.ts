@@ -10,10 +10,12 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from '../user.repository';
 import { Response } from 'express';
+import { UserService } from '../user.service';
 
 @Injectable()
 export class UserGuard implements CanActivate {
   constructor(
+    private readonly userService: UserService,
     private readonly userRepository: UserRepository,
     private jwtService: JwtService,
     private configService: ConfigService,
@@ -40,6 +42,7 @@ export class UserGuard implements CanActivate {
     if (accessToken) {
       const decoded = this.jwtService.verify(accessToken, {
         secret: accessTokenKey,
+        ignoreExpiration: true,
       });
       if (decoded.exp < currentTime) {
         accessToken = null;
@@ -53,6 +56,7 @@ export class UserGuard implements CanActivate {
     if (!accessToken && refreshToken) {
       const decoded = this.jwtService.verify(refreshToken, {
         secret: refreshTokenKey,
+        ignoreExpiration: true,
       });
       if (decoded.exp < currentTime) {
         response.clearCookie('refreshToken');
@@ -68,9 +72,12 @@ export class UserGuard implements CanActivate {
     const decoded = this.jwtService.verify(accessToken, {
       secret: accessTokenKey,
     });
-    let existuser = await this.userRepository.findEmail(decoded.email);
-    if (!existuser) {
+    let existUser = await this.userRepository.findEmail(decoded.email);
+    if (!existUser) {
       throw new BadRequestException('인증되지 않은 사용자 입니다.');
+    }
+    if (this.userService.logOutUsers[existUser.id]) {
+      throw new BadRequestException('다시 로그인 해주세요.');
     }
     try {
       reqest.user = {
