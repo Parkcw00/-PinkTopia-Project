@@ -10,6 +10,6 @@ export class VerifyDto {
   @ApiProperty({ example: 'TEST12' })
   @IsNotEmpty({ message: '인증코드를 입력해주세요.' })
   @IsString({ message: '인증코드를는 문자열이어야 합니다.' })
-  @Length(6, 6, { message: '인증코드는 6자 이상 20자 이하로 입력해주세요.' })
+  @Length(6, 6, { message: '인증코드는 여섯 글자로 입력해주세요.' })
   verificationCode: string;
 }
