@@ -74,7 +74,7 @@ export class PinkmongService {
       pinkmong_image,
     };
 
-    return this.pinkmongRepository.createPinkmong(pinkmongData);
+    return await this.pinkmongRepository.createPinkmong(pinkmongData);
   }
 
   /**
