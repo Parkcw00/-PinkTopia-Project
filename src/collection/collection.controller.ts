@@ -15,31 +15,29 @@ import { UpdateCollectionDto } from './dto/update-collection.dto';
 export class CollectionController {
   constructor(private readonly collectionService: CollectionService) {}
 
-  @Post()
+  @Post('collections')
   create(@Body() createCollectionDto: CreateCollectionDto) {
-    return this.collectionService.create(createCollectionDto);
+    return this.collectionService.createCollection(createCollectionDto);
   }
 
-  @Get()
+  @Get('collections')
   findAll() {
-    return this.collectionService.findAll();
+    return this.collectionService.findCollections();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.collectionService.findOne(+id);
-  }
-
-  @Patch(':id')
+  @Patch('collections/:collectionId')
   update(
-    @Param('id') id: string,
+    @Param('collectionId') collectionId: string,
     @Body() updateCollectionDto: UpdateCollectionDto,
   ) {
-    return this.collectionService.update(+id, updateCollectionDto);
+    return this.collectionService.updateCollection(
+      Number(collectionId),
+      updateCollectionDto,
+    );
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.collectionService.remove(+id);
+  @Delete('collections/:collectionId')
+  remove(@Param('collectionId') collectionId: string) {
+    return this.collectionService.deleteCollection(Number(collectionId));
   }
 }
