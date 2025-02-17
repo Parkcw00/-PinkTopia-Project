@@ -44,7 +44,7 @@ export class UserGuard implements CanActivate {
       if (decoded.exp < currentTime) {
         accessToken = null;
       }
-      const payload = { id: decoded.id, email: decoded.email };
+      const payload = { id: decoded.id, email: decoded.email, role: decoded.role };
       const newAccessToken = await this.makeAccessToken(payload);
       accessToken = newAccessToken;
     }
@@ -58,8 +58,8 @@ export class UserGuard implements CanActivate {
         response.clearCookie('refreshToken');
         throw new Error('다시 로그인 해주세요.');
       } // refresh token 만료되었을 때 재로그인 유도
-
-      const payload = { id: decoded.id, email: decoded.email };
+      // role 추가
+      const payload = { id: decoded.id, email: decoded.email, role: decoded.role };
       const newAccessToken = await this.makeAccessToken(payload);
       accessToken = newAccessToken;
     }
@@ -72,10 +72,12 @@ export class UserGuard implements CanActivate {
     if (!existuser) {
       throw new BadRequestException('인증되지 않은 사용자 입니다.');
     }
+    const existuserrole = existuser.role === true ? 1 : existuser.role === false ? 0 : existuser.role;
     try {
       reqest.user = {
         id: decoded.id, // JWT 생성 시 sub에 user.id 저장
         email: decoded.email, // 이메일 정보도 저장
+        role: existuserrole,  // ✅ AdminGuard에서 사용할 role 값 저장
       };
       if (refreshToken) {
         response.setHeader('Authorization', `Bearer ${accessToken}`);
