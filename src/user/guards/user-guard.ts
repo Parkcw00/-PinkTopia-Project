@@ -76,6 +76,7 @@ export class UserGuard implements CanActivate {
       reqest.user = {
         id: decoded.id, // JWT 생성 시 sub에 user.id 저장
         email: decoded.email, // 이메일 정보도 저장
+        role: existuser.role,
       };
       if (refreshToken) {
         response.setHeader('Authorization', `Bearer ${accessToken}`);
