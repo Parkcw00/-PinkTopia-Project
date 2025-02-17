@@ -324,5 +324,8 @@ export class UserService {
     await transporter.sendMail(mailOptions);
 
     return verificationCode;
+
+    
   }
+
 }
