@@ -1,20 +1,23 @@
-import {  
+import {
   Controller,
-  Get,
-  Post,
-  Res,
-  UseGuards,
+  Get,  Res,
   Request,
+  Post,
   Body,
   Patch,
   Param,
+  UseGuards,
   Delete,
-  BadRequestException,NotFoundException
+  Query,
+  BadRequestException,
+  NotFoundException,
+  ParseIntPipe,
 } from '@nestjs/common';
+import { UserGuard } from '../user/guards/user-guard';
+import {AdminGuard} from '../user/guards/admin.guard'
 import { AchievementCService } from './achievement-c.service';
 import { CreateAchievementCDto } from './dto/create-achievement-c.dto';
 import { UpdateAchievementCDto } from './dto/update-achievement-c.dto';
-import { UserGuard } from '../user/guards/user-guard';
 
 
 @Controller('achievementC')
@@ -22,10 +25,10 @@ export class AchievementCController {
   constructor(private readonly achievementCService: AchievementCService) {}
 
 // 완료 업적 추가 - 보상주기(유저테이블 수정)
-  @UseGuards(UserGuard)
+  @UseGuards(UserGuard,AdminGuard)
   @Post()
   async create(@Request() req, @Body() createAchievementCDto: CreateAchievementCDto) {
-    return await this.achievementCService.create(req.user, createAchievementCDto);
+    return await this.achievementCService.create(createAchievementCDto);
   }
 
 // 완료 업적 상세 조회

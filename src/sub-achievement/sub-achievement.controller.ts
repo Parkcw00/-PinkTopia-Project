@@ -1,13 +1,20 @@
 import {
   Controller,
-  Get,
+  Get,  Res,
+  Request,
   Post,
   Body,
   Patch,
   Param,
+  UseGuards,
   Delete,
+  Query,
   BadRequestException,
+  NotFoundException,
+  ParseIntPipe,
 } from '@nestjs/common';
+import { UserGuard } from '../user/guards/user-guard';
+import {AdminGuard} from '../user/guards/admin.guard'
 import { SubAchievementService } from './sub-achievement.service';
 import { CreateSubAchievementDto } from './dto/create-sub-achievement.dto';
 import { UpdateSubAchievementDto } from './dto/update-sub-achievement.dto';

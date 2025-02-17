@@ -1,12 +1,20 @@
 import {
   Controller,
-  Get,
+  Get,  Res,
+  Request,
   Post,
   Body,
   Patch,
   Param,
-  Delete,ParseIntPipe,BadRequestException,NotFoundException
+  UseGuards,
+  Delete,
+  Query,
+  BadRequestException,
+  NotFoundException,
+  ParseIntPipe,
 } from '@nestjs/common';
+import { UserGuard } from '../user/guards/user-guard';
+import {AdminGuard} from '../user/guards/admin.guard'
 import { AchievementPService } from './achievement-p.service';
 import { CreateAchievementPDto } from './dto/create-achievement-p.dto';
 import { UpdateAchievementPDto } from './dto/update-achievement-p.dto';

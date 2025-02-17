@@ -1,26 +1,30 @@
 import {
   Controller,
-  Get,
+  Get,  Res,
+  Request,
   Post,
   Body,
   Patch,
   Param,
+  UseGuards,
   Delete,
   Query,
   BadRequestException,
   NotFoundException,
   ParseIntPipe,
 } from '@nestjs/common';
+import { UserGuard } from '../user/guards/user-guard';
+import {AdminGuard} from '../user/guards/admin.guard'
 import { AchievementService } from './achievement.service';
 import { CreateAchievementDto } from './dto/create-achievement.dto';
 import { UpdateAchievementDto } from './dto/update-achievement.dto';
-
 
 @Controller('achievement')
 export class AchievementController {
   constructor(private readonly achievementService: AchievementService) {}
 
   // 생성
+  @UseGuards(UserGuard,AdminGuard)
   @Post()
   async create(@Body() createAchievementDto: CreateAchievementDto) {
     return await this.achievementService.create(createAchievementDto);
@@ -59,6 +63,7 @@ export class AchievementController {
   
 
   // 수정
+  @UseGuards(UserGuard,AdminGuard)
   @Patch(':achievementId')
   async update(
     @Param('achievementId') achievementId: string,      
@@ -69,6 +74,7 @@ export class AchievementController {
 
 
   // 삭제
+  @UseGuards(UserGuard,AdminGuard)
   @Delete(':achievementId')
   async remove(@Param('achievementId') achievementId: string      ) {
     return await this.achievementService.remove(achievementId);

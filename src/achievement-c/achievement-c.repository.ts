@@ -21,6 +21,7 @@ export class AchievementCRepository {
     return await this.entityC.findOne({ where: { user_id, achievement_id} });
   }
 
+  /*
   // 관리자권한확인
   async isManager(user_id:number): Promise<boolean>{
     const user = await this.entityU.findOne({
@@ -28,9 +29,9 @@ export class AchievementCRepository {
       select: ['role'],
     });
   
-    return user?.role === true; // role이 true이면 관리자, 아니면 false 반환
+    return user?.role === 1; // role이 true이면 관리자, 아니면 false 반환
   }
-  
+  */
 
 
   // 생성

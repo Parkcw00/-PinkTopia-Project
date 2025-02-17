@@ -8,17 +8,7 @@ import { IsDate } from 'class-validator';
 export class AchievementCService {
   constructor(private readonly repository: AchievementCRepository,) {}
   
-  async create(req: { user: { id: number}}, createAchievementCDto: CreateAchievementCDto) {
-    // 권한 확인
-    if (!req.user || !req.user.id) {
-      throw new BadRequestException('유효한 사용자 정보가 없습니다.');
-    }
-    const isManager= await this.repository.isManager(req.user.id)
-    if (!isManager){
-        throw new NotFoundException('관리자가 아닙니다.');
-    }
-
-
+  async create(createAchievementCDto: CreateAchievementCDto) {
     if (!createAchievementCDto) {
       throw new BadRequestException('올바른 데이터를 입력하세요.');
     }
