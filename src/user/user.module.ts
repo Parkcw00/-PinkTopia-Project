@@ -1,6 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserController } from './user.controller';
+import { UserController, UsersController } from './user.controller';
 import { UserService } from './user.service';
 import { UserRepository } from './user.repository';
 import { User } from './entities/user.entity';
@@ -29,7 +29,7 @@ import { UserGuard } from './guards/user-guard';
       inject: [ConfigService],
     }),
   ],
-  controllers: [UserController],
+  controllers: [UserController, UsersController],
   providers: [UserService, UserRepository, UserGuard],
   exports: [UserGuard, JwtModule, UserRepository]
 })

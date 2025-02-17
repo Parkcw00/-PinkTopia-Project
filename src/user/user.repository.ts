@@ -46,7 +46,7 @@ export class UserRepository {
       achievementCount: user.achievement_c.length, // 달성 업적의 개수 계산
     }));
   }
-  
+
   // 닉네임으로 찾기
   async findNickname(nickname: string) {
     return await this.userRepository.findOne({
@@ -58,6 +58,13 @@ export class UserRepository {
   async findEmail(email: string) {
     return await this.userRepository.findOne({
       where: { email },
+    });
+  }
+
+  // 유저 조회
+  async findId(id: number) {
+    return await this.userRepository.findOne({
+      where: { id },
     });
   }
 
@@ -74,6 +81,30 @@ export class UserRepository {
       password,
       ...(birthday && { birthday }),
     });
+  }
+
+  // 회원정보 수정
+  async updateMyInfo(
+    email: string,
+    nickname?: string,
+    password?: string,
+    profile_image?: string,
+    birthday?: Date,
+  ) {
+    return await this.userRepository.update(
+      { email },
+      {
+        ...(nickname && { nickname }),
+        ...(password && { password }),
+        ...(profile_image && { profile_image }),
+        ...(birthday && { birthday }),
+      },
+    );
+  }
+
+  // 회원 탈퇴
+  async deleteUser(email: string) {
+    return await this.userRepository.delete({ email });
   }
 
   // 이메일 인증코드 업데이트
