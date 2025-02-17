@@ -6,25 +6,33 @@ import {
   Patch,
   Param,
   Delete,
+  Request,
 } from '@nestjs/common';
 import { CollectionService } from './collection.service';
 import { CreateCollectionDto } from './dto/create-collection.dto';
 import { UpdateCollectionDto } from './dto/update-collection.dto';
+import { UseGuards } from '@nestjs/common';
+import { UserGuard } from '../user/guards/user-guard';
+import { AdminGuard } from '../user/guards/admin.guard';
+import { userInfo } from 'os';
 
 @Controller('collection')
 export class CollectionController {
   constructor(private readonly collectionService: CollectionService) {}
 
   @Post('collections')
+  @UseGuards(UserGuard, AdminGuard)
   create(@Body() createCollectionDto: CreateCollectionDto) {
     return this.collectionService.createCollection(createCollectionDto);
   }
 
   @Get('collections')
-  findAll() {
-    return this.collectionService.findCollections();
+  @UseGuards(UserGuard)
+  findAll(@Request() req) {
+    // UserGuard가 req.user에 인증된 유저 정보를 담아둔다고 가정
+    const userId = req.user.id;
+    return this.collectionService.findCollectionsByUser(userId);
   }
-
   @Patch('collections/:collectionId')
   update(
     @Param('collectionId') collectionId: string,
