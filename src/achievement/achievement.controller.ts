@@ -31,14 +31,18 @@ export class AchievementController {
   async findAll() {
    return  await this.achievementService.findAll();    
   }
-
+  // + 완료 목록 조회
+  @Get('/done')
+  async findAllDone() {    
+    return await this.achievementService.findAllDone();
+  }
   // 활성화 목록 조회
-  @Get('active')
+  @Get('/active')
   async findAllActive() {    
     return await this.achievementService.findAllActive();
   }
 
-  // 카테고리별 조회회
+  // 카테고리별 조회
   // 'achievement/?category=OOO'
   @Get('by-category')
   async findByCategory(@Query('category') category?: string) {

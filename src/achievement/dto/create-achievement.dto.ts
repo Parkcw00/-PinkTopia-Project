@@ -1,37 +1,39 @@
-import { PickType } from '@nestjs/mapped-types'; // 타입 가져오기
-import { IsString, IsEnum, IsDateString } from 'class-validator'; // 데코레이터 가져오기
-import { ApiProperty } from '@nestjs/swagger';
 import { Achievement } from '../entities/achievement.entity'; 
+import { Type, Transform } from 'class-transformer';
+import { PickType } from '@nestjs/mapped-types'; // 타입 가져오기
+import { IsISO8601,IsString, IsEnum, IsDateString, IsDate } from 'class-validator'; // 데코레이터 가져오기
+import { ApiProperty } from '@nestjs/swagger';
 import { AchievementCategory} from '../enums/achievement-category.enum';
 
-export class CreateAchievementDto extends PickType(Achievement, ['title', 'content', 'category','reward','expiration_at'] as const) {
+export class CreateAchievementDto extends PickType(Achievement, ['title', 'content', 'category','reward'] as const) {//,'expiration_at'
 
   @ApiProperty({ example: '대전 빵집투어어' })
   @IsString()
 title:string;
 
-@ApiProperty({ example: AchievementCategory.christmas }) // 예제 추가
-@IsEnum(AchievementCategory)
+@ApiProperty({ example: 'FOOD_TOUR'}) // 예제 추가
+@IsEnum(AchievementCategory, { message: 'category 값이 유효하지 않습니다. (SEOUL_TOUR, JEJU_TOUR, FOOD_TOUR 중 선택)' })
 category: AchievementCategory;
 
-@ApiProperty({ 
-  example: `성심당 빵집 순례부터 ~~~~ 까지! 
-튀김소보로, 과일시루케이크, 빵먹고싶다` 
-}) 
-@IsString() 
+
+@ApiProperty({ example: '제주도 1주일 길잡이!' })
+@IsString()
 content: string;
 
 @ApiProperty({ example: 'pinkJam : 100' })
-@IsString()
+@IsString({message:'pinkJam : 100 처럼 적어주세요'})
 reward:string;
 
-// IsDateString 타입 사용 예제
-//const validData = { eventDate: '2025-01-01T10:00:00.000Z' }; // ✅ 유효함
-//const invalidData = { eventDate: '2025-01-01' }; // ✅ 이것도 허용됨
-//const invalidFormat = { eventDate: 'random string' }; // ❌ 유효하지 않음
-// ISO 8601 형식의 날짜 문자열을 허용 (YYYY-MM-DD 또는 YYYY-MM-DDTHH:mm:ss.sssZ)
-@ApiProperty({ example: '2025-12-25' })
-@IsDateString() 
-expiration_date: Date
 
+// 날짜를 YYYY-MM-DD 형식으로 받음
+/*
+  @ApiProperty({ example: '2025-12-25' }) 
+  @Transform(({ value }) => new Date(value).toISOString()) // 자동 변환 추가
+  @IsDateString()
+  expiration_at: string;  // ✅ string으로 유지
+  */
+
+  @IsDate()
+  @Type(() => Date) // 문자열을 Date 객체로 변환
+  expiration_at: Date;
 }

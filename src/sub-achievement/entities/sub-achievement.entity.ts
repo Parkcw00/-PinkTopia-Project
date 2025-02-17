@@ -43,7 +43,7 @@ export class SubAchievement {
   mission_type: SubAchievementMissionType;
 
   // 만료일 컬럼 추가
-  @CreateDateColumn()
+  @Column({ type: 'date', nullable: true })
   expiration_at: Date;
 
   @UpdateDateColumn()

@@ -1,4 +1,6 @@
 export enum AchievementCategory {
-  halloween = '할로윈',
-  christmas = '크리스마스',
+  JEJU_TOUR = 'JEJU_TOUR',
+  SEOUL_TOUR = 'SEOUL_TOUR',
+  FOOD_TOUR = 'FOOD_TOUR',
 }
+// req body는 위에 값으로 기록

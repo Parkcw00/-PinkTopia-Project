@@ -9,6 +9,7 @@ export class AchievementCRepository {
   constructor(
     @InjectRepository(AchievementC)
     private readonly entityC: Repository<AchievementC>,
+    @InjectRepository(AchievementP)
     private readonly entityP: Repository<AchievementP>,
   ) {}
 

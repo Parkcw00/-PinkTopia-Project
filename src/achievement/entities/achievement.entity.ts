@@ -33,8 +33,8 @@ export class Achievement {
   @Column({ type: 'text', nullable: false }) 
   content: string; 
 
-  // 만료일 컬럼 추가
-  @CreateDateColumn()
+  // 만료일 컬럼 추가, 자동생성 아님 2025-05-22
+  @Column({ type: 'date', nullable: true })
   expiration_at: Date;
 
   @CreateDateColumn()

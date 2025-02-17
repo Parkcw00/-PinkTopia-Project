@@ -17,7 +17,7 @@ import { UpdateAchievementCDto } from './dto/update-achievement-c.dto';
 export class AchievementCController {
   constructor(private readonly achievementCService: AchievementCService) {}
 
-// 완료 업적 추가
+// 완료 업적 추가 - 보상주기(유저테이블 수정)
   @Post()
   async create(@Body() createAchievementCDto: CreateAchievementCDto) {
     return await this.achievementCService.create(createAchievementCDto);

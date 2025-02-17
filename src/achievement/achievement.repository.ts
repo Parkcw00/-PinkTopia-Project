@@ -1,5 +1,5 @@
-import {Injectable } from '@nestjs/common';
-import {  IsNull,Repository,MoreThan } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { IsNull,Repository,MoreThan, LessThan } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Achievement } from './entities/achievement.entity';
 import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
@@ -12,6 +12,7 @@ export class AchievementRepository {
   constructor(
     @InjectRepository(Achievement)
     private readonly entity: Repository<Achievement>,
+    @InjectRepository(SubAchievement)
     private readonly subEntity: Repository<SubAchievement>,
   ) {}
 
@@ -26,8 +27,20 @@ export class AchievementRepository {
       return await this.entity.findOne({ where: { title } });
     }
     // create()는 데이터베이스에 저장하지 않고 단순히 엔터티 인스턴스만 생성
-    async create(createAchievementDto:CreateAchievementDto): Promise<Achievement | null>{
-      return this.entity.create(createAchievementDto)
+    async create({
+      title,
+      category: validCategory,
+      reward,
+      content,
+      expiration_at: expiration_at
+  }): Promise<Achievement | null>{
+      return this.entity.create({
+        title,
+        category: validCategory,
+        reward,
+        content,
+        expiration_at: expiration_at
+    })
     }
     // 반드시 save()를 호출해야 데이터베이스에 저장됨.
   async save(achievement: Achievement): Promise<Achievement> {
@@ -48,6 +61,13 @@ export class AchievementRepository {
   }
 
 
+  // 만료기한 지난 업적
+  async findAllDone(date: Date): Promise<Achievement[]> {
+    return await this.entity.find({ 
+      where: { expiration_at: LessThan(date) }, 
+      order: { expiration_at: 'ASC' } // 만료일이 가까운 순으로 정렬
+    });
+  }
   // 만료기한 이전의 업적
 async findAllActive(date: Date): Promise<Achievement[]> {
   return await this.entity.find({ 
@@ -57,10 +77,10 @@ async findAllActive(date: Date): Promise<Achievement[]> {
 }
 
 // 카테고리별 조회
-async findCategory(category: string): Promise<Achievement[]> {
+async findCategory(category: AchievementCategory): Promise<Achievement[]> {
   return await this.entity.find({ 
     where: { 
-      category: category as AchievementCategory, 
+      category: category, 
       deleted_at: IsNull() // 삭제된 항목 제외
     },
     order: { expiration_at: 'ASC' } // 만료일 가까운 순으로 정렬
