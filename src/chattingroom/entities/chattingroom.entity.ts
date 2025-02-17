@@ -3,6 +3,8 @@ import { Chatmember } from 'src/chatmember/entities/chatmember.entity';
 import { Chatting } from 'src/chatting/entities/chatting.entity';
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -17,10 +19,10 @@ export class ChattingRoom {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @CreateDateColumn()
   created_at: Date;
 
-  @Column()
+  @DeleteDateColumn()
   deleted_at: Date;
 
   @OneToMany(() => Chatting, (chatting) => chatting.chattingRoom)
