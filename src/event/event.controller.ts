@@ -1,7 +1,7 @@
 import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { EventService } from './event.service';
-import { UserGuard } from 'src/user/guards/user-guard';
-import { AdminGuard } from 'src/user/guards/admin.guard';
+import { UserGuard } from '../user/guards/user-guard';
+import { AdminGuard } from '../user/guards/admin.guard';
 
 /**
  * EventController

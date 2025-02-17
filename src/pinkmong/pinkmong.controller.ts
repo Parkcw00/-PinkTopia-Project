@@ -1,7 +1,7 @@
 import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { PinkmongService } from './pinkmong.service';
-import { UserGuard } from 'src/user/guards/user-guard';
-import { AdminGuard } from 'src/user/guards/admin.guard';
+import { UserGuard } from '../user/guards/user-guard';
+import { AdminGuard } from '../user/guards/admin.guard';
 
 @Controller('pinkmong')
 export class PinkmongController {
