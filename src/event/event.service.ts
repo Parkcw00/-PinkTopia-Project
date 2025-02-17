@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EventRepository } from './event.repository';
 import { Event } from './entities/event.entity';
 
 /**
@@ -11,105 +10,45 @@ import { Event } from './entities/event.entity';
 @Injectable()
 export class EventService {
   constructor(
-    @InjectRepository(Event)
-    private readonly eventRepository: Repository<Event>,
+    private readonly eventRepository: EventRepository, // 레포지토리 주입
   ) {}
 
   /**
-   * 이벤트 생성
+   * 전체 이벤트 조회
    * 
-   * @ param title - 이벤트 제목
-   * @ param content - 이벤트 내용
-   * @ param image - 이벤트 이미지 URL (선택 사항)
-   * @ returns 생성 완료 메시지
+   * returns 데이터베이스에 저장된 모든 이벤트 목록을 반환
    */
-  async createEvent(title: string, content: string, image?: string, expiration_at?: string) {
-    let expirationDate: Date | null = null;
-
-    if (expiration_at) {
-      expirationDate = new Date(expiration_at); // ✅ 날짜 문자열을 Date 객체로 변환
-    }
-    const event = this.eventRepository.create({ title, content, image, expiration_at });
-    await this.eventRepository.save(event);
-    return { message: '이벤트 생성이 완료 되었습니다.' };
+  async getAllEvents(): Promise<{ message: string; events: Event[] }> {
+    const events = await this.eventRepository.findAll();
+    return { message: '이벤트 전체 조회 완료', events };
   }
-
-
- /** 전체 이벤트 조회 (진행 중 + 종료된 이벤트 포함) */
- async getAllEvents() {
-  // console.log('📢 getAllEvents() 실행됨');
-
-  try {
-    const events = await this.eventRepository.find({
-      withDeleted: true, // 소프트 삭제된 데이터 포함
-    });
-    // console.log('🔍 조회된 이벤트:', events);
-    if (!events || events.length === 0) {
-      return { message: '조회할 이벤트가 없습니다.', events: [] };
-    }
-    return { message: '이벤트 전체 조회가 완료되었습니다.', events };
-  } catch (error) {
-    // console.error('❌ 전체 조회 중 오류 발생:', error);
-    throw new Error('이벤트 전체 조회 중 오류가 발생했습니다.');
-  }
-}
-
-
-/** 종료된 이벤트만 조회 */
-async getClosedEvents() {
-  // console.log('📢 getClosedEvents() 실행됨');
-
-  try {
-    const events = await this.eventRepository.find({
-      where: { status: 'closed' }, // 'closed' 상태인 이벤트만 가져오기
-    });
-
-    // console.log('🔍 종료된 이벤트:', events);
-
-    if (!events || events.length === 0) {
-      return { message: '종료된 이벤트가 없습니다.', events: [] };
-    }
-
-    return { message: '종료된 이벤트 조회 완료', events };
-  } catch (error) {
-    // console.error('❌ 종료된 이벤트 조회 중 오류 발생:', error);
-    throw new Error('종료된 이벤트 조회 중 오류가 발생했습니다.');
-  }
-}
-
 
   /**
    * 특정 이벤트 조회
    * 
    * param eventId - 조회할 이벤트의 ID
-   * returns 해당 이벤트 정보
+   * returns 해당 이벤트 정보 반환
    * throws NotFoundException - 이벤트가 존재하지 않을 경우 예외 발생
    */
-  async getEvent(eventId: number) {
-    const event = await this.eventRepository.findOne({ where: { id: eventId } });
+  async getEvent(eventId: number): Promise<Event> {
+    const event = await this.eventRepository.findById(eventId);
     if (!event) throw new NotFoundException({ message: '이벤트가 존재하지 않습니다.' });
     return event;
   }
 
-
-/** 진행 중인 이벤트만 조회 */
-async getActiveEvents() {
-  const events = await this.eventRepository.find({ where: { status: 'active' } });
-  return { message: '진행 중인 이벤트 조회 완료', events };
-}
-
-
-/** 이벤트 종료 (삭제 대신 상태 변경) */
-async closeEvent(eventId: number) {
-  const event = await this.eventRepository.findOne({ where: { id: eventId } });
-  if (!event) throw new NotFoundException({ message: '이벤트가 존재하지 않습니다.' });
-
-  // 이벤트를 'closed' 상태로 변경
-  event.status = 'closed';
-  await this.eventRepository.save(event);
-
-  return { message: '이벤트가 종료되었습니다.' };
-}
+  /**
+   * 이벤트 생성
+   * 
+   * param title - 이벤트 제목
+   * param content - 이벤트 내용
+   * param image - 이벤트 이미지 URL (선택 사항)
+   * param expiration_at - 이벤트 만료 날짜 (선택 사항)
+   * returns 생성 완료 메시지 반환
+   */
+  async createEvent(title: string, content: string, image?: string, expiration_at?: string): Promise<{ message: string }> {
+    await this.eventRepository.createEvent({ title, content, image, expiration_at });
+    return { message: '이벤트 생성 완료' };
+  }
 
   /**
    * 이벤트 수정
@@ -118,39 +57,75 @@ async closeEvent(eventId: number) {
    * param title - 새로운 제목 (선택 사항)
    * param content - 새로운 내용 (선택 사항)
    * param image - 새로운 이미지 URL (선택 사항)
-   * returns 수정 완료 메시지
+   * param expiration_at - 새로운 만료 날짜 (선택 사항)
+   * returns 수정 완료 메시지 및 수정된 이벤트 정보 반환
    * throws NotFoundException - 이벤트가 존재하지 않을 경우 예외 발생
    */
   async updateEvent(eventId: number, title?: string, content?: string, image?: string, expiration_at?: string) {
-    // console.log(`📢 업데이트 요청: eventId=${eventId}, expiration_at=${expiration_at}`);
-  
-    const event = await this.eventRepository.findOne({ where: { id: eventId } });
+    const event = await this.eventRepository.findById(eventId);
     if (!event) throw new NotFoundException({ message: '이벤트가 존재하지 않습니다.' });
-  
+
     event.title = title ?? event.title;
     event.content = content ?? event.content;
     event.image = image ?? event.image;
-  
-    // ✅ expiration_at을 직접 업데이트 (널 값이 들어가지 않도록 체크)
+
     if (expiration_at !== undefined) {
-      // console.log(`🔍 업데이트할 expiration_at: ${expiration_at}`);
-      event.expiration_at = expiration_at;  // ✅ 강제로 적용
+      event.expiration_at = expiration_at;
     }
-  
-    await this.eventRepository.save(event);
-    // console.log(`✅ 이벤트 수정 완료: ${JSON.stringify(event)}`);
+
+    await this.eventRepository.updateEvent(event);
     return { message: '이벤트 수정 성공', event };
   }
-  
 
- /** 이벤트 완전 삭제 (DB에서 삭제) */
- async deleteEvent(eventId: number) {
-  const event = await this.eventRepository.findOne({ where: { id: eventId } });
-  if (!event) throw new NotFoundException({ message: '이벤트가 존재하지 않습니다.' });
+  /**
+   * 이벤트 삭제
+   * 
+   * param eventId - 삭제할 이벤트의 ID
+   * returns 삭제 완료 메시지 반환
+   * throws NotFoundException - 이벤트가 존재하지 않을 경우 예외 발생
+   */
+  async deleteEvent(eventId: number): Promise<{ message: string }> {
+    const event = await this.eventRepository.findById(eventId);
+    if (!event) throw new NotFoundException({ message: '이벤트가 존재하지 않습니다.' });
 
-  // DB에서 완전 삭제
-  await this.eventRepository.remove(event);
+    await this.eventRepository.deleteEvent(event);
+    return { message: '이벤트 삭제 완료' };
+  }
 
-  return { message: '이벤트가 완전히 삭제되었습니다.' };
-}
+  /**
+   * 종료된 이벤트 조회
+   * 
+   * returns 상태가 'closed'인 이벤트 목록 반환
+   */
+  async getClosedEvents(): Promise<{ message: string; events: Event[] }> {
+    const events = await this.eventRepository.findClosedEvents();
+    return { message: '종료된 이벤트 조회 완료', events };
+  }
+
+  /**
+   * 진행 중인 이벤트 조회
+   * 
+   * returns 상태가 'active'인 이벤트 목록 반환
+   */
+  async getActiveEvents(): Promise<{ message: string; events: Event[] }> {
+    const events = await this.eventRepository.findActiveEvents();
+    return { message: '진행 중인 이벤트 조회 완료', events };
+  }
+
+  /**
+   * 이벤트 종료 (상태 변경)
+   * 
+   * param eventId - 종료할 이벤트의 ID
+   * returns 종료 완료 메시지 반환
+   * throws NotFoundException - 이벤트가 존재하지 않을 경우 예외 발생
+   */
+  async closeEvent(eventId: number) {
+    const event = await this.eventRepository.findById(eventId);
+    if (!event) throw new NotFoundException({ message: '이벤트가 존재하지 않습니다.' });
+
+    event.status = 'closed';
+    await this.eventRepository.updateEvent(event);
+
+    return { message: '이벤트가 종료되었습니다.' };
+  }
 }
