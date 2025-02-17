@@ -158,7 +158,7 @@ export class UserService {
       throw new BadRequestException('비밀번호가 틀렸습니다.');
     }
 
-    const payload = { id: existEmail.id, email: existEmail.email };
+    const payload = { id: existEmail.id, email: existEmail.email, role: existEmail.role };
     let accessTokenExpiresIn = this.configService.get<string>(
       'ACCESS_TOKEN_EXPIRES_IN',
     );
