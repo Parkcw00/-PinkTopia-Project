@@ -3,17 +3,24 @@ import { Chatting } from './entities/chatting.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateChattingDto } from './dto/create-chatting.dto';
+import { Chatmember } from 'src/chatmember/entities/chatmember.entity';
 
 @Injectable()
 export class ChattingRepository {
   constructor(
     @InjectRepository(Chatting)
     private chattingRepository: Repository<Chatting>,
+    @InjectRepository(Chatmember)
+    private chatmemberRepository: Repository<Chatmember>,
   ) {}
 
-  async create(chatting_room_id: string, createChattingDto: CreateChattingDto) {
+  async create(
+    user: any,
+    chatting_room_id: string,
+    createChattingDto: CreateChattingDto,
+  ) {
     const chatting = this.chattingRepository.create({
-      user_id: 1,
+      user_id: user.id,
       chatting_room_id: Number(chatting_room_id),
       ...createChattingDto,
     });
@@ -36,5 +43,16 @@ export class ChattingRepository {
       message: result.message,
       nickname: result.user.nickname,
     }));
+  }
+
+  async isMember(userId: number, chatting_room_id: string): Promise<boolean> {
+    const member = await this.chatmemberRepository.findOne({
+      where: {
+        user_id: userId,
+        chatting_room_id: Number(chatting_room_id),
+      },
+    });
+
+    return !!member;
   }
 }
