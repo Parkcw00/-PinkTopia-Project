@@ -19,16 +19,19 @@ import { UserGuard } from 'src/user/guards/user-guard';
 @Controller('catch-pinkmong')
 export class CatchPinkmongController {
   constructor(private readonly catchPinkmongService: CatchPinkmongService) {}
+
   @Post('catchpinkmong')
   catchPinkmong(@Request() req) {
     return this.catchPinkmongService.appearPinkmong(req.user.id);
   }
+
   @Get('feeding')
   feeding(@Request() req, @Body('itemId', ParseIntPipe) itemId: number) {
     return this.catchPinkmongService.feeding(req.user.id, itemId);
   }
+
   @Post('giveup')
-  giveup(@Request() req) {
-    return this.catchPinkmongService.giveup(req.user.id);
+  async giveUp(@Body('userId') userId: number) {
+    return this.catchPinkmongService.giveup(userId);
   }
 }

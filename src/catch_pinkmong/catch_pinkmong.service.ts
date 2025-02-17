@@ -105,7 +105,7 @@ export class CatchPinkmongService {
       relations: ['user', 'pinkmong', 'inventory'],
     });
     if (!catchRecord) {
-      throw new NotFoundException('해당 사용자의 포획기록를 찾을 수 없습니다.');
+      throw new NotFoundException('해당 핑크몽을 잡을 수 없습니다.');
     }
     const { user, pinkmong, inventory } = catchRecord;
     if (!inventory) {
@@ -212,19 +212,20 @@ export class CatchPinkmongService {
   }
 
   // 도망 로직: catchPinkmong 레코드만 삭제
-  async giveup(
-    catchId: number,
-  ): Promise<{ message: string; success: boolean }> {
+  async giveup(userId: number): Promise<{ message: string; success: boolean }> {
     const catchRecord = await this.catchPinkmongRepository.findOne({
-      where: { id: catchId },
+      where: { user_id: userId },
       relations: ['pinkmong'],
     });
     if (!catchRecord) {
-      throw new NotFoundException('해당 몬스터 등장 기록을 찾을 수 없습니다.');
+      throw new NotFoundException(
+        '해당 유저의 몬스터 등장 기록을 찾을 수 없습니다.',
+      );
     }
 
-    const { pinkmong } = catchRecord;
     await this.catchPinkmongRepository.remove(catchRecord);
-    return { message: `${pinkmong.name}이 도망갔습니다!`, success: false };
+    // feeding 시도 기록도 함께 삭제
+    this.catchAttempts.delete(catchRecord.id);
+    return { message: `성공적으로 도망쳤습니다!`, success: false };
   }
 }
