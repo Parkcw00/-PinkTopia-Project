@@ -16,7 +16,7 @@ import { Item } from 'src/item/entities/item.entity';
 
 @Injectable()
 export class CatchPinkmongService {
-  // [추가] feeding 시도 횟수를 기록하기 위한 in-memory Map
+  // feeding 시도 횟수를 기록하기 위한 in-memory Map
   // 키: catchPinkmong 레코드 id, 값: feeding 시도 횟수
   private catchAttempts: Map<number, number> = new Map();
 
@@ -96,16 +96,16 @@ export class CatchPinkmongService {
 
   // 먹이를 주고 잡는 로직
   async feeding(
-    catchId: number, // catchPinkmong 레코드의 id
+    userId: number, // 사용자 아이디
     itemId: number, // 사용하려는 아이템 ID
   ): Promise<{ message: string; success: boolean }> {
-    // catchPinkmong 레코드 조회 (user, pinkmong, inventory 관계 포함)
+    // 사용자 ID로 활성 캐치 레코드를 조회합니다.
     const catchRecord = await this.catchPinkmongRepository.findOne({
-      where: { id: catchId },
+      where: { user_id: userId }, // 사용자 ID에 해당하는 캐치 레코드를 찾음
       relations: ['user', 'pinkmong', 'inventory'],
     });
     if (!catchRecord) {
-      throw new NotFoundException('해당 몬스터는 이미 잡혔거나 도망쳤습니다.');
+      throw new NotFoundException('해당 사용자의 포획기록를 찾을 수 없습니다.');
     }
     const { user, pinkmong, inventory } = catchRecord;
     if (!inventory) {
@@ -156,37 +156,26 @@ export class CatchPinkmongService {
       3: 0.27, // 37%
       4: 0.35, // 45%
     };
-    //스웨디시젤리
-    const isBaseItem = item.id === 1; // 기본 베이스 아이템의 id를 1로 가정
-
+    const isBaseItem = item.id === 1;
     const bonus = isBaseItem ? 0 : getChanceIncrease[item.id] || 0;
     const finalCatchRate = baseCatchRate + bonus;
 
-    // 잡기 실패: 확률 계산 결과 실패하면, feeding 시도 횟수를 업데이트
-    // finalCatchRate보다 큰 경우, 몬스터 잡기에 실패한 것으로 판단합니다.
-    // 만약 해당 레코드의 feeding 시도 횟수가 아직 기록되어 있지 않다면, 기본값으로 0을 사용합니다.
+    // 실패 시 feeding 시도 횟수를 업데이트 (최대 5회)
     if (Math.random() > finalCatchRate) {
-      // 현재 시도 횟수를 업데이트
-      // 해당 catchId에 대해 기록된 feeding 시도 횟수를 가져오고, 만약 기록이 없다면 0을 사용
-      const currentAttempts = this.catchAttempts.get(catchId) || 0;
-      // 현재 시도 횟수에 1을 더하여 새 feeding 시도 횟수를 계산합니다.
+      const currentAttempts = this.catchAttempts.get(catchRecord.id) || 0;
       const newAttempts = currentAttempts + 1;
-      this.catchAttempts.set(catchId, newAttempts);
-      // feeding 시도 횟수가 아직 5번 미만인 경우
+      this.catchAttempts.set(catchRecord.id, newAttempts);
       if (newAttempts < 5) {
-        // 남은 기회 수: 5번에서 현재 시도 횟수를 뺀 값
         return {
-          message: `핑크몽을 잡는 데 실패했습니다! 아직 ${5 - newAttempts}번의 기회가 남았습니다.`,
+          message: `핑크몽 포획에 실패했습니다! 아직 ${5 - newAttempts}번의 기회가 남았습니다.`,
           success: false,
         };
       } else {
-        // 5번 실패 시, catchRecord 삭제 및 시도 기록 초기화 (몬스터 도망)
         await this.catchPinkmongRepository.remove(catchRecord);
-        // 그리고 해당 catchId에 대한 feeding 시도 기록을 삭제하여 초기화합니다.
-        this.catchAttempts.delete(catchId);
+        this.catchAttempts.delete(catchRecord.id);
         return {
           message:
-            '핑크몽을 잡는 데 실패했습니다! 모든 기회를 소진하여 몬스터가 도망갔습니다.',
+            '핑크몽 포획에 실패했습니다! 모든 기회를 소진하여 몬스터가 도망갔습니다.',
           success: false,
         };
       }

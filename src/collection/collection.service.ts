@@ -27,15 +27,6 @@ export class CollectionService {
     private pinkmongRepository: Repository<Pinkmong>,
   ) {}
 
-  /**
-   * 새로운 도감(컬렉션) 기록을 생성합니다.
-   * 사용자가 특정 핑크몽을 최초 포획했을 때 호출됩니다.
-   *
-   * @param createCollectionDto - 유저와 핑크몽의 id 정보를 포함하는 DTO
-   * @returns 성공 메시지와 함께 생성된 컬렉션 레코드를 반환합니다.
-   * @throws NotFoundException - 해당 유저나 핑크몽이 존재하지 않는 경우
-   * @throws BadRequestException - 이미 등록된 도감 기록이 있을 경우
-   */
   async createCollection(
     createCollectionDto: CreateCollectionDto,
   ): Promise<{ message: string }> {
