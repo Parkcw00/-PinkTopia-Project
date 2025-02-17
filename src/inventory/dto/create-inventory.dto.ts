@@ -1,1 +1,3 @@
-export class CreateInventoryDto {}
+export class CreateInventoryDto {
+  user_id: number;
+}
