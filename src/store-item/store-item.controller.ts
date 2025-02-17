@@ -33,8 +33,6 @@ export class StoreItemController {
     @Body() createStoreItemDto: CreateStoreItemDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    console.log(file);
-    console.log(createStoreItemDto);
     return this.storeItemService.addShopItem(
       req.user,
       createStoreItemDto,
