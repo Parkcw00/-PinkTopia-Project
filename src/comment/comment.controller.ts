@@ -28,9 +28,8 @@ export class CommentController {
     @Param('post_id', ParseIntPipe) post_id: number,
     @Body() createCommentDto: CreateCommentDto,
   ) {
-    const userId = req.user.id;
     return await this.commentService.createComment(
-      userId,
+      req.user.id,
       post_id,
       createCommentDto,
     );
@@ -50,9 +49,8 @@ export class CommentController {
     @Param('id') id: number,
     @Body() updateCommentDto: UpdateCommentDto,
   ) {
-    const userId = req.user.id;
     return await this.commentService.updateComment(
-      userId,
+      req.user.id,
       +id,
       updateCommentDto,
     );
@@ -62,7 +60,6 @@ export class CommentController {
   @Delete(':post_id/comments/:id')
   @UseGuards(UserGuard)
   async remove(@Request() req, @Param('id') id: number) {
-    const userId = req.user.id;
-    return await this.commentService.deleteComment(userId, +id);
+    return await this.commentService.deleteComment(req.user.id, +id);
   }
 }

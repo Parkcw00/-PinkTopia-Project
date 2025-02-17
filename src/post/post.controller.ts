@@ -20,11 +20,10 @@ import { UserGuard } from '../user/guards/user-guard';
 export class PostController {
   constructor(private readonly postService: PostService) {}
   @ApiOperation({ summary: '게시글 생성' })
-  @Post()
   @UseGuards(UserGuard)
+  @Post()
   async createPost(@Request() req, @Body() createPostDto: CreatePostDto) {
-    const userId = req.user.id;
-    return await this.postService.createPost(userId, createPostDto);
+    return await this.postService.createPost(req.user.id, createPostDto);
   }
 
   @ApiOperation({ summary: '게시글들 조회' })
@@ -40,22 +39,20 @@ export class PostController {
   }
 
   @ApiOperation({ summary: '게시글 수정' })
-  @Patch(':id')
   @UseGuards(UserGuard)
+  @Patch(':id')
   async update(
     @Request() req,
     @Param('id') id: number,
     @Body() updatePostDto: UpdatePostDto,
   ) {
-    const userId = req.user.id;
-    return await this.postService.updatePost(userId, +id, updatePostDto);
+    return await this.postService.updatePost(req.user.id, +id, updatePostDto);
   }
 
   @ApiOperation({ summary: '게시글 삭제' })
-  @Delete(':id')
   @UseGuards(UserGuard)
+  @Delete(':id')
   async remove(@Request() req, @Param('id') id: number) {
-    const userId = req.user.id;
-    return await this.postService.deletePost(userId, +id);
+    return await this.postService.deletePost(req.user.id, +id);
   }
 }
