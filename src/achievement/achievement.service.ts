@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException,
-  BadRequestException,
+  BadRequestException,ConflictException,
   ParseIntPipe, } from '@nestjs/common';
 import { AchievementCategory } from "./enums/achievement-category.enum"; // ENUM 경로 확인
 import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
@@ -67,19 +67,20 @@ console.log("생성 서비스3")
   return fixres(save); // ✅ 함수 실행
 }
 
-
-  
+  // 전체
   async findAll(): Promise<Achievement[]> {
     const data=await this.repository.findAll();
     if(!data){
       throw new NotFoundException(`등록된 업적이 없습니다.`);
         }
-    return data
+    return fixresArr(data)
   }
 
+  // 만료목록
   async findAllDone(): Promise<Achievement[]> {  
     // 현재 UTC 기준 시간 가져오기
-    const now = new Date();  
+    const now = new Date(); 
+    console.log('날짜',now) 
 
     // 활성화된 업적 조회
     const data = await this.repository.findAllDone(now);
@@ -92,6 +93,7 @@ console.log("생성 서비스3")
     return data;
   }
 
+  // 활성목록
   async findAllActive(): Promise<Achievement[]> {  
     // 현재 UTC 기준 시간 가져오기
     const now = new Date();  
@@ -107,6 +109,7 @@ console.log("생성 서비스3")
     return data;
   }
 
+  // 카테고리별 조회
   async findCategory(category: string): Promise<Achievement[]> {
 // 📌 category 값 Enum 변환
   const validCategory = Object.values(AchievementCategory).includes(category as AchievementCategory) 
@@ -118,25 +121,28 @@ console.log("생성 서비스3")
   }
 
 
-    const data=this.repository.findCategory(validCategory)//({ where: { category } });
-    if (!data) {
+    const data=await this.repository.findCategory(validCategory)//({ where: { category } });
+    if (!data|| data.length<1) {      
       throw new NotFoundException(`"${validCategory}" 카테고리에 해당하는 업적이 없습니다.`);
     }
 return data
-
-
   }
 
   async findOne(id: string): Promise<{ title: string; subAchievements: SubAchievement[] }>{
+    console.log('id : ', id)
     const idA = Number(id);
     if (!idA) {
       throw new BadRequestException('achievementId 값이 없거나 형식이 맞지 않습니다');
     }
+    console.log('idA : ', idA)
+
   // 업적 조회 - 타이틀 가져오기
   const achievement = await this.repository.findOne(idA);
   if (!achievement) {
   throw new NotFoundException(`ID ${id}에 해당하는 업적을 찾을 수 없습니다.`);
   }
+  console.log('업적 : ', achievement)
+
   // 서브업적 조회
 
   const subAchievement = await this.repository.findByAId(idA);
@@ -144,6 +150,7 @@ return data
     throw new NotFoundException(`ID ${id}에 해당하는 업적을 찾을 수 없습니다.`);
   }
 
+  console.log('서브 업적 : ', subAchievement)
   return {
           title: achievement.title,
           subAchievements: subAchievement ?? [], // null이면 빈 배열 반환
@@ -164,14 +171,22 @@ return data
     if (!updateAchievementDto || Object.keys(updateAchievementDto).length === 0) {
       throw new BadRequestException('수정할 데이터를 입력하세요.');
     }
+     // 새로운 title이 존재하는지 확인 (자기 자신 제외)
+     if (updateAchievementDto.title) {
+      const duplicateTitle = await this.repository.findByTitle(updateAchievementDto.title);
+      if (duplicateTitle && duplicateTitle.id !== idA) {
+          throw new ConflictException(`"${updateAchievementDto.title}" 제목의 업적이 이미 존재합니다.`);
+      }
+  }
 
+  // 업데이트 수행
     await this.repository.update(idA, updateAchievementDto);
-    const data = await this.repository.findOne(idA)
-    if (!data) {
+    const updatedData = await this.repository.findOne(idA)
+    if (!updatedData) {
       throw new NotFoundException(`ID ${id}에 해당하는 업적을 확인인할 수 없습니다.`);
     }
     
-    return [{message: '수정 성공'},data]
+    return [{message: '수정 성공'},updatedData]
   }
 
   async remove(id:string): Promise<{message:string}> {

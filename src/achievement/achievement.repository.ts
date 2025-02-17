@@ -63,11 +63,13 @@ export class AchievementRepository {
 
   // 만료기한 지난 업적
   async findAllDone(date: Date): Promise<Achievement[]> {
+    console.log('값이 어디에?')
     return await this.entity.find({ 
       where: { expiration_at: LessThan(date) }, 
       order: { expiration_at: 'ASC' } // 만료일이 가까운 순으로 정렬
     });
   }
+  
   // 만료기한 이전의 업적
 async findAllActive(date: Date): Promise<Achievement[]> {
   return await this.entity.find({ 

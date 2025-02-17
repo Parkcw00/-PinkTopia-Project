@@ -24,7 +24,7 @@ export class AchievementCController {
   }
 
 // 완료 업적 상세 조회
-  @Get(':achievementCId')
+  @Get('achievementCId/:achievementCId')
   async findOne(@Param('achievementCId') achievementCId: string) {
     return await this.achievementCService.findOne(achievementCId);
   }

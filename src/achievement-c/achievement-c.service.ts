@@ -11,10 +11,16 @@ export class AchievementCService {
     if (!createAchievementCDto) {
       throw new BadRequestException('올바른 데이터를 입력하세요.');
     }
+    
 
     // 유저id, 업적id로 검색 -> 겹치나 확인
     const isExists = await this.repository.isExists(createAchievementCDto.user_id, createAchievementCDto.achievement_id);
+    if(isExists){
+      throw new BadRequestException('이미 있는 항목 입니다.');
+    
+    }
     const creatC = await this.repository.create(createAchievementCDto);
+    console.log('생성', creatC)
     return await this.repository.save(creatC);
   }
 
@@ -56,9 +62,6 @@ export class AchievementCService {
 
 
   async remove(id: string) {
-    if(!id){
-      throw new NotFoundException('achievementCId가 없습니다.');
-    }
     const idA = Number(id);
     if (!idA) {
       throw new BadRequestException('achievementCId 값이 없거나 틀린 형식입니다');

@@ -16,6 +16,8 @@ export class AchievementPController {
   constructor(private readonly achievementPService: AchievementPService) {}
 
 
+  //  유저 회원가입 시 생성(쭈루룩 추가)
+
   // 수행으로 수정
   @Patch(':achievementPId')
   async update(@Param('achievementPId') achievementPId: string,

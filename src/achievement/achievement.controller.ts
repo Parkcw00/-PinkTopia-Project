@@ -23,13 +23,20 @@ export class AchievementController {
   // 생성
   @Post()
   async create(@Body() createAchievementDto: CreateAchievementDto) {
-        return await this.achievementService.create(createAchievementDto);
+    return await this.achievementService.create(createAchievementDto);
+  }
+  
+  // 상세 조회 /:id와 /done를 구별 못함
+  @Get('/achievementId/:achievementId')
+  async findOne(@Param('achievementId') achievementId: string) {
+    console.log('상세조회',achievementId )
+    return await this.achievementService.findOne(achievementId);
   }
 
   // 조회
   @Get()
   async findAll() {
-   return  await this.achievementService.findAll();    
+    return  await this.achievementService.findAll();    
   }
   // + 완료 목록 조회
   @Get('/done')
@@ -50,11 +57,6 @@ export class AchievementController {
     return await this.achievementService.findCategory(category ?? '');
   }
   
-  // 상세 조회
-  @Get(':achievementId')
-  async findOne(@Param('achievementId') achievementId: string) {
-    return await this.achievementService.findOne(achievementId);
-  }
 
   // 수정
   @Patch(':achievementId')
