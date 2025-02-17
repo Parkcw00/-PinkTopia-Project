@@ -1,6 +1,7 @@
 import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { PinkmongService } from './pinkmong.service';
 import { UserGuard } from 'src/user/guards/user-guard';
+import { AdminGuard } from 'src/user/guards/admin.guard';
 
 @Controller('pinkmong')
 export class PinkmongController {
@@ -11,7 +12,7 @@ export class PinkmongController {
    * [POST] /pinkmong
    */
   @Post()
-  @UseGuards(UserGuard)
+  @UseGuards(UserGuard, AdminGuard)
   createPinkmong(@Body() body) {
     return this.pinkmongService.createPinkmong(body);
   }
@@ -40,7 +41,7 @@ export class PinkmongController {
    * [PATCH] /pinkmong/:pinkmongId
    */
   @Patch(':pinkmongId')
-  @UseGuards(UserGuard)
+  @UseGuards(UserGuard, AdminGuard)
   updatePinkmong(@Param('pinkmongId') pinkmongId: number, @Body() body) {
     return this.pinkmongService.updatePinkmong(pinkmongId, body);
   }
@@ -50,7 +51,7 @@ export class PinkmongController {
    * [DELETE] /pinkmong/:pinkmongId
    */
   @Delete(':pinkmongId')
-  @UseGuards(UserGuard)
+  @UseGuards(UserGuard, AdminGuard)
   deletePinkmong(@Param('pinkmongId') pinkmongId: number) {
     return this.pinkmongService.deletePinkmong(pinkmongId);
   }
