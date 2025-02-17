@@ -17,6 +17,7 @@ import { UpdateStoreItemDto } from './dto/update-store-item.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserGuard } from 'src/user/guards/user-guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { AdminGuard } from 'src/user/guards/admin.guard';
 
 @ApiTags('상점 아이템 CRUD')
 @Controller('store-item')
@@ -25,7 +26,7 @@ export class StoreItemController {
 
   @Post()
   @ApiOperation({ summary: '상점 아이템 추가' })
-  @UseGuards(UserGuard)
+  @UseGuards(UserGuard, AdminGuard)
   @UseInterceptors(FileInterceptor('file'))
   create(
     @Request() req,
@@ -54,7 +55,7 @@ export class StoreItemController {
   // }
 
   @ApiOperation({ summary: '상점 아이템 수정' })
-  @UseGuards(UserGuard)
+  @UseGuards(UserGuard, AdminGuard)
   @Patch(':id')
   update(
     @Request() req,
@@ -69,7 +70,7 @@ export class StoreItemController {
   }
 
   @ApiOperation({ summary: '상점 아이템 삭제' })
-  @UseGuards(UserGuard)
+  @UseGuards(UserGuard, AdminGuard)
   @Delete(':id')
   delete(@Request() req, @Param('id') id: number) {
     return this.storeItemService.deleteStoreItem(req.user, id);
