@@ -33,6 +33,6 @@ import { InventoryModule } from 'src/inventory/inventory.module';
   ],
   controllers: [UserController, UsersController],
   providers: [UserService, UserRepository, UserGuard],
-  exports: [UserGuard, JwtModule, UserRepository]
+  exports: [UserGuard, JwtModule, UserRepository, UserService]
 })
 export class UserModule {}

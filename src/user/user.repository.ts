@@ -104,7 +104,7 @@ export class UserRepository {
 
   // 회원 탈퇴
   async deleteUser(email: string) {
-    return await this.userRepository.delete({ email });
+    return await this.userRepository.update({ email }, {deleted_at: new Date()});
   }
 
   // 이메일 인증코드 업데이트
