@@ -15,6 +15,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Response } from 'express';
 import { UserGuard } from './guards/user-guard';
+import { LoginDto } from './dto/login.dto';
+import { VerifycodeDto } from './dto/verifycode.dto';
 
 @Controller('user')
 export class UserController {
@@ -44,23 +46,23 @@ export class UserController {
 
   // 이메일 인증코드 전송(인증코드 재전송, 회원가입은 하고 인증 안한 사용자용)
   @Post('/auth/send-code')
-  async sendCode(@Body() body: { email: string; password: string }) {
-    return await this.userService.sendCode(body.email, body.password);
+  async sendCode(@Body() loginDto: LoginDto) {
+    return await this.userService.sendCode(loginDto.email, loginDto.password);
   }
 
   // 이메일 인증
   @Post('/auth/verify-code')
-  async verifyCode(@Body() body: { email: string; verificationCode: string }) {
-    return await this.userService.verifyCode(body.email, body.verificationCode);
+  async verifyCode(@Body() verifycodeDto: VerifycodeDto) {
+    return await this.userService.verifyCode(
+      verifycodeDto.email,
+      verifycodeDto.verificationCode,
+    );
   }
 
   // 로그인
   @Post('/auth/login')
-  async logIn(
-    @Body() body: { email: string; password: string },
-    @Res() res: Response,
-  ) {
-    return await this.userService.logIn(body.email, body.password, res);
+  async logIn(@Body() loginDto: LoginDto, @Res() res: Response) {
+    return await this.userService.logIn(loginDto.email, loginDto.password, res);
   }
 
   // 로그아웃
