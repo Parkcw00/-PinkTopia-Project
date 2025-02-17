@@ -143,6 +143,10 @@ export class UserService {
       throw new BadRequestException('존재하는지 않는 이메일입니다.');
     }
 
+    if (existEmail.email_verify === false) {
+      throw new BadRequestException('이메일 인증을 진행해 주세요');
+    }
+
     const isPasswordMatched = bcrypt.compareSync(password, existEmail.password);
     if (!isPasswordMatched) {
       throw new BadRequestException('비밀번호가 틀렸습니다.');
@@ -172,7 +176,6 @@ export class UserService {
       0,
       refreshTokenExpiresIn.length - 1,
     );
-    
 
     res.setHeader('Authorization', `Bearer ${accessToken}`);
     res.cookie('refreshToken', refreshToken, {
@@ -183,7 +186,6 @@ export class UserService {
   }
 
   // 로그아웃
-
   async logOut(user: Request, @Res() res: Response) {
     const accessToken = this.jwtService.sign(user, {
       secret: this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
@@ -192,6 +194,97 @@ export class UserService {
     res.setHeader('Authorization', `Bearer ${accessToken}`);
     res.clearCookie('refreshToken');
     return res.status(200).json({ message: '로그아웃이 되었습니다.' });
+  }
+
+  // 유저 조회
+  async getUserInfo(id: number) {
+    if (isNaN(id) == true) {
+      throw new BadRequestException('userId값에는 숫자를 넣어주세요');
+    }
+    const userInfo = await this.userRepository.findId(id);
+    if (!userInfo) {
+      throw new BadRequestException('존재하지 않는 유저입니다.');
+    }
+    try {
+      const filteredInfo = {
+        email: userInfo.email,
+        nickname: userInfo.nickname,
+        profile_image: userInfo.profile_image,
+        collection_point: userInfo.collection_point,
+      };
+      return filteredInfo;
+    } catch (err) {
+      throw new BadRequestException('유저 조회중 오류가 발생하였습니다.');
+    }
+  }
+
+  // 내 정보 조회
+  async getMyInfo(user: any) {
+    let myInfo = await this.userRepository.findEmail(user.email);
+
+    if (!myInfo) {
+      throw new BadRequestException('사용자를 찾을 수 없습니다.');
+    }
+    try {
+      const filteredInfo = {
+        email: myInfo.email,
+        nickname: myInfo.nickname,
+        profile_image: myInfo.profile_image,
+        collection_point: myInfo.collection_point,
+        pink_gem: myInfo.pink_gem,
+        pink_dia: myInfo.pink_dia,
+        appearance: myInfo.appearance,
+        birthday: myInfo.birthday,
+      };
+      return filteredInfo;
+    } catch (err) {
+      throw new BadRequestException('내 정보 조회중 오류가 발생하였습니다.');
+    }
+  }
+
+  // 내 정보 수정
+  async updateMyInfo(user: any, updateUserDto: UpdateUserDto) {
+    const { nickname, password, profile_image, birthday } = updateUserDto;
+    if (!nickname && !password && !profile_image && !birthday) {
+      throw new BadRequestException('수정을 원하는 값을 한개 이상 넣어주세요.');
+    }
+
+    if (nickname) {
+      const existNickname = await this.userRepository.findNickname(nickname);
+      if (existNickname) {
+        throw new BadRequestException('이미 존재하는 닉네임입니다.');
+      }
+    }
+
+    let hashedPassword: string = '';
+    if (password) {
+      const saltRounds =
+        this.configService.get<number>('BCRYPT_SALT_ROUNDS') || 10;
+      hashedPassword = await bcrypt.hash(password, Number(saltRounds));
+    }
+
+    try {
+      await this.userRepository.updateMyInfo(
+        user.email,
+        nickname,
+        hashedPassword,
+        profile_image,
+        birthday,
+      );
+      return { message: '회원 정보가 수정되었습니다.' };
+    } catch (err) {
+      throw new BadRequestException('정보 수정 중 오류가 발생하였습니다.');
+    }
+  }
+
+  // 회원 탈퇴
+  async deleteMe(user: any) {
+    try {
+      await this.userRepository.deleteUser(user.email);
+      return { message: '회원 탈퇴되었습니다.' };
+    } catch (err) {
+      throw new BadRequestException('회원 탈퇴 중 오류가 발생하였습니다.');
+    }
   }
 
   // 인증 코드 메일 보내는 메서드
