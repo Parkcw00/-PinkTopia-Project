@@ -2,6 +2,8 @@ import { User } from 'src/user/entities/user.entity';
 import { ChattingRoom } from 'src/chattingroom/entities/chattingroom.entity';
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -21,10 +23,10 @@ export class Chatting {
   @Column()
   image?: string;
 
-  @Column()
+  @CreateDateColumn()
   created_at: Date;
 
-  @Column()
+  @DeleteDateColumn()
   deleted_at: Date;
 
   @ManyToOne(() => User, (user) => user.chatting)
