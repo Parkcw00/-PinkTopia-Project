@@ -18,10 +18,13 @@ export class Chatting {
   id: number;
 
   @Column()
-  message: string;
+  message?: string;
 
   @Column()
   image?: string;
+
+  @Column({ type: 'enum', enum: ['text', 'image'] })
+  type: 'text' | 'image';
 
   @CreateDateColumn()
   created_at: Date;

@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, isNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  isNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateChattingDto {
   @IsNotEmpty({ message: '메시지를 입력해주세요.' })

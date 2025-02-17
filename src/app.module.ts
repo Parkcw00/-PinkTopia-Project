@@ -24,7 +24,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AchievementCModule } from './achievement-c/achievement-c.module';
-import { UploadModule } from './upload/upload.module';
 import { StoreItemModule } from './store-item/store-item.module';
 
 const typeOrmModuleOptions = {
@@ -88,7 +87,6 @@ const typeOrmModuleOptions = {
     DirectionModule,
     ChatmemberModule,
     ChatblacklistModule,
-    UploadModule,
     StoreItemModule,
   ],
   controllers: [AppController],
