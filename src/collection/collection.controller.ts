@@ -20,11 +20,11 @@ import { userInfo } from 'os';
 export class CollectionController {
   constructor(private readonly collectionService: CollectionService) {}
 
-  @Post('collections')
-  @UseGuards(UserGuard, AdminGuard)
-  create(@Body() createCollectionDto: CreateCollectionDto) {
-    return this.collectionService.createCollection(createCollectionDto);
-  }
+  // @Post('collections')
+  // @UseGuards(UserGuard, AdminGuard)
+  // create(@Body() createCollectionDto: CreateCollectionDto) {
+  //   return this.collectionService.createCollection(createCollectionDto);
+  // }
 
   @Get('collections')
   @UseGuards(UserGuard)
@@ -33,16 +33,16 @@ export class CollectionController {
     const userId = req.user.id;
     return this.collectionService.findCollectionsByUser(userId);
   }
-  @Patch('collections/:collectionId')
-  update(
-    @Param('collectionId') collectionId: string,
-    @Body() updateCollectionDto: UpdateCollectionDto,
-  ) {
-    return this.collectionService.updateCollection(
-      Number(collectionId),
-      updateCollectionDto,
-    );
-  }
+  // @Patch('collections/:collectionId')
+  // update(
+  //   @Param('collectionId') collectionId: string,
+  //   @Body() updateCollectionDto: UpdateCollectionDto,
+  // ) {
+  //   return this.collectionService.updateCollection(
+  //     Number(collectionId),
+  //     updateCollectionDto,
+  //   );
+  // }
 
   @Delete('collections/:collectionId')
   remove(@Param('collectionId') collectionId: string) {
