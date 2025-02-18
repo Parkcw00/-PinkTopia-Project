@@ -6,40 +6,32 @@ import {
   Patch,
   Param,
   Delete,
+  ParseFloatPipe,
+  ParseIntPipe,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { CatchPinkmongService } from './catch_pinkmong.service';
 import { CreateCatchPinkmongDto } from './dto/create-catch_pinkmong.dto';
 import { UpdateCatchPinkmongDto } from './dto/update-catch_pinkmong.dto';
-
+import { UserGuard } from 'src/user/guards/user-guard';
+@UseGuards(UserGuard)
 @Controller('catch-pinkmong')
 export class CatchPinkmongController {
   constructor(private readonly catchPinkmongService: CatchPinkmongService) {}
 
-  @Post()
-  create(@Body() createCatchPinkmongDto: CreateCatchPinkmongDto) {
-    return this.catchPinkmongService.create(createCatchPinkmongDto);
+  @Post('catchpinkmong')
+  catchPinkmong(@Request() req) {
+    return this.catchPinkmongService.appearPinkmong(req.user.id);
   }
 
-  @Get()
-  findAll() {
-    return this.catchPinkmongService.findAll();
+  @Get('feeding')
+  feeding(@Request() req, @Body('itemId', ParseIntPipe) itemId: number) {
+    return this.catchPinkmongService.feeding(req.user.id, itemId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.catchPinkmongService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateCatchPinkmongDto: UpdateCatchPinkmongDto,
-  ) {
-    return this.catchPinkmongService.update(+id, updateCatchPinkmongDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.catchPinkmongService.remove(+id);
+  @Post('giveup')
+  async giveUp(@Body('userId') userId: number) {
+    return this.catchPinkmongService.giveup(userId);
   }
 }
