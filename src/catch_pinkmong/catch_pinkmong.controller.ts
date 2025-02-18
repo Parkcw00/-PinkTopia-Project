@@ -3,18 +3,13 @@ import {
   Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
-  ParseFloatPipe,
   ParseIntPipe,
   UseGuards,
   Request,
 } from '@nestjs/common';
 import { CatchPinkmongService } from './catch_pinkmong.service';
-import { CreateCatchPinkmongDto } from './dto/create-catch_pinkmong.dto';
-import { UpdateCatchPinkmongDto } from './dto/update-catch_pinkmong.dto';
 import { UserGuard } from 'src/user/guards/user-guard';
+
 @UseGuards(UserGuard)
 @Controller('catch-pinkmong')
 export class CatchPinkmongController {

@@ -25,11 +25,10 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AchievementCModule } from './achievement-c/achievement-c.module';
 import { StoreItemModule } from './store-item/store-item.module';
+import { S3Module } from './s3/s3.module';
 
 const typeOrmModuleOptions = {
-  useFactory: async (
-    configService: ConfigService,
-  ): Promise<TypeOrmModuleOptions> => ({
+  useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
     namingStrategy: new SnakeNamingStrategy(),
     type: 'mysql',
     username: configService.get('DB_USERNAME'),
@@ -88,6 +87,7 @@ const typeOrmModuleOptions = {
     ChatmemberModule,
     ChatblacklistModule,
     StoreItemModule,
+    S3Module,
   ],
   controllers: [AppController],
   providers: [AppService],
