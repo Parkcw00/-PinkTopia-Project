@@ -6,43 +6,70 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Request,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UserGuard } from '../user/guards/user-guard';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('게시글CRUD')
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}
   @ApiOperation({ summary: '게시글 생성' })
+  @ApiConsumes('multipart/form-data')
+  @UseGuards(UserGuard)
   @Post()
-  createPost(@Body() createPostDto: CreatePostDto) {
-    return this.postService.createPost(1, createPostDto);
+  @UseInterceptors(FilesInterceptor('files'))
+  async createPost(
+    @Request() req,
+    @Body() createPostDto: CreatePostDto,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    return await this.postService.createPost(req.user.id, createPostDto, files);
   }
 
   @ApiOperation({ summary: '게시글들 조회' })
   @Get()
-  findPosts() {
-    return this.postService.findPosts();
+  async findPosts() {
+    return await this.postService.findPosts();
   }
 
   @ApiOperation({ summary: '게시글 조회' })
   @Get(':id')
-  findPost(@Param('id') id: number) {
-    return this.postService.findPost(+id);
+  async findPost(@Param('id') id: number) {
+    return await this.postService.findPost(+id);
   }
 
   @ApiOperation({ summary: '게시글 수정' })
+  @ApiConsumes('multipart/form-data')
+  @UseGuards(UserGuard)
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updatePostDto: UpdatePostDto) {
-    return this.postService.updatePost(1, +id, updatePostDto);
+  @UseInterceptors(FilesInterceptor('files'))
+  async update(
+    @Request() req,
+    @Param('id') id: number,
+    @Body() updatePostDto: UpdatePostDto,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    return await this.postService.updatePost(
+      req.user.id,
+      +id,
+      updatePostDto,
+      files,
+    );
   }
 
   @ApiOperation({ summary: '게시글 삭제' })
+  @UseGuards(UserGuard)
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.postService.deletePost(1, +id);
+  async remove(@Request() req, @Param('id') id: number) {
+    return await this.postService.deletePost(req.user.id, +id);
   }
 }

@@ -33,15 +33,7 @@ export class CommentService {
     if (!post) {
       throw new NotFoundException(`게시물이 존재하지 않습니다.`);
     }
-    return await this.commentRepository.findComments();
-  }
-
-  async findComment(id: number) {
-    const comment = await this.commentRepository.findComment(id);
-    if (!comment) {
-      throw new NotFoundException(`댓글을 찾을 수 없습니다.`);
-    }
-    return comment;
+    return await this.commentRepository.findComments(post_id);
   }
 
   async updateComment(
