@@ -60,16 +60,16 @@ export class UserController {
   @ApiOperation({ summary: '이메일 인증' })
   @Post('/auth/verify-code')
   async verifyCode(@Body() verifyDto: VerifyDto) {
-    return await this.userService.verifyCode(verifyDto.email, verifyDto.verificationCode);
+    return await this.userService.verifyCode(
+      verifyDto.email,
+      verifyDto.verificationCode,
+    );
   }
 
   // 로그인
   @ApiOperation({ summary: '로그인' })
   @Post('/auth/login')
-  async logIn(
-    @Body()  logInDto: LogInDto,
-    @Res() res: Response,
-  ) {
+  async logIn(@Body() logInDto: LogInDto, @Res() res: Response) {
     return await this.userService.logIn(logInDto.email, logInDto.password, res);
   }
 

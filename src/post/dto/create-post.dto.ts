@@ -11,4 +11,11 @@ export class CreatePostDto {
   @IsNotEmpty()
   @ApiProperty({ example: '게시글 내용' })
   content: string;
+
+  @ApiProperty({
+    type: 'array',
+    items: { type: 'string', format: 'binary' },
+    description: '업로드할 파일들',
+  })
+  files?: Express.Multer.File[];
 }
