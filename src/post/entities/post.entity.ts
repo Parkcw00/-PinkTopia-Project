@@ -25,8 +25,8 @@ export class Post {
   @Column({ type: 'bigint' })
   user_id: number;
 
-  @Column({ type: 'varchar', nullable: true })
-  post_image: string;
+  @Column({ type: 'json', nullable: true })
+  post_image: string[];
 
   @Column({ type: 'varchar', nullable: false })
   title: string;
