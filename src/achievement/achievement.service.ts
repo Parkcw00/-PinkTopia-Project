@@ -31,7 +31,7 @@ export class AchievementService {
       throw new NotFoundException(`이미 있는 업적 이름 입니다.`);
     }
     console.log("생성 서비스1")
-    // 새로운 엔터티 생성
+    // 새로운 엔티티 생성
   const { title, category, reward, content, expiration_at } = createAchievementDto;
 
   // 📌 category 값 Enum 변환
@@ -189,18 +189,22 @@ return data
     return [{message: '수정 성공'},updatedData]
   }
 
+
+  // 소프트 삭제제
   async remove(id:string): Promise<{message:string}> {
     const idA = Number(id);
+    console.log("id 형변환")    
     if (!idA) {
       throw new BadRequestException('achievementId 값이 없거나 형식이 맞지 않습니다');
     }
 
     await this.repository.softDelete(idA);
-
+    console.log("삭제")
     const isExists = await this.repository.findOne(idA);
     if(isExists){
       throw new NotFoundException(`삭제 실패`);
     }
+    console.log("여기까지 오긴 왔네")
     return {message:'삭제 성공'}
   }
     

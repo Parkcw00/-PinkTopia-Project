@@ -24,6 +24,7 @@ export class SubAchievementController {
   constructor(private readonly service: SubAchievementService) {}
 
   // 생성
+  @UseGuards(UserGuard,AdminGuard)
   @Post()
   async create(@Body() createSubAchievementDto: CreateSubAchievementDto) {
     return await await this.service.create(createSubAchievementDto);
@@ -44,6 +45,7 @@ export class SubAchievementController {
 
 
   // 수정
+  @UseGuards(UserGuard,AdminGuard)
   @Patch('/:subAchievementId')
   async update(
     @Param('subAchievementId') subAchievementId: string,
@@ -53,6 +55,7 @@ export class SubAchievementController {
   }
 
   // 삭제
+  @UseGuards(UserGuard,AdminGuard)
   @Delete('/:subAchievementId')
   async remove(@Param('subAchievementId') subAchievementId: string) {
       return await this.service.softDelete(subAchievementId);

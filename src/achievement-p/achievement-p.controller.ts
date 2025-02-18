@@ -19,18 +19,37 @@ import { AchievementPService } from './achievement-p.service';
 import { CreateAchievementPDto } from './dto/create-achievement-p.dto';
 import { UpdateAchievementPDto } from './dto/update-achievement-p.dto';
 
+
 @Controller('achievement-p')
 export class AchievementPController {
-  constructor(private readonly achievementPService: AchievementPService) {}
+  constructor(private readonly APService: AchievementPService) {}
 
-
-  //  유저 회원가입 시 생성(쭈루룩 추가)
-
-  // 수행으로 수정
-  @Patch(':achievementPId')
-  async update(@Param('achievementPId') achievementPId: string,
+  // 수행으로 등록  
+ // @UseGuards(UserGuard, AdminGuard)
+  @Post('/subAchievementId/:subAchievementId')
+  async post(
+    @Request() request,
+    @Param('subAchievementId') subAchievementId: string,
   ) {
-    return this.achievementPService.update(achievementPId)
+    return this.APService.post(request.user.id, subAchievementId);
   }
 
+  // 잘못 등록된 경우 삭제
+ // @UseGuards(UserGuard, AdminGuard)
+  @Delete('/subAchievementId/:subAchievementId')
+  async deleteByUserNSub(
+    @Request() request,
+    @Param('subAchievementId') subAchievementId: string,
+  ) {
+    return this.APService.deleteByUserNSub(request.user.id, subAchievementId);
+  }  
+  // 잘못 등록된 경우 삭제
+  //@UseGuards(UserGuard, AdminGuard)
+  @Delete('chievement_p_Id/:achievementPId')
+  async deleteByPId(
+    @Request() request,
+    @Param('achievementPId') achievementPId: string,
+  ) {
+    return this.APService.deleteByPId(achievementPId);
+  }
 }

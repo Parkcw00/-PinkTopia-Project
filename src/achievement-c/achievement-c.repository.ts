@@ -69,4 +69,7 @@ export class AchievementCRepository {
     return await this.entityC.delete(id);
   }
 
+
+
+
 }

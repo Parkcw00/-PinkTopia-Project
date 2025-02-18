@@ -5,7 +5,7 @@ import { IsISO8601,IsString, IsEnum, IsDateString, IsDate } from 'class-validato
 import { ApiProperty } from '@nestjs/swagger';
 import { AchievementCategory} from '../enums/achievement-category.enum';
 
-export class CreateAchievementDto extends PickType(Achievement, ['title', 'content', 'category','reward'] as const) {//,'expiration_at'
+export class CreateAchievementDto extends PickType(Achievement, ['expiration_at','title', 'content', 'category','reward'] as const) {//,'expiration_at'
 
   @ApiProperty({ example: '대전 빵집투어어' })
   @IsString()
