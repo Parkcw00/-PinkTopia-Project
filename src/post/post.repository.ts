@@ -10,8 +10,18 @@ export class PostRepository {
     private postRepository: Repository<Post>,
   ) {}
 
-  async createPost(user_id: number, title: string, content: string) {
-    const newPost = this.postRepository.create({ user_id, title, content });
+  async createPost(
+    user_id: number,
+    title: string,
+    content: string,
+    post_image: string[],
+  ) {
+    const newPost = this.postRepository.create({
+      user_id,
+      title,
+      content,
+      post_image,
+    });
     return await this.postRepository.save(newPost);
   }
 
