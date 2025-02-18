@@ -5,21 +5,16 @@ import {
 } from '@nestjs/common';
 import { CreateChattingDto } from './dto/create-chatting.dto';
 import { ChattingRepository } from './chatting.repository';
-import * as AWS from 'aws-sdk';
-import { awsConfig } from '../../aws.config';
+import { S3Service } from '../s3/s3.service';
 import { UploadChattingDto } from './dto/create-upload-chatting.dto';
 
 @Injectable()
 export class ChattingService {
-  private s3: AWS.S3;
-  constructor(private readonly chattingRepository: ChattingRepository) {
-    this.s3 = new AWS.S3({
-      region: process.env.AWS_REGION || 'ap-northeast-2',
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY || '',
-        secretAccessKey: process.env.AWS_SECRET_KEY || '',
-      },
-    });
+  constructor(
+    private readonly chattingRepository: ChattingRepository,
+    private readonly s3Service: S3Service,
+  ) {
+    // S3 초기화 코드 제거
   }
 
   async create(
@@ -70,18 +65,7 @@ export class ChattingService {
         throw new ForbiddenException('메시지 업로드 권한이 없습니다.');
       }
 
-      const uniqueFileName = `${Date.now()}-${file.originalname}`;
-
-      const params = {
-        Bucket: awsConfig.bucketName || '',
-        Key: uniqueFileName,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-        ACL: 'public-read',
-      };
-
-      const uploadResult = await this.s3.upload(params).promise();
-      const imageUrl = uploadResult.Location;
+      const imageUrl = await this.s3Service.uploadFile(file);
 
       // 채팅 메시지 생성 DTO
       const createChattingDto: UploadChattingDto = {
