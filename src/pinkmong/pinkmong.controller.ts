@@ -1,7 +1,19 @@
-import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { PinkmongService } from './pinkmong.service';
 import { UserGuard } from 'src/user/guards/user-guard';
 import { AdminGuard } from 'src/user/guards/admin.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('pinkmong')
 export class PinkmongController {
@@ -13,8 +25,9 @@ export class PinkmongController {
    */
   @Post()
   @UseGuards(UserGuard, AdminGuard)
-  createPinkmong(@Body() body) {
-    return this.pinkmongService.createPinkmong(body);
+  @UseInterceptors(FileInterceptor('file'))
+  createPinkmong(@Body() body, @UploadedFile() file: Express.Multer.File) {
+    return this.pinkmongService.createPinkmong(body, file);
   }
 
   /**
@@ -34,7 +47,6 @@ export class PinkmongController {
   getPinkmong(@Param('pinkmongId') pinkmongId: number) {
     return this.pinkmongService.getPinkmong(pinkmongId);
   }
-
 
   /**
    * 핑크몽 수정 API
