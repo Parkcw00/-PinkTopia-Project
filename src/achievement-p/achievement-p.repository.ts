@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AchievementP } from './entities/achievement-p.entity';
-
 import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
 import { AchievementC } from '../achievement-c/entities/achievement-c.entity';
 import { User } from '../user/entities/user.entity';

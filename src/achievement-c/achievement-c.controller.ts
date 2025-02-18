@@ -48,7 +48,7 @@ export class AchievementCController {
 
   // 삭제(업적 자체가 업적테이블에서 지워질 때... 쓸일 없나?)
   @UseGuards(UserGuard, AdminGuard)
-  @Delete(':achievementCId')
+  @Delete('achievementCId/:achievementCId')
   async remove(@Param('achievementCId') achievementCId: string) {
     return await this.achievementCService.remove(achievementCId);
   }

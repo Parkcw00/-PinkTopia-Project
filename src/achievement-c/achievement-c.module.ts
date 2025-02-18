@@ -8,7 +8,7 @@ import { AchievementP } from '../achievement-p/entities/achievement-p.entity'; /
 import { User } from '../user/entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AchievementC, AchievementP,User])], // ✅ TypeOrmModule에 엔터티 추가
+  imports: [TypeOrmModule.forFeature([AchievementC, AchievementP, User])], // ✅ TypeOrmModule에 엔터티 추가
   controllers: [AchievementCController],
   providers: [AchievementCService, AchievementCRepository], // ✅ Repository 등록
   exports: [AchievementCService, AchievementCRepository], // ✅ 다른 모듈에서 사용 가능하도록 export

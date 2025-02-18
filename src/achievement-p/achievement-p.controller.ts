@@ -1,6 +1,7 @@
 import {
   Controller,
-  Get,  Res,
+  Get,
+  Res,
   Request,
   Post,
   Body,
@@ -14,35 +15,36 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { UserGuard } from '../user/guards/user-guard';
-import {AdminGuard} from '../user/guards/admin.guard'
+import { AdminGuard } from '../user/guards/admin.guard';
 import { AchievementPService } from './achievement-p.service';
 import { CreateAchievementPDto } from './dto/create-achievement-p.dto';
 import { UpdateAchievementPDto } from './dto/update-achievement-p.dto';
-
 
 @Controller('achievement-p')
 export class AchievementPController {
   constructor(private readonly APService: AchievementPService) {}
 
-  // 수행으로 등록  
- // @UseGuards(UserGuard, AdminGuard)
+  // 수행으로 등록
+  @UseGuards(UserGuard)
   @Post('/subAchievementId/:subAchievementId')
   async post(
-    @Request() request,
+    @Request() req,
     @Param('subAchievementId') subAchievementId: string,
   ) {
-    return this.APService.post(request.user.id, subAchievementId);
+    console.log('P 생성 컨트롤러');
+    return this.APService.post(req.user, subAchievementId);
   }
 
   // 잘못 등록된 경우 삭제
- // @UseGuards(UserGuard, AdminGuard)
+  @UseGuards(UserGuard)
   @Delete('/subAchievementId/:subAchievementId')
   async deleteByUserNSub(
-    @Request() request,
+    @Request() req,
     @Param('subAchievementId') subAchievementId: string,
   ) {
-    return this.APService.deleteByUserNSub(request.user.id, subAchievementId);
-  }  
+    return this.APService.deleteByUserNSub(req.user.id, subAchievementId);
+  }
+
   // 잘못 등록된 경우 삭제
   //@UseGuards(UserGuard, AdminGuard)
   @Delete('chievement_p_Id/:achievementPId')

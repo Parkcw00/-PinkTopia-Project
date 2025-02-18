@@ -16,9 +16,11 @@ import { IsDate } from 'class-validator';
 export class AchievementPService {
   constructor(private readonly repository: AchievementPRepository) {}
 
-  async post(user_id: number, subId: string): Promise<AchievementP> {
+  async post(user: any, subId: string): Promise<AchievementP> {
+    const user_id = user.id;
     const idS = Number(subId);
     if (!idS) {
+      console.log('idS불량');
       throw new BadRequestException(
         'subAchievementId 값이 없거나 형식이 맞지 않습니다',
       );
@@ -27,11 +29,13 @@ export class AchievementPService {
     // subId와 일치하는 데이터가 있는지 확인
     const isSubId = await this.repository.findSub(idS);
     if (!isSubId) {
+      console.log('isSubId불량');
       throw new NotFoundException('해당 서브업적이 존재하지 않습니다.');
     }
     // 이미 있는 항목인지 확인
     const alreadyP = await this.repository.findPByUserNSub(user_id, idS);
     if (alreadyP) {
+      console.log('이미 있음');
       throw new BadRequestException('이미 달성한 서브업적 입니다.');
     }
 
@@ -43,20 +47,35 @@ export class AchievementPService {
       complete: true,
     };
     const createP = await this.repository.createP(dataP);
-    const save = await this.repository.save(createP);
+    if (!createP) {
+      console.log('생성실패');
+      throw new BadRequestException('생성 실패했습니다.');
+    }
 
+    const save = await this.repository.save(createP);
+    if (!save) {
+      console.log('save 실패');
+      throw new BadRequestException('저장 실패했습니다.');
+    }
     // 비교하고 aC 추가하기
 
     // subAhcivment 배열 생성 (subAllByA 결과에서 id만 추출)
     const subAhcivment = (
       await this.repository.subAllByA(isSubId.achievement_id)
     ).map((subId) => subId.id);
+    if (!subAhcivment || subAhcivment.length < 1) {
+      console.log('s-서브목록조회실패');
+      throw new BadRequestException('s-서브목록 조회실패했습니다.');
+    }
 
     // ahcivmentP 배열 생성 (pAllByA 결과에서 sub_achievement_id만 추출)
     const ahcivmentP = (
       await this.repository.pAllByA(isSubId.achievement_id)
     ).map((subId) => subId.sub_achievement_id);
-
+    if (!ahcivmentP || ahcivmentP.length < 1) {
+      console.log('P-서브목록조회실패');
+      throw new BadRequestException('P-서브목록 조회실패했습니다.');
+    }
     // 비교
     // 비교 방법
     // 1. 두 배열의 길이 비교(쉬움)
