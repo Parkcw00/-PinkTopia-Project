@@ -1,7 +1,9 @@
 import { Controller, Post, Get, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { EventService } from './event.service';
-import { UserGuard } from 'src/user/guards/user-guard';
-import { AdminGuard } from 'src/user/guards/admin.guard';
+import { UserGuard } from '../user/guards/user-guard';
+import { AdminGuard } from '../user/guards/admin.guard';
+import { CreateEventDto } from './dto/create-event.dto';
+import { UpdateEventDto } from './dto/update-event.dto';
 
 /**
  * EventController
@@ -17,10 +19,9 @@ export class EventController {
    * [POST] /event
    */
   @Post()
-  @UseGuards(UserGuard,AdminGuard)
-  createEvent(@Body() body: { title: string; content: string; image?: string, expiration_at?: string }) {
-    console.log(AdminGuard)
-    return this.eventService.createEvent(body.title, body.content, body.image, body.expiration_at);
+  @UseGuards(UserGuard, AdminGuard)
+  createEvent(@Body() createEventDto: CreateEventDto) {
+    return this.eventService.createEvent(createEventDto);
   }
 
 
@@ -29,7 +30,6 @@ export class EventController {
 getAllEvents() {
   return this.eventService.getAllEvents();
 }
-
 
 /** 진행 중인 이벤트 조회 */
 @Get('active')
@@ -43,14 +43,14 @@ getClosedEvents() {
   return this.eventService.getClosedEvents();
 }
 
-  /**
-   * 특정 이벤트 조회 API
-   * [GET] /event/:eventId
-   */
-  @Get(':eventId')
-  getEvent(@Param('eventId') eventId: number) {
-    return this.eventService.getEvent(eventId);
-  }
+/**
+ * 특정 이벤트 조회 API
+ * [GET] /event/:eventId
+ */
+@Get(':eventId')
+getEvent(@Param('eventId') eventId: number) {
+  return this.eventService.getEvent(eventId);
+}
 
 /** 이벤트 종료 */
 @Patch('close/:eventId')
@@ -59,26 +59,18 @@ closeEvent(@Param('eventId') eventId: number) {
   return this.eventService.closeEvent(eventId);
 }
 
-  /**
-   * 이벤트 수정 API
-   * [PATCH] /event/:eventId
-   */
-  @Patch(':eventId')
-  @UseGuards(UserGuard, AdminGuard)
-  updateEvent(
-    @Param('eventId') eventId: number,
-    @Body() body: { title?: string; content?: string; image?: string; expiration_at?: string },
-  ) {
-    // console.log(`📢 컨트롤러 요청: eventId=${eventId}, expiration_at=${body.expiration_at}`);
-  
-    return this.eventService.updateEvent(
-      eventId, 
-      body.title, 
-      body.content, 
-      body.image, 
-      body.expiration_at  // ✅ expiration_at 전달 추가
-    );
-  }
+/**
+ * 이벤트 수정 API
+ * [PATCH] /event/:eventId
+ */
+@Patch(':eventId')
+@UseGuards(UserGuard, AdminGuard)
+updateEvent(
+  @Param('eventId') eventId: number,
+  @Body() updateEventDto: UpdateEventDto
+) {
+  return this.eventService.updateEvent(eventId, updateEventDto);
+}
 
 /** 이벤트 완전 삭제 (DB에서 삭제) */
 @Delete(':eventId')
