@@ -20,9 +20,6 @@ export class Chatting {
   @Column()
   message?: string;
 
-  @Column()
-  image?: string;
-
   @Column({ type: 'enum', enum: ['text', 'image'] })
   type: 'text' | 'image';
 
