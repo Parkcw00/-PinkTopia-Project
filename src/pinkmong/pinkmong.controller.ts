@@ -14,6 +14,8 @@ import { PinkmongService } from './pinkmong.service';
 import { UserGuard } from 'src/user/guards/user-guard';
 import { AdminGuard } from 'src/user/guards/admin.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CreatePinkmongDto } from './dto/create-pinkmong.dto';
+import { UpdatePinkmongDto } from './dto/update-pinkmong.dto';
 
 @Controller('pinkmong')
 export class PinkmongController {
@@ -26,8 +28,8 @@ export class PinkmongController {
   @Post()
   @UseGuards(UserGuard, AdminGuard)
   @UseInterceptors(FileInterceptor('file'))
-  createPinkmong(@Body() body, @UploadedFile() file: Express.Multer.File) {
-    return this.pinkmongService.createPinkmong(body, file);
+  createPinkmong(@Body() createPinkmongDto: CreatePinkmongDto, @UploadedFile() file: Express.Multer.File) {
+    return this.pinkmongService.createPinkmong(createPinkmongDto, file);
   }
 
   /**
@@ -54,8 +56,8 @@ export class PinkmongController {
    */
   @Patch(':pinkmongId')
   @UseGuards(UserGuard, AdminGuard)
-  updatePinkmong(@Param('pinkmongId') pinkmongId: number, @Body() body) {
-    return this.pinkmongService.updatePinkmong(pinkmongId, body);
+  updatePinkmong(@Param('pinkmongId') pinkmongId: number, @Body() updatePinkmongDto: UpdatePinkmongDto) {
+    return this.pinkmongService.updatePinkmong(pinkmongId, updatePinkmongDto);
   }
 
   /**

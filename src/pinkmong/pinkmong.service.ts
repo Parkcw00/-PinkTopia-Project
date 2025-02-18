@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PinkmongRepository } from './pinkmong.repository';
 import { Pinkmong } from './entities/pinkmong.entity';
+import { CreatePinkmongDto } from './dto/create-pinkmong.dto';
+import { UpdatePinkmongDto } from './dto/update-pinkmong.dto';
 import * as AWS from 'aws-sdk';
 
 /**
@@ -43,8 +45,7 @@ export class PinkmongService {
    */
   async getPinkmong(pinkmongId: number): Promise<Pinkmong> {
     const pinkmong = await this.pinkmongRepository.findById(pinkmongId);
-    if (!pinkmong)
-      throw new NotFoundException({ message: '핑크몽이 존재하지 않습니다.' });
+    if (!pinkmong) throw new NotFoundException({ message: '핑크몽이 존재하지 않습니다.' });
     return pinkmong;
   }
 
@@ -55,7 +56,7 @@ export class PinkmongService {
    * param file - 업로드된 파일
    * returns 생성 완료 메시지 반환
    */
-  async createPinkmong(body: any, file: Express.Multer.File) {
+  async createPinkmong(createPinkmongDto: CreatePinkmongDto, file: Express.Multer.File) {
     const uniqueFileName = `${Date.now()}-${file.originalname}`;
 
     const params = {
@@ -70,7 +71,7 @@ export class PinkmongService {
     const pinkmong_image = uploadResult.Location;
 
     const pinkmongData = {
-      ...body,
+      ...createPinkmongDto,
       pinkmong_image,
     };
 
@@ -85,12 +86,11 @@ export class PinkmongService {
    * returns 수정 완료 메시지 반환
    * throws NotFoundException - 핑크몽이 존재하지 않을 경우 예외 발생
    */
-  async updatePinkmong(pinkmongId: number, data: Partial<Pinkmong>) {
+  async updatePinkmong(pinkmongId: number, updatePinkmongDto: UpdatePinkmongDto) {
     const pinkmong = await this.pinkmongRepository.findById(pinkmongId);
-    if (!pinkmong)
-      throw new NotFoundException({ message: '핑크몽이 존재하지 않습니다.' });
+    if (!pinkmong) throw new NotFoundException({ message: '핑크몽이 존재하지 않습니다.' });
 
-    Object.assign(pinkmong, data);
+    Object.assign(pinkmong, updatePinkmongDto);
     await this.pinkmongRepository.updatePinkmong(pinkmong);
     return { message: '핑크몽 수정이 완료 되었습니다.' };
   }
@@ -104,8 +104,7 @@ export class PinkmongService {
    */
   async deletePinkmong(pinkmongId: number): Promise<{ message: string }> {
     const pinkmong = await this.pinkmongRepository.findById(pinkmongId);
-    if (!pinkmong)
-      throw new NotFoundException({ message: '핑크몽이 존재하지 않습니다.' });
+    if (!pinkmong) throw new NotFoundException({ message: '핑크몽이 존재하지 않습니다.' });
 
     await this.pinkmongRepository.deletePinkmong(pinkmong);
     return { message: '핑크몽 삭제가 완료 되었습니다.' };
