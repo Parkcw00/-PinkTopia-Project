@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!-- 움직이는 마커, 고정된 마커 만들기(배열을 직접 입력) -->
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>핑크군단 API</title>
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+
+  <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=5dc1bc6ffb574e60204390643bad8557"></script>
+  <script>
+    var mapContainer = document.getElementById('map'),
+      mapOption = {
+        center: new kakao.maps.LatLng(36.3275, 127.4268),
+        level: 5,
+        mapTypeId: kakao.maps.MapTypeId.ROADMAP
+      };
+
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+    var zoomControl = new kakao.maps.ZoomControl();
+    map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+    // 마커 정보 배열
+    var markerData = [
+      {
+        position: new kakao.maps.LatLng(36.3275, 127.4268),
+        imageUrl: 'https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fch0TFq%2FbtsMojyLajz%2FbWu5fv0Ox11EuAlSI9RxA1%2Fimg.png',
+        size: new kakao.maps.Size(100, 100),
+        info: '성심당 케익 부띠크!',
+        draggable: true  // 이동 가능
+      },
+      {
+        position: new kakao.maps.LatLng(36.340309, 127.389999),
+        imageUrl: 'https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FN5k03%2FbtsMn0l4BNf%2F0Lk5if43ncFTjl9rzKCE61%2Fimg.png',
+        size: new kakao.maps.Size(100, 100),
+        info: '북마커 위치',
+        draggable: false  // 이동 불가능
+      }
+    ];
+
+    var markers = [];
+
+    markerData.forEach(function (data) {
+      var markerImage = new kakao.maps.MarkerImage(data.imageUrl, data.size);
+      var marker = new kakao.maps.Marker({
+        position: data.position,
+        image: markerImage,
+        map: map,
+        draggable: data.draggable  // 마커 이동 여부 설정
+      });
+
+      var infowindow = new kakao.maps.InfoWindow({
+        content: `<div style="padding:5px;">${data.info} <br>
+                  <a href="https://map.kakao.com/link/map/${data.info},${data.position.getLat()},${data.position.getLng()}" target="_blank" style="color:skyblue">큰지도보기</a> 
+                  <a href="https://map.kakao.com/link/to/${data.info},${data.position.getLat()},${data.position.getLng()}" target="_blank" style="color:blue">길찾기</a></div>`
+      });
+
+      infowindow.open(map, marker);  // 마커마다 InfoWindow 열기
+      markers.push(marker);
+    });
+
+  </script>
+</body>
+
+</html>
