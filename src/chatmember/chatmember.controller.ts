@@ -38,6 +38,7 @@ export class ChatmemberController {
     return this.chatmemberService.findOneChatMember(+id);
   }
 
+  @UseGuards(UserGuard)
   @Patch(':id')
   updateChatMember(
     @Param('id') id: string,
@@ -46,6 +47,7 @@ export class ChatmemberController {
     return this.chatmemberService.updateChatMember(+id, updateChatmemberDto);
   }
 
+  @UseGuards(UserGuard)
   @Delete(':id')
   deleteChatMember(@Param('id') id: string) {
     return this.chatmemberService.deleteChatMember(+id);
