@@ -1,15 +1,35 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { ChatblacklistService } from './chatblacklist.service';
 import { CreateChatblacklistDto } from './dto/create-chatblacklist.dto';
 import { UpdateChatblacklistDto } from './dto/update-chatblacklist.dto';
+import { UserGuard } from 'src/user/guards/user-guard';
+import { AdminGuard } from 'src/user/guards/admin.guard';
 
 @Controller('chatblacklist')
 export class ChatblacklistController {
   constructor(private readonly chatblacklistService: ChatblacklistService) {}
 
+  @UseGuards(UserGuard, AdminGuard)
   @Post()
-  create(@Body() createChatblacklistDto: CreateChatblacklistDto) {
-    return this.chatblacklistService.create(createChatblacklistDto);
+  create(
+    @Request() req,
+    @Body() createChatblacklistDto: CreateChatblacklistDto,
+  ) {
+    const userId = req.user.id;
+    return this.chatblacklistService.createChatblacklist(
+      userId,
+      createChatblacklistDto,
+    );
   }
 
   @Get()
@@ -20,11 +40,6 @@ export class ChatblacklistController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.chatblacklistService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateChatblacklistDto: UpdateChatblacklistDto) {
-    return this.chatblacklistService.update(+id, updateChatblacklistDto);
   }
 
   @Delete(':id')

@@ -8,4 +8,5 @@ export const Messages = {
   CHATMEMBER_UPDATE_SUCCESS: '채팅멤버 수정 성공',
   CHATMEMBER_DELETE_SUCCESS: '채팅멤버 삭제 성공',
   CHATROOM_NOT_FOUND: '해당 채팅방이 존재하지 않습니다.',
+  CHATBLACKLIST_NOT_FOUND: '해당 채팅방 블랙리스트가 존재하지 않습니다.',
 };

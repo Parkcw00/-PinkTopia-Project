@@ -8,9 +8,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserRepository {
-  findOneByUserId(userId: number) {
-    throw new Error('Method not implemented.');
-  }
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     // @InjectRepository(Chatting)

@@ -2,15 +2,12 @@ import { Repository } from 'typeorm';
 import { Chatmember } from './entities/chatmember.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { UpdateChatmemberDto } from './dto/update-chatmember.dto';
-import { User } from 'src/user/entities/user.entity';
+
 @Injectable()
 export class ChatmemberRepository {
   constructor(
     @InjectRepository(Chatmember)
     private chatmemberRepository: Repository<Chatmember>,
-    // @InjectRepository(User)
-    // private userRepository: Repository<User>,
   ) {}
   // 유저 아이디 조회
   async findByUserId(userId: number) {
@@ -27,11 +24,6 @@ export class ChatmemberRepository {
   // 채팅멤버 생성
   async createChatmember(chatmember: Chatmember) {
     return this.chatmemberRepository.save(chatmember);
-  }
-
-  // 채팅멤버 수정
-  async updateChatmember(id: number, updateChatmemberDto: UpdateChatmemberDto) {
-    return this.chatmemberRepository.update(id, updateChatmemberDto);
   }
 
   // 채팅멤버 삭제

@@ -38,14 +38,14 @@ export class ChatmemberController {
     return this.chatmemberService.findOneChatMember(+id);
   }
 
-  @UseGuards(UserGuard)
-  @Patch(':id')
-  updateChatMember(
-    @Param('id') id: string,
-    @Body() updateChatmemberDto: UpdateChatmemberDto,
-  ) {
-    return this.chatmemberService.updateChatMember(+id, updateChatmemberDto);
-  }
+  // @UseGuards(UserGuard)
+  // @Patch(':id')
+  // updateChatMember(
+  //   @Param('id') id: string,
+  //   @Body() updateChatmemberDto: UpdateChatmemberDto,
+  // ) {
+  //   return this.chatmemberService.updateChatMember(+id, updateChatmemberDto);
+  // }
 
   @UseGuards(UserGuard)
   @Delete(':id')
