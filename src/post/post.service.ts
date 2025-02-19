@@ -4,12 +4,14 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
 import { PostRepository } from './post.repository';
 import { S3Service } from '../s3/s3.service';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class PostService {
   constructor(
     private readonly postRepository: PostRepository,
     private readonly s3Service: S3Service,
+    private readonly redisService: RedisService,
   ) {
     // 기존의 S3 객체 생성 코드 제거
   }
@@ -31,7 +33,9 @@ export class PostService {
   }
 
   async findPosts(): Promise<Post[]> {
-    return await this.postRepository.findPosts();
+    const posts = await this.postRepository.findPosts();
+    await this.redisService.set(`posts:`, posts, 60);
+    return posts;
   }
 
   async findPost(id: number): Promise<Post> {
