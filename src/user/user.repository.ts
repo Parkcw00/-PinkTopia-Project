@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { Chatting } from 'src/chatting/entities/chatting.entity';
+// import { Chatting } from 'src/chatting/entities/chatting.entity';
 import { AchievementC } from 'src/achievement-c/entities/achievement-c.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -13,10 +13,10 @@ export class UserRepository {
   }
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-    @InjectRepository(Chatting)
-    private chattingRepository: Repository<Chatting>,
-    @InjectRepository(AchievementC)
-    private achievementCRepository: Repository<AchievementC>,
+    // @InjectRepository(Chatting)
+    // private chattingRepository: Repository<Chatting>,
+    // @InjectRepository(AchievementC)
+    // private achievementCRepository: Repository<AchievementC>,
     // 필요할 것 같은 레포지토리들
   ) {}
 
@@ -104,7 +104,10 @@ export class UserRepository {
 
   // 회원 탈퇴
   async deleteUser(email: string) {
-    return await this.userRepository.update({ email }, {deleted_at: new Date()});
+    return await this.userRepository.update(
+      { email },
+      { deleted_at: new Date() },
+    );
   }
 
   // 이메일 인증코드 업데이트

@@ -1,34 +1,53 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { ChatmemberService } from './chatmember.service';
 import { CreateChatmemberDto } from './dto/create-chatmember.dto';
 import { UpdateChatmemberDto } from './dto/update-chatmember.dto';
+import { UserGuard } from 'src/user/guards/user-guard';
 
 @Controller('chatmember')
 export class ChatmemberController {
   constructor(private readonly chatmemberService: ChatmemberService) {}
 
+  @UseGuards(UserGuard)
   @Post()
-  create(@Body() createChatmemberDto: CreateChatmemberDto) {
-    return this.chatmemberService.create(createChatmemberDto);
+  createChatmember(
+    @Request() req,
+    @Body() createChatmemberDto: CreateChatmemberDto,
+  ) {
+    const userId = req.user.id;
+    return this.chatmemberService.createChatmember(userId, createChatmemberDto);
   }
 
   @Get()
-  findAll() {
-    return this.chatmemberService.findAll();
+  findAllChatMember() {
+    return this.chatmemberService.findAllChatMember();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.chatmemberService.findOne(+id);
+  findOneChatMember(@Param('id') id: string) {
+    return this.chatmemberService.findOneChatMember(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateChatmemberDto: UpdateChatmemberDto) {
-    return this.chatmemberService.update(+id, updateChatmemberDto);
+  updateChatMember(
+    @Param('id') id: string,
+    @Body() updateChatmemberDto: UpdateChatmemberDto,
+  ) {
+    return this.chatmemberService.updateChatMember(+id, updateChatmemberDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.chatmemberService.remove(+id);
+  deleteChatMember(@Param('id') id: string) {
+    return this.chatmemberService.deleteChatMember(+id);
   }
 }
