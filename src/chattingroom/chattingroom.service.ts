@@ -21,6 +21,12 @@ export class ChattingRoomService {
     return { message: `채팅방이 생성되었습니다.` };
   }
 
+  // 채팅방 조회
+  async getChattingRoom(user: any) {
+    const chattingRoom = await this.chattingRoomRepository.findChattingRoom();
+    return { message: `채팅방 목록입니다.`, chattingRoom };
+  }
+
   // 채팅방 나가기
   async outChattingRoom(user: any, chattingRoomId: number) {
     const isMember = await this.chattingRoomRepository.findChatMember(
