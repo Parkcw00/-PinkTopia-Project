@@ -9,6 +9,7 @@ export class ValkeyService implements OnModuleDestroy {
     this.client = new Redis({
       host: 'localhost', // Docker 컨테이너와 같은 네트워크일 경우 'valkey' 사용 가능
       port: 6379,
+      password: process.env.VALKEY_PASSWORD || undefined, // 비밀번호 추가
     });
   }
 
