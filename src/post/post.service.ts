@@ -4,14 +4,14 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
 import { PostRepository } from './post.repository';
 import { S3Service } from '../s3/s3.service';
-import { RedisService } from '../redis/redis.service';
+import { ValkeyService } from '../valkey/valkey.service';
 
 @Injectable()
 export class PostService {
   constructor(
     private readonly postRepository: PostRepository,
     private readonly s3Service: S3Service,
-    private readonly redisService: RedisService,
+    private readonly valkeyService: ValkeyService,
   ) {
     // 기존의 S3 객체 생성 코드 제거
   }
@@ -35,12 +35,12 @@ export class PostService {
   async findPosts(): Promise<Post[]> {
     const posts = await this.postRepository.findPosts();
 
-    const cachedPosts = await this.redisService.get(`boards:`);
+    const cachedPosts: any = await this.valkeyService.get(`boards:`);
     if (cachedPosts) {
       console.log(cachedPosts);
       return cachedPosts; // 캐시된 데이터 반환
     }
-    await this.redisService.set(`posts:`, posts, 60);
+    await this.valkeyService.set(`posts:`, posts, 60);
     return posts;
   }
 
