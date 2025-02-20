@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Chatmember } from 'src/chatmember/entities/chatmember.entity';
+import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { ChattingRoom } from './entities/chattingroom.entity';
 
@@ -11,6 +12,8 @@ export class ChattingRoomRepository {
     private chattingRoomrepository: Repository<ChattingRoom>,
     @InjectRepository(Chatmember)
     private chatMemberRepository: Repository<Chatmember>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   // 채팅방 만들기
@@ -73,5 +76,26 @@ export class ChattingRoomRepository {
   // 채팅방 삭제
   async deleteChattingRoom(id: number) {
     return await this.chattingRoomrepository.delete({ id });
+  }
+
+  // 유저 조회
+  async findId(id: number) {
+    return await this.userRepository.findOne({
+      where: { id },
+    });
+  }
+
+  // 채팅방 확인
+  async findChattingRoom(id: number) {
+    return await this.chattingRoomrepository.findOne({ where: { id } });
+  }
+
+  // 채팅방 멤버 추가(not admin)
+  async addChatMemberNotAdmin(chatting_room_id: number, user_id: number) {
+    return await this.chatMemberRepository.save({
+      chatting_room_id,
+      user_id,
+      admin: false,
+    });
   }
 }
