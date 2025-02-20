@@ -22,12 +22,15 @@ export class ChatblacklistRepository {
     return this.userRepository.findId(userId);
   }
 
-  // 채팅방 아이디 조회
-  // async findByChattingRoomId(chattingRoomId: number) {
-  //   return this.chatblacklistRepository.find({
-  //     where: { chatting_room_id: chattingRoomId },
-  //   });
-  // }
+  // 특정 채팅방 내에서 유저 조회
+  async findByUserIdAndChattingRoomId(userId: number, chattingRoomId: number) {
+    return this.chatblacklistRepository.findOne({
+      where: {
+        user_id: userId,
+        chatting_room_id: chattingRoomId,
+      },
+    });
+  }
 
   // 채팅방 블랙리스트 조회
   async findByChatblacklist(id: number) {

@@ -74,4 +74,14 @@ export class ChattingRoomRepository {
   async deleteChattingRoom(id: number) {
     return await this.chattingRoomrepository.delete({ id });
   }
+
+  // 채팅방 조회
+  async findChattingRoom() {
+    return await this.chattingRoomrepository.find();
+  }
+
+  // 특정 채팅방 조회
+  async findChattingRoomById(id: number) {
+    return await this.chattingRoomrepository.findOne({ where: { id } });
+  }
 }

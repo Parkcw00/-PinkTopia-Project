@@ -10,5 +10,6 @@ import { ChattingRoomRepository } from './chattingroom.repository';
   imports: [TypeOrmModule.forFeature([ChattingRoom, Chatmember])],
   controllers: [ChattingRoomController],
   providers: [ChattingRoomService, ChattingRoomRepository],
+  exports: [ChattingRoomRepository],
 })
 export class ChattingRoomModule {}

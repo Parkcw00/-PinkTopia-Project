@@ -1,36 +1,49 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateChatblacklistDto } from './dto/create-chatblacklist.dto';
 import { ChatblacklistRepository } from './chatblacklist.repository';
 import { UserRepository } from 'src/user/user.repository';
-// import { ChatmemberRepository } from 'src/chatmember/chatmember.repository';
 import { Messages } from 'src/common/messages';
 import { plainToInstance } from 'class-transformer';
 import { Chatblacklist } from './entities/chatblacklist.entity';
+import { ChattingRoomRepository } from 'src/chattingroom/chattingroom.repository';
 
 @Injectable()
 export class ChatblacklistService {
   constructor(
     private readonly chatblacklistRepository: ChatblacklistRepository,
     private readonly userRepository: UserRepository,
-    // private readonly chattingRoomRepository: ChattingRoomRepository,
+    private readonly chattingRoomRepository: ChattingRoomRepository,
   ) {}
   // 채팅방 블랙리스트 생성
   async createChatblacklist(
     userId: number,
     createChatblacklistDto: CreateChatblacklistDto,
   ) {
-    // const { chatting_room_id } = createChatblacklistDto;
+    const { chatting_room_id } = createChatblacklistDto;
 
     const user = await this.userRepository.findId(userId);
     if (!user) {
       throw new NotFoundException(Messages.USER_NOT_FOUND);
     }
 
-    // const chattingRoom =
-    //   await this.chatmemberRepository.findByChattingRoomId(chatting_room_id);
-    // if (!chattingRoom) {
-    //   throw new NotFoundException(Messages.CHATROOM_NOT_FOUND);
-    // }
+    const chackuser =
+      await this.chatblacklistRepository.findByUserIdAndChattingRoomId(
+        userId,
+        chatting_room_id,
+      );
+    if (chackuser) {
+      throw new ConflictException(Messages.BLACKLIST_ALREADY_EXISTS);
+    }
+
+    const chattingRoom =
+      await this.chattingRoomRepository.findChattingRoomById(chatting_room_id);
+    if (!chattingRoom) {
+      throw new NotFoundException(Messages.CHATROOM_NOT_FOUND);
+    }
     const chatblacklist = plainToInstance(Chatblacklist, {
       user_id: createChatblacklistDto.user_id,
       chatting_room_id: createChatblacklistDto.chatting_room_id,

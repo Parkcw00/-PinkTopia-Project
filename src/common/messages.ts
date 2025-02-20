@@ -9,4 +9,7 @@ export const Messages = {
   CHATMEMBER_DELETE_SUCCESS: '채팅멤버 삭제 성공',
   CHATROOM_NOT_FOUND: '해당 채팅방이 존재하지 않습니다.',
   CHATBLACKLIST_NOT_FOUND: '해당 채팅방 블랙리스트가 존재하지 않습니다.',
+  CHATMEMBER_ALREADY_EXISTS: '해당 채팅방 멤버가 이미 존재합니다.',
+  BLACKLIST_ALREADY_EXISTS: '해당 채팅방 블랙리스트가 이미 존재합니다.',
+  USER_BLACKLISTED: '해당 유저는 블랙리스트에 등록되어 있습니다.',
 };

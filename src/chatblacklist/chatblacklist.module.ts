@@ -5,24 +5,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Chatblacklist } from './entities/chatblacklist.entity';
 import { UserModule } from 'src/user/user.module';
 import { User } from 'src/user/entities/user.entity';
-import { ChatmemberModule } from 'src/chatmember/chatmember.module';
 import { ChatblacklistRepository } from './chatblacklist.repository';
-import { UserRepository } from 'src/user/user.repository';
-// import { ChattingRoomModule } from 'src/chattingroom/chattingroom.module';
-// import { ChatmemberRepository } from 'src/chatmember/chatmember.repository';
+import { ChattingRoomModule } from 'src/chattingroom/chattingroom.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Chatblacklist, User]),
     UserModule,
-    ChatmemberModule,
-    // ChattingRoomModule,
+    ChattingRoomModule,
   ],
   controllers: [ChatblacklistController],
-  providers: [
-    ChatblacklistService,
-    ChatblacklistRepository,
-    UserRepository,
-    // ChatmemberRepository,
-  ],
+  providers: [ChatblacklistService, ChatblacklistRepository],
+  exports: [ChatblacklistRepository],
 })
 export class ChatblacklistModule {}
