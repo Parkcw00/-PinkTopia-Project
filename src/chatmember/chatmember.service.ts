@@ -78,7 +78,7 @@ export class ChatmemberService {
     }));
   }
 
-  // 채팅멤버 조회
+  // 채팅멤버 상세조회
   async findOneChatMember(chatmemberId: number) {
     const chatmember =
       await this.chatmemberRepository.findByChatmember(chatmemberId);
@@ -101,7 +101,7 @@ export class ChatmemberService {
     };
   }
 
-  // 채팅멤버 삭제
+  // 채팅방 나가기
   async deleteChatMember(chatmemberId: number) {
     return this.chatmemberRepository.deleteChatmember(chatmemberId);
   }
