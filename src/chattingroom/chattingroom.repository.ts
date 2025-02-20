@@ -54,6 +54,14 @@ export class ChattingRoomRepository {
     );
   }
 
+  // 어드민 권한 삭제
+  async deleteAdmin(chatting_room_id: number, user_id: number) {
+    return await this.chatMemberRepository.update(
+      { chatting_room_id, user_id },
+      { admin: false },
+    );
+  }
+
   // 채팅방 멤버 삭제
   async deleteChatMember(chatting_room_id: number, user_id: number) {
     return await this.chatMemberRepository.delete({
