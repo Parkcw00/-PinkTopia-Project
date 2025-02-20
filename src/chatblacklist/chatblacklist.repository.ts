@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Chatblacklist } from './entities/chatblacklist.entity';
 import { UserRepository } from 'src/user/user.repository';
-// import { ChattingRoomRepository } from 'src/chattingroom/chattingroom.repository';
 
 @Injectable()
 export class ChatblacklistRepository {
@@ -11,7 +10,6 @@ export class ChatblacklistRepository {
     @InjectRepository(Chatblacklist)
     private chatblacklistRepository: Repository<Chatblacklist>,
     private userRepository: UserRepository,
-    // private chattingRoomRepository: ChattingRoomRepository,
   ) {}
   // 채팅방 블랙리스트 생성
   async createChatblacklist(chatblacklist: Chatblacklist) {
