@@ -15,7 +15,9 @@ export class Chatblacklist {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => ChattingRoom, (chattingRoom) => chattingRoom.chatblacklist)
+  @ManyToOne(() => ChattingRoom, (chattingRoom) => chattingRoom.chatblacklist, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'chatting_room_id' })
   chattingRoom: ChattingRoom;
   @Column()
