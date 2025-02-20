@@ -1,4 +1,5 @@
 import { Inventory } from 'src/inventory/entities/inventory.entity';
+import { PinkmongAppearLocation } from 'src/pinkmong-appear-location/entities/pinkmong-appear-location.entity';
 import { Pinkmong } from 'src/pinkmong/entities/pinkmong.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
@@ -31,6 +32,7 @@ export class CatchPinkmong {
   })
   @JoinColumn({ name: 'pinkmong_id' })
   pinkmong: Pinkmong;
+
   @Column({ type: 'int', nullable: false })
   pinkmong_id: number;
 
@@ -47,4 +49,21 @@ export class CatchPinkmong {
 
   @DeleteDateColumn({ type: 'timestamp' })
   deleted_at: Date;
+
+  @Column({ type: 'varchar', nullable: false })
+  latitude: string;
+
+  @Column({ type: 'varchar', nullable: false })
+  longitude: string;
+
+  @ManyToOne(
+    () => PinkmongAppearLocation,
+    (pinkmongAppearLocation) => pinkmongAppearLocation.catchPinkmong,
+    {},
+  )
+  @JoinColumn({ name: 'pinkmongAppearLocation_id' })
+  pinkmongAppearLocation: PinkmongAppearLocation;
+
+  @Column({ type: 'int', nullable: false })
+  pinkmongAppearLocation_id: number;
 }
