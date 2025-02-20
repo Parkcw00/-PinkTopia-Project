@@ -159,6 +159,16 @@ export class ChattingRoomService {
       throw new BadRequestException('존재하지 않는 채팅방입니다.');
     }
 
+    const isMember = await this.chattingRoomRepository.findChatMember(
+      chattingRoomId,
+      user.id,
+    );
+    if (isMember) {
+      throw new BadRequestException(
+        '선택한 유저는 이미 해당 채팅방의 멤버입니다.',
+      );
+    }
+
     try {
       await this.chattingRoomRepository.addChatMemberNotAdmin(
         chattingRoomId,
