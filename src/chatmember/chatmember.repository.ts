@@ -2,12 +2,13 @@ import { Repository } from 'typeorm';
 import { Chatmember } from './entities/chatmember.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-
+// import { ChattingRoomRepository } from 'src/chattingroom/chattingroom.repository';
 @Injectable()
 export class ChatmemberRepository {
   constructor(
     @InjectRepository(Chatmember)
     private chatmemberRepository: Repository<Chatmember>,
+    // private readonly chattingRoomRepository: ChattingRoomRepository,
   ) {}
   // 유저 아이디 조회
   async findByUserId(userId: number) {
