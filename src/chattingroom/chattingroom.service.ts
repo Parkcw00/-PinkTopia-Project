@@ -160,7 +160,7 @@ export class ChattingRoomService {
   // url 받아 접속한 멤버 채팅룸에 join
   async joinChattingRoom(user: any, chattingRoomId: number) {
     const existChattingRoom =
-      await this.chattingRoomRepository.findChattingRoom(chattingRoomId);
+      await this.chattingRoomRepository.checkChattingRoom(chattingRoomId);
     if (!existChattingRoom) {
       throw new BadRequestException('존재하지 않는 채팅방입니다.');
     }
