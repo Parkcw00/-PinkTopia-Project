@@ -13,12 +13,15 @@ import { UserGuard } from 'src/user/guards/user-guard';
 import { ChattingRoomService } from './chattingroom.service';
 import { ChangeAdmin } from './dto/change-admin.dto';
 import { InviteUser } from './dto/invite-user.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('채팅방 기능')
 @Controller('chattingroom')
 export class ChattingRoomController {
   constructor(private readonly chattingRoomService: ChattingRoomService) {}
 
   // 채팅방 생성
+  @ApiOperation({ summary: '채팅방 생성' })
   @UseGuards(UserGuard)
   @Post('')
   createChattingRoom(@Request() req) {
@@ -26,6 +29,7 @@ export class ChattingRoomController {
   }
 
   // 채팅방 나가기
+  @ApiOperation({ summary: '채팅방 나가기' })
   @UseGuards(UserGuard)
   @Patch('/out/:chattingRoomId')
   outChattingRoom(
@@ -36,6 +40,7 @@ export class ChattingRoomController {
   }
 
   // 채팅방 삭제
+  @ApiOperation({ summary: '채팅방 삭제' })
   @UseGuards(UserGuard)
   @Delete('/:chattingRoomId')
   deleteChattingRoom(
@@ -49,6 +54,7 @@ export class ChattingRoomController {
   }
 
   // 관리자 위임
+  @ApiOperation({ summary: '관리자 위임' })
   @UseGuards(UserGuard)
   @Patch('/:chattingRoomId/admin')
   changeAdmin(
@@ -64,6 +70,7 @@ export class ChattingRoomController {
   }
 
   // 채팅방 URL 원하는 유저한테 보내기
+  @ApiOperation({ summary: '채팅방 URl 원하는 유저 메일로 전송' })
   @UseGuards(UserGuard)
   @Post('/:chattingRoomId/send-url')
   sendInviteUrl(
@@ -78,7 +85,8 @@ export class ChattingRoomController {
     );
   }
 
-  // url 받아 접속한 멤버 채팅룸에 join
+  // url 받아 접속한 멤버 채팅방에 join
+  @ApiOperation({ summary: 'URL 받아 접속한 멤버 채팅방에 JOIN' })
   @UseGuards(UserGuard)
   @Get('/:chattingRoomId/join')
   joinChattingRoom(
