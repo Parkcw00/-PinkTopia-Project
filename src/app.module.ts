@@ -26,6 +26,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AchievementCModule } from './achievement-c/achievement-c.module';
 import { StoreItemModule } from './store-item/store-item.module';
 import { S3Module } from './s3/s3.module';
+import { LocationHistoryModule } from './location-history/location-history.module';
 
 const typeOrmModuleOptions = {
   useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
@@ -88,6 +89,7 @@ const typeOrmModuleOptions = {
     ChatblacklistModule,
     StoreItemModule,
     S3Module,
+    LocationHistoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
