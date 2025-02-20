@@ -78,6 +78,16 @@ export class ChattingRoomRepository {
     return await this.chattingRoomrepository.delete({ id });
   }
 
+  // 채팅방 조회
+  async findChattingRoom() {
+    return await this.chattingRoomrepository.find();
+  }
+
+  // 특정 채팅방 조회
+  async findChattingRoomById(id: number) {
+    return await this.chattingRoomrepository.findOne({ where: { id } });
+  }
+
   // 유저 조회
   async findId(id: number) {
     return await this.userRepository.findOne({
@@ -86,7 +96,7 @@ export class ChattingRoomRepository {
   }
 
   // 채팅방 확인
-  async findChattingRoom(id: number) {
+  async checkChattingRoom(id: number) {
     return await this.chattingRoomrepository.findOne({ where: { id } });
   }
 

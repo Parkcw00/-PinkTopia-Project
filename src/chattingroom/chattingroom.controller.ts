@@ -28,6 +28,13 @@ export class ChattingRoomController {
     return this.chattingRoomService.createChattingRoom(req.user);
   }
 
+  // 채팅방 조회
+  @UseGuards(UserGuard)
+  @Get('')
+  getChattingRoom(@Request() req) {
+    return this.chattingRoomService.getChattingRoom(req.user);
+  }
+
   // 채팅방 나가기
   @ApiOperation({ summary: '채팅방 나가기' })
   @UseGuards(UserGuard)
