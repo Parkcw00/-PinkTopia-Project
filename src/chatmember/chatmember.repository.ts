@@ -32,7 +32,10 @@ export class ChatmemberRepository {
 
   // 채팅멤버 조회
   async findByChatmember(id: number) {
-    return this.chatmemberRepository.findOne({ where: { id: id } });
+    return this.chatmemberRepository.findOne({
+      where: { id: id },
+      relations: ['user'],
+    });
   }
 
   // 채팅멤버 전체 조회

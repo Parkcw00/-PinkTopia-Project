@@ -79,13 +79,26 @@ export class ChatmemberService {
   }
 
   // 채팅멤버 조회
-  async findOneChatMember(chatmemberId: number): Promise<Chatmember> {
+  async findOneChatMember(chatmemberId: number) {
     const chatmember =
       await this.chatmemberRepository.findByChatmember(chatmemberId);
     if (!chatmember) {
       throw new NotFoundException(Messages.CHATMEMBER_NOT_FOUND);
     }
-    return chatmember;
+
+    // 필요한 사용자 정보만 선택하여 반환
+    const userInfo = {
+      id: chatmember.user.id,
+      email: chatmember.user.email,
+      nickname: chatmember.user.nickname,
+      profile_image: chatmember.user.profile_image,
+      birthday: chatmember.user.birthday,
+    };
+
+    return {
+      ...chatmember,
+      user: userInfo,
+    };
   }
 
   // 채팅멤버 삭제
