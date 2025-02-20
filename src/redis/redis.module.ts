@@ -7,10 +7,10 @@ import { RedisModule } from '@nestjs-modules/ioredis';
     RedisModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         options: {
-          host: configService.get('REDIS_NAME'),
-          port: configService.get('REDIS_PORT'),
-          username: configService.get('REDIS_USER'),
-          password: configService.get('REDIS_PASSWORD'),
+          host: configService.get('VALKEY_NAME'),
+          port: configService.get('VALKEY_PORT'),
+          // username: configService.get('REDIS_USER'),
+          // password: configService.get('REDIS_PASSWORD'),
         },
         type: 'single',
       }),

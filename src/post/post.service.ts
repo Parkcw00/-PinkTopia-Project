@@ -34,6 +34,12 @@ export class PostService {
 
   async findPosts(): Promise<Post[]> {
     const posts = await this.postRepository.findPosts();
+
+    const cachedPosts = await this.redisService.get(`boards:`);
+    if (cachedPosts) {
+      console.log(cachedPosts);
+      return cachedPosts; // 캐시된 데이터 반환
+    }
     await this.redisService.set(`posts:`, posts, 60);
     return posts;
   }
