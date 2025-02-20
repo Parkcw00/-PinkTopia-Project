@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { PostModule } from './post/post.module';
 import { DirectionModule } from './direction/direction.module';
 import { RankingModule } from './ranking/ranking.module';
-import { ChattingroomModule } from './chattingroom/chattingroom.module';
+import { ChattingRoomModule } from './chattingroom/chattingroom.module';
 import { ChattingModule } from './chatting/chatting.module';
 import { AchievementPModule } from './achievement-p/achievement-p.module';
 import { SubAchievementModule } from './sub-achievement/sub-achievement.module';
@@ -83,7 +83,7 @@ const typeOrmModuleOptions = {
     AchievementPModule,
     AchievementCModule,
     ChattingModule,
-    ChattingroomModule,
+    ChattingRoomModule,
     RankingModule,
     DirectionModule,
     ChatmemberModule,
