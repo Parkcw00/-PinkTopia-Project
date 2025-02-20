@@ -27,7 +27,7 @@ import { AchievementCModule } from './achievement-c/achievement-c.module';
 import { StoreItemModule } from './store-item/store-item.module';
 import { S3Module } from './s3/s3.module';
 import { LocationHistoryModule } from './location-history/location-history.module';
-import { CustomRedisModule } from './redis/redis.module';
+import { ValkeyModule } from './valkey/valkey.module';
 
 const typeOrmModuleOptions = {
   useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
@@ -91,7 +91,7 @@ const typeOrmModuleOptions = {
     StoreItemModule,
     S3Module,
     LocationHistoryModule,
-    CustomRedisModule,
+    ValkeyModule,
   ],
   controllers: [AppController],
   providers: [AppService],

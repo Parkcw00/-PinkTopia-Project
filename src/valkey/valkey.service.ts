@@ -13,8 +13,12 @@ export class ValkeyService implements OnModuleDestroy {
     });
   }
 
-  async set(key: string, value: string) {
-    await this.client.set(key, value);
+  async set(key: string, value: any, expiryInSeconds?: number) {
+    if (expiryInSeconds) {
+      await this.client.set(key, JSON.stringify(value), 'EX', expiryInSeconds);
+    } else {
+      await this.client.set(key, JSON.stringify(value));
+    }
   }
 
   async get(key: string) {

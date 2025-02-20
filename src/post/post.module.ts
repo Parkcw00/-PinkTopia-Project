@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { PostRepository } from './post.repository';
 import { S3Service } from 'src/s3/s3.service';
-import { CustomRedisModule } from '../redis/redis.module';
-import { RedisService } from 'src/redis/redis.service';
+import { ValkeyModule } from 'src/valkey/valkey.module';
+import { ValkeyService } from 'src/valkey/valkey.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Post]), CustomRedisModule],
+  imports: [TypeOrmModule.forFeature([Post]), ValkeyModule],
   controllers: [PostController],
-  providers: [PostService, PostRepository, S3Service, RedisService],
+  providers: [PostService, PostRepository, S3Service, ValkeyService],
   exports: [PostRepository],
 })
 export class PostModule {}
