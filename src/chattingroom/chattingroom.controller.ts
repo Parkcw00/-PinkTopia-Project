@@ -6,40 +6,100 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
-import { ChattingroomService } from './chattingroom.service';
-import { CreateChattingroomDto } from './dto/create-chattingroom.dto';
-import { UpdateChattingroomDto } from './dto/update-chattingroom.dto';
+import { UserGuard } from 'src/user/guards/user-guard';
+import { ChattingRoomService } from './chattingroom.service';
+import { ChangeAdmin } from './dto/change-admin.dto';
+import { InviteUser } from './dto/invite-user.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('채팅방 기능')
 @Controller('chattingroom')
-export class ChattingroomController {
-  constructor(private readonly chattingroomService: ChattingroomService) {}
+export class ChattingRoomController {
+  constructor(private readonly chattingRoomService: ChattingRoomService) {}
 
-  @Post()
-  create(@Body() createChattingroomDto: CreateChattingroomDto) {
-    return this.chattingroomService.create(createChattingroomDto);
+  // 채팅방 생성
+  @ApiOperation({ summary: '채팅방 생성' })
+  @UseGuards(UserGuard)
+  @Post('')
+  createChattingRoom(@Request() req) {
+    return this.chattingRoomService.createChattingRoom(req.user);
   }
 
-  @Get()
-  findAll() {
-    return this.chattingroomService.findAll();
+  // 채팅방 조회
+  @UseGuards(UserGuard)
+  @Get('')
+  getChattingRoom(@Request() req) {
+    return this.chattingRoomService.getChattingRoom(req.user);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.chattingroomService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateChattingroomDto: UpdateChattingroomDto,
+  // 채팅방 나가기
+  @ApiOperation({ summary: '채팅방 나가기' })
+  @UseGuards(UserGuard)
+  @Patch('/out/:chattingRoomId')
+  outChattingRoom(
+    @Request() req,
+    @Param('chattingRoomId') chattingRoomId: number,
   ) {
-    return this.chattingroomService.update(+id, updateChattingroomDto);
+    return this.chattingRoomService.outChattingRoom(req.user, chattingRoomId);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.chattingroomService.remove(+id);
+  // 채팅방 삭제
+  @ApiOperation({ summary: '채팅방 삭제' })
+  @UseGuards(UserGuard)
+  @Delete('/:chattingRoomId')
+  deleteChattingRoom(
+    @Request() req,
+    @Param('chattingRoomId') chattingRoomId: number,
+  ) {
+    return this.chattingRoomService.deleteChattingRoom(
+      req.user,
+      chattingRoomId,
+    );
+  }
+
+  // 관리자 위임
+  @ApiOperation({ summary: '관리자 위임' })
+  @UseGuards(UserGuard)
+  @Patch('/:chattingRoomId/admin')
+  changeAdmin(
+    @Request() req,
+    @Param('chattingRoomId') chattingRoomId: number,
+    @Body() changeAdmin: ChangeAdmin,
+  ) {
+    return this.chattingRoomService.changeAdmin(
+      req.user,
+      chattingRoomId,
+      changeAdmin.userId,
+    );
+  }
+
+  // 채팅방 URL 원하는 유저한테 보내기
+  @ApiOperation({ summary: '채팅방 URl 원하는 유저 메일로 전송' })
+  @UseGuards(UserGuard)
+  @Post('/:chattingRoomId/send-url')
+  sendInviteUrl(
+    @Request() req,
+    @Param('chattingRoomId') chattingRoomId: number,
+    @Body() inviteUser: InviteUser,
+  ) {
+    return this.chattingRoomService.sendInviteUrl(
+      req.user,
+      chattingRoomId,
+      inviteUser.userId,
+    );
+  }
+
+  // url 받아 접속한 멤버 채팅방에 join
+  @ApiOperation({ summary: 'URL 받아 접속한 멤버 채팅방에 JOIN' })
+  @UseGuards(UserGuard)
+  @Get('/:chattingRoomId/join')
+  joinChattingRoom(
+    @Request() req,
+    @Param('chattingRoomId') chattingRoomId: number,
+  ) {
+    return this.chattingRoomService.joinChattingRoom(req.user, chattingRoomId);
   }
 }

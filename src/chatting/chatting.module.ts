@@ -11,5 +11,6 @@ import { S3Service } from 'src/s3/s3.service';
   imports: [TypeOrmModule.forFeature([Chatting, Chatmember])],
   controllers: [ChattingController],
   providers: [ChattingService, ChattingRepository, S3Service],
+  exports: [ChattingService, ChattingRepository],
 })
 export class ChattingModule {}

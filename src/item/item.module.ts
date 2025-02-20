@@ -11,6 +11,11 @@ import { Inventory } from 'src/inventory/entities/inventory.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Item, StoreItem, Inventory])],
   controllers: [ItemController],
-  providers: [ItemService, ItemRepository, StoreItemRepository, InventoryRepository],
+  providers: [
+    ItemService,
+    ItemRepository,
+    StoreItemRepository,
+    InventoryRepository,
+  ],
 })
 export class ItemModule {}
