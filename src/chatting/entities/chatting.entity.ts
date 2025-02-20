@@ -35,7 +35,9 @@ export class Chatting {
   @Column()
   user_id: number;
 
-  @ManyToOne(() => ChattingRoom, (chattingRoom) => chattingRoom.chatting)
+  @ManyToOne(() => ChattingRoom, (chattingRoom) => chattingRoom.chatting, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'chatting_room_id' })
   chattingRoom: Chatting;
   @Column()
