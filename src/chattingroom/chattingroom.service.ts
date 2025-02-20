@@ -78,6 +78,7 @@ export class ChattingRoomService {
     if (isMember.admin !== true) {
       throw new BadRequestException('관리자 위임 권한이 없습니다.');
     }
+
     const isMember2 = await this.chattingRoomRepository.findChatMember(
       chattingRoomId,
       userId,
@@ -87,5 +88,8 @@ export class ChattingRoomService {
         '선택한 유저는 해당 채팅방의 멤버가 아닙니다.',
       );
     }
+    await this.chattingRoomRepository.deleteAdmin(chattingRoomId, user.id);
+    await this.chattingRoomRepository.getAdmin(chattingRoomId, userId);
+    return { message: `${userId}님에게 관리자 권한을 위임하였습니다.` };
   }
 }
