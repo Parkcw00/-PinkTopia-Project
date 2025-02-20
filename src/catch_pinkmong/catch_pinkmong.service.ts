@@ -36,141 +36,203 @@ export class CatchPinkmongService {
   ) {}
 
   // 새로운 CatchPinkmong 생성
-  // 몬스터 등장 로직
   async appearPinkmong(userId: number): Promise<{
     message: string;
     pinkmong?: { id: number; name: string; explain: string };
   }> {
+    // 1. 유저 조회
     const user = await this.userRepository.findOne({
       where: { id: userId },
-      relations: ['inventory'], // 유저의 인벤토리를 가져옴
     });
+    // 유저가 없으면 NotFoundException 발생
+    if (!user) throw new NotFoundException('유저를 찾을 수 없습니다.');
 
-    // 유저가 존재하지 않을때
-    if (!user) {
-      throw new NotFoundException('유저를 찾을 수 없습니다.');
-    }
-    // 유저의 인벤토리가 없을때
-    if (!user.inventory) {
-      throw new NotFoundException('해당 유저의 인벤토리를 찾을 수 없습니다.');
-    }
-
-    // DB에서 pinkmong_id가 4인 핑크몽을 가져옴
-    const selectedPinkmong = await this.pinkmongRepository.findOne({
-      where: { id: 4 },
+    // 2. inventoryRepository를 이용하여 유저의 인벤토리 조회
+    const inventory = await this.inventoryRepository.findOne({
+      where: { user_id: user.id },
     });
-
-    if (!selectedPinkmong) {
-      throw new NotFoundException('핑크몽을 찾을 수 없습니다.');
-    }
-
-    // 동일한 user, pinkmong, inventory 조합의 CatchPinkmong 레코드가 이미 있는지 확인
-    const existingCatch = await this.catchPinkmongRepository.findOne({
-      where: {
-        user_id: user.id,
-        pinkmong_id: selectedPinkmong.id,
-        inventory_id: user.inventory.id,
-      },
-    });
-
-    if (existingCatch) {
-      // 이미 해당 조합으로 생성되어 있다면, 중복 생성하지 않고 메시지 반환
-      return { message: `${selectedPinkmong.name}이(가) 이미 등장중입니다!` };
-    }
-
-    // CatchPinkmong 레코드 생성
-    const catchPinkmong = this.catchPinkmongRepository.create({
-      user,
-      user_id: user.id,
-      pinkmong_id: selectedPinkmong.id,
-      inventory: user.inventory,
-      inventory_id: user.inventory.id,
-    });
-    await this.catchPinkmongRepository.save(catchPinkmong);
-
-    // 잡기 시도 기록을 0으로 초기화
-    this.catchAttempts.set(catchPinkmong.id, 0);
-
-    return { message: `${selectedPinkmong.name}이(가) 등장했다!` };
-  }
-
-  // 먹이를 주고 잡는 로직
-  async feeding(
-    userId: number, // 사용자 아이디
-    itemId: number, // 사용하려는 아이템 ID
-  ): Promise<{ message: string; success: boolean }> {
-    // 사용자 ID로 활성 캐치 레코드를 조회합니다.
-    const catchRecord = await this.catchPinkmongRepository.findOne({
-      where: { user_id: userId }, // 사용자 ID에 해당하는 캐치 레코드를 찾음
-      relations: ['user', 'pinkmong', 'inventory'],
-    });
-    if (!catchRecord) {
-      throw new NotFoundException('해당 핑크몽을 잡을 수 없습니다.');
-    }
-    const { user, pinkmong, inventory } = catchRecord;
+    // 인벤토리가 없으면 NotFoundException 발생
     if (!inventory) {
       throw new NotFoundException('해당 유저의 인벤토리를 찾을 수 없습니다.');
     }
 
-    // 아이템 테이블에서 직접 아이템을 가져옴 + 인벤토리 관계 로드
+    // 3. 인벤토리에 이미 CatchPinkmong 레코드가 존재하는지 확인 (한 인벤토리에는 하나만 존재)
+    const existingInventoryCatch = await this.catchPinkmongRepository.findOne({
+      where: { inventory_id: inventory.id },
+    });
+    // 이미 존재하면 등장 중이라는 메시지를 반환
+    if (existingInventoryCatch) {
+      return { message: `이미 다른 핑크몽이 등장 중입니다!` };
+    }
+
+    // 4. 등급을 고정 확률로 랜덤 선택
+    // Math.random()을 통해 0 ~ 1 사이의 난수를 생성
+    // 전설: 5%, 희귀: 40%, 보통: 55%
+    const r = Math.random();
+    let selectedGrade: string;
+    if (r < 0.05) {
+      selectedGrade = 'legendary'; // 난수가 0 ~ 0.05이면 'legendary'
+    } else if (r < 0.05 + 0.35) {
+      selectedGrade = 'rare'; // 난수가 0.05 이상 0.40 미만이면 'rare'
+    } else {
+      selectedGrade = 'common'; // 그 외에는 'common'
+    }
+
+    // 5. 선택된 등급에 해당하는 pinkmong들 중에서 region_theme을 그룹화하여 RAND() 함수로 무작위 선택
+    const randomRegionResult = await this.pinkmongRepository
+      .createQueryBuilder('p')
+      .select('p.region_theme', 'region')
+      .where('p.grade = :grade', { grade: selectedGrade })
+      .groupBy('p.region_theme')
+      .orderBy('RAND()')
+      .getRawOne();
+    // region_theme이 없으면 예외 발생
+    if (!randomRegionResult)
+      throw new NotFoundException(
+        '해당 등급에 등록된 region_theme이 없습니다.',
+      );
+    // 선택된 region_theme 값을 저장
+    const randomRegion = randomRegionResult.region;
+
+    // 6. 선택된 등급과 region_theme 조건에 맞는 pinkmong 중 무작위로 하나의 레코드를 조회
+    const selectedPinkmong = await this.pinkmongRepository
+      .createQueryBuilder('p')
+      .where('p.grade = :grade', { grade: selectedGrade })
+      .andWhere('p.region_theme = :region', { region: randomRegion })
+      .orderBy('RAND()')
+      .getOne();
+    // pinkmong이 없으면 예외 발생
+    if (!selectedPinkmong)
+      throw new NotFoundException(
+        '해당 등급 및 region_theme에 해당하는 pinkmong이 없습니다.',
+      );
+
+    // 7. 기존 CatchPinkmong 중 동일한 user, pinkmong, inventory 조합의 기록이 있는지 추가 검증
+    const existingCatch = await this.catchPinkmongRepository.findOne({
+      where: {
+        user_id: user.id,
+        pinkmong_id: selectedPinkmong.id,
+        inventory_id: inventory.id,
+      },
+    });
+    // 이미 존재하면 등장 중이라는 메시지 반환
+    if (existingCatch) {
+      return { message: `${selectedPinkmong.name}이(가) 이미 등장중입니다!` };
+    }
+
+    // 8. 새로운 CatchPinkmong 레코드 생성 및 저장 (유저, pinkmong, 인벤토리 정보를 기록)
+    const catchPinkmong = this.catchPinkmongRepository.create({
+      user,
+      user_id: user.id,
+      pinkmong_id: selectedPinkmong.id,
+      inventory, // 별도로 조회한 inventory 사용
+      inventory_id: inventory.id,
+    });
+    await this.catchPinkmongRepository.save(catchPinkmong);
+
+    // 9. feeding(먹이 주기) 시도 횟수를 0으로 초기화 (in-memory Map에 등록)
+    this.catchAttempts.set(catchPinkmong.id, 0);
+
+    // 10. pinkmong 등장 메시지와 선택된 pinkmong의 상세 정보를 반환
+    return {
+      message: `${selectedPinkmong.name}이(가) 등장했다!`,
+      pinkmong: {
+        id: selectedPinkmong.id,
+        name: selectedPinkmong.name,
+        explain: selectedPinkmong.explain,
+      },
+    };
+  }
+
+  // 먹이를 주고 핑크몽을 잡는 로직을 처리하는 메서드입니다.
+  async feeding(
+    userId: number, // 먹이 주기를 시도하는 사용자의 id
+    itemId: number, // 사용하려는 아이템의 id
+  ): Promise<{ message: string; success: boolean }> {
+    // 사용자 ID를 기준으로 활성화된 CatchPinkmong 레코드를 조회합니다.
+    // relations 옵션을 사용해 user, pinkmong, inventory 정보를 함께 로드합니다.
+    const catchRecord = await this.catchPinkmongRepository.findOne({
+      where: { user_id: userId },
+      relations: ['user', 'pinkmong', 'inventory'],
+    });
+    // 만약 활성 레코드가 없다면, 핑크몽을 잡을 수 없으므로 예외 발생
+    if (!catchRecord) {
+      throw new NotFoundException('해당 핑크몽을 잡을 수 없습니다.');
+    }
+    // 구조 분해 할당을 통해 catchRecord의 user, pinkmong, inventory 값을 가져옵니다.
+    const { user, pinkmong, inventory } = catchRecord;
+    // 인벤토리 정보가 없다면 예외 발생
+    if (!inventory) {
+      throw new NotFoundException('해당 유저의 인벤토리를 찾을 수 없습니다.');
+    }
+
+    // 아이템 Repository를 사용하여 itemId에 해당하는 아이템을 조회합니다.
+    // 아이템과 연결된 inventory 정보도 relations 옵션으로 함께 로드합니다.
     const item = await this.itemRepository.findOne({
       where: { id: itemId },
       relations: ['inventory'],
     });
+    // 아이템이 존재하지 않으면 예외 발생
     if (!item) {
       throw new NotFoundException('아이템을 찾을 수 없습니다.');
     }
 
-    // 아이템이 인벤토리에 소속되어 있는지 확인
+    // 조회된 아이템이 인벤토리에 속해 있는지 확인합니다.
     if (!item.inventory) {
       throw new BadRequestException(
         '이 아이템은 인벤토리에 속해있지 않습니다.',
       );
     }
 
-    // 아이템이 현재 유저의 인벤토리에 속해 있는지 확인
+    // 조회된 아이템의 인벤토리가 현재 사용자의 인벤토리와 일치하는지 확인합니다.
     if (item.inventory.id !== inventory.id) {
       throw new BadRequestException(
         '이 아이템은 현재 유저의 인벤토리에 속해 있지 않습니다.',
       );
     }
 
-    // 아이템 사용하면 아이템보유수 1감소
+    // 아이템의 count(보유 수량)가 0보다 크면 1 감소시키고 저장합니다.
     if (item.count > 0) {
-      item.count = item.count - 1; // count 1 감소
-      await this.itemRepository.save(item); // 변경사항 저장
+      item.count = item.count - 1; // 아이템 수량 1 감소
+      await this.itemRepository.save(item); // 변경된 아이템 정보를 저장
     } else {
+      // 아이템 수량이 부족하면 예외 발생
       throw new BadRequestException('해당 아이템의 수량이 부족합니다.');
     }
 
-    // 확률 계산 (기본 확률에 아이템에 따른 추가 확률을 더함)
-    // 기본 아이템 (예: item.id === 1)인 경우 추가 확률은 0
+    // 기본 포획 확률을 0.1(10%)로 설정합니다.
     const baseCatchRate = 0.1;
+    // 아이템 id에 따른 추가 확률(bonus)을 정의하는 객체입니다.
+    // 예시로 아이템 id 2, 3, 4에 대해 각각 다른 추가 확률을 부여합니다.
     const getChanceIncrease = {
-      // 예시: 아이템 id 2, 3에 대해서만 추가 확률을 부여
-
-      // 나중에 등급이 나오면 퍼센트 감소 ====================
-
-      // 1번은 스웨디시젤리 10%
-      2: 0.15, // 핑크과자 25%
-      3: 0.27, // 37%
-      4: 0.35, // 45%
+      2: 0.15, // 아이템 id 2: 15% 추가 확률
+      3: 0.27, // 아이템 id 3: 27% 추가 확률
+      4: 0.35, // 아이템 id 4: 35% 추가 확률
     };
+    // 기본 아이템(예: item.id === 1)인 경우 추가 확률은 0입니다.
     const isBaseItem = item.id === 1;
+    // 추가 확률(bonus)은 기본 아이템이면 0, 아니면 getChanceIncrease에서 아이템 id에 해당하는 값을 사용합니다.
     const bonus = isBaseItem ? 0 : getChanceIncrease[item.id] || 0;
+    // 최종 포획 확률은 기본 확률과 추가 확률을 합산합니다.
     const finalCatchRate = baseCatchRate + bonus;
 
-    // 실패 시 feeding 시도 횟수를 업데이트 (최대 5회)
+    // Math.random()을 사용하여 포획에 성공할 확률을 결정합니다.
+    // 만약 랜덤 값이 finalCatchRate보다 크면 실패한 것으로 처리합니다.
     if (Math.random() > finalCatchRate) {
+      // 현재 feeding 시도 횟수를 in-memory Map에서 가져옵니다. (없으면 0으로 간주)
       const currentAttempts = this.catchAttempts.get(catchRecord.id) || 0;
+      // feeding 시도 횟수를 1 증가시킵니다.
       const newAttempts = currentAttempts + 1;
+      // 증가된 시도 횟수를 Map에 업데이트합니다.
       this.catchAttempts.set(catchRecord.id, newAttempts);
+      // 시도 횟수가 5회 미만이면 남은 기회를 알려주며 실패 메시지 반환
       if (newAttempts < 5) {
         return {
           message: `핑크몽 포획에 실패했습니다! 아직 ${5 - newAttempts}번의 기회가 남았습니다.`,
           success: false,
         };
       } else {
+        // 5회 이상 실패하면 CatchPinkmong 레코드를 삭제하고 feeding 시도 기록도 삭제한 후 실패 메시지 반환
         await this.catchPinkmongRepository.remove(catchRecord);
         this.catchAttempts.delete(catchRecord.id);
         return {
@@ -181,22 +243,22 @@ export class CatchPinkmongService {
       }
     }
 
-    // 잡기 성공 시, catchRecord 삭제 (몬스터를 잡았으므로 등장 기록 삭제)
+    // 포획에 성공하면, 더 이상 필요하지 않은 CatchPinkmong 레코드를 삭제합니다.
     await this.catchPinkmongRepository.remove(catchRecord);
 
-    // 컬렉션(도감)에 해당 유저와 핑크몽 조합의 레코드가 있는지 확인
+    //  컬렉션(도감)에 이미 해당 유저와 핑크몽 조합의 레코드가 있는지 확인합니다.
     const existingCollection = await this.collectionRepository.findOne({
       where: { pinkmong_id: pinkmong.id, user_id: user.id },
     });
 
+    // 이미 도감에 등록되어 있으면 단순히 성공 메시지를 반환합니다.
     if (existingCollection) {
-      // 이미 등록된 경우
       return {
         message: `${pinkmong.name}을(를) 잡았습니다!`,
         success: true,
       };
     } else {
-      // 최초 포획인 경우 도감에 추가
+      // 최초 포획이면 새로운 Collection 레코드를 생성하여 도감에 등록합니다.
       const newCollection = this.collectionRepository.create({
         user,
         user_id: user.id,
@@ -211,21 +273,26 @@ export class CatchPinkmongService {
     }
   }
 
-  // 도망 로직: catchPinkmong 레코드만 삭제
+  // 도망 로직: 유저의 CatchPinkmong 레코드를 삭제하여 몬스터 등장 기록을 제거합니다.
   async giveup(userId: number): Promise<{ message: string; success: boolean }> {
+    // userId를 기준으로 CatchPinkmong 레코드를 조회합니다.
+    // 여기서는 pinkmong 정보만 relations로 로드합니다.
     const catchRecord = await this.catchPinkmongRepository.findOne({
       where: { user_id: userId },
       relations: ['pinkmong'],
     });
+    // 만약 해당 레코드가 없으면 예외 발생
     if (!catchRecord) {
       throw new NotFoundException(
         '해당 유저의 몬스터 등장 기록을 찾을 수 없습니다.',
       );
     }
 
+    // CatchPinkmong 레코드를 삭제하여 도망 처리를 진행합니다.
     await this.catchPinkmongRepository.remove(catchRecord);
-    // feeding 시도 기록도 함께 삭제
+    // in-memory Map에서 feeding 시도 기록도 함께 삭제합니다.
     this.catchAttempts.delete(catchRecord.id);
+    // 도망 성공 메시지와 함께 success:false를 반환합니다.
     return { message: `성공적으로 도망쳤습니다!`, success: false };
   }
 }

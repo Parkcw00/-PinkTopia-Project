@@ -27,6 +27,7 @@ import { AchievementCModule } from './achievement-c/achievement-c.module';
 import { StoreItemModule } from './store-item/store-item.module';
 import { S3Module } from './s3/s3.module';
 import { LocationHistoryModule } from './location-history/location-history.module';
+import { PinkmongAppearLocationModule } from './pinkmong-appear-location/pinkmong-appear-location.module';
 
 const typeOrmModuleOptions = {
   useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
@@ -90,6 +91,7 @@ const typeOrmModuleOptions = {
     StoreItemModule,
     S3Module,
     LocationHistoryModule,
+    PinkmongAppearLocationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
