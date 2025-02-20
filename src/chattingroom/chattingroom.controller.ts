@@ -55,7 +55,11 @@ export class ChattingRoomController {
     @Param('chattingRoomId') chattingRoomId: number,
     @Body() changeAdmin: ChangeAdmin,
   ) {
-    return this.chattingRoomService.changeAdmin(req.user, chattingRoomId);
+    return this.chattingRoomService.changeAdmin(
+      req.user,
+      chattingRoomId,
+      changeAdmin.userId,
+    );
   }
 
   // // 멤버초대 URL생성
