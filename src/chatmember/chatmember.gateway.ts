@@ -11,10 +11,14 @@ import { ChatmemberService } from './chatmember.service';
 @WebSocketGateway({
   namespace: '/chatmember',
   cors: {
-    origin: ['http://127.0.0.1:5500'],
+    origin: true,
     methods: ['GET', 'POST'],
     credentials: true,
+    allowedHeaders: ['content-type'],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   },
+  transports: ['websocket', 'polling'],
 })
 export class ChatmemberGateway {
   @WebSocketServer()

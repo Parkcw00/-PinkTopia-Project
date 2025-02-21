@@ -105,4 +105,18 @@ export class ChatmemberService {
   async deleteChatMember(chatmemberId: number) {
     return this.chatmemberRepository.deleteChatmember(chatmemberId);
   }
+
+  async findByRoomAndUser(roomId: number, userId: number) {
+    const chatMember =
+      await this.chatmemberRepository.findByUserIdAndChattingRoomId(
+        userId,
+        roomId,
+      );
+
+    if (!chatMember) {
+      throw new NotFoundException(Messages.CHATMEMBER_NOT_FOUND);
+    }
+
+    return chatMember;
+  }
 }

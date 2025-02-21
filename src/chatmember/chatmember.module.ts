@@ -18,8 +18,10 @@ import { ChatmemberGateway } from './chatmember.gateway';
     UserModule,
     ChattingRoomModule,
     ChatblacklistModule,
+    ChattingModule,
   ],
   controllers: [ChatmemberController],
   providers: [ChatmemberService, ChatmemberRepository, ChatmemberGateway],
+  exports: [ChatmemberService, ChatmemberRepository],
 })
 export class ChatmemberModule {}
