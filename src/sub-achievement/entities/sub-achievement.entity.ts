@@ -7,17 +7,19 @@ import {
   DeleteDateColumn,
   ManyToOne,
   JoinColumn,
-  OneToMany,
+  OneToMany,Unique
 } from 'typeorm';
 import { SubAchievementMissionType } from '../enums/sub-achievement-mission-type.enum';
 import { Achievement } from 'src/achievement/entities/achievement.entity';
 import { AchievementP } from 'src/achievement-p/entities/achievement-p.entity';
 
 @Entity({ name: 'sub-achievement' })
+@Unique(['title']) // 유니크 추가
 export class SubAchievement {
   @PrimaryGeneratedColumn()
   id: number;
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   @ManyToOne(() => Achievement, (achievement) => achievement.sub_achievement, {
     onDelete: 'CASCADE',
   })
@@ -28,7 +30,10 @@ export class SubAchievement {
   achievement_id: number;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
-  conditions: string; // `linestring` → `varchar`로 변경
+  title: string; 
+
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  conditions: string; 
 
   @Column({
     type: 'enum',
@@ -36,6 +41,10 @@ export class SubAchievement {
     nullable: false,
   })
   mission_type: SubAchievementMissionType;
+
+  // 만료일 컬럼 추가
+  @Column({ type: 'date', nullable: true })
+  expiration_at: Date;
 
   @UpdateDateColumn()
   updated_at: Date;
@@ -47,7 +56,7 @@ export class SubAchievement {
   deleted_at: Date;
 
   @OneToMany(
-    () => AchievementP,
+    () => AchievementP,    
     (achievement_p) => achievement_p.sub_achievement,
   ) // 카드 엔티티와 1:n 관계 설정
   achievement_p: AchievementP[];

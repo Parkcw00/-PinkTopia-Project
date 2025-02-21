@@ -18,6 +18,7 @@ import {
 } from 'typeorm';
 import { Chatblacklist } from 'src/chatblacklist/entities/chatblacklist.entity';
 import { Chatmember } from 'src/chatmember/entities/chatmember.entity';
+import { LocationHistory } from 'src/location-history/entities/location-history.entity';
 
 @Entity({
   name: 'user',
@@ -100,4 +101,7 @@ export class User {
 
   @OneToMany(() => Chatblacklist, (chatblacklist) => chatblacklist.user)
   chatblacklist: Chatblacklist[];
+
+  @OneToMany(() => LocationHistory, (locationHistory) => locationHistory.user)
+  locationHistory: LocationHistory[];
 }

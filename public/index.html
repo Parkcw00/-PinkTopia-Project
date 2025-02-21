@@ -8,6 +8,7 @@
     <div id="map" style="width: 100%; height: 100vh"></div>
 
     <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=7c34ce71def52f8fed0733ef6e3b1a03"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
       var mapContainer = document.getElementById('map'), // 지도를 표시할 div
         mapOption = {
@@ -19,6 +20,28 @@
       // 지도를 생성한다
       var map = new kakao.maps.Map(mapContainer, mapOption);
 
+      // 웹소켓 연결
+      var socket = io('http://localhost:3000');
+
+      // GPS 데이터 수신
+      socket.on('receiveGpsData', function (data) {
+        console.log('Received GPS data:', data);
+        updateMap(data.latitude, data.longitude);
+      });
+
+      // 지도 업데이트 함수
+      function updateMap(latitude, longitude) {
+        var newCenter = new kakao.maps.LatLng(latitude, longitude);
+        map.setCenter(newCenter);
+
+        var markerPosition = new kakao.maps.LatLng(latitude, longitude);
+        var marker = new kakao.maps.Marker({
+          position: markerPosition,
+        });
+        marker.setMap(map);
+      }
+
+      // 기존 데이터에 대한 마커 생성
       var 데이터 = [
         [
           37.56649,

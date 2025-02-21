@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Application</title>
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <style>
+      #chat {
+        width: 300px;
+        height: 400px;
+        border: 1px solid #ccc;
+        overflow-y: scroll;
+        margin-bottom: 10px;
+      }
+      #messageInput,
+      #roomIdInput {
+        width: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Chat Application</h1>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="이메일" required />
+      <input type="password" id="password" placeholder="비밀번호" required />
+      <button type="submit">로그인</button>
+    </form>
+
+    <div id="chat"></div>
+    <input type="text" id="roomIdInput" placeholder="Chat Room ID" />
+    <input type="text" id="messageInput" placeholder="Type a message" />
+    <button id="joinRoom">채팅방 참여</button>
+    <button id="leaveRoom">채팅방 나가기</button>
+    <button id="sendMessage">메시지 보내기</button>
+
+    <script>
+      const socket = io('http://localhost:3000/chatting');
+
+      document.getElementById('loginForm').onsubmit = async function (event) {
+        event.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        try {
+          const response = await fetch(
+            'http://localhost:3000/user/auth/login',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ email, password }),
+              credentials: 'include', // 쿠키를 포함하기 위해 추가
+            },
+          );
+
+          if (response.ok) {
+            // Authorization 헤더에서 토큰 추출
+            const accessToken = response.headers
+              .get('Authorization')
+              ?.split('Bearer ')[1];
+            console.log('로그인 성공');
+
+            if (accessToken) {
+              localStorage.setItem('accessToken', accessToken);
+              const userData = await response.json();
+              localStorage.setItem('userId', userData.id);
+            } else {
+              console.error('토큰을 찾을 수 없습니다.');
+            }
+          } else {
+            console.error('로그인 실패');
+          }
+        } catch (error) {
+          console.error('오류:', error);
+        }
+      };
+
+      document.getElementById('joinRoom').onclick = async () => {
+        const roomId = document.getElementById('roomIdInput').value;
+        const userId = localStorage.getItem('userId');
+        const accessToken = localStorage.getItem('accessToken');
+
+        if (!userId || !accessToken) {
+          console.error('로그인이 필요합니다.');
+          return;
+        }
+
+        try {
+          // 채팅 멤버 조회 먼저 시도
+          const checkResponse = await fetch(
+            `http://localhost:3000/chatmember/check/${roomId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+              credentials: 'include',
+            },
+          );
+
+          if (checkResponse.ok) {
+            // 이미 멤버인 경우
+            const memberData = await checkResponse.json();
+            localStorage.setItem('chatMemberId', memberData.id);
+            socket.emit('joinRoom', { chattingRoomId: parseInt(roomId) });
+            console.log('기존 채팅방 참여 성공');
+            return;
+          }
+
+          // 새로운 멤버로 등록
+          const response = await fetch('http://localhost:3000/chatmember', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+              chatting_room_id: parseInt(roomId),
+              admin: false,
+            }),
+            credentials: 'include',
+          });
+
+          const responseData = await response.json();
+
+          if (response.ok) {
+            localStorage.setItem('chatMemberId', responseData.id);
+            socket.emit('joinRoom', { chattingRoomId: parseInt(roomId) });
+            console.log('새로운 채팅방 참여 성공:', responseData);
+          } else {
+            console.error(
+              '채팅방 참여 실패:',
+              responseData.message || '알 수 없는 오류',
+            );
+          }
+        } catch (error) {
+          console.error('채팅방 참여 중 오류:', error);
+        }
+      };
+
+      document.getElementById('leaveRoom').onclick = async () => {
+        const roomId = document.getElementById('roomIdInput').value;
+        const accessToken = localStorage.getItem('accessToken');
+        const chatMemberId = localStorage.getItem('chatMemberId');
+
+        if (!chatMemberId || !accessToken) {
+          console.error('채팅 멤버 정보가 없습니다.');
+          return;
+        }
+
+        try {
+          // 채팅 멤버 삭제 API 호출
+          const response = await fetch(
+            `http://localhost:3000/chatmember/${chatMemberId}`,
+            {
+              method: 'DELETE',
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+              credentials: 'include',
+            },
+          );
+
+          if (response.ok) {
+            localStorage.removeItem('chatMemberId');
+            socket.emit('leaveRoom', { chattingRoomId: parseInt(roomId) });
+            console.log('채팅방 나가기 성공');
+          } else {
+            console.error('채팅방 나가기 실패');
+          }
+        } catch (error) {
+          console.error('채팅방 나가기 중 오류:', error);
+        }
+      };
+
+      document.getElementById('sendMessage').onclick = () => {
+        const roomId = document.getElementById('roomIdInput').value;
+        const message = document.getElementById('messageInput').value;
+        const userId = localStorage.getItem('userId');
+        const chatMemberId = localStorage.getItem('chatMemberId');
+
+        if (!userId || !chatMemberId) {
+          console.error('User is not logged in or not a chat member.');
+          return;
+        }
+
+        socket.emit('sendMessage', {
+          userId: parseInt(userId, 10),
+          chatMemberId: parseInt(chatMemberId, 10),
+          chattingRoomId: roomId,
+          message,
+        });
+      };
+
+      socket.on('joinedRoom', (data) => {
+        console.log('Joined room:', data.roomId);
+      });
+
+      socket.on('leftRoom', (data) => {
+        console.log('Left room:', data.roomId);
+      });
+
+      socket.on('messageReceived', (data) => {
+        const chatDiv = document.getElementById('chat');
+        const messageElement = document.createElement('div');
+        messageElement.textContent = `User ${data.userId}: ${data.message}`;
+        chatDiv.appendChild(messageElement);
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+      });
+
+      socket.on('error', (error) => {
+        console.error('Error:', error.message);
+      });
+    </script>
+  </body>
+</html>
