@@ -190,10 +190,60 @@
         alert(`채팅방에서 나갔습니다. (멤버 ID: ${data.chatmemberId})`);
       });
 
-      // 에러 처리
+      // 블랙리스트 관련 소켓 연결
+      const blacklistSocket = io('http://localhost:3000/chatblacklist', {
+        withCredentials: true,
+        transports: ['websocket', 'polling'],
+        extraHeaders: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1:5500',
+        },
+      });
+
+      // 블랙리스트 이벤트 리스너
+      blacklistSocket.on('allBlacklists', (blacklists) => {
+        console.log('📥 블랙리스트 업데이트 수신:', blacklists);
+        // 현재 사용자가 블랙리스트에 추가되었는지 확인
+        const userId = document.getElementById('userId').value;
+        const chatRoomId = document.getElementById('chatRoomId').value;
+
+        const isBlacklisted = blacklists.some(
+          (blacklist) =>
+            blacklist.user_id === parseInt(userId) &&
+            blacklist.chatting_room_id === parseInt(chatRoomId),
+        );
+
+        if (isBlacklisted) {
+          console.log('❌ 사용자가 블랙리스트에 추가됨');
+          alert(
+            '해당 채팅방에서 차단되었습니다. 자동으로 채팅방에서 나갑니다.',
+          );
+          // 채팅방 나가기 처리
+          const chatmemberId =
+            /* 현재 chatmember ID */
+            socket.emit('deleteChatMember', { chatmemberId });
+        }
+      });
+
+      // 에러 메시지 개선
       socket.on('error', (error) => {
         console.error('❌ 오류 발생:', error);
-        alert('오류가 발생했습니다: ' + error.message);
+        let errorMessage = '오류가 발생했습니다: ';
+
+        switch (error.message) {
+          case 'USER_BLACKLISTED':
+            errorMessage += '해당 사용자는 차단되어 있습니다.';
+            break;
+          case 'CHATMEMBER_NOT_FOUND':
+            errorMessage += '채팅 멤버를 찾을 수 없습니다.';
+            break;
+          case 'CHATMEMBER_ALREADY_EXISTS':
+            errorMessage += '이미 채팅방에 참여중입니다.';
+            break;
+          default:
+            errorMessage += error.message;
+        }
+
+        alert(errorMessage);
       });
     </script>
   </body>
