@@ -9,6 +9,7 @@ import { ChattingModule } from 'src/chatting/chatting.module';
 import { UserModule } from 'src/user/user.module';
 import { ChattingRoomModule } from 'src/chattingroom/chattingroom.module';
 import { ChatblacklistModule } from 'src/chatblacklist/chatblacklist.module';
+import { ChatmemberGateway } from './chatmember.gateway';
 
 @Module({
   imports: [
@@ -19,6 +20,6 @@ import { ChatblacklistModule } from 'src/chatblacklist/chatblacklist.module';
     ChatblacklistModule,
   ],
   controllers: [ChatmemberController],
-  providers: [ChatmemberService, ChatmemberRepository],
+  providers: [ChatmemberService, ChatmemberRepository, ChatmemberGateway],
 })
 export class ChatmemberModule {}

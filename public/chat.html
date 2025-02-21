@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Member Management</title>
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <style>
+      #chat {
+        width: 300px;
+        height: 400px;
+        border: 1px solid #ccc;
+        overflow-y: scroll;
+        margin-bottom: 10px;
+      }
+      #messageInput {
+        width: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Chat Member Management</h1>
+    <div id="chat"></div>
+    <input type="text" id="userIdInput" placeholder="유저 ID" />
+    <input type="text" id="chatRoomIdInput" placeholder="채팅방 ID" />
+    <button id="createChatmember">멤버 생성</button>
+    <button id="findAllChatMembers">모든 멤버 조회</button>
+    <button id="findOneChatMember">멤버 조회</button>
+    <button id="deleteChatMember">멤버 삭제</button>
+
+    <script>
+      const socket = io('http://localhost:3000/chatmember');
+
+      document.getElementById('createChatmember').onclick = () => {
+        const userId = document.getElementById('userIdInput').value;
+        const chatRoomId = document.getElementById('chatRoomIdInput').value;
+        const createChatmemberDto = {
+          chatting_room_id: chatRoomId,
+          admin: false,
+        }; // 예시 데이터
+        socket.emit('createChatmember', { userId, createChatmemberDto });
+      };
+
+      document.getElementById('findAllChatMembers').onclick = () => {
+        socket.emit('findAllChatMember');
+      };
+
+      document.getElementById('findOneChatMember').onclick = () => {
+        const chatmemberId = document.getElementById('chatRoomIdInput').value;
+        socket.emit('findOneChatMember', { chatmemberId });
+      };
+
+      document.getElementById('deleteChatMember').onclick = () => {
+        const chatmemberId = document.getElementById('chatRoomIdInput').value;
+        socket.emit('deleteChatMember', { chatmemberId });
+      };
+
+      socket.on('chatmemberCreated', (data) => {
+        console.log('Chat member created:', data);
+      });
+
+      socket.on('allChatMembers', (data) => {
+        console.log('All chat members:', data);
+      });
+
+      socket.on('chatmemberDetails', (data) => {
+        console.log('Chat member details:', data);
+      });
+
+      socket.on('chatmemberDeleted', (data) => {
+        console.log('Chat member deleted:', data);
+      });
+
+      socket.on('error', (error) => {
+        console.error('Error:', error.message);
+      });
+    </script>
+  </body>
+</html>
