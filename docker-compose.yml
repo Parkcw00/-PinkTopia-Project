@@ -1,0 +1,16 @@
+# version: '3.8' # 사용할 Docker Compose 버전 지정 (선택 사항)
+
+services:
+  valkey:
+    image: valkey/valkey:latest # Valkey 최신 버전의 Docker 이미지 사용
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes # 비밀번호 없이 접속 허용 (운영 환경에서는 보안상 비추천)
+      - VALKEY_DISABLE_COMMANDS=FLUSHDB,FLUSHALL # DB 삭제 명령어(FLUSHDB, FLUSHALL) 비활성화하여 데이터 보호
+    ports:
+      - '6379:6379' # 호스트의 6379 포트를 컨테이너의 6379 포트와 매핑 (Valkey 기본 포트)
+    volumes:
+      - 'valkey_data:/valkey/data' # 데이터를 영구적으로 저장하기 위해 볼륨 마운트 (컨테이너 삭제 시 데이터 유지)
+
+volumes:
+  valkey_data:
+    driver: local # 로컬 드라이버를 사용하여 볼륨 생성 (호스트의 저장공간 활용)
