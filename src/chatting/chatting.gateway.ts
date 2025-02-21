@@ -49,6 +49,10 @@ export class ChattingGateway {
         data.userId,
       );
 
+      if (!chatMember || !chatMember.user) {
+        throw new Error('CHATMEMBER_OR_USER_NOT_FOUND');
+      }
+
       // 블랙리스트 확인
       const blacklists = await this.chatblacklistService.findAll();
       const isBlacklisted = blacklists.some(
@@ -73,7 +77,12 @@ export class ChattingGateway {
       });
     } catch (error) {
       console.error('Error joining room:', error);
-      client.emit('error', { message: error.message });
+      client.emit('error', {
+        message:
+          error.message === 'CHATMEMBER_OR_USER_NOT_FOUND'
+            ? '채팅방 멤버 또는 사용자 정보를 찾을 수 없습니다.'
+            : error.message,
+      });
     }
   }
 
