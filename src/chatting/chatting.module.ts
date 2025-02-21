@@ -13,5 +13,6 @@ import { ValkeyModule } from 'src/valkey/valkey.module';
   imports: [TypeOrmModule.forFeature([Chatting, Chatmember]), ValkeyModule],
   controllers: [ChattingController],
   providers: [ChattingService, ChattingRepository, S3Service, ValkeyService],
+  exports: [ChattingService, ChattingRepository],
 })
 export class ChattingModule {}

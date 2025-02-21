@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { PostModule } from './post/post.module';
 import { DirectionModule } from './direction/direction.module';
 import { RankingModule } from './ranking/ranking.module';
-import { ChattingroomModule } from './chattingroom/chattingroom.module';
+import { ChattingRoomModule } from './chattingroom/chattingroom.module';
 import { ChattingModule } from './chatting/chatting.module';
 import { AchievementPModule } from './achievement-p/achievement-p.module';
 import { SubAchievementModule } from './sub-achievement/sub-achievement.module';
@@ -28,6 +28,7 @@ import { StoreItemModule } from './store-item/store-item.module';
 import { S3Module } from './s3/s3.module';
 import { LocationHistoryModule } from './location-history/location-history.module';
 import { ValkeyModule } from './valkey/valkey.module';
+import { PinkmongAppearLocationModule } from './pinkmong-appear-location/pinkmong-appear-location.module';
 
 const typeOrmModuleOptions = {
   useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
@@ -83,7 +84,7 @@ const typeOrmModuleOptions = {
     AchievementPModule,
     AchievementCModule,
     ChattingModule,
-    ChattingroomModule,
+    ChattingRoomModule,
     RankingModule,
     DirectionModule,
     ChatmemberModule,
@@ -92,6 +93,7 @@ const typeOrmModuleOptions = {
     S3Module,
     LocationHistoryModule,
     ValkeyModule,
+    PinkmongAppearLocationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
