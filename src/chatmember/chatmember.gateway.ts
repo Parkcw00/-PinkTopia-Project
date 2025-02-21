@@ -37,8 +37,11 @@ export class ChatmemberGateway {
         data.userId,
         data.createChatmemberDto,
       );
-      console.log(`Chatmember created for user ${data.userId}`);
+      // 개별 클라이언트에게 생성 완료 알림
       client.emit('chatmemberCreated', chatmember);
+      // 모든 클라이언트에게 업데이트된 목록 전송
+      const allChatmembers = await this.chatmemberService.findAllChatMember();
+      this.server.emit('allChatMembers', allChatmembers);
     } catch (error) {
       console.error('Error creating chatmember:', error);
       client.emit('error', { message: 'Failed to create chatmember' });
@@ -82,7 +85,11 @@ export class ChatmemberGateway {
   ) {
     try {
       await this.chatmemberService.deleteChatMember(data.chatmemberId);
+      // 개별 클라이언트에게 삭제 완료 알림
       client.emit('chatmemberDeleted', { chatmemberId: data.chatmemberId });
+      // 모든 클라이언트에게 업데이트된 목록 전송
+      const allChatmembers = await this.chatmemberService.findAllChatMember();
+      this.server.emit('allChatMembers', allChatmembers);
     } catch (error) {
       console.error('Error deleting chatmember:', error);
       client.emit('error', { message: 'Failed to delete chatmember' });

@@ -85,9 +85,14 @@
         },
       });
 
-      // 소켓 연결 이벤트
+      // 소켓 연결/해제 이벤트
       socket.on('connect', () => {
-        console.log('Connected to server');
+        console.log('🟢 서버와 연결되었습니다.');
+        console.log('소켓 ID:', socket.id);
+      });
+
+      socket.on('disconnect', () => {
+        console.log('🔴 서버와 연결이 끊어졌습니다.');
       });
 
       // 채팅 멤버 생성
@@ -100,6 +105,11 @@
           admin: false, // 기본값으로 false 설정
         };
 
+        console.log('📤 채팅 멤버 생성 요청:', {
+          userId: parseInt(userId),
+          createChatmemberDto: createChatmemberDto,
+        });
+
         socket.emit('createChatmember', {
           userId: parseInt(userId),
           createChatmemberDto: createChatmemberDto,
@@ -108,17 +118,19 @@
 
       // 이벤트 리스너
       socket.on('chatmemberCreated', (chatmember) => {
+        console.log('📥 새로운 채팅 멤버가 생성됨:', chatmember);
         alert(`채팅 멤버가 생성되었습니다.\n멤버 ID: ${chatmember.id}`);
-        console.log('Created chatmember:', chatmember);
       });
 
       // 전체 멤버 조회
       function getAllChatMembers() {
+        console.log('📤 전체 멤버 목록 조회 요청');
         socket.emit('findAllChatMember');
       }
 
       // 전체 멤버 조회 결과 리스너
       socket.on('allChatMembers', (chatmembers) => {
+        console.log('📥 전체 멤버 목록 수신:', chatmembers);
         const memberList = document.getElementById('memberList');
         memberList.innerHTML = '';
         chatmembers.forEach((member) => {
@@ -134,6 +146,9 @@
       // 특정 멤버 조회
       function findOneChatMember() {
         const chatmemberId = document.getElementById('searchMemberId').value;
+        console.log('📤 특정 멤버 조회 요청:', {
+          chatmemberId: parseInt(chatmemberId),
+        });
         socket.emit('findOneChatMember', {
           chatmemberId: parseInt(chatmemberId),
         });
@@ -141,6 +156,7 @@
 
       // 상세 조회 결과 리스너
       socket.on('chatmemberDetails', (chatmember) => {
+        console.log('📥 멤버 상세 정보 수신:', chatmember);
         const memberDetails = document.getElementById('memberDetails');
         memberDetails.innerHTML = `
           <div class="member-item">
@@ -160,6 +176,9 @@
       // 채팅방 나가기
       function deleteChatMember() {
         const chatmemberId = document.getElementById('deleteMemberId').value;
+        console.log('📤 채팅방 나가기 요청:', {
+          chatmemberId: parseInt(chatmemberId),
+        });
         socket.emit('deleteChatMember', {
           chatmemberId: parseInt(chatmemberId),
         });
@@ -167,11 +186,13 @@
 
       // 채팅방 나가기 완료 리스너
       socket.on('chatmemberDeleted', (data) => {
+        console.log('📥 채팅방 나가기 완료:', data);
         alert(`채팅방에서 나갔습니다. (멤버 ID: ${data.chatmemberId})`);
       });
 
       // 에러 처리
       socket.on('error', (error) => {
+        console.error('❌ 오류 발생:', error);
         alert('오류가 발생했습니다: ' + error.message);
       });
     </script>
