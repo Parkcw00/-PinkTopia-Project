@@ -40,7 +40,18 @@ export class StoreItemController {
     );
   }
 
-  @ApiOperation({ summary: '상점 아이템 조회' })
+  @ApiOperation({ summary: '모든 상점 아이템 조회' })
+  @Get()
+  findAll() {
+    return this.storeItemService.findAll();
+  }
+
+  @ApiOperation({ summary: '특정 상점 아이템 조회' })
+  @Get(':id')
+  findOne(@Param('id') id: number) {
+    return this.storeItemService.storeItemFindOne(id);
+  }
+
   @ApiOperation({ summary: '상점 아이템 수정' })
   @UseGuards(UserGuard, AdminGuard)
   @Patch(':id')
