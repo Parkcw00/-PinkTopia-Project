@@ -1,13 +1,11 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
-import { CreateCatchPinkmongDto } from './dto/create-catch_pinkmong.dto';
-import { UpdateCatchPinkmongDto } from './dto/update-catch_pinkmong.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CatchPinkmong } from 'src/catch_pinkmong/entities/catch_pinkmong.entity';
 import { Repository } from 'typeorm';
+import { CatchPinkmong } from 'src/catch_pinkmong/entities/catch_pinkmong.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Pinkmong } from 'src/pinkmong/entities/pinkmong.entity';
 import { Inventory } from 'src/inventory/entities/inventory.entity';
@@ -17,8 +15,6 @@ import { ValkeyService } from 'src/valkey/valkey.service';
 
 @Injectable()
 export class CatchPinkmongService {
-  // feeding 시도 횟수를 기록하기 위한 in-memory Map
-  // 키: catchPinkmong 레코드 id, 값: feeding 시도 횟수
   private catchAttempts: Map<number, number> = new Map();
 
   constructor(
@@ -34,11 +30,12 @@ export class CatchPinkmongService {
     private itemRepository: Repository<Item>,
     @InjectRepository(Collection)
     private collectionRepository: Repository<Collection>,
-    private readonly valkeyService: ValkeyService, // ✅ Valkey 추가
+    private readonly valkeyService: ValkeyService,
   ) {}
 
   // 🔹 핑크몽 등장 (전투 시작 시 Valkey에 저장)
   async appearPinkmong(userId: number): Promise<{ message: string }> {
+    // 1. 유저 조회
     const user = await this.userRepository.findOne({
       where: { id: userId },
       relations: ['inventory'],
@@ -52,25 +49,52 @@ export class CatchPinkmongService {
       throw new NotFoundException('해당 유저의 인벤토리를 찾을 수 없습니다.');
     }
 
-    const selectedPinkmong = await this.pinkmongRepository.findOne({
-      where: { id: 4 },
-    });
-    if (!selectedPinkmong) {
-      throw new NotFoundException('핑크몽을 찾을 수 없습니다.');
-    }
-
+    // 2. 현재 인벤토리에 활성화된 핑크몽이 있는지 확인
     const existingCatch = await this.catchPinkmongRepository.findOne({
-      where: {
-        user_id: user.id,
-        pinkmong_id: selectedPinkmong.id,
-        inventory_id: user.inventory.id,
-      },
+      where: { inventory_id: user.inventory.id },
     });
 
     if (existingCatch) {
-      return { message: `${selectedPinkmong.name}이(가) 이미 등장중입니다!` };
+      return { message: `이미 다른 핑크몽이 등장 중입니다!` };
     }
 
+    // 3. 등급 결정 (전설: 5%, 희귀: 35%, 보통: 60%)
+    const r = Math.random();
+    let selectedGrade: string;
+    if (r < 0.05) {
+      selectedGrade = 'legendary';
+    } else if (r < 0.05 + 0.35) {
+      selectedGrade = 'rare';
+    } else {
+      selectedGrade = 'common';
+    }
+
+    // 4. 선택된 등급과 지역에 따른 핑크몽 선택
+    const randomRegion = await this.pinkmongRepository
+      .createQueryBuilder('pinkmong')
+      .select('pinkmong.region_theme')
+      .where('pinkmong.grade = :grade', { grade: selectedGrade })
+      .orderBy('RANDOM()')
+      .limit(1)
+      .getRawOne();
+
+    const selectedPinkmong = await this.pinkmongRepository
+      .createQueryBuilder('pinkmong')
+      .where('pinkmong.grade = :grade AND pinkmong.region_theme = :region', {
+        grade: selectedGrade,
+        region: randomRegion.region_theme,
+      })
+      .orderBy('RANDOM()')
+      .limit(1)
+      .getOne();
+
+    if (!selectedPinkmong) {
+      throw new NotFoundException(
+        `해당 등급(${selectedGrade})의 핑크몽을 찾을 수 없습니다.`,
+      );
+    }
+
+    // 5. CatchPinkmong 생성 및 저장
     const catchPinkmong = this.catchPinkmongRepository.create({
       user,
       user_id: user.id,
@@ -80,9 +104,10 @@ export class CatchPinkmongService {
     });
     await this.catchPinkmongRepository.save(catchPinkmong);
 
+    // 6. feeding 시도 횟수를 0으로 초기화
     this.catchAttempts.set(catchPinkmong.id, 0);
 
-    // ✅ Valkey에 전투 정보 저장 (30분 후 자동 삭제)
+    // 7. Valkey에 전투 정보 저장 (30분 후 자동 삭제)
     const cacheKey = `pinkmong_battle:${userId}`;
     await this.valkeyService.set(
       cacheKey,
@@ -90,7 +115,9 @@ export class CatchPinkmongService {
       1800,
     );
 
-    return { message: `${selectedPinkmong.name}이(가) 등장했다!` };
+    return {
+      message: `${selectedPinkmong.name}이(가) 등장했다! (등급: ${selectedGrade})`,
+    };
   }
 
   // 🔹 먹이를 주고 잡는 로직 (포획 성공/실패 + 아이템 사용)
@@ -109,24 +136,17 @@ export class CatchPinkmongService {
 
     const { user, pinkmong, inventory } = catchRecord;
 
-    // 🔹 아이템 테이블에서 직접 아이템을 가져옴
     const item = await this.itemRepository.findOne({
       where: { id: itemId },
       relations: ['inventory'],
     });
 
-    if (!item) {
-      throw new NotFoundException('아이템을 찾을 수 없습니다.');
-    }
-
-    // 🔹 아이템이 현재 유저의 인벤토리에 속해 있는지 확인
-    if (!item.inventory || item.inventory.id !== inventory.id) {
+    if (!item || !item.inventory || item.inventory.id !== inventory.id) {
       throw new BadRequestException(
         '이 아이템은 현재 유저의 인벤토리에 속해 있지 않습니다.',
       );
     }
 
-    // 🔹 아이템 사용 (개수 감소)
     if (item.count > 0) {
       item.count -= 1;
       await this.itemRepository.save(item);
@@ -134,7 +154,6 @@ export class CatchPinkmongService {
       throw new BadRequestException('해당 아이템의 수량이 부족합니다.');
     }
 
-    // 🔹 포획 확률 계산
     const baseCatchRate = 0.1;
     const getChanceIncrease = { 2: 0.15, 3: 0.27, 4: 0.35 };
     const bonus = getChanceIncrease[item.id] || 0;
@@ -157,23 +176,8 @@ export class CatchPinkmongService {
       }
     }
 
-    // 🔹 포획 성공 (도감 등록)
     await this.catchPinkmongRepository.remove(catchRecord);
     await this.valkeyService.del(`pinkmong_battle:${userId}`);
-
-    const existingCollection = await this.collectionRepository.findOne({
-      where: { pinkmong_id: pinkmong.id, user_id: user.id },
-    });
-
-    if (!existingCollection) {
-      const newCollection = this.collectionRepository.create({
-        user,
-        user_id: user.id,
-        pinkmong,
-        pinkmong_id: pinkmong.id,
-      });
-      await this.collectionRepository.save(newCollection);
-    }
 
     return { message: `${pinkmong.name}을 잡았습니다!`, success: true };
   }

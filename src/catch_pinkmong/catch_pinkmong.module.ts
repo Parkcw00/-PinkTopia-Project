@@ -9,6 +9,7 @@ import { Inventory } from 'src/inventory/entities/inventory.entity';
 import { Item } from 'src/item/entities/item.entity';
 import { Collection } from 'src/collection/entities/collection.entity';
 import { ValkeyService } from 'src/valkey/valkey.service';
+import { CatchPinkmongRepository } from './catch_pinkmong.repository';
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { ValkeyService } from 'src/valkey/valkey.service';
     ]),
   ],
   controllers: [CatchPinkmongController],
-  providers: [CatchPinkmongService, ValkeyService],
+  providers: [CatchPinkmongService, CatchPinkmongRepository, ValkeyService],
 })
 export class CatchPinkmongModule {}

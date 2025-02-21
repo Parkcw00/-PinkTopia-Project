@@ -4,18 +4,18 @@ import { UserController, UsersController } from './user.controller';
 import { UserService } from './user.service';
 import { UserRepository } from './user.repository';
 import { User } from './entities/user.entity';
-import { Chatting } from 'src/chatting/entities/chatting.entity';
 import { AchievementC } from 'src/achievement-c/entities/achievement-c.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserGuard } from './guards/user-guard';
 import { InventoryModule } from 'src/inventory/inventory.module';
 import { ValkeyService } from 'src/valkey/valkey.service';
+import { AchievementCRepository } from 'src/achievement-c/achievement-c.repository';
 
 @Global()
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Chatting, AchievementC]),
+    TypeOrmModule.forFeature([User, AchievementC]),
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
