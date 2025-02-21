@@ -56,7 +56,7 @@
     <button id="openKakaoMap">카카오맵 열기</button>
   </div>
 
-  <!-- 카카오맵 SDK (자신의 appkey로 변경) -->
+  <!-- 카카오맵 SDK (본인의 appkey로 변경) -->
   <script
     src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=5dc1bc6ffb574e60204390643bad8557&libraries=clusterer"></script>
   <script>
@@ -75,16 +75,18 @@
     var startMarker = new kakao.maps.Marker({
       position: new kakao.maps.LatLng(36.3275, 127.4268),
       draggable: true
+      // image: startMarkerImage (원하는 경우 커스텀 아이콘 설정)
     });
     startMarker.setMap(map);
 
     var destMarker = new kakao.maps.Marker({
       position: new kakao.maps.LatLng(36.3335, 127.4268),
       draggable: true
+      // image: destMarkerImage
     });
     destMarker.setMap(map);
 
-    // 인포윈도우 생성 (초기 내용 포함)
+    // 인포윈도우 생성
     var startInfowindow = new kakao.maps.InfoWindow({
       content: '<div style="padding:5px;">출발지<br><a href="https://map.kakao.com/link/to/출발지,36.3275,127.4268" target="_blank" style="color:blue;">길찾기</a></div>'
     });
@@ -92,7 +94,6 @@
       content: '<div style="padding:5px;">도착지<br><a href="https://map.kakao.com/link/to/도착지,36.3335,127.4268" target="_blank" style="color:blue;">길찾기</a></div>'
     });
 
-    // 마커에 마우스 이벤트 등록
     kakao.maps.event.addListener(startMarker, 'mouseover', function () {
       startInfowindow.open(map, startMarker);
     });
@@ -106,7 +107,7 @@
       destInfowindow.close();
     });
 
-    // 도착지 마커 이동 시 인포윈도우 링크 업데이트 및 도착 체크
+    // 도착지 마커 이동 후 인포윈도우 링크 업데이트 및 도착 체크
     kakao.maps.event.addListener(destMarker, 'dragend', function () {
       var pos = destMarker.getPosition();
       var content = '<div style="padding:5px;">도착지<br>' +
@@ -115,7 +116,7 @@
       checkArrival(pos);
     });
 
-    // 출발지 마커 이동 시 인포윈도우 업데이트
+    // 출발지 마커 이동 시 인포윈도우 업데이트 (선택사항)
     kakao.maps.event.addListener(startMarker, 'dragend', function () {
       var pos = startMarker.getPosition();
       var content = '<div style="padding:5px;">출발지<br>' +
@@ -142,7 +143,7 @@
       bookmarkListDiv.appendChild(div);
     });
 
-    // 북마크 선택 시 마커 위치 변경 함수
+    // 북마크 버튼 클릭 시 마커 위치 변경 함수
     function setAsStart(lat, lng) {
       var newPos = new kakao.maps.LatLng(lat, lng);
       startMarker.setPosition(newPos);
@@ -184,11 +185,11 @@
       }
     });
 
-    // 카카오맵 열기 버튼: 현재 설정된 출발지와 도착지를 기준으로 길찾기 링크 오픈
+    // 카카오맵 열기 버튼: 출발지와 도착지 좌표로 길찾기 링크 오픈
     document.getElementById('openKakaoMap').addEventListener('click', function () {
       var startPos = startMarker.getPosition();
       var destPos = destMarker.getPosition();
-      // 예시 URL: 필요에 따라 URL 형식을 조정하세요.
+      // 예시: 두 좌표를 이용한 길찾기 링크 (필요에 따라 URL 형식을 조정)
       var url = "https://map.kakao.com/link/to/길찾기,";
       url += startPos.getLat() + "," + startPos.getLng() + "/";
       url += destPos.getLat() + "," + destPos.getLng();
@@ -200,7 +201,7 @@
       function toRad(degree) {
         return degree * Math.PI / 180;
       }
-      var R = 6371e3; // 지구 반지름 (m)
+      var R = 6371e3; // 지구 반지름(m)
       var φ1 = toRad(lat1);
       var φ2 = toRad(lat2);
       var Δφ = toRad(lat2 - lat1);
@@ -212,7 +213,7 @@
       return R * c;
     }
 
-    // 도착지 마커가 북마크 위치에 근접(50m 이내)하면 알람 표시
+    // 도착지 마커가 북마크 위치에 근접했는지 확인 (50m 이내)
     function checkArrival(pos) {
       bookmarks.forEach(function (bookmark) {
         var distance = getDistance(pos.getLat(), pos.getLng(), bookmark.lat, bookmark.lng);
@@ -222,7 +223,7 @@
       });
     }
 
-    // 북마크 관련 함수들을 전역 노출
+    // 북마크 버튼 함수 전역 노출
     window.setAsStart = setAsStart;
     window.setAsDest = setAsDest;
   </script>

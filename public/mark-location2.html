@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>카카오맵 출발지-도착지 길찾기</title>
   <style>
+    /* 전체 화면을 채우도록 설정 */
     html,
     body {
       width: 100%;
@@ -14,16 +15,19 @@
       padding: 0;
     }
 
+    /* 지도 영역 스타일 지정 */
     #map {
       width: 100%;
       height: 90%;
     }
 
+    /* 컨트롤 버튼 영역 스타일 지정 */
     #controls {
       text-align: center;
       padding: 10px;
     }
 
+    /* 버튼 스타일 지정 */
     button {
       padding: 10px;
       font-size: 16px;
@@ -37,28 +41,38 @@
 </head>
 
 <body>
+  <!-- 지도 표시 영역 -->
   <div id="map"></div>
+
+  <!-- 길찾기 버튼 -->
   <div id="controls">
     <button onclick="openDirection()">🚗 길찾기</button>
   </div>
 
+  <!-- 카카오 지도 API 스크립트 추가 (개인 키 사용 필요) -->
   <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=5dc1bc6ffb574e60204390643bad8557"></script>
   <script>
+    // 로컬 스토리지에서 저장된 출발지와 도착지 정보를 가져옴
     var savedStart = JSON.parse(localStorage.getItem('startLocation'));
     var savedEnd = JSON.parse(localStorage.getItem('endLocation'));
 
-    var mapContainer = document.getElementById('map'),
-      mapOption = {
-        center: savedStart
-          ? new kakao.maps.LatLng(savedStart.lat, savedStart.lng)
-          : new kakao.maps.LatLng(36.3275, 127.4268), // 기본값
-        level: 5
-      };
+    // 지도 컨테이너 설정
+    var mapContainer = document.getElementById('map');
+    var mapOption = {
+      center: savedStart
+        ? new kakao.maps.LatLng(savedStart.lat, savedStart.lng)
+        : new kakao.maps.LatLng(36.3275, 127.4268), // 기본 위치 (예: 대전)
+      level: 5 // 지도 확대 수준
+    };
 
+    // 지도 생성
     var map = new kakao.maps.Map(mapContainer, mapOption);
+
+    // 확대/축소 컨트롤 추가
     var zoomControl = new kakao.maps.ZoomControl();
     map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
 
+    // 마커 정보 배열
     var markers = [
       {
         key: "start",
@@ -66,7 +80,7 @@
         position: savedStart
           ? new kakao.maps.LatLng(savedStart.lat, savedStart.lng)
           : new kakao.maps.LatLng(36.3275, 127.4268),
-        imageUrl: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/red_b.png", // 🔵 파란 마커
+        imageUrl: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/red_b.png", // 파란색 마커
         storageKey: "startLocation"
       },
       {
@@ -75,39 +89,44 @@
         position: savedEnd
           ? new kakao.maps.LatLng(savedEnd.lat, savedEnd.lng)
           : new kakao.maps.LatLng(36.340309, 127.389999),
-        imageUrl: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/blue_b.png", // 🔴 빨간 마커
+        imageUrl: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/blue_b.png", // 빨간색 마커
         storageKey: "endLocation"
       }
     ];
 
+    // 마커를 지도에 추가하고 이벤트 등록
     markers.forEach(function (data) {
       var markerImage = new kakao.maps.MarkerImage(data.imageUrl, new kakao.maps.Size(50, 50));
       var marker = new kakao.maps.Marker({
         position: data.position,
         image: markerImage,
         map: map,
-        draggable: true
+        draggable: true // 드래그 가능하도록 설정
       });
 
+      // 마커 위에 정보창 추가
       var infowindow = new kakao.maps.InfoWindow({
         content: `<div style="padding:5px;">${data.info}</div>`
       });
-
       infowindow.open(map, marker);
 
+      // 마커 드래그 후 위치 변경 시 로컬 스토리지에 저장
       kakao.maps.event.addListener(marker, 'dragend', function () {
         var position = marker.getPosition();
         localStorage.setItem(data.storageKey, JSON.stringify({ lat: position.getLat(), lng: position.getLng() }));
         console.log(`${data.info} 위치 저장됨:`, position.getLat(), position.getLng());
       });
 
+      // 마커 객체 저장
       data.marker = marker;
     });
 
+    // 길찾기 버튼 클릭 시 카카오맵 길찾기 URL을 새 창에서 엶
     function openDirection() {
       var start = markers.find(m => m.key === "start").marker.getPosition();
       var end = markers.find(m => m.key === "end").marker.getPosition();
 
+      // 카카오맵 길찾기 링크 생성 및 새 창에서 열기
       var url = `https://map.kakao.com/link/to/도착지,${end.getLat()},${end.getLng()}/from/출발지,${start.getLat()},${start.getLng()}`;
       window.open(url, "_blank");
     }

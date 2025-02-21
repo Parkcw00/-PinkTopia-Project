@@ -54,6 +54,7 @@
     <button id="setStartCurrent">현재위치를 출발지로</button>
     <button id="setDestCurrent">현재위치를 도착지로</button>
     <button id="openKakaoMap">카카오맵 열기</button>
+    <!-- 지정된 목적지/출발지로 길찾기 추가 -->
   </div>
 
   <!-- 카카오맵 SDK (자신의 appkey로 변경) -->
@@ -83,6 +84,15 @@
       draggable: true
     });
     destMarker.setMap(map);
+
+
+
+
+
+
+
+
+
 
     // 인포윈도우 생성 (초기 내용 포함)
     var startInfowindow = new kakao.maps.InfoWindow({
