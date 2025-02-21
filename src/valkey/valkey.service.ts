@@ -11,14 +11,16 @@ export class ValkeyService implements OnModuleDestroy {
     });
   }
   async set(key: string, value: any, expiryInSeconds?: number) {
+    const jsonValue = JSON.stringify(value); // JSON 변환
     if (expiryInSeconds) {
-      await this.client.set(key, JSON.stringify(value), 'EX', expiryInSeconds);
+      await this.client.set(key, jsonValue, 'EX', expiryInSeconds);
     } else {
-      await this.client.set(key, JSON.stringify(value));
+      await this.client.set(key, jsonValue);
     }
   }
-  async get(key: string) {
-    return await this.client.get(key);
+  async get<T>(key: string): Promise<T | null> {
+    const data = await this.client.get(key);
+    return data ? JSON.parse(data) : null; // JSON 변환 후 반환
   }
   async del(key: string) {
     await this.client.del(key);
