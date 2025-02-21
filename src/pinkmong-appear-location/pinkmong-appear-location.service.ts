@@ -1,26 +1,31 @@
-import { Injectable } from '@nestjs/common';
-import { CreatePinkmongAppearLocationDto } from './dto/create-pinkmong-appear-location.dto';
-import { UpdatePinkmongAppearLocationDto } from './dto/update-pinkmong-appear-location.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PinkmongAppearLocationRepository } from 'src/pinkmong-appear-location/pinkmong-appear-location.repository';
+import { CreatePinkmongAppearLocationDto } from 'src/pinkmong-appear-location/dto/create-pinkmong-appear-location.dto';
+import { PinkmongAppearLocation } from 'src/pinkmong-appear-location/entities/pinkmong-appear-location.entity';
 
 @Injectable()
 export class PinkmongAppearLocationService {
-  create(createPinkmongAppearLocationDto: CreatePinkmongAppearLocationDto) {
-    return 'This action adds a new pinkmongAppearLocation';
+  constructor(private readonly repository: PinkmongAppearLocationRepository) {}
+
+  async createLocation(
+    dto: CreatePinkmongAppearLocationDto,
+  ): Promise<PinkmongAppearLocation> {
+    return this.repository.createLocation(dto);
   }
 
-  findAll() {
-    return `This action returns all pinkmongAppearLocation`;
+  async getAllLocations(): Promise<PinkmongAppearLocation[]> {
+    return this.repository.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} pinkmongAppearLocation`;
+  async getLocationById(id: number): Promise<PinkmongAppearLocation> {
+    const location = await this.repository.findById(id);
+    if (!location) {
+      throw new NotFoundException(`ID ${id}에 해당하는 위치가 없습니다.`);
+    }
+    return location;
   }
 
-  update(id: number, updatePinkmongAppearLocationDto: UpdatePinkmongAppearLocationDto) {
-    return `This action updates a #${id} pinkmongAppearLocation`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} pinkmongAppearLocation`;
+  async deleteLocation(id: number): Promise<void> {
+    return this.repository.deleteLocation(id);
   }
 }

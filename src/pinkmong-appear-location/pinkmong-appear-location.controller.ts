@@ -1,54 +1,33 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
-import { PinkmongAppearLocationService } from './pinkmong-appear-location.service';
-import { CreatePinkmongAppearLocationDto } from './dto/create-pinkmong-appear-location.dto';
-import { UpdatePinkmongAppearLocationDto } from './dto/update-pinkmong-appear-location.dto';
+import { Controller, Post, Get, Delete, Param, Body } from '@nestjs/common';
+import { PinkmongAppearLocationService } from 'src/pinkmong-appear-location/pinkmong-appear-location.service';
+import { CreatePinkmongAppearLocationDto } from 'src/pinkmong-appear-location/dto/create-pinkmong-appear-location.dto';
+import { PinkmongAppearLocation } from 'src/pinkmong-appear-location/entities/pinkmong-appear-location.entity';
 
 @Controller('pinkmong-appear-location')
 export class PinkmongAppearLocationController {
-  constructor(
-    private readonly pinkmongAppearLocationService: PinkmongAppearLocationService,
-  ) {}
+  constructor(private readonly service: PinkmongAppearLocationService) {}
 
   @Post()
-  create(
-    @Body() createPinkmongAppearLocationDto: CreatePinkmongAppearLocationDto,
-  ) {
-    return this.pinkmongAppearLocationService.create(
-      createPinkmongAppearLocationDto,
-    );
+  async createLocation(
+    @Body() dto: CreatePinkmongAppearLocationDto,
+  ): Promise<PinkmongAppearLocation> {
+    return this.service.createLocation(dto);
   }
 
   @Get()
-  findAll() {
-    return this.pinkmongAppearLocationService.findAll();
+  async getAllLocations(): Promise<PinkmongAppearLocation[]> {
+    return this.service.getAllLocations();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pinkmongAppearLocationService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updatePinkmongAppearLocationDto: UpdatePinkmongAppearLocationDto,
-  ) {
-    return this.pinkmongAppearLocationService.update(
-      +id,
-      updatePinkmongAppearLocationDto,
-    );
+  async getLocationById(
+    @Param('id') id: number,
+  ): Promise<PinkmongAppearLocation> {
+    return this.service.getLocationById(id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.pinkmongAppearLocationService.remove(+id);
+  async deleteLocation(@Param('id') id: number): Promise<void> {
+    return this.service.deleteLocation(id);
   }
 }
