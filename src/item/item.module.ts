@@ -8,8 +8,12 @@ import { StoreItemRepository } from 'src/store-item/store-item.repository';
 import { StoreItem } from 'src/store-item/entities/store-item.entity';
 import { InventoryRepository } from 'src/inventory/inventory.repository';
 import { Inventory } from 'src/inventory/entities/inventory.entity';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 @Module({
-  imports: [TypeOrmModule.forFeature([Item, StoreItem, Inventory])],
+  imports: [
+    TypeOrmModule.forFeature([Item, StoreItem, Inventory]),
+    ValkeyModule,
+  ],
   controllers: [ItemController],
   providers: [
     ItemService,
