@@ -13,6 +13,8 @@ import { UserRepository } from './user.repository';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { InventoryService } from 'src/inventory/inventory.service';
+import { ValkeyService } from 'src/valkey/valkey.service';
+
 @Injectable()
 export class UserService {
   logOutUsers: { [key: number]: boolean } = {};
@@ -22,14 +24,41 @@ export class UserService {
     private readonly jwtService: JwtService,
     private configService: ConfigService,
     private readonly inventoryService: InventoryService,
+    private readonly valkeyService: ValkeyService, // ✅ Valkey 서비스 추가
   ) {}
 
+  // 🔹 컬렉션 포인트 랭킹 조회 (Valkey 적용)
   async getRanking() {
-    return await this.userRepository.findUsersByCollectionPoint();
+    const cacheKey = 'ranking:collection_point';
+
+    // Valkey에서 먼저 조회
+    const cachedData = await this.valkeyService.get(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
+
+    // Valkey에 데이터가 없으면 DB에서 조회 후 캐싱
+    const rankingData = await this.userRepository.findUsersByCollectionPoint();
+    await this.valkeyService.set(cacheKey, rankingData, 300); // 5분 캐싱
+
+    return rankingData;
   }
 
+  // 🔹 업적 랭킹 조회 (Valkey 적용)
   async getRankingAchievement() {
-    return await this.userRepository.findUsersByAchievement();
+    const cacheKey = 'ranking:achievement';
+
+    // Valkey에서 먼저 조회
+    const cachedData = await this.valkeyService.get(cacheKey);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
+
+    // Valkey에 데이터가 없으면 DB에서 조회 후 캐싱
+    const rankingData = await this.userRepository.findUsersByAchievement();
+    await this.valkeyService.set(cacheKey, rankingData, 300); // 5분 캐싱
+
+    return rankingData;
   }
 
   // 회원가입
@@ -56,7 +85,7 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(password, Number(saltRounds));
 
     try {
-      const user =await this.userRepository.signUp(
+      const user = await this.userRepository.signUp(
         nickname,
         email,
         hashedPassword,
@@ -64,9 +93,8 @@ export class UserService {
       );
 
       await this.inventoryService.createInventory({
-        user_id: user.id, 
+        user_id: user.id,
       });
-
     } catch (err) {
       throw new InternalServerErrorException(
         '유저 정보 저장 중 오류가 발생하였습니다.',
@@ -160,7 +188,11 @@ export class UserService {
       throw new BadRequestException('비밀번호가 틀렸습니다.');
     }
 
-    const payload = { id: existEmail.id, email: existEmail.email, role: existEmail.role };
+    const payload = {
+      id: existEmail.id,
+      email: existEmail.email,
+      role: existEmail.role,
+    };
     let accessTokenExpiresIn = this.configService.get<string>(
       'ACCESS_TOKEN_EXPIRES_IN',
     );
@@ -190,8 +222,8 @@ export class UserService {
       maxAge: 1000 * 60 * 60 * 24 * +refreshTokenExpiresIn,
       httpOnly: true,
     });
-    if(this.logOutUsers[existEmail.id]) {
-      delete this.logOutUsers[existEmail.id]
+    if (this.logOutUsers[existEmail.id]) {
+      delete this.logOutUsers[existEmail.id];
     }
     return res.status(200).json({ message: '로그인이 되었습니다.' });
   }
@@ -330,8 +362,5 @@ export class UserService {
     await transporter.sendMail(mailOptions);
 
     return verificationCode;
-
-    
   }
-
 }

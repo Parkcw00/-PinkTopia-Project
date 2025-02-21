@@ -10,6 +10,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserGuard } from './guards/user-guard';
 import { InventoryModule } from 'src/inventory/inventory.module';
+import { ValkeyService } from 'src/valkey/valkey.service';
 
 @Global()
 @Module({
@@ -18,21 +19,25 @@ import { InventoryModule } from 'src/inventory/inventory.module';
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
-        signOptions: { expiresIn: configService.get<string>('ACCESS_TOKEN_EXPIRES_IN') },
+        signOptions: {
+          expiresIn: configService.get<string>('ACCESS_TOKEN_EXPIRES_IN'),
+        },
       }),
       inject: [ConfigService],
     }),
     JwtModule.registerAsync({
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('REFRESH_TOKEN_SECRET_KEY'),
-        signOptions: { expiresIn: configService.get<string>('REFRESH_TOKEN_EXPIRES_IN') },
+        signOptions: {
+          expiresIn: configService.get<string>('REFRESH_TOKEN_EXPIRES_IN'),
+        },
       }),
       inject: [ConfigService],
     }),
     InventoryModule,
   ],
   controllers: [UserController, UsersController],
-  providers: [UserService, UserRepository, UserGuard],
-  exports: [UserGuard, JwtModule, UserRepository, UserService]
+  providers: [UserService, UserRepository, UserGuard, ValkeyService],
+  exports: [UserGuard, JwtModule, UserRepository, UserService],
 })
 export class UserModule {}
