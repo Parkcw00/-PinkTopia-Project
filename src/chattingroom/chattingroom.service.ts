@@ -56,7 +56,12 @@ export class ChattingRoomService {
           }),
         );
 
-        return { id: room.id, members: memberNicknames.join(', ') };
+        // Include the title in the returned object
+        return {
+          id: room.id,
+          title: room.title,
+          members: memberNicknames.join(', '),
+        };
       }),
     ).then((rooms) => rooms.filter((room) => room !== null));
 
