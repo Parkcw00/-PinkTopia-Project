@@ -1,7 +1,17 @@
-import { Controller, Post, Get, Delete, Param, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Delete,
+  Param,
+  Body,
+  ParseIntPipe,
+  Patch,
+} from '@nestjs/common';
 import { PinkmongAppearLocationService } from 'src/pinkmong-appear-location/pinkmong-appear-location.service';
 import { CreatePinkmongAppearLocationDto } from 'src/pinkmong-appear-location/dto/create-pinkmong-appear-location.dto';
 import { PinkmongAppearLocation } from 'src/pinkmong-appear-location/entities/pinkmong-appear-location.entity';
+import { UpdatePinkmongAppearLocationDto } from './dto/update-pinkmong-appear-location.dto';
 
 @Controller('pinkmong-appear-location')
 export class PinkmongAppearLocationController {
@@ -19,15 +29,16 @@ export class PinkmongAppearLocationController {
     return this.service.getAllLocations();
   }
 
-  @Get(':id')
-  async getLocationById(
-    @Param('id') id: number,
+  @Patch(':id')
+  async updateLocation(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateDto: UpdatePinkmongAppearLocationDto,
   ): Promise<PinkmongAppearLocation> {
-    return this.service.getLocationById(id);
+    return this.service.updateLocation(id, updateDto);
   }
 
   @Delete(':id')
-  async deleteLocation(@Param('id') id: number): Promise<void> {
+  async deleteLocation(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.service.deleteLocation(id);
   }
 }
