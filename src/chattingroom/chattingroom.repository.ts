@@ -42,6 +42,12 @@ export class ChattingRoomRepository {
     });
   }
 
+  async findChatMemberByUserId(user_id: number) {
+    return await this.chatMemberRepository.find({
+      where: { user_id },
+    });
+  }
+
   // 채팅방 전체 멤버 조회
   async findAllChatMembers(chatting_room_id: number) {
     return await this.chatMemberRepository.find({
