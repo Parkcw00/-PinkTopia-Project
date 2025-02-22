@@ -1,18 +1,30 @@
-import { IsString, IsNumber, Min, Max, IsEnum } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsString,
+  IsNumber,
+  Min,
+  Max,
+  IsEnum,
+  IsOptional,
+} from 'class-validator';
 
 export class CreatePinkmongAppearLocationDto {
   @IsString()
   title: string;
 
-  @IsString()
+  @ApiProperty({ description: '위도', minimum: -90, maximum: 90 })
+  @IsOptional()
+  @IsNumber()
   @Min(-90)
   @Max(90)
-  latitude: string;
+  latitude: number;
 
-  @IsString()
+  @ApiProperty({ description: '경도', minimum: -180, maximum: 180 })
+  @IsOptional()
+  @IsNumber()
   @Min(-180)
   @Max(180)
-  longitude: string;
+  longitude: number;
 
   @IsEnum(['forest', 'desert', 'ocean', 'mountain', 'city'])
   region_theme: string;
