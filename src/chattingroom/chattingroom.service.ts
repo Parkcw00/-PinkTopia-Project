@@ -5,9 +5,10 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { Any, DataSource } from 'typeorm';
 import { ChattingRoomRepository } from './chattingroom.repository';
 import * as nodemailer from 'nodemailer';
+import { CreateChattingRoomDto } from './dto/create-chattingroom.dto';
 
 @Injectable()
 export class ChattingRoomService {
@@ -19,8 +20,9 @@ export class ChattingRoomService {
   ) {}
 
   // 채팅방 생성
-  async createChattingRoom(user: any) {
-    const chattingRoom = await this.chattingRoomRepository.createChattingRoom();
+  async createChattingRoom(user: any, CreateChattingRoomDto: CreateChattingRoomDto) {
+    const chattingRoom: any = await this.chattingRoomRepository.createChattingRoom(CreateChattingRoomDto);
+    console.log(`채팅방 생성`,typeof(chattingRoom.id));
     const addChatMember = await this.chattingRoomRepository.addChatMember(
       chattingRoom.id,
       user.id,

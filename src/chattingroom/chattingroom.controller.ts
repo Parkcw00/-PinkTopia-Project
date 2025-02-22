@@ -14,6 +14,7 @@ import { ChattingRoomService } from './chattingroom.service';
 import { ChangeAdmin } from './dto/change-admin.dto';
 import { InviteUser } from './dto/invite-user.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CreateChattingRoomDto } from './dto/create-chattingroom.dto'
 
 @ApiTags('채팅방 기능')
 @Controller('chattingroom')
@@ -24,8 +25,8 @@ export class ChattingRoomController {
   @ApiOperation({ summary: '채팅방 생성' })
   @UseGuards(UserGuard)
   @Post('')
-  createChattingRoom(@Request() req) {
-    return this.chattingRoomService.createChattingRoom(req.user);
+  createChattingRoom(@Request() req, @Body() CreateChattingRoomDto: CreateChattingRoomDto) {
+    return this.chattingRoomService.createChattingRoom(req.user, CreateChattingRoomDto);
   }
 
   // 채팅방 조회
