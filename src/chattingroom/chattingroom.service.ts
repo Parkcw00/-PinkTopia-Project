@@ -30,18 +30,35 @@ export class ChattingRoomService {
 
   // 채팅방 조회
   async getChattingRoom(user: any) {
+    // Fetch all chat member entries for the user
     const chatMembers =
       await this.chattingRoomRepository.findChatMemberByUserId(user.id);
 
+    // Extract chat room IDs from the chat member entries
     const chattingRoomIds = chatMembers.map(
       (member) => member.chatting_room_id,
     );
 
+    // Fetch chat rooms and their members' nicknames
     const chattingRooms = await Promise.all(
-      chattingRoomIds.map((id) =>
-        this.chattingRoomRepository.findChattingRoomById(id),
-      ),
-    );
+      chattingRoomIds.map(async (id) => {
+        const room = await this.chattingRoomRepository.findChattingRoomById(id);
+        if (!room) return null;
+
+        const members =
+          await this.chattingRoomRepository.findAllChatMembers(id);
+        const memberNicknames = await Promise.all(
+          members.map(async (member) => {
+            const user = await this.chattingRoomRepository.findId(
+              member.user_id,
+            );
+            return user?.nickname || 'Unknown';
+          }),
+        );
+
+        return { id: room.id, members: memberNicknames.join(', ') };
+      }),
+    ).then((rooms) => rooms.filter((room) => room !== null));
 
     return { message: `채팅방 목록입니다.`, chattingRooms };
   }
