@@ -9,6 +9,7 @@ import { ChattingModule } from 'src/chatting/chatting.module';
 import { UserModule } from 'src/user/user.module';
 import { ChattingRoomModule } from 'src/chattingroom/chattingroom.module';
 import { ChatblacklistModule } from 'src/chatblacklist/chatblacklist.module';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ChatblacklistModule } from 'src/chatblacklist/chatblacklist.module';
     UserModule,
     ChattingRoomModule,
     ChatblacklistModule,
+    ValkeyModule,
   ],
   controllers: [ChatmemberController],
   providers: [ChatmemberService, ChatmemberRepository],

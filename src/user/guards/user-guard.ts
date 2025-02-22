@@ -11,6 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from '../user.repository';
 import { Response } from 'express';
 import { UserService } from '../user.service';
+import { ValkeyService } from 'src/valkey/valkey.service';
 
 @Injectable()
 export class UserGuard implements CanActivate {
@@ -19,6 +20,7 @@ export class UserGuard implements CanActivate {
     private readonly userRepository: UserRepository,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private readonly valkeyService: ValkeyService,
   ) {}
 
   async canActivate(context: ExecutionContext) {
@@ -99,7 +101,7 @@ export class UserGuard implements CanActivate {
     if (!existUser) {
       throw new BadRequestException('인증되지 않은 사용자 입니다.');
     }
-    if (this.userService.logOutUsers[existUser.id]) {
+    if (await this.valkeyService.get(`logoutUser:${existUser.id}`)) {
       throw new UnauthorizedException('다시 로그인 해주세요.');
     }
     const existUserrole =

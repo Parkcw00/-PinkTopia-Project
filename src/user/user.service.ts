@@ -13,15 +13,17 @@ import { UserRepository } from './user.repository';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { InventoryService } from 'src/inventory/inventory.service';
+import { ValkeyService } from 'src/valkey/valkey.service';
 @Injectable()
 export class UserService {
-  logOutUsers: { [key: number]: boolean } = {};
+  // logOutUsers: { [key: number]: boolean } = {};
 
   constructor(
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
     private configService: ConfigService,
     private readonly inventoryService: InventoryService,
+    private readonly valkeyService: ValkeyService,
   ) {}
 
   async getRanking() {
@@ -56,7 +58,7 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(password, Number(saltRounds));
 
     try {
-      const user =await this.userRepository.signUp(
+      const user = await this.userRepository.signUp(
         nickname,
         email,
         hashedPassword,
@@ -64,9 +66,8 @@ export class UserService {
       );
 
       await this.inventoryService.createInventory({
-        user_id: user.id, 
+        user_id: user.id,
       });
-
     } catch (err) {
       throw new InternalServerErrorException(
         '유저 정보 저장 중 오류가 발생하였습니다.',
@@ -160,7 +161,11 @@ export class UserService {
       throw new BadRequestException('비밀번호가 틀렸습니다.');
     }
 
-    const payload = { id: existEmail.id, email: existEmail.email, role: existEmail.role };
+    const payload = {
+      id: existEmail.id,
+      email: existEmail.email,
+      role: existEmail.role,
+    };
     let accessTokenExpiresIn = this.configService.get<string>(
       'ACCESS_TOKEN_EXPIRES_IN',
     );
@@ -190,9 +195,10 @@ export class UserService {
       maxAge: 1000 * 60 * 60 * 24 * +refreshTokenExpiresIn,
       httpOnly: true,
     });
-    if(this.logOutUsers[existEmail.id]) {
-      delete this.logOutUsers[existEmail.id]
-    }
+    // if (this.logOutUsers[existEmail.id]) {
+    //   delete this.logOutUsers[existEmail.id];
+    // }
+    await this.valkeyService.del(`logoutUser:${existEmail.id}`);
     return res.status(200).json({ message: '로그인이 되었습니다.' });
   }
 
@@ -204,7 +210,8 @@ export class UserService {
     });
     res.setHeader('Authorization', `Bearer ${accessToken}`);
     res.clearCookie('refreshToken');
-    this.logOutUsers[user.id] = true;
+    // this.logOutUsers[user.id] = true;
+    await this.valkeyService.set(`logoutUser:${user.id}`, 'true');
     return res.status(200).json({ message: '로그아웃이 되었습니다.' });
   }
 
@@ -330,8 +337,5 @@ export class UserService {
     await transporter.sendMail(mailOptions);
 
     return verificationCode;
-
-    
   }
-
 }

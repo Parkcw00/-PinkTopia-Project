@@ -4,9 +4,10 @@ import { Event } from './entities/event.entity';
 import { EventService } from './event.service';
 import { EventController } from './event.controller';
 import { EventRepository } from './event.repository';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Event])],
+  imports: [TypeOrmModule.forFeature([Event]), ValkeyModule],
   controllers: [EventController],
   providers: [EventService, EventRepository], //레포지토리 추가
   exports: [EventRepository],

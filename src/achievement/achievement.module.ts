@@ -7,11 +7,14 @@ import { AchievementController } from './achievement.controller';
 import { AchievementC } from '../achievement-c/entities/achievement-c.entity';
 import { AchievementRepository } from './achievement.repository';
 import { User } from '../user/entities/user.entity';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 @Module({
-  imports: [TypeOrmModule.forFeature([Achievement, SubAchievement, AchievementC, User])], // ✅ TypeOrmModule에 엔터티 추가
+  imports: [
+    TypeOrmModule.forFeature([Achievement, SubAchievement, AchievementC, User]),
+    ValkeyModule,
+  ], // ✅ TypeOrmModule에 엔터티 추가
   controllers: [AchievementController],
   providers: [AchievementService, AchievementRepository], // ✅ AchievementRepository 등록
   exports: [AchievementService, AchievementRepository], // ✅ 다른 모듈에서도 사용할 수 있도록 export
-  
 })
 export class AchievementModule {}
