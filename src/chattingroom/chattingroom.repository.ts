@@ -17,8 +17,10 @@ export class ChattingRoomRepository {
   ) {}
 
   // 채팅방 만들기
-  async createChattingRoom() {
-    const newChattingRoom = this.chattingRoomrepository.create();
+  async createChattingRoom(createChattingRoomDto) {
+      const newChattingRoom = this.chattingRoomrepository.create({
+        ...createChattingRoomDto,
+      });
     console.log(newChattingRoom);
     return await this.chattingRoomrepository.save(newChattingRoom);
   }
@@ -39,6 +41,12 @@ export class ChattingRoomRepository {
         chatting_room_id,
         user_id,
       },
+    });
+  }
+
+  async findChatMemberByUserId(user_id: number) {
+    return await this.chatMemberRepository.find({
+      where: { user_id },
     });
   }
 
@@ -79,7 +87,7 @@ export class ChattingRoomRepository {
   }
 
   // 채팅방 조회
-  async findChattingRoom() {
+  async findChattingRoom(id: number) {
     return await this.chattingRoomrepository.find();
   }
 

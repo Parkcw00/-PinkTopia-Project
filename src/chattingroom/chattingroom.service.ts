@@ -5,9 +5,10 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { Any, DataSource } from 'typeorm';
 import { ChattingRoomRepository } from './chattingroom.repository';
 import * as nodemailer from 'nodemailer';
+import { CreateChattingRoomDto } from './dto/create-chattingroom.dto';
 
 @Injectable()
 export class ChattingRoomService {
@@ -19,8 +20,15 @@ export class ChattingRoomService {
   ) {}
 
   // 채팅방 생성
-  async createChattingRoom(user: any) {
-    const chattingRoom = await this.chattingRoomRepository.createChattingRoom();
+  async createChattingRoom(
+    user: any,
+    CreateChattingRoomDto: CreateChattingRoomDto,
+  ) {
+    const chattingRoom: any =
+      await this.chattingRoomRepository.createChattingRoom(
+        CreateChattingRoomDto,
+      );
+    console.log(`채팅방 생성`, typeof chattingRoom.id);
     const addChatMember = await this.chattingRoomRepository.addChatMember(
       chattingRoom.id,
       user.id,
@@ -30,8 +38,42 @@ export class ChattingRoomService {
 
   // 채팅방 조회
   async getChattingRoom(user: any) {
-    const chattingRoom = await this.chattingRoomRepository.findChattingRoom();
-    return { message: `채팅방 목록입니다.`, chattingRoom };
+    // Fetch all chat member entries for the user
+    const chatMembers =
+      await this.chattingRoomRepository.findChatMemberByUserId(user.id);
+
+    // Extract chat room IDs from the chat member entries
+    const chattingRoomIds = chatMembers.map(
+      (member) => member.chatting_room_id,
+    );
+
+    // Fetch chat rooms and their members' nicknames
+    const chattingRooms = await Promise.all(
+      chattingRoomIds.map(async (id) => {
+        const room = await this.chattingRoomRepository.findChattingRoomById(id);
+        if (!room) return null;
+
+        const members =
+          await this.chattingRoomRepository.findAllChatMembers(id);
+        const memberNicknames = await Promise.all(
+          members.map(async (member) => {
+            const user = await this.chattingRoomRepository.findId(
+              member.user_id,
+            );
+            return user?.nickname || 'Unknown';
+          }),
+        );
+
+        // Include the title in the returned object
+        return {
+          id: room.id,
+          title: room.title,
+          members: memberNicknames.join(', '),
+        };
+      }),
+    ).then((rooms) => rooms.filter((room) => room !== null));
+
+    return { message: `채팅방 목록입니다.`, chattingRooms };
   }
 
   // 채팅방 나가기
