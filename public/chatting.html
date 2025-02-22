@@ -244,14 +244,19 @@
             throw new Error('로그인에 실패했습니다.');
           }
 
-          // 응답 헤더에서 토큰 추출
+          // Authorization 헤더에서 accessToken 추출
           const authHeader = response.headers.get('Authorization');
-          if (!authHeader) {
+          console.log('Authorization 헤더:', authHeader);
+
+          if (!authHeader || !authHeader.startsWith('Bearer ')) {
             throw new Error('인증 토큰을 받지 못했습니다.');
           }
 
           accessToken = authHeader.split(' ')[1];
           console.log('저장된 토큰:', accessToken);
+
+          const data = await response.json();
+          console.log('로그인 응답:', data);
 
           try {
             // JWT 토큰을 디코드하여 사용자 정보 추출
@@ -262,7 +267,7 @@
             currentUser = {
               id: decodedPayload.id,
               email: decodedPayload.email,
-              nickname: decodedPayload.email ? decodedPayload.email.split('@')[0] : '사용자'
+              nickname: decodedPayload.email.split('@')[0] // 임시로 이메일에서 추출
             };
           } catch (error) {
             console.error('토큰 디코딩 실패:', error);
