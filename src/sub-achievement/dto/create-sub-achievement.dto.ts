@@ -22,6 +22,7 @@ export class CreateSubAchievementDto extends PickType(SubAchievement, [
   'title',
   'mission_type',
   'longitude',
+  'content',
   'latitude',
   'expiration_at',
 ] as const) {
@@ -33,6 +34,26 @@ export class CreateSubAchievementDto extends PickType(SubAchievement, [
   @ApiProperty({ example: 'OOO빵집 방문' })
   @IsString()
   title: string;
+
+  @ApiProperty({ example: '시루케이크 맛있음' })
+  @IsString()
+  content: string;
+
+  @ApiProperty({ description: '위도', minimum: -90, maximum: 90 })
+  @IsOptional()
+  @Transform(({ value }) => parseFloat(value))
+  @IsNumber()
+  @Min(-90)
+  @Max(90)
+  latitude: number;
+
+  @ApiProperty({ description: '경도', minimum: -180, maximum: 180 })
+  @IsOptional()
+  @Transform(({ value }) => parseFloat(value))
+  @IsNumber()
+  @Min(-180)
+  @Max(180)
+  longitude: number;
 
   @ApiProperty({
     type: 'array',
@@ -47,16 +68,6 @@ export class CreateSubAchievementDto extends PickType(SubAchievement, [
       'category 값이 유효하지 않습니다. (SEOUL_TOUR, JEJU_TOUR, FOOD_TOUR 중 선택)',
   })
   mission_type: SubAchievementMissionType;
-
-  @IsNumber()
-  @Min(-90)
-  @Max(90)
-  latitude: number;
-
-  @IsNumber()
-  @Min(-180)
-  @Max(180)
-  longitude: number;
 
   @IsDate()
   @Type(() => Date) // 문자열을 Date 객체로 변환

@@ -14,12 +14,16 @@ import {
   NotFoundException,
   ParseIntPipe,
   UploadedFiles,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { UserGuard } from '../user/guards/user-guard';
 import { AdminGuard } from '../user/guards/admin.guard';
 import { AchievementService } from './achievement.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateAchievementDto } from './dto/create-achievement.dto';
 import { UpdateAchievementDto } from './dto/update-achievement.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('achievement')
 export class AchievementController {
@@ -27,11 +31,15 @@ export class AchievementController {
 
   // 생성
   @UseGuards(UserGuard, AdminGuard)
+  @UseInterceptors(FilesInterceptor('files'))
   @Post()
   async create(
     @Body() createAchievementDto: CreateAchievementDto,
-    @UploadedFiles() files: Express.Multer.File[],
+    @UploadedFiles() files: Express.Multer.File[], // 단일 파일로 변경
   ) {
+    console.log(createAchievementDto);
+    console.log(typeof createAchievementDto.title);
+    console.log(`파일즈`, files);
     return await this.achievementService.create(createAchievementDto, files);
   }
 

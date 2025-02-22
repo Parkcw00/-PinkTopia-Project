@@ -22,6 +22,7 @@ export class LocationHistoryController {
   constructor(
     private readonly locationHistoryService: LocationHistoryService,
   ) {}
+} /*
 
   // 회원가입 시 유저id 와 연결된 7개의 디폴트 데이터 생성
   @UseGuards(UserGuard)
@@ -76,3 +77,4 @@ export class LocationHistoryController {
     return this.locationHistoryService.delete(+req.user.id);
   }
 }
+*/

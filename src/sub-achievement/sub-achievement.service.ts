@@ -46,14 +46,16 @@ export class SubAchievementService {
         id: sub.id,
         achievement_id: sub.achievement_id,
         title: sub.title,
+        content: sub.content,
         longitude: sub.longitude,
         latitude: sub.latitude,
         sub_achievement_images: sub.sub_achievement_images,
         mission_type: sub.mission_type,
-        expiration_at: sub.expiration_at?.toISOString() || null,
+        expiration_at: sub.expiration_at,
         created_at: sub.created_at?.toISOString() || null,
         updated_at: sub.updated_at?.toISOString() || null,
       };
+      console.log(subData);
 
       pipeline.set(key, JSON.stringify(subData)); // Redis에 저장
     }
@@ -96,10 +98,13 @@ export class SubAchievementService {
       achievement_id,
       title,
       mission_type,
+      content,
       longitude,
       latitude,
       expiration_at,
     } = createSubAchievementDto;
+
+    console.log(typeof content, '여기');
 
     //  mission_type 값 Enum 변환
     const valid_mission_type = Object.values(
@@ -126,19 +131,24 @@ export class SubAchievementService {
       }
       expirationAt = parsedDate;
     }
-    //  새로운 엔티티 생성
 
     const sub_achievement_images = await this.s3Service.uploadFiles(files);
 
+    //  새로운 엔티티 생성
     const createSub = `achievement_id: ${achievement_id}, // ✅ 관계 매핑
       expiration_at: expirationAt ?? undefined, // ✅ null → undefined 변환
-      title:${title},
+      title:${title},content: ${content},
       sub_achievement_images:${sub_achievement_images},
       longitude:${longitude},
       latitude:${latitude},
       mission_type:${valid_mission_type}`;
 
-    const subAchievementV = await this.valkeyService.get(createSub);
+    //  const subAchievementV = await this.valkeyService.set(createSub);
+    // Redis 저장할 키 생성 (고유 ID 자동 생성되므로 따로 안 넣음)
+    const key = `sub_achievement:${achievement_id}:${Date.now()}`;
+
+    // Redis에 저장
+    await this.valkeyService.set(key, createSub);
 
     const subAchievement = await this.repository.create({
       achievement_id: achievement_id, // ✅ 관계 매핑
@@ -148,6 +158,7 @@ export class SubAchievementService {
       longitude,
       latitude,
       mission_type: valid_mission_type,
+      content,
     });
 
     //  DB 저장

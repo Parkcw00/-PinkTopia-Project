@@ -30,7 +30,7 @@ export class AchievementService {
     files: Express.Multer.File[], // 여러 파일을 받도록 수정
   ): Promise<Achievement> {
     console.log('생성 서비스');
-    if (!createAchievementDto) {
+    if (!createAchievementDto || !createAchievementDto.title) {
       throw new BadRequestException('올바른 데이터를 입력하세요.');
     }
     // title로 검색 -> 겹치나 확인
@@ -68,7 +68,7 @@ export class AchievementService {
       title,
       category: validCategory,
       reward,
-      achievement_images,
+      achievement_images: achievement_images,
       content,
       expiration_at: expirationAt,
     });

@@ -13,12 +13,15 @@ import {
   BadRequestException,
   NotFoundException,
   ParseIntPipe,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { UserGuard } from '../user/guards/user-guard';
 import { AdminGuard } from '../user/guards/admin.guard';
 import { SubAchievementService } from './sub-achievement.service';
 import { CreateSubAchievementDto } from './dto/create-sub-achievement.dto';
 import { UpdateSubAchievementDto } from './dto/update-sub-achievement.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('sub-achievement')
 export class SubAchievementController {
@@ -33,12 +36,14 @@ export class SubAchievementController {
 
   // 생성
   @UseGuards(UserGuard, AdminGuard)
+  @UseInterceptors(FilesInterceptor('files'))
   @Post()
   async create(
     @Body() createSubAchievementDto: CreateSubAchievementDto,
-    files: Express.Multer.File[],
+    @UploadedFiles() files: Express.Multer.File[], // 단일 파일로 변경
   ) {
-    return await await this.service.create(createSubAchievementDto);
+    console.log(createSubAchievementDto);
+    return await await this.service.create(createSubAchievementDto, files);
   }
 
   // 유저 전체에 새로고침.

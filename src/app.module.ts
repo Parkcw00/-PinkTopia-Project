@@ -48,7 +48,7 @@ const typeOrmModuleOptions = {
     synchronize: configService.get('DB_SYNC'), //true, // 기존 테이블이 있다면 자동으로 수정됨
     // migrations: [__dirname + '/**/migrations/*.{ts,js}'], // 모든 폴더 내의 migrations 폴더에서 마이그레이션 파일을 자동으로 등록
     migrationsRun: !configService.get('DB_SYNC'), // 앱 실행 시 마이그레이션 적용
-
+    dropSchema: configService.get('DB_SYNC'),
     logging: true,
   }),
   inject: [ConfigService],

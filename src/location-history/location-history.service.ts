@@ -13,10 +13,10 @@ export class LocationHistoryService {
     private readonly repository: LocationHistoryRepository,
     private readonly valkeyService: ValkeyService,
   ) {}
-
-  /**
-   * 회원가입 시 유저id와 연결된 7개의 디폴트 데이터를 생성합니다.
-   */
+}
+/**
+ * 회원가입 시 유저id와 연결된 7개의 디폴트 데이터를 생성합니다.
+ */ /*
   async createDB(user_id: number): Promise<LocationHistory[]> {
     const defaultRecords: LocationHistory[] = [];
 
@@ -88,8 +88,8 @@ export class LocationHistoryService {
     }
   }
   async delete(user_id) {}
-
-  /*
+*/
+/*
   async create(
     user_id: number,
     createLocationHistoryDto: CreateLocationHistoryDto,
@@ -151,4 +151,4 @@ export class LocationHistoryService {
   ): Promise<void> {
     await this.locationHistoryRepository.delete({ user_id: userId });
   }*/
-}
+//}

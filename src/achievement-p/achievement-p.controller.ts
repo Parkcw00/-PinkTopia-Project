@@ -24,6 +24,13 @@ import { UpdateAchievementPDto } from './dto/update-achievement-p.dto';
 export class AchievementPController {
   constructor(private readonly APService: AchievementPService) {}
 
+  // 로그인 시 유저의 업적P 발키로 올리기
+  @UseGuards(UserGuard)
+  @Post('fill-valkey')
+  async fillValkey(@Request() req) {
+    return await await this.APService.fillValkey(req.user.id);
+  }
+
   // 수행으로 등록
   @UseGuards(UserGuard)
   @Post('/subAchievementId/:subAchievementId')
