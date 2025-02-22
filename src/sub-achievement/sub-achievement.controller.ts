@@ -24,6 +24,13 @@ import { UpdateSubAchievementDto } from './dto/update-sub-achievement.dto';
 export class SubAchievementController {
   constructor(private readonly service: SubAchievementService) {}
 
+  // db 읽어서 발키로 다 올리는 로직 추가
+  @UseGuards(UserGuard, AdminGuard)
+  @Post('fill-valkey')
+  async fillValkey() {
+    return await await this.service.fillValkey();
+  }
+
   // 생성
   @UseGuards(UserGuard, AdminGuard)
   @Post()

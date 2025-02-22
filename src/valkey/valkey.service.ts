@@ -2,6 +2,9 @@ import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 @Injectable()
 export class ValkeyService implements OnModuleDestroy {
+  pipeline() {
+    throw new Error('Method not implemented.');
+  }
   private readonly client: Redis;
   constructor() {
     this.client = new Redis({
@@ -18,6 +21,7 @@ export class ValkeyService implements OnModuleDestroy {
       await this.client.set(key, jsonValue);
     }
   }
+
   async get<T>(key: string): Promise<T | null> {
     const data = await this.client.get(key);
     return data ? JSON.parse(data) : null; // JSON 변환 후 반환
@@ -41,5 +45,13 @@ export class ValkeyService implements OnModuleDestroy {
   }
   onModuleDestroy() {
     this.client.quit();
+  }
+  // ✅ 클라이언트 접근을 위한 public 메서드 추가
+  getClient(): Redis {
+    return this.client;
+  }
+  // ✅ Pipeline 전용 메서드 추가
+  createPipeline() {
+    return this.client.pipeline();
   }
 }
