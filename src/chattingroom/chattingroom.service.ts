@@ -20,9 +20,15 @@ export class ChattingRoomService {
   ) {}
 
   // 채팅방 생성
-  async createChattingRoom(user: any, CreateChattingRoomDto: CreateChattingRoomDto) {
-    const chattingRoom: any = await this.chattingRoomRepository.createChattingRoom(CreateChattingRoomDto);
-    console.log(`채팅방 생성`,typeof(chattingRoom.id));
+  async createChattingRoom(
+    user: any,
+    CreateChattingRoomDto: CreateChattingRoomDto,
+  ) {
+    const chattingRoom: any =
+      await this.chattingRoomRepository.createChattingRoom(
+        CreateChattingRoomDto,
+      );
+    console.log(`채팅방 생성`, typeof chattingRoom.id);
     const addChatMember = await this.chattingRoomRepository.addChatMember(
       chattingRoom.id,
       user.id,
@@ -58,7 +64,12 @@ export class ChattingRoomService {
           }),
         );
 
-        return { id: room.id, members: memberNicknames.join(', ') };
+        // Include the title in the returned object
+        return {
+          id: room.id,
+          title: room.title,
+          members: memberNicknames.join(', '),
+        };
       }),
     ).then((rooms) => rooms.filter((room) => room !== null));
 
