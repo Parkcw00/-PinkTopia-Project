@@ -30,7 +30,7 @@ export class ChattingRoomService {
 
   // 채팅방 조회
   async getChattingRoom(user: any) {
-    const chattingRoom = await this.chattingRoomRepository.findChattingRoom();
+    const chattingRoom = await this.chattingRoomRepository.findChattingRoom(user.id);
     return { message: `채팅방 목록입니다.`, chattingRoom };
   }
 

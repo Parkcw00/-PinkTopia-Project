@@ -79,7 +79,7 @@ export class ChattingRoomRepository {
   }
 
   // 채팅방 조회
-  async findChattingRoom() {
+  async findChattingRoom(id: number) {
     return await this.chattingRoomrepository.find();
   }
 
