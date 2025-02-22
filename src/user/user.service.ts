@@ -161,39 +161,47 @@ export class UserService {
     }
 
     const payload = { id: existEmail.id, email: existEmail.email, role: existEmail.role };
-    let accessTokenExpiresIn = this.configService.get<string>(
-      'ACCESS_TOKEN_EXPIRES_IN',
-    );
-    let refreshTokenExpiresIn = this.configService.get<string>(
-      'REFRESH_TOKEN_EXPIRES_IN',
-    );
+    let accessTokenExpiresIn = this.configService.get<string>('ACCESS_TOKEN_EXPIRES_IN');
+    let refreshTokenExpiresIn = this.configService.get<string>('REFRESH_TOKEN_EXPIRES_IN');
+    
     if (!accessTokenExpiresIn || !refreshTokenExpiresIn) {
-      console.log('token 환경 변수가 설정되지 않았습니다.');
-      throw new InternalServerErrorException('관리자에게 문의해 주세요');
+        console.log('token 환경 변수가 설정되지 않았습니다.');
+        throw new InternalServerErrorException('관리자에게 문의해 주세요');
     }
 
     const accessToken = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
-      expiresIn: accessTokenExpiresIn,
+        secret: this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
+        expiresIn: accessTokenExpiresIn,
     });
     const refreshToken = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('REFRESH_TOKEN_SECRET_KEY'),
-      expiresIn: refreshTokenExpiresIn,
+        secret: this.configService.get<string>('REFRESH_TOKEN_SECRET_KEY'),
+        expiresIn: refreshTokenExpiresIn,
     });
-    refreshTokenExpiresIn = refreshTokenExpiresIn.slice(
-      0,
-      refreshTokenExpiresIn.length - 1,
-    );
 
+    // refreshTokenExpiresIn에서 'd' 제거하고 숫자만 추출
+    const refreshTokenDays = parseInt(refreshTokenExpiresIn.replace('d', ''));
+
+    // 응답 헤더 설정 수정
+    res.setHeader('Access-Control-Expose-Headers', 'Authorization');  // Authorization 헤더 노출
     res.setHeader('Authorization', `Bearer ${accessToken}`);
+
+    // 쿠키 설정
     res.cookie('refreshToken', refreshToken, {
-      maxAge: 1000 * 60 * 60 * 24 * +refreshTokenExpiresIn,
-      httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * refreshTokenDays,
+        httpOnly: false,  // 클라이언트에서 접근 가능하도록 변경
+        secure: false,
+        sameSite: 'lax',
+        path: '/',
+        domain: 'localhost'  // 또는 domain 옵션 제거
     });
+
     if(this.logOutUsers[existEmail.id]) {
-      delete this.logOutUsers[existEmail.id]
+        delete this.logOutUsers[existEmail.id];
     }
-    return res.status(200).json({ message: '로그인이 되었습니다.' });
+
+    return res.status(200)
+        .header('Authorization', `Bearer ${accessToken}`)
+        .json({ message: '로그인이 되었습니다.' });
   }
 
   // 로그아웃
@@ -239,6 +247,7 @@ export class UserService {
     }
     try {
       const filteredInfo = {
+        id: myInfo.id,
         email: myInfo.email,
         nickname: myInfo.nickname,
         profile_image: myInfo.profile_image,

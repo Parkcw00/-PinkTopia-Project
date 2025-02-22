@@ -4,6 +4,7 @@ import { Chatmember } from 'src/chatmember/entities/chatmember.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { ChattingRoom } from './entities/chattingroom.entity';
+import { IsNull } from 'typeorm';
 
 @Injectable()
 export class ChattingRoomRepository {

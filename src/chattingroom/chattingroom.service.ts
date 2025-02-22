@@ -260,4 +260,58 @@ export class ChattingRoomService {
     };
     await transporter.sendMail(mailOptions);
   }
+
+  // 채팅방 멤버 확인
+  async checkChatMember(userId: number, chattingRoomId: number) {
+    try {
+      // 채팅방이 존재하는지 먼저 확인
+      const chattingRoom = await this.chattingRoomRepository.checkChattingRoom(chattingRoomId);
+      if (!chattingRoom) {
+        throw new BadRequestException('존재하지 않는 채팅방입니다.');
+      }
+
+      // 채팅방 멤버인지 확인
+      const isMember = await this.chattingRoomRepository.findChatMember(
+        chattingRoomId,
+        userId,
+      );
+
+      if (!isMember) {
+        throw new BadRequestException('해당 채팅멤버가 존재하지 않습니다.');
+      }
+
+      // 채팅방의 모든 멤버 정보 조회
+      const allMembers = await this.chattingRoomRepository.findAllChatMembers(chattingRoomId);
+      
+      // 각 멤버의 사용자 정보 조회
+      const membersWithUserInfo = await Promise.all(
+        allMembers.map(async (member) => {
+          const user = await this.chattingRoomRepository.findId(member.user_id);
+          return {
+            id: member.user_id,
+            nickname: user?.nickname || '알 수 없음',
+            isAdmin: member.admin
+          };
+        })
+      );
+
+      return {
+        success: true,
+        isMember: true,
+        data: {
+          member: {
+            id: isMember.user_id,
+            isAdmin: isMember.admin
+          },
+          allMembers: membersWithUserInfo
+        }
+      };
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      console.error('채팅 멤버 확인 중 오류:', error);
+      throw new InternalServerErrorException('채팅 멤버 확인 중 오류가 발생했습니다.');
+    }
+  }
 }
