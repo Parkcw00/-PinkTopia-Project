@@ -56,4 +56,5 @@ export class Achievement {
 
   @OneToMany(() => AchievementC, (achievement_c) => achievement_c.achievement) // 카드 엔티티와 1:n 관계 설정
   achievement_c: AchievementC[];
+  static achievement_images: any;
 }

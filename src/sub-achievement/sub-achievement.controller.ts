@@ -34,7 +34,10 @@ export class SubAchievementController {
   // 생성
   @UseGuards(UserGuard, AdminGuard)
   @Post()
-  async create(@Body() createSubAchievementDto: CreateSubAchievementDto) {
+  async create(
+    @Body() createSubAchievementDto: CreateSubAchievementDto,
+    files: Express.Multer.File[],
+  ) {
     return await await this.service.create(createSubAchievementDto);
   }
 

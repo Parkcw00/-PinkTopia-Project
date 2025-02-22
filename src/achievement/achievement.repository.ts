@@ -22,7 +22,7 @@ export class AchievementRepository {
   }
 
   // 생성
-  // 타이틀로로 조회
+  // 타이틀로 조회
   async findByTitle(title: string): Promise<Achievement | null> {
     return await this.entity.findOne({ where: { title } });
   }
@@ -35,7 +35,7 @@ export class AchievementRepository {
     achievement_images,
     expiration_at: expiration_at,
   }): Promise<Achievement | null> {
-    return this.entity.create({
+    const newA = this.entity.create({
       title,
       category: validCategory,
       reward,
@@ -43,6 +43,7 @@ export class AchievementRepository {
       content,
       expiration_at: expiration_at,
     });
+    return await this.entity.save(newA);
   }
   // 반드시 save()를 호출해야 데이터베이스에 저장됨.
   async save(achievement: Achievement): Promise<Achievement> {
@@ -50,9 +51,9 @@ export class AchievementRepository {
   }
 
   // 연결된 서브업적 가져오기
-  async findByAId(id: number): Promise<SubAchievement[] | null> {
+  async findByAId(Aid: number): Promise<SubAchievement[] | null> {
     return await this.subEntity.find({
-      where: { achievement_id: id },
+      where: { achievement_id: Aid },
       order: { updated_at: 'DESC', created_at: 'DESC' }, // 업데이트순 -> 생성순 정렬
     });
   }
@@ -92,10 +93,24 @@ export class AchievementRepository {
 
   async update(
     idA: number,
-    updateAchievementDto: UpdateAchievementDto,
+    {
+      title,
+      category: validCategory,
+      reward,
+      content,
+      achievement_images: imageUrls,
+      expiration_at,
+    },
   ): Promise<void> {
     // 업데이트 실행
-    await this.entity.update(idA, updateAchievementDto);
+    await this.entity.update(idA, {
+      title,
+      category: validCategory,
+      reward,
+      content,
+      achievement_images: imageUrls,
+      expiration_at,
+    });
   }
 
   // 가벼운 삭제

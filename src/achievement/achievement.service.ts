@@ -5,19 +5,18 @@ import {
   ConflictException,
   ParseIntPipe,
 } from '@nestjs/common';
-import { AchievementCategory } from './enums/achievement-category.enum'; // ENUM 경로 확인
-import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
 import { format } from 'date-fns'; // npm install date-fns
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository, DeleteResult, MoreThan } from 'typeorm';
 import { S3Service } from '../s3/s3.service';
-import { AchievementRepository } from './achievement.repository';
-
+import { parseISO } from 'date-fns';
+import { AchievementCategory } from './enums/achievement-category.enum'; // ENUM 경로 확인
+import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
 import { CreateAchievementDto } from './dto/create-achievement.dto';
 import { UpdateAchievementDto } from './dto/update-achievement.dto';
-import { Achievement } from './entities/achievement.entity';
+import { AchievementRepository } from './achievement.repository';
 import { fixresArr, fixres } from './utils/format';
-import { parseISO } from 'date-fns';
+import { Achievement } from './entities/achievement.entity';
 @Injectable()
 export class AchievementService {
   constructor(
@@ -81,10 +80,10 @@ export class AchievementService {
     }
     console.log('생성 서비스3');
 
-    // 데이터베이스에 저장
-    const save = await this.repository.save(achievement);
+    // 데이터베이스에 저장 -> 레포지토리에서 함
+    // const save = await this.repository.save(achievement);
 
-    return fixres(save); // ✅ 함수 실행
+    return fixres(achievement); // ✅ 함수 실행
   }
 
   // 전체
@@ -193,6 +192,7 @@ export class AchievementService {
   async update(
     id: string,
     updateAchievementDto: UpdateAchievementDto,
+    files?: Express.Multer.File[],
   ): Promise<[{ message: string }, Achievement]> {
     const idA = Number(id);
     if (!idA) {
@@ -225,19 +225,62 @@ export class AchievementService {
       }
     }
 
+    const {
+      title,
+      category: validCategory,
+      reward,
+      content,
+      expiration_at,
+    } = updateAchievementDto;
+
+    //   achievement_images,
+
+    // 기존 이미지 배열을 기본값으로 사용
+    let imageUrls = isExists.achievement_images;
+
+    if (files && files.length > 0) {
+      // 새 이미지가 있을 경우 기존 이미지 삭제
+      if (
+        isExists.achievement_images &&
+        isExists.achievement_images.length > 0
+      ) {
+        for (const imgUrl of isExists.achievement_images) {
+          const key = imgUrl.split('/').pop();
+          if (key) {
+            try {
+              await this.s3Service.deleteFile(key);
+            } catch (error) {
+              console.error(`Failed to delete image from S3: ${error.message}`);
+            }
+          }
+        }
+      }
+      // 새 이미지 업로드 후 URL 획득
+      imageUrls = await this.s3Service.uploadFiles(files);
+    }
+
+    const updateData = {
+      title,
+      category: validCategory,
+      reward,
+      content,
+      achievement_images: imageUrls,
+      expiration_at,
+    };
+
     // 업데이트 수행
-    await this.repository.update(idA, updateAchievementDto);
+    await this.repository.update(idA, updateData);
     const updatedData = await this.repository.findOne(idA);
     if (!updatedData) {
       throw new NotFoundException(
-        `ID ${id}에 해당하는 업적을 확인인할 수 없습니다.`,
+        `ID ${id}에 해당하는 업적을 확인할 수 없습니다.`,
       );
     }
 
     return [{ message: '수정 성공' }, updatedData];
   }
 
-  // 소프트 삭제제
+  // 소프트 삭제
   async remove(id: string): Promise<{ message: string }> {
     const idA = Number(id);
     console.log('id 형변환');
