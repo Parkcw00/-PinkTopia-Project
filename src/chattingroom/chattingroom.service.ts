@@ -30,8 +30,20 @@ export class ChattingRoomService {
 
   // 채팅방 조회
   async getChattingRoom(user: any) {
-    const chattingRoom = await this.chattingRoomRepository.findChattingRoom(user.id);
-    return { message: `채팅방 목록입니다.`, chattingRoom };
+    const chatMembers =
+      await this.chattingRoomRepository.findChatMemberByUserId(user.id);
+
+    const chattingRoomIds = chatMembers.map(
+      (member) => member.chatting_room_id,
+    );
+
+    const chattingRooms = await Promise.all(
+      chattingRoomIds.map((id) =>
+        this.chattingRoomRepository.findChattingRoomById(id),
+      ),
+    );
+
+    return { message: `채팅방 목록입니다.`, chattingRooms };
   }
 
   // 채팅방 나가기
