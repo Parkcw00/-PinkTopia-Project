@@ -17,8 +17,10 @@ export class ChattingRoomRepository {
   ) {}
 
   // 채팅방 만들기
-  async createChattingRoom() {
-    const newChattingRoom = this.chattingRoomrepository.create();
+  async createChattingRoom(createChattingRoomDto) {
+      const newChattingRoom = this.chattingRoomrepository.create({
+        ...createChattingRoomDto,
+      });
     console.log(newChattingRoom);
     return await this.chattingRoomrepository.save(newChattingRoom);
   }
