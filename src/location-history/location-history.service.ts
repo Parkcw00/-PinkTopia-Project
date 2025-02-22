@@ -61,6 +61,7 @@ export class LocationHistoryService {
       updateLocationHistoryDto,
     );
   }
+
   // 3분에 한번
   async updateDB(user_id, updateLocationHistoryDto) {
     // 최신 레코드를 찾아 위도경도 비교. 벡터값이 3m 이내면 throw, 더 많이 움직였으면 업데이트

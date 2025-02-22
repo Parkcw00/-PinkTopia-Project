@@ -2,6 +2,9 @@ import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 @Injectable()
 export class ValkeyService implements OnModuleDestroy {
+  findOne(arg0: { where: { user_id: any }; order: { timestamp: string } }) {
+    throw new Error('Method not implemented.');
+  }
   pipeline() {
     throw new Error('Method not implemented.');
   }
