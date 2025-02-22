@@ -143,14 +143,22 @@
 
       // 소켓 연결 함수
       function connectSocket() {
-        socket = io('http://localhost:3000/chatting', {
+        const socketOptions = {
           withCredentials: true,
           transports: ['websocket', 'polling'],
           extraHeaders: {
-            'Access-Control-Allow-Origin': 'http://127.0.0.1:5500',
-            'Authorization': `Bearer ${accessToken}`
+            'Access-Control-Allow-Origin': 'http://127.0.0.1:5500'
           },
-        });
+          auth: {
+            token: accessToken
+          }
+        };
+
+        if (accessToken) {
+          socketOptions.extraHeaders['Authorization'] = `Bearer ${accessToken}`;
+        }
+
+        socket = io('http://localhost:3000/chatting', socketOptions);
 
         // 소켓 이벤트 리스너 설정
         socket.on('connect', () => {
@@ -236,15 +244,37 @@
             throw new Error('로그인에 실패했습니다.');
           }
 
-          const data = await response.json();
-          console.log('로그인 응답:', data);
+          // 응답 헤더에서 토큰 추출
+          const authHeader = response.headers.get('Authorization');
+          if (!authHeader) {
+            throw new Error('인증 토큰을 받지 못했습니다.');
+          }
 
-          // 로그인 성공 후 바로 currentUser 설정
-          currentUser = {
-            id: data.id || 1,  // 임시로 ID 설정
-            email: email,
-            nickname: email.split('@')[0]  // 임시로 이메일의 앞부분을 닉네임으로 사용
-          };
+          accessToken = authHeader.split(' ')[1];
+          console.log('저장된 토큰:', accessToken);
+
+          try {
+            // JWT 토큰을 디코드하여 사용자 정보 추출
+            const [header, payload, signature] = accessToken.split('.');
+            const decodedPayload = JSON.parse(atob(payload));
+            console.log('토큰 페이로드:', decodedPayload);
+
+            currentUser = {
+              id: decodedPayload.id,
+              email: decodedPayload.email,
+              nickname: decodedPayload.email ? decodedPayload.email.split('@')[0] : '사용자'
+            };
+          } catch (error) {
+            console.error('토큰 디코딩 실패:', error);
+            // 토큰 디코딩 실패 시 기본값 설정
+            currentUser = {
+              id: 1,
+              email: email,
+              nickname: email.split('@')[0]
+            };
+          }
+          
+          console.log('현재 유저:', currentUser);
           
           // 소켓 연결
           connectSocket();
@@ -370,10 +400,11 @@
         }
 
         try {
-          const response = await fetch(`http://localhost:3000/chattingroom?user=${JSON.stringify({id: currentUser.id})}`, {
+          const response = await fetch(`http://localhost:3000/chattingroom`, {
             method: 'GET',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`
             },
             credentials: 'include'
           });
@@ -388,15 +419,15 @@
           const roomList = document.getElementById('roomList');
           roomList.innerHTML = '<h3>참여 중인 채팅방 목록</h3>';
           
-          if (data.chattingRoom && data.chattingRoom.length > 0) {
+          if (data.chattingRooms && data.chattingRooms.length > 0) {
             const ul = document.createElement('ul');
-            data.chattingRoom.forEach(room => {
+            data.chattingRooms.forEach(room => {
               const li = document.createElement('li');
               li.style.cursor = 'pointer';
               li.style.marginBottom = '10px';
-              li.innerHTML = `채팅방 ${room.chatting_room_id} (${room.admin ? '관리자' : '멤버'})`;
+              li.innerHTML = `채팅방 ${room.id} (${room.admin ? '관리자' : '멤버'})`;
               li.onclick = () => {
-                document.getElementById('roomId').value = room.chatting_room_id;
+                document.getElementById('roomId').value = room.id;
               };
               ul.appendChild(li);
             });
