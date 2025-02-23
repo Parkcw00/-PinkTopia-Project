@@ -77,16 +77,12 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
         throw new WsException('인증되지 않은 사용자입니다.');
       }
 
-      console.log('사용자 정보:', user);
-
       try {
-        // 채팅멤버 확인
+        // 채팅멤버 확인 및 사용자 정보 조회
         const chatMember = await this.chatmemberService.findByRoomAndUser(
           data.roomId,
           user.id,
         );
-
-        console.log('채팅 멤버 확인 결과:', chatMember);
 
         // 블랙리스트 확인
         const blacklists = await this.chatblacklistService.findAll();
@@ -104,16 +100,15 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
         // 채팅방 입장
         await client.join(`room_${data.roomId}`);
         
-        // 입장 메시지 브로드캐스트
+        // 입장 메시지 브로드캐스트 (닉네임 사용)
         this.server.to(`room_${data.roomId}`).emit('userJoined', {
           userId: user.id,
-          nickname: user.email
+          nickname: chatMember.user.nickname // 닉네임 사용
         });
 
         return { success: true };
       } catch (error) {
         if (error instanceof NotFoundException) {
-          // 채팅 멤버가 아닌 경우
           console.log('채팅 멤버가 아님:', error.message);
           return { success: false, message: error.message };
         }
@@ -170,27 +165,40 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
     @ConnectedSocket() client: Socket,
   ) {
     try {
+      // 사용자 정보 조회
+      const user = client.data.user;
+      if (!user) {
+        throw new WsException('인증되지 않은 사용자입니다.');
+      }
+
+      // 채팅멤버 정보 조회 (소켓 연결 해제 전에 수행)
       const chatMember = await this.chatmemberService.findByRoomAndUser(
         data.roomId,
-        data.userId,
+        user.id
       );
 
-      // 채팅방 퇴장
-      client.leave(`room_${data.roomId}`);
+      // 퇴장하는 클라이언트의 소켓만 방에서 나가도록 수정
+      await client.leave(`room_${data.roomId}`);
 
-      // 퇴장 메시지 브로드캐스트
+      // 퇴장 메시지 브로드캐스트 (닉네임 사용)
       this.server.to(`room_${data.roomId}`).emit('userLeft', {
-        userId: data.userId,
-        nickname: chatMember.user.nickname,
-        message: '님이 퇴장하셨습니다.',
+        userId: user.id,
+        nickname: chatMember.user.nickname
       });
+
+      // 퇴장한 사용자의 소켓 연결만 해제
+      client.disconnect(true);
+
+      return { success: true };
     } catch (error) {
-      console.error('Error leaving room:', error);
-      client.emit('error', { message: error.message });
+      console.error('채팅방 나가기 중 에러:', error);
+      return { success: false, message: error.message };
     }
   }
 
+  // 연결 해제 처리
   handleDisconnect(client: Socket) {
     console.log('클라이언트 연결 종료:', client.id);
+    // 다른 사용자의 연결은 유지
   }
 }

@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Request,
+  NotFoundException,
 } from '@nestjs/common';
 import { UserGuard } from 'src/user/guards/user-guard';
 import { ChattingRoomService } from './chattingroom.service';
@@ -126,6 +127,27 @@ export class ChattingRoomController {
       return result;
     } catch (error) {
       console.error('멤버 확인 중 에러:', error);
+      throw error;
+    }
+  }
+
+  // 특정 채팅방 조회 엔드포인트 추가
+  @UseGuards(UserGuard)
+  @Get(':id')
+  async getChattingRoomById(
+    @Request() req,
+    @Param('id') id: number
+  ) {
+    try {
+      const chattingRoom = await this.chattingRoomService.findChattingRoomById(id);
+      if (!chattingRoom) {
+        throw new NotFoundException('존재하지 않는 채팅방입니다.');
+      }
+      return {
+        success: true,
+        data: chattingRoom
+      };
+    } catch (error) {
       throw error;
     }
   }

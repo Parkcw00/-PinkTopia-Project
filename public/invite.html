@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>채팅방 초대</title>
+</head>
+<body>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomId = urlParams.get('roomId');
+            
+            if (!roomId) {
+                alert('올바르지 않은 초대 링크입니다.');
+                window.location.href = '/public/login.html';
+                return;
+            }
+
+            // 로그인 상태 확인
+            const accessToken = localStorage.getItem('accessToken');
+            
+            if (!accessToken) {
+                // 로그인되지 않은 경우만 초대 정보 저장 후 로그인 페이지로 이동
+                localStorage.setItem('pendingInvite', JSON.stringify({
+                    type: 'invite',
+                    roomId: roomId,
+                    timestamp: new Date().getTime()
+                }));
+                window.location.href = '/public/login.html';
+            } else {
+                // 이미 로그인된 경우 바로 채팅방 입장 처리
+                try {
+                    // 채팅방 멤버 확인
+                    const memberCheckResponse = await fetch(`http://localhost:3000/chatmember/check/${roomId}`, {
+                        headers: {
+                            'Authorization': accessToken
+                        }
+                    });
+
+                    if (memberCheckResponse.ok) {
+                        // 이미 멤버라면 바로 채팅방으로 이동
+                        window.location.href = `/public/chatting.html?roomId=${roomId}`;
+                        return;
+                    }
+
+                    // 멤버가 아니라면 새로 가입
+                    const joinResponse = await fetch(`http://localhost:3000/chatmember`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': accessToken,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            chatting_room_id: parseInt(roomId)
+                        })
+                    });
+
+                    if (joinResponse.ok) {
+                        window.location.href = `/public/chatting.html?roomId=${roomId}`;
+                    } else {
+                        const errorData = await joinResponse.json();
+                        throw new Error(errorData.message || '채팅방 입장에 실패했습니다.');
+                    }
+                } catch (error) {
+                    console.error('채팅방 입장 실패:', error);
+                    alert(error.message || '채팅방 입장에 실패했습니다.');
+                    window.location.href = '/public/chattingrooms.html';
+                }
+            }
+        });
+    </script>
+</body>
+</html> 
