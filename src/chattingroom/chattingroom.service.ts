@@ -264,8 +264,12 @@ export class ChattingRoomService {
   // 채팅방 멤버 확인
   async checkChatMember(userId: number, chattingRoomId: number) {
     try {
+      console.log('멤버 확인 서비스 시작:', { userId, chattingRoomId });
+
       // 채팅방이 존재하는지 먼저 확인
       const chattingRoom = await this.chattingRoomRepository.checkChattingRoom(chattingRoomId);
+      console.log('채팅방 확인 결과:', chattingRoom);
+      
       if (!chattingRoom) {
         throw new BadRequestException('존재하지 않는 채팅방입니다.');
       }
@@ -275,6 +279,7 @@ export class ChattingRoomService {
         chattingRoomId,
         userId,
       );
+      console.log('멤버 확인 결과:', isMember);
 
       if (!isMember) {
         throw new BadRequestException('해당 채팅멤버가 존재하지 않습니다.');
@@ -282,36 +287,32 @@ export class ChattingRoomService {
 
       // 채팅방의 모든 멤버 정보 조회
       const allMembers = await this.chattingRoomRepository.findAllChatMembers(chattingRoomId);
-      
-      // 각 멤버의 사용자 정보 조회
-      const membersWithUserInfo = await Promise.all(
-        allMembers.map(async (member) => {
-          const user = await this.chattingRoomRepository.findId(member.user_id);
-          return {
-            id: member.user_id,
-            nickname: user?.nickname || '알 수 없음',
-            isAdmin: member.admin
-          };
-        })
-      );
+      console.log('전체 멤버 조회 결과:', allMembers);
 
-      return {
+      const response = {
         success: true,
-        isMember: true,
         data: {
           member: {
             id: isMember.user_id,
             isAdmin: isMember.admin
           },
-          allMembers: membersWithUserInfo
+          allMembers: allMembers.map(member => ({
+            id: member.user_id,
+            isAdmin: member.admin
+          }))
         }
       };
+
+      console.log('최종 응답:', response);
+      return response;
     } catch (error) {
+      console.error('멤버 확인 중 에러 (서비스):', error);
       if (error instanceof BadRequestException) {
         throw error;
       }
-      console.error('채팅 멤버 확인 중 오류:', error);
-      throw new InternalServerErrorException('채팅 멤버 확인 중 오류가 발생했습니다.');
+      throw new InternalServerErrorException(
+        `채팅 멤버 확인 중 오류가 발생했습니다: ${error.message}`
+      );
     }
   }
 }

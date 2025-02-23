@@ -4,10 +4,17 @@ import {
   SubscribeMessage,
   MessageBody,
   ConnectedSocket,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatmemberService } from '../chatmember/chatmember.service';
 import { ChatblacklistService } from '../chatblacklist/chatblacklist.service';
+import { ChattingService } from '../chatting/chatting.service';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { WsException } from '@nestjs/websockets';
+import { NotFoundException } from '@nestjs/common';
 
 interface ChatMessage {
   userId: number;
@@ -16,112 +23,143 @@ interface ChatMessage {
 }
 
 @WebSocketGateway({
-  namespace: '/chatting',
+  namespace: 'chatting',
   cors: {
-    origin: true,
-    methods: ['GET', 'POST'],
+    origin: ['http://localhost:3000', 'http://127.0.0.1:5500'],
     credentials: true,
-    allowedHeaders: ['content-type'],
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
   },
-  transports: ['websocket', 'polling'],
 })
-export class ChattingGateway {
+export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
   constructor(
     private readonly chatmemberService: ChatmemberService,
     private readonly chatblacklistService: ChatblacklistService,
+    private readonly chattingService: ChattingService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
+
+  async handleConnection(client: Socket) {
+    try {
+      const token = client.handshake.auth.token;
+
+      if (!token) {
+        throw new WsException('인증 토큰이 없습니다.');
+      }
+
+      const tokenWithoutBearer = token.replace('Bearer ', '');
+
+      try {
+        const decoded = this.jwtService.verify(tokenWithoutBearer, {
+          secret: this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY')
+        });
+
+        client.data.user = decoded;
+      } catch (error) {
+        throw new WsException('유효하지 않은 토큰입니다.');
+      }
+
+    } catch (error) {
+      client.disconnect();
+    }
+  }
 
   // 채팅방 입장
   @SubscribeMessage('joinRoom')
-  async handleJoinRoom(
-    @MessageBody() data: { userId: number; roomId: number },
-    @ConnectedSocket() client: Socket,
-  ) {
+  async handleJoinRoom(client: Socket, data: { roomId: number }) {
     try {
-      // 채팅멤버 확인
-      const chatMember = await this.chatmemberService.findByRoomAndUser(
-        data.roomId,
-        data.userId,
-      );
-
-      if (!chatMember || !chatMember.user) {
-        throw new Error('CHATMEMBER_OR_USER_NOT_FOUND');
+      console.log('방 입장 요청:', data);
+      
+      const user = client.data.user;
+      if (!user) {
+        throw new WsException('인증되지 않은 사용자입니다.');
       }
 
-      // 블랙리스트 확인
-      const blacklists = await this.chatblacklistService.findAll();
-      const isBlacklisted = blacklists.some(
-        (blacklist) =>
-          blacklist.user_id === data.userId &&
-          blacklist.chatting_room_id === data.roomId,
-      );
+      console.log('사용자 정보:', user);
 
-      if (isBlacklisted) {
-        client.emit('error', { message: 'USER_BLACKLISTED' });
-        return;
+      try {
+        // 채팅멤버 확인
+        const chatMember = await this.chatmemberService.findByRoomAndUser(
+          data.roomId,
+          user.id,
+        );
+
+        console.log('채팅 멤버 확인 결과:', chatMember);
+
+        // 블랙리스트 확인
+        const blacklists = await this.chatblacklistService.findAll();
+        const isBlacklisted = blacklists.some(
+          (blacklist) =>
+            blacklist.user_id === user.id &&
+            blacklist.chatting_room_id === data.roomId,
+        );
+
+        if (isBlacklisted) {
+          client.emit('error', { message: 'USER_BLACKLISTED' });
+          return { success: false, message: 'USER_BLACKLISTED' };
+        }
+
+        // 채팅방 입장
+        await client.join(`room_${data.roomId}`);
+        
+        // 입장 메시지 브로드캐스트
+        this.server.to(`room_${data.roomId}`).emit('userJoined', {
+          userId: user.id,
+          nickname: user.email
+        });
+
+        return { success: true };
+      } catch (error) {
+        if (error instanceof NotFoundException) {
+          // 채팅 멤버가 아닌 경우
+          console.log('채팅 멤버가 아님:', error.message);
+          return { success: false, message: error.message };
+        }
+        throw error;
       }
-
-      // 채팅방 입장
-      client.join(`room_${data.roomId}`);
-
-      // 입장 메시지 브로드캐스트
-      this.server.to(`room_${data.roomId}`).emit('userJoined', {
-        userId: data.userId,
-        nickname: chatMember.user.nickname,
-        message: '님이 입장하셨습니다.',
-      });
     } catch (error) {
-      console.error('Error joining room:', error);
-      client.emit('error', {
-        message:
-          error.message === 'CHATMEMBER_OR_USER_NOT_FOUND'
-            ? '채팅방 멤버 또는 사용자 정보를 찾을 수 없습니다.'
-            : error.message,
-      });
+      console.error('방 입장 중 에러:', error);
+      return { success: false, message: error.message };
     }
   }
 
   // 채팅 메시지 전송
   @SubscribeMessage('sendMessage')
-  async handleMessage(
-    @MessageBody() data: ChatMessage,
-    @ConnectedSocket() client: Socket,
-  ) {
+  async handleMessage(client: Socket, data: { roomId: number; message: string }) {
     try {
-      // 채팅멤버 확인
-      const chatMember = await this.chatmemberService.findByRoomAndUser(
-        data.roomId,
-        data.userId,
-      );
-
-      // 블랙리스트 확인
-      const blacklists = await this.chatblacklistService.findAll();
-      const isBlacklisted = blacklists.some(
-        (blacklist) =>
-          blacklist.user_id === data.userId &&
-          blacklist.chatting_room_id === data.roomId,
-      );
-
-      if (isBlacklisted) {
-        client.emit('error', { message: 'USER_BLACKLISTED' });
-        return;
+      console.log('메시지 수신:', data);
+      
+      const user = client.data.user;
+      if (!user) {
+        throw new WsException('인증되지 않은 사용자입니다.');
       }
 
-      // 메시지 전송
-      this.server.to(`room_${data.roomId}`).emit('newMessage', {
-        userId: data.userId,
-        nickname: chatMember.user.nickname,
+      // 사용자 닉네임 조회
+      const chatMember = await this.chatmemberService.findByRoomAndUser(
+        data.roomId,
+        user.id
+      );
+
+      // 메시지 저장 및 브로드캐스트
+      const messageData = {
+        userId: user.id,
+        nickname: chatMember.user.nickname || user.email, // 닉네임이 없으면 이메일 사용
         message: data.message,
-        timestamp: new Date(),
-      });
+        timestamp: new Date().toISOString()
+      };
+
+      // DB에 메시지 저장
+      await this.chattingService.saveMessage(data.roomId, user.id, data.message);
+
+      // 같은 방의 모든 사용자에게 메시지 전송
+      this.server.to(`room_${data.roomId}`).emit('message', messageData);
+
+      return { success: true };
     } catch (error) {
-      console.error('Error sending message:', error);
-      client.emit('error', { message: error.message });
+      console.error('메시지 처리 중 에러:', error);
+      return { success: false, message: error.message };
     }
   }
 
@@ -150,5 +188,9 @@ export class ChattingGateway {
       console.error('Error leaving room:', error);
       client.emit('error', { message: error.message });
     }
+  }
+
+  handleDisconnect(client: Socket) {
+    console.log('클라이언트 연결 종료:', client.id);
   }
 }

@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Res,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -13,6 +14,10 @@ import { UserRepository } from './user.repository';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { InventoryService } from 'src/inventory/inventory.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
+
 @Injectable()
 export class UserService {
   logOutUsers: { [key: number]: boolean } = {};
@@ -165,43 +170,40 @@ export class UserService {
     let refreshTokenExpiresIn = this.configService.get<string>('REFRESH_TOKEN_EXPIRES_IN');
     
     if (!accessTokenExpiresIn || !refreshTokenExpiresIn) {
-        console.log('token 환경 변수가 설정되지 않았습니다.');
-        throw new InternalServerErrorException('관리자에게 문의해 주세요');
+      throw new InternalServerErrorException('관리자에게 문의해 주세요');
     }
 
     const accessToken = this.jwtService.sign(payload, {
-        secret: this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
-        expiresIn: accessTokenExpiresIn,
+      secret: this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
+      expiresIn: accessTokenExpiresIn,
     });
     const refreshToken = this.jwtService.sign(payload, {
-        secret: this.configService.get<string>('REFRESH_TOKEN_SECRET_KEY'),
-        expiresIn: refreshTokenExpiresIn,
+      secret: this.configService.get<string>('REFRESH_TOKEN_SECRET_KEY'),
+      expiresIn: refreshTokenExpiresIn,
     });
 
-    // refreshTokenExpiresIn에서 'd' 제거하고 숫자만 추출
     const refreshTokenDays = parseInt(refreshTokenExpiresIn.replace('d', ''));
 
-    // 응답 헤더 설정 수정
-    res.setHeader('Access-Control-Expose-Headers', 'Authorization');  // Authorization 헤더 노출
+    res.setHeader('Access-Control-Expose-Headers', 'Authorization');
     res.setHeader('Authorization', `Bearer ${accessToken}`);
 
-    // 쿠키 설정
     res.cookie('refreshToken', refreshToken, {
-        maxAge: 1000 * 60 * 60 * 24 * refreshTokenDays,
-        httpOnly: false,  // 클라이언트에서 접근 가능하도록 변경
-        secure: false,
-        sameSite: 'lax',
-        path: '/',
-        domain: 'localhost'  // 또는 domain 옵션 제거
+      maxAge: 1000 * 60 * 60 * 24 * refreshTokenDays,
+      httpOnly: false,
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+      domain: 'localhost'
     });
 
     if(this.logOutUsers[existEmail.id]) {
-        delete this.logOutUsers[existEmail.id];
+      delete this.logOutUsers[existEmail.id];
     }
 
-    return res.status(200)
-        .header('Authorization', `Bearer ${accessToken}`)
-        .json({ message: '로그인이 되었습니다.' });
+    // 토큰을 응답 본문에서 제외하고 메시지만 반환
+    return res.status(200).json({
+      message: '로그인이 되었습니다.'
+    });
   }
 
   // 로그아웃
@@ -339,8 +341,33 @@ export class UserService {
     await transporter.sendMail(mailOptions);
 
     return verificationCode;
-
-    
   }
 
+  // 로그인용 이메일로 사용자 찾기 메서드 추가
+  async findByEmail(email: string) {
+    try {
+      const user = await this.userRepository.findEmail(email);
+      if (!user) {
+        throw new NotFoundException('사용자를 찾을 수 없습니다.');
+      }
+      return user;
+    } catch (error) {
+      console.error('사용자 조회 중 에러:', error);
+      throw error;
+    }
+  }
+
+  // ID로 사용자 찾기 메서드 추가
+  async findById(id: number) {
+    try {
+      const user = await this.userRepository.findId(id);
+      if (!user) {
+        throw new NotFoundException('사용자를 찾을 수 없습니다.');
+      }
+      return user;
+    } catch (error) {
+      console.error('사용자 조회 중 에러:', error);
+      throw error;
+    }
+  }
 }

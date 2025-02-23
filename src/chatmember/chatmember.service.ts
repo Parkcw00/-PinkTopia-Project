@@ -11,6 +11,9 @@ import { Messages } from 'src/common/messages';
 import { ChattingRoomRepository } from 'src/chattingroom/chattingroom.repository';
 import { ChatblacklistRepository } from 'src/chatblacklist/chatblacklist.repository';
 import { UserRepository } from 'src/user/user.repository';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 @Injectable()
 export class ChatmemberService {
   constructor(
@@ -18,6 +21,8 @@ export class ChatmemberService {
     private readonly userRepository: UserRepository,
     private readonly chattingRoomRepository: ChattingRoomRepository,
     private readonly chatblacklistRepository: ChatblacklistRepository,
+    @InjectRepository(Chatmember)
+    private chatmemberRepositoryTypeorm: Repository<Chatmember>,
   ) {}
   // 채팅멤버 생성
   async createChatmember(
@@ -106,17 +111,27 @@ export class ChatmemberService {
     return this.chatmemberRepository.deleteChatmember(chatmemberId);
   }
 
-  async findByRoomAndUser(roomId: number, userId: number) {
-    const chatMember =
-      await this.chatmemberRepository.findByUserIdAndChattingRoomId(
-        userId,
-        roomId,
-      );
+  async findByRoomAndUser(chatting_room_id: number, user_id: number) {
+    console.log('채팅 멤버 조회 시도:', { chatting_room_id, user_id });
 
-    if (!chatMember) {
-      throw new NotFoundException(Messages.CHATMEMBER_NOT_FOUND);
+    try {
+      const member = await this.chatmemberRepositoryTypeorm
+        .createQueryBuilder('chatmember')
+        .leftJoinAndSelect('chatmember.user', 'user')
+        .where('chatmember.chatting_room_id = :chatting_room_id', { chatting_room_id })
+        .andWhere('chatmember.user_id = :user_id', { user_id })
+        .getOne();
+
+      console.log('조회된 멤버:', member);
+
+      if (!member) {
+        throw new NotFoundException('해당 채팅멤버가 존재하지 않습니다.');
+      }
+
+      return member;
+    } catch (error) {
+      console.error('채팅 멤버 조회 중 에러:', error);
+      throw error;
     }
-
-    return chatMember;
   }
 }

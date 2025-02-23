@@ -37,12 +37,22 @@ export class ChattingRoomRepository {
 
   // 채팅방 멤버인지 확인
   async findChatMember(chatting_room_id: number, user_id: number) {
-    return await this.chatMemberRepository.findOne({
-      where: {
-        chatting_room_id,
-        user_id,
-      },
-    });
+    console.log('멤버 조회 시도:', { chatting_room_id, user_id });
+    
+    try {
+      const member = await this.chatMemberRepository
+        .createQueryBuilder('chatmember')
+        .where('chatmember.chatting_room_id = :chatting_room_id', { chatting_room_id })
+        .andWhere('chatmember.user_id = :user_id', { user_id })
+        .leftJoinAndSelect('chatmember.user', 'user')
+        .getOne();
+
+      console.log('조회된 멤버:', member);
+      return member;
+    } catch (error) {
+      console.error('멤버 조회 중 에러:', error);
+      throw error;
+    }
   }
 
   async findChatMemberByUserId(user_id: number) {
@@ -53,9 +63,11 @@ export class ChattingRoomRepository {
 
   // 채팅방 전체 멤버 조회
   async findAllChatMembers(chatting_room_id: number) {
-    return await this.chatMemberRepository.find({
-      where: { chatting_room_id },
-    });
+    return await this.chatMemberRepository
+      .createQueryBuilder('chatmember')
+      .where('chatmember.chatting_room_id = :chatting_room_id', { chatting_room_id })
+      .leftJoinAndSelect('chatmember.user', 'user')
+      .getMany();
   }
 
   // 어드민 권한 부여

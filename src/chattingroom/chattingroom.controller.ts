@@ -111,6 +111,22 @@ export class ChattingRoomController {
     @Request() req,
     @Param('chattingRoomId') chattingRoomId: string
   ) {
-    return await this.chattingRoomService.checkChatMember(req.user.id, Number(chattingRoomId));
+    try {
+      console.log('멤버 확인 요청:', {
+        userId: req.user.id,
+        chattingRoomId: parseInt(chattingRoomId)
+      });
+
+      const result = await this.chattingRoomService.checkChatMember(
+        req.user.id,
+        parseInt(chattingRoomId)
+      );
+
+      console.log('멤버 확인 결과:', result);
+      return result;
+    } catch (error) {
+      console.error('멤버 확인 중 에러:', error);
+      throw error;
+    }
   }
 }
