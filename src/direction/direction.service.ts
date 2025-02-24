@@ -7,11 +7,11 @@ export class DirectionService {
   create(createDirectionDto: CreateDirectionDto) {
     return 'This action adds a new direction';
   }
-
+  /*
   async findAll() {
     const keys = await this.redisClient.keys('bookmark:*');
     const bookmarks = [];
-
+   
     for (const key of keys) {
       const data = await this.redisClient.hgetall(key);
       bookmarks.push({
@@ -35,5 +35,5 @@ export class DirectionService {
 
   remove(id: number) {
     return `This action removes a #${id} direction`;
-  }
+  }*/
 }
