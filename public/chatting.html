@@ -112,25 +112,6 @@
         display: table;
         clear: both;
       }
-
-      .message.system {
-        text-align: center;
-        margin: 10px 0;
-      }
-
-      .message.system .message-content {
-        background-color: #f0f0f0;
-        color: #666;
-        padding: 5px 15px;
-        border-radius: 15px;
-        display: inline-block;
-      }
-
-      .message.system .timestamp {
-        font-size: 0.8em;
-        margin-left: 5px;
-        color: #999;
-      }
     </style>
   </head>
   <body>
@@ -148,7 +129,6 @@
       let socket;
       let currentRoomId;
       let currentUserId; // 현재 사용자 ID 변수 추가
-      let currentUserNickname; // 현재 사용자 닉네임 변수 추가
       
       // 페이지 로드 시 인증 확인
       document.addEventListener('DOMContentLoaded', async () => {
@@ -202,7 +182,7 @@
             // 멤버 정보 가져오기
             const memberResponse = await fetch(`http://localhost:3000/chatmember/check/${roomId}`, {
                 headers: {
-                    'Authorization': `Bearer ${accessToken}`
+                    'Authorization': accessToken
                 }
             });
             
@@ -212,28 +192,14 @@
 
             if (data && data.user_id) {
                 currentUserId = data.user_id;
-                currentUserNickname = data.nickname;
                 console.log('현재 사용자 ID:', currentUserId);
 
                 // socket.io 연결 설정
                 socket = io('http://localhost:3000/chatting', {
                     withCredentials: true,
                     auth: {
-                        token: `Bearer ${accessToken}`
-                    },
-                    transports: ['websocket'],
-                    extraHeaders: {
-                        'Authorization': `Bearer ${accessToken}`
+                        token: accessToken
                     }
-                });
-
-                // 연결 상태 확인을 위한 이벤트 리스너 추가
-                socket.on('connect_error', (error) => {
-                    console.error('소켓 연결 에러:', error);
-                });
-
-                socket.on('disconnect', (reason) => {
-                    console.log('소켓 연결 끊김:', reason);
                 });
 
                 // 소켓 연결 후 방 입장
@@ -254,12 +220,12 @@
 
       function setupSocketListeners() {
         socket.on('connect', () => {
-          console.log('소켓 연결됨:', socket.id, '현재 사용자:', currentUserId);
+          console.log('소켓 연결됨:', socket.id);
           addSystemMessage('채팅방에 연결되었습니다.');
         });
 
         socket.on('message', (data) => {
-          console.log('메시지 수신:', data);
+          console.log('메시지 수신:', data);  // 디버깅용
           
           const chatBox = document.getElementById('chatBox');
           const messageDiv = document.createElement('div');
@@ -297,8 +263,11 @@
 
         socket.on('userLeft', (data) => {
           console.log('사용자 퇴장:', data);
-          if (data.userId !== currentUserId) {  // 자신의 퇴장이 아닌 경우에만 메시지 표시
-              addSystemMessage(`${data.nickname}님이 퇴장하셨습니다.`);
+          
+          // 퇴장한 사용자가 자신이 아닌 경우에만 메시지 표시
+          if (data.userId !== currentUserId) {
+              const nickname = data.nickname || '알 수 없는 사용자';
+              addSystemMessage(`${nickname}님이 퇴장하셨습니다.`);
           }
         });
 
@@ -315,15 +284,9 @@
         
         if (message && socket && currentRoomId) {
             try {
-                console.log('메시지 전송 시도:', {
-                    roomId: currentRoomId,
-                    message: message,
-                    type: 'text'
-                });
                 socket.emit('sendMessage', {
                     roomId: currentRoomId,
-                    message: message,
-                    type: 'text'
+                    message: message
                 });
                 
                 // 입력창 초기화
@@ -337,33 +300,25 @@
 
       // 채팅방 나가기 함수
       async function leaveRoom() {
-        if (!confirm('정말로 채팅방을 나가시겠습니까?')) {
-            return;
-        }
-
         try {
-            // 서버에 나가기 요청
-            const response = await fetch(`/chattingroom/out/${currentRoomId}`, {
+            const response = await fetch(`http://localhost:3000/chattingroom/out/${currentRoomId}`, {
                 method: 'PATCH',
                 headers: {
                     'Authorization': localStorage.getItem('accessToken')
                 }
             });
 
-            if (!response.ok) {
+            if (response.ok) {
+                socket.emit('leaveRoom', {
+                    userId: currentUserId,
+                    roomId: currentRoomId
+                });
+                
+                window.location.href = '/public/chattingrooms.html';
+            } else {
                 const error = await response.json();
                 throw new Error(error.message || '채팅방 나가기에 실패했습니다.');
             }
-
-            // 나가기 메시지 전송
-            socket.emit('leaveRoom', {
-                roomId: currentRoomId,
-                userId: currentUserId,
-                nickname: currentUserNickname
-            });
-
-            // 채팅방 목록으로 이동
-            window.location.href = '/public/chattingrooms.html';
         } catch (error) {
             console.error('채팅방 나가기 실패:', error);
             alert(error.message || '채팅방 나가기에 실패했습니다.');
@@ -377,17 +332,12 @@
         }
       }
 
-      // 시스템 메시지 추가 함수 수정
+      // 시스템 메시지 추가
       function addSystemMessage(message) {
         const chatBox = document.getElementById('chatBox');
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message system';
-        messageDiv.innerHTML = `
-            <div class="message-content">
-                <span class="message-text">${message}</span>
-                <span class="timestamp">${new Date().toLocaleTimeString()}</span>
-            </div>
-        `;
+        messageDiv.innerHTML = `<div class="message-content">${message}</div>`;
         chatBox.appendChild(messageDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
       }
