@@ -140,7 +140,7 @@
 
         <!-- 채팅방 직접 입장 폼 추가 -->
         <div class="join-room-form">
-            <input type="text" id="roomInput" placeholder="채팅방 ID 또는 초대 링크 입력">
+            <input type="text" id="roomInput" placeholder="초대 링크 입력">
             <button class="button" onclick="joinDirectRoom()">채팅방 입장</button>
         </div>
 
@@ -211,6 +211,7 @@
             showModal();
         }
 
+        // 채팅방 입장 함수 수정
         async function joinRoom(roomId) {
             try {
                 // 먼저 채팅방 멤버인지 확인
@@ -220,27 +221,11 @@
                     }
                 });
 
-                // 멤버가 아닌 경우에도 바로 채팅방으로 이동하지 말고, 먼저 멤버로 추가
                 if (!checkResponse.ok) {
-                    // 멤버가 아니라면 새로 생성
-                    const response = await fetch(`/chatmember`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': localStorage.getItem('accessToken'),
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            chatting_room_id: roomId
-                        })
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || '채팅방 입장 실패');
-                    }
+                    throw new Error('채팅방 멤버가 아닙니다. 초대 링크를 통해서만 입장할 수 있습니다.');
                 }
 
-                // 멤버 확인 또는 생성이 성공하면 채팅방으로 이동
+                // 멤버인 경우에만 채팅방으로 이동
                 window.location.href = `/public/chatting.html?roomId=${roomId}`;
 
             } catch (error) {
@@ -249,32 +234,32 @@
             }
         }
 
-        // 채팅방 ID로 직접 입장하는 함수 추가
+        // 채팅방 입장 함수 수정
         async function joinDirectRoom() {
             const input = document.getElementById('roomInput').value.trim();
             if (!input) {
-                alert('채팅방 ID 또는 초대 링크를 입력해주세요.');
+                alert('초대 링크를 입력해주세요.');
                 return;
             }
 
             try {
                 let roomId;
                 
-                // URL인지 확인
+                // URL에서 roomId 추출 (두 가지 형식 모두 지원)
                 if (input.includes('/chattingroom/')) {
-                    // URL에서 채팅방 ID 추출
+                    // /chattingroom/{id}/join 형식
                     const urlParts = input.split('/');
                     roomId = urlParts[urlParts.indexOf('chattingroom') + 1];
-                    if (roomId.includes('join')) {
-                        roomId = roomId.split('/')[0];
-                    }
+                } else if (input.includes('/invite.html?roomId=')) {
+                    // /invite.html?roomId={id} 형식
+                    const urlParams = new URLSearchParams(input.split('?')[1]);
+                    roomId = urlParams.get('roomId');
                 } else {
-                    // 숫자만 입력한 경우
-                    roomId = input;
+                    throw new Error('올바른 초대 링크를 입력해주세요.');
                 }
 
                 if (!roomId || isNaN(roomId)) {
-                    throw new Error('올바른 채팅방 ID 또는 초대 링크를 입력해주세요.');
+                    throw new Error('올바른 초대 링크를 입력해주세요.');
                 }
 
                 // 채팅방 존재 여부 확인
@@ -288,7 +273,7 @@
                     throw new Error('존재하지 않는 채팅방입니다.');
                 }
 
-                // 채팅방 멤버 확인
+                // 채팅방 멤버 확인 및 가입 처리
                 const memberCheckResponse = await fetch(`/chatmember/check/${roomId}`, {
                     headers: {
                         'Authorization': localStorage.getItem('accessToken')
@@ -339,17 +324,17 @@
             document.getElementById('roomList').appendChild(roomElement);
         }
 
-        // 초대 링크 공유 함수 수정
+        // 초대 링크 공유 함수 복구
         async function shareInviteLink(roomId) {
             try {
-                // 경로 수정: /public/invite.html로 변경
-                const inviteLink = `/public/invite.html?roomId=${roomId}`;
+                // 초대 링크 형식 수정
+                const inviteLink = `/chattingroom/${roomId}/join`;
                 const fullLink = window.location.origin + inviteLink;
                 
                 await navigator.clipboard.writeText(fullLink);
                 alert('초대 링크가 클립보드에 복사되었습니다!\n' + fullLink);
                 
-                // 또는 특정 사용자에게 이메일로 보내기
+                // 특정 사용자에게 이메일로 보내기
                 const userId = prompt('초대할 사용자 ID를 입력하세요:');
                 if (userId) {
                     const response = await fetch(`/chattingroom/${roomId}/send-url`, {
