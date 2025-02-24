@@ -6,11 +6,17 @@ import { LocationHistoryService } from './location-history.service';
 import { LocationHistoryController } from './location-history.controller';
 import { ValkeyModule } from '../valkey/valkey.module';
 import { ValkeyService } from 'src/valkey/valkey.service';
+import { LocationHistoryGateway } from './location-history.gateway';
 
 @Module({
   imports: [TypeOrmModule.forFeature([LocationHistory]), ValkeyModule],
   controllers: [LocationHistoryController],
-  providers: [LocationHistoryService, LocationHistoryRepository, ValkeyService],
+  providers: [
+    LocationHistoryService,
+    LocationHistoryRepository,
+    LocationHistoryGateway,
+    ValkeyService,
+  ],
   exports: [LocationHistoryRepository],
 })
 export class LocationHistoryModule {}

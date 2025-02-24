@@ -32,8 +32,9 @@ export class UpdateLocationHistoryDto extends PartialType(
   @Min(-180)
   @Max(180)
   longitude: number;
+
   @ApiProperty({ description: '타임스탬프' })
   @IsOptional()
   @IsDate()
-  timestamp: Date;
+  timestamp?: Date;
 }

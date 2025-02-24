@@ -47,7 +47,7 @@ export class LocationHistoryService {
     if (history) {
       history.latitude = updateDto.latitude ?? history.latitude;
       history.longitude = updateDto.longitude ?? history.longitude;
-      history.timestamp = new Date();
+      history.timestamp = updateDto.timestamp ?? new Date(); // ✅ timestamp 적용
 
       await this.repository.save(history);
     } else {
@@ -55,13 +55,13 @@ export class LocationHistoryService {
         user_id,
         updateDto.latitude,
         updateDto.longitude,
-        new Date(),
+        updateDto.timestamp ?? new Date(), // ✅ timestamp 적용
       );
     }
 
+    // ✅ valkey(캐시) 업데이트 추가
     await this.valkeyService.set(`LocationHistory:${user_id}`, history);
   }
-
   /**
    * ✅ 10분마다 실행되는 DB 업데이트
    */
@@ -78,7 +78,7 @@ export class LocationHistoryService {
 
       // ✅ save()가 LocationHistory를 반환하므로 문제 없음
       const updatedHistory = await this.repository.save(history);
-      console.log('✅ updateDB()에서 업데이트된 데이터:', updatedHistory);
+      // console.log('✅ updateDB()에서 업데이트된 데이터:', updatedHistory);
       return updatedHistory;
     } else {
       // ✅ 새 데이터를 생성하고 반환

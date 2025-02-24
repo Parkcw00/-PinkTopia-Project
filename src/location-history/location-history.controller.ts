@@ -10,6 +10,7 @@ import {
   Request,
   UseInterceptors,
   UploadedFiles,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { LocationHistoryService } from './location-history.service';
 import { CreateLocationHistoryDto } from './dto/create-location-history.dto';
@@ -27,12 +28,11 @@ export class LocationHistoryController {
    * ✅ 회원가입 시 기본 7개의 위치 데이터를 생성합니다.
    * 엔드포인트: **POST /location-history/default**
    */
-  @UseGuards(UserGuard)
   @Post('default')
-  async createDB(@Request() req) {
-    return this.locationHistoryService.createDB(req.user.id);
+  async createDB(@Body('user_id', ParseIntPipe) user_id: number) {
+    const locationHistory = await this.locationHistoryService.createDB(user_id);
+    return { message: '기본 위치 데이터 생성 완료', locationHistory };
   }
-
   /**
    * ✅ 로그인 시, DB의 위치 데이터를 valkey(캐싱)에 저장합니다.
    * 엔드포인트: **POST /location-history/valkey**

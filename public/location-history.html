@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>실시간 위치 업데이트</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_REAL_KAKAO_API_KEY"></script>
+</head>
+
+<body>
+    <h1>실시간 위치 업데이트</h1>
+    <script>
+        const socket = io('/location', {
+            withCredentials: true, // ✅ 쿠키 포함 설정
+            extraHeaders: {
+                'Access-Control-Allow-Origin': '*'
+            }
+        });
+        function sendLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const data = {
+                        userId: 1, // 실제 사용자의 ID를 설정
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    socket.emit('updateLocation', data); // ✅ 위치 업데이트 이벤트 전송
+                });
+            } else {
+                alert('Geolocation을 지원하지 않는 브라우저입니다.');
+            }
+        }
+
+        setInterval(sendLocation, 10000); // ✅ 10초마다 실행
+
+        socket.on('locationUpdated', (data) => {
+            console.log('✅ 서버 응답:', data);
+        });
+
+        socket.on('error', (error) => {
+            console.error('❌ 서버 오류:', error);
+        });
+    </script>
+</body>
+
+</html>
