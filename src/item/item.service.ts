@@ -17,13 +17,17 @@ export class ItemService {
     private readonly userRepository: UserRepository,
   ) {}
 
-  async purchaseItem(userId: number, createItemDto: CreateItemDto): Promise<{item: Item, message: string}> {
+  async purchaseItem(
+    userId: number,
+    createItemDto: CreateItemDto,
+  ): Promise<{ item: Item; message: string }> {
     const { storeItemId, count, paymentMethod } = createItemDto;
 
     // StoreItem 테이블에서 아이템 확인
-    const storeItem = await this.storeItemRepository.storeItemFindOne(storeItemId);
+    const storeItem =
+      await this.storeItemRepository.storeItemFindOne(storeItemId);
     if (!storeItem) {
-        throw new NotFoundException('상점에 존재하지 않는 아이템입니다.');
+      throw new NotFoundException('상점에 존재하지 않는 아이템입니다.');
     }
 
     // 유저가 가지고 있는 gem과 다이아몬드 확인
@@ -44,7 +48,9 @@ export class ItemService {
       console.log('젬으로 결제 완료');
     } else if (paymentMethod === 'dia') {
       if (user.pink_dia < diaCost) {
-        throw new NotFoundException('현재 보유하고 있는 다이아몬드가 부족합니다.');
+        throw new NotFoundException(
+          '현재 보유하고 있는 다이아몬드가 부족합니다.',
+        );
       }
       user.pink_dia -= diaCost;
       await this.userRepository.updateUser(userId, { pink_dia: user.pink_dia });
@@ -60,23 +66,36 @@ export class ItemService {
     }
 
     // 기존 아이템 확인 및 처리
-    const item = await this.itemRepository.findOneByInventoryIdAndStoreItemId(inventory.id, storeItemId);
+    const item = await this.itemRepository.findOneByInventoryIdAndStoreItemId(
+      inventory.id,
+      storeItemId,
+    );
     if (item) {
-        if (item.count + count >= 100) {
-            throw new NotFoundException('아이템 수량은 최대 99개까지만 구매할 수 있습니다.');
-        }
-        item.count += count;
-        await this.itemRepository.updateItem(item.id, { count: item.count });
-        return { item: item, message: `${storeItem.name} ${count}개를 구매하였습니다. 남아있는 젬 ${user.pink_gem}개, 남아있는 다이아몬드 ${user.pink_dia}개`};
+      if (item.count + count >= 100) {
+        throw new NotFoundException(
+          '아이템 수량은 최대 99개까지만 구매할 수 있습니다.',
+        );
+      }
+      item.count += count;
+      await this.itemRepository.updateItem(item.id, { count: item.count });
+      return {
+        item: item,
+        message: `${storeItem.name} ${count}개를 구매하였습니다. 남아있는 젬 ${user.pink_gem}개, 남아있는 다이아몬드 ${user.pink_dia}개`,
+      };
     } else {
-        if (count >= 100) {
-            throw new NotFoundException('아이템 수량은 최대 99개까지만 구매할 수 있습니다.');
-        }
-        const newItem = await this.itemRepository.buyItem({
-          ...createItemDto,
-          inventoryId: Number(inventory.id),
-        } as CreateItemWithInventoryDto);
-        return { item: newItem, message: `${storeItem.name} ${count}개를 구매하였습니다. 남아있는 젬 ${user.pink_gem}개, 남아있는 다이아몬드 ${user.pink_dia}개`};
+      if (count >= 100) {
+        throw new NotFoundException(
+          '아이템 수량은 최대 99개까지만 구매할 수 있습니다.',
+        );
+      }
+      const newItem = await this.itemRepository.buyItem({
+        ...createItemDto,
+        inventoryId: Number(inventory.id),
+      } as CreateItemWithInventoryDto);
+      return {
+        item: newItem,
+        message: `${storeItem.name} ${count}개를 구매하였습니다. 남아있는 젬 ${user.pink_gem}개, 남아있는 다이아몬드 ${user.pink_dia}개`,
+      };
     }
   }
 
@@ -91,46 +110,59 @@ export class ItemService {
   async sellItem(userId: number, id: number, updateItemDto: UpdateItemDto) {
     const sellCount = updateItemDto.count;
 
+    // 먼저 유저의 인벤토리 확인
+    const inventory = await this.inventoryRepository.findOneByUserId(userId);
+    if (!inventory) {
+      throw new NotFoundException('인벤토리를 찾을 수 없습니다.');
+    }
+
+    // 아이템 찾기 및 소유권 확인
     const item = await this.itemRepository.findOneByItemId(id);
     if (!item) {
       throw new NotFoundException('아이템을 찾을 수 없습니다.');
     }
 
-    const storeItemId = item.store_item_id;
+    // 본인의 인벤토리에 있는 아이템인지 확인
+    if (item.inventory_id === inventory.id) {
+      const storeItemId = item.store_item_id;
 
+      const storeItem =
+        await this.storeItemRepository.storeItemFindOne(storeItemId);
+      if (!storeItem) {
+        throw new NotFoundException('상점에 존재하지 않는 아이템입니다.');
+      }
 
-    const storeItem = await this.storeItemRepository.storeItemFindOne(storeItemId);
-    if (!storeItem) {
-      throw new NotFoundException('상점에 존재하지 않는 아이템입니다.');
-    }
+      // 수량 감소 로직
+      if (item.count < sellCount) {
+        throw new NotFoundException(
+          '현재 보유한 아이템 수량이 판매 수량 보다 부족합니다.',
+        );
+      }
 
-    // 수량 감소 로직
-    if (item.count < sellCount) {
-        throw new NotFoundException('현재 보유한 아이템 수량이 판매 수량 보다 부족합니다.');
-    }
+      item.count -= sellCount;
+      const refundGem = storeItem.gem_price * sellCount * 0.5;
 
+      if (item.count === 0) {
+        await this.itemRepository.deleteItem(id);
+      } else {
+        await this.itemRepository.updateItem(id, { count: item.count });
+      }
 
-    
+      const user = await this.userRepository.findUserId(userId);
+      if (user) {
+        user.pink_gem += refundGem;
+        await this.userRepository.updateUser(userId, {
+          pink_gem: user.pink_gem,
+        });
+      } else {
+        throw new NotFoundException('유저가 존재 하지 않습니다.');
+      }
 
-    item.count -= sellCount;
-    const refundGem = storeItem.gem_price * sellCount * 0.5;
-
-    
-    if (item.count === 0) {
-      await this.itemRepository.deleteItem(id);
+      return {
+        message: `${storeItem.name} ${sellCount}개를 판매하였습니다. 젬 ${refundGem}개를 환불 받았습니다.`,
+      };
     } else {
-      await this.itemRepository.updateItem(id, { count: item.count }); 
+      throw new NotFoundException('본인의 아이템만 판매할 수 있습니다.');
     }
-    
-    const user = await this.userRepository.findUserId(userId);
-    if (user) {
-      user.pink_gem += refundGem;
-      await this.userRepository.updateUser(userId, { pink_gem: user.pink_gem });
-    } else {
-      throw new NotFoundException('유저가 존재 하지 않습니다.');
-    }
-
-    return { message: `${storeItem.name} ${sellCount}개를 판매하였습니다. 젬 ${refundGem}개를 환불 받았습니다.`};
   }
-
 }

@@ -9,7 +9,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UserRepository {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     // @InjectRepository(Chatting)
     // private chattingRepository: Repository<Chatting>,
     // @InjectRepository(AchievementC)
