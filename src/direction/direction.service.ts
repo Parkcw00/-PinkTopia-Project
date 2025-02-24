@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
 import { PinkmongAppearLocation } from '../pinkmong-appear-location/entities/pinkmong-appear-location.entity';
 import { CreateDirectionDto } from './dto/create-direction.dto';
@@ -18,8 +23,14 @@ export class DirectionService {
 
   async createBookmarks() {
     // ✅ Redis SCAN을 사용하여 패턴에 맞는 키들을 가져옴
-    const keysS = await this.scanKeys('subEntity:*');
-    const keysP = await this.scanKeys('pinkEntity:*');
+    const keysS: any = await this.valkeyService.get(
+      `sub-achievement:${this.subEntity.id}`,
+    );
+    console.log('🔍 keysS 확인:', keysS);
+    const keysP: any = await this.valkeyService.get(
+      `pinkEntity:${this.pinkEntity.id}`,
+    );
+    console.log('🔍 keysP 확인:', keysP);
 
     const bookmarksS: Array<{
       title: any;
@@ -42,6 +53,9 @@ export class DirectionService {
       deleted_at: any;
     }> = [];
 
+    if (!keysS || keysS.length < 1) {
+      throw new NotFoundException('발키에 서브업적 데이터가 없습니다.');
+    }
     for (const key of keysS) {
       let data = await this.valkeyService.hgetall(key);
       if (data && Object.keys(data).length > 0) {
@@ -59,6 +73,9 @@ export class DirectionService {
       }
     }
 
+    if (!keysP || keysP.length < 1) {
+      throw new NotFoundException('발키에 핑크몽 리스트트 데이터가 없습니다.');
+    }
     for (const key of keysP) {
       let dataP = await this.valkeyService.hgetall(key);
       if (dataP && Object.keys(dataP).length > 0) {
@@ -75,7 +92,7 @@ export class DirectionService {
 
     return { bookmarksS, bookmarksP };
   }
-
+  /*
   // Redis SCAN을 활용하여 키 목록 가져오기
   private async scanKeys(pattern: string): Promise<string[]> {
     let cursor = '0';
@@ -83,14 +100,18 @@ export class DirectionService {
 
     do {
       const [newCursor, foundKeys] = await this.valkeyService
-        .getClient()
-        .scan(cursor, 'MATCH', pattern);
+        //.getClient()
+        .hgetall
+        //.scan(cursor, 'MATCH', pattern);
       cursor = newCursor;
       keys = keys.concat(foundKeys);
     } while (cursor !== '0');
 
     return keys;
   }
+
+
+*/
 
   findOne(id: number) {
     return `This action returns a #${id} direction`;
