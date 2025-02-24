@@ -3,6 +3,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Res,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -14,6 +15,10 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { ValkeyService } from 'src/valkey/valkey.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
+
 @Injectable()
 export class UserService {
   // logOutUsers: { [key: number]: boolean } = {};
@@ -173,7 +178,6 @@ export class UserService {
       'REFRESH_TOKEN_EXPIRES_IN',
     );
     if (!accessTokenExpiresIn || !refreshTokenExpiresIn) {
-      console.log('token 환경 변수가 설정되지 않았습니다.');
       throw new InternalServerErrorException('관리자에게 문의해 주세요');
     }
 
@@ -185,15 +189,19 @@ export class UserService {
       secret: this.configService.get<string>('REFRESH_TOKEN_SECRET_KEY'),
       expiresIn: refreshTokenExpiresIn,
     });
-    refreshTokenExpiresIn = refreshTokenExpiresIn.slice(
-      0,
-      refreshTokenExpiresIn.length - 1,
-    );
 
+    const refreshTokenDays = parseInt(refreshTokenExpiresIn.replace('d', ''));
+
+    res.setHeader('Access-Control-Expose-Headers', 'Authorization');
     res.setHeader('Authorization', `Bearer ${accessToken}`);
+
     res.cookie('refreshToken', refreshToken, {
-      maxAge: 1000 * 60 * 60 * 24 * +refreshTokenExpiresIn,
-      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24 * refreshTokenDays,
+      httpOnly: false,
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+      domain: 'localhost',
     });
     // if (this.logOutUsers[existEmail.id]) {
     //   delete this.logOutUsers[existEmail.id];
@@ -246,6 +254,7 @@ export class UserService {
     }
     try {
       const filteredInfo = {
+        id: myInfo.id,
         email: myInfo.email,
         nickname: myInfo.nickname,
         profile_image: myInfo.profile_image,
@@ -337,5 +346,33 @@ export class UserService {
     await transporter.sendMail(mailOptions);
 
     return verificationCode;
+  }
+
+  // 로그인용 이메일로 사용자 찾기 메서드 추가
+  async findByEmail(email: string) {
+    try {
+      const user = await this.userRepository.findEmail(email);
+      if (!user) {
+        throw new NotFoundException('사용자를 찾을 수 없습니다.');
+      }
+      return user;
+    } catch (error) {
+      console.error('사용자 조회 중 에러:', error);
+      throw error;
+    }
+  }
+
+  // ID로 사용자 찾기 메서드 추가
+  async findById(id: number) {
+    try {
+      const user = await this.userRepository.findId(id);
+      if (!user) {
+        throw new NotFoundException('사용자를 찾을 수 없습니다.');
+      }
+      return user;
+    } catch (error) {
+      console.error('사용자 조회 중 에러:', error);
+      throw error;
+    }
   }
 }

@@ -114,45 +114,59 @@ export class ItemService {
   async sellItem(userId: number, id: number, updateItemDto: UpdateItemDto) {
     const sellCount = updateItemDto.count;
 
+    // 먼저 유저의 인벤토리 확인
+    const inventory = await this.inventoryRepository.findOneByUserId(userId);
+    if (!inventory) {
+      throw new NotFoundException('인벤토리를 찾을 수 없습니다.');
+    }
+
+    // 아이템 찾기 및 소유권 확인
     const item = await this.itemRepository.findOneByItemId(id);
     if (!item) {
       throw new NotFoundException('아이템을 찾을 수 없습니다.');
     }
 
-    const storeItemId = item.store_item_id;
+    // 본인의 인벤토리에 있는 아이템인지 확인
+    if (item.inventory_id === inventory.id) {
+      const storeItemId = item.store_item_id;
 
-    const storeItem =
-      await this.storeItemRepository.storeItemFindOne(storeItemId);
-    if (!storeItem) {
-      throw new NotFoundException('상점에 존재하지 않는 아이템입니다.');
-    }
+      const storeItem =
+        await this.storeItemRepository.storeItemFindOne(storeItemId);
+      if (!storeItem) {
+        throw new NotFoundException('상점에 존재하지 않는 아이템입니다.');
+      }
 
-    // 수량 감소 로직
-    if (item.count < sellCount) {
-      throw new NotFoundException(
-        '현재 보유한 아이템 수량이 판매 수량 보다 부족합니다.',
-      );
-    }
+      // 수량 감소 로직
+      if (item.count < sellCount) {
+        throw new NotFoundException(
+          '현재 보유한 아이템 수량이 판매 수량 보다 부족합니다.',
+        );
+      }
 
-    item.count -= sellCount;
-    const refundGem = storeItem.gem_price * sellCount * 0.5;
+      item.count -= sellCount;
+      const refundGem = storeItem.gem_price * sellCount * 0.5;
 
-    if (item.count === 0) {
-      await this.itemRepository.deleteItem(id);
+      if (item.count === 0) {
+        await this.itemRepository.deleteItem(id);
+      } else {
+        await this.itemRepository.updateItem(id, { count: item.count });
+      }
+
+      const user = await this.userRepository.findUserId(userId);
+      if (user) {
+        user.pink_gem += refundGem;
+        await this.userRepository.updateUser(userId, {
+          pink_gem: user.pink_gem,
+        });
+      } else {
+        throw new NotFoundException('유저가 존재 하지 않습니다.');
+      }
+
+      return {
+        message: `${storeItem.name} ${sellCount}개를 판매하였습니다. 젬 ${refundGem}개를 환불 받았습니다.`,
+      };
     } else {
-      await this.itemRepository.updateItem(id, { count: item.count });
+      throw new NotFoundException('본인의 아이템만 판매할 수 있습니다.');
     }
-
-    const user = await this.userRepository.findUserId(userId);
-    if (user) {
-      user.pink_gem += refundGem;
-      await this.userRepository.updateUser(userId, { pink_gem: user.pink_gem });
-    } else {
-      throw new NotFoundException('유저가 존재 하지 않습니다.');
-    }
-    await this.valkeyService.del(`invenItems:`);
-    return {
-      message: `${storeItem.name} ${sellCount}개를 판매하였습니다. 젬 ${refundGem}개를 환불 받았습니다.`,
-    };
   }
 }

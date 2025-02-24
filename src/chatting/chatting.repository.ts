@@ -3,15 +3,15 @@ import { Chatting } from './entities/chatting.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateChattingDto } from './dto/create-chatting.dto';
-import { Chatmember } from 'src/chatmember/entities/chatmember.entity';
+import { Chatmember } from '../chatmember/entities/chatmember.entity';
 
 @Injectable()
 export class ChattingRepository {
   constructor(
     @InjectRepository(Chatting)
-    private chattingRepository: Repository<Chatting>,
+    private readonly chattingRepository: Repository<Chatting>,
     @InjectRepository(Chatmember)
-    private chatmemberRepository: Repository<Chatmember>,
+    private readonly chatmemberRepository: Repository<Chatmember>,
   ) {}
 
   async create(
@@ -56,14 +56,20 @@ export class ChattingRepository {
     });
     return user; // 유저의 닉네임 반환
   }
-  async isMember(userId: number, chatting_room_id: string): Promise<boolean> {
-    const member = await this.chatmemberRepository.findOne({
-      where: {
-        user_id: userId,
-        chatting_room_id: Number(chatting_room_id),
-      },
-    });
-
-    return !!member;
+  async isMember(userId: number, chattingRoomId: string): Promise<boolean> {
+    try {
+      console.log('멤버 확인 시도:', { userId, chattingRoomId });
+      const member = await this.chatmemberRepository.findOne({
+        where: {
+          user_id: userId,
+          chatting_room_id: parseInt(chattingRoomId),
+        },
+      });
+      console.log('멤버 확인 결과:', member);
+      return !!member;
+    } catch (error) {
+      console.error('멤버 확인 중 에러:', error);
+      throw error;
+    }
   }
 }

@@ -19,6 +19,9 @@ export class ChattingRoom {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'varchar', nullable: false })
+  title: string;
+
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 

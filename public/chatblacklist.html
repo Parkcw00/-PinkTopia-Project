@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>채팅방 블랙리스트 관리</title>
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+    <style>
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .section {
+        margin-bottom: 30px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      .button {
+        padding: 8px 15px;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .button:hover {
+        background-color: #c82333;
+      }
+      #blacklistList {
+        margin-top: 20px;
+      }
+      .blacklist-item {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>채팅방 블랙리스트 관리</h1>
+
+      <!-- 블랙리스트 추가 섹션 -->
+      <div class="section">
+        <h2>블랙리스트 추가</h2>
+        <input type="number" id="userId" placeholder="차단할 사용자 ID" />
+        <input type="number" id="chatRoomId" placeholder="채팅방 ID" />
+        <button class="button" onclick="createBlacklist()">차단하기</button>
+      </div>
+
+      <!-- 블랙리스트 목록 섹션 -->
+      <div class="section">
+        <h2>블랙리스트 목록</h2>
+        <button class="button" onclick="getAllBlacklists()">목록 조회</button>
+        <div id="blacklistList"></div>
+      </div>
+
+      <!-- 블랙리스트 상세 조회 섹션 -->
+      <div class="section">
+        <h2>블랙리스트 상세 조회</h2>
+        <input
+          type="number"
+          id="searchBlacklistId"
+          placeholder="블랙리스트 ID"
+        />
+        <button class="button" onclick="findOneBlacklist()">상세 조회</button>
+        <div id="blacklistDetails"></div>
+      </div>
+
+      <!-- 블랙리스트 해제 섹션 -->
+      <div class="section">
+        <h2>블랙리스트 해제</h2>
+        <input
+          type="number"
+          id="removeBlacklistId"
+          placeholder="블랙리스트 ID"
+        />
+        <button class="button" onclick="removeBlacklist()">차단 해제</button>
+      </div>
+    </div>
+
+    <script>
+      const socket = io('/chatblacklist', {
+        withCredentials: true,
+        transports: ['websocket', 'polling'],
+        extraHeaders: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1:5500',
+        },
+      });
+
+      // 소켓 연결/해제 이벤트
+      socket.on('connect', () => {
+        console.log('🟢 서버와 연결되었습니다.');
+        console.log('소켓 ID:', socket.id);
+      });
+
+      socket.on('disconnect', () => {
+        console.log('🔴 서버와 연결이 끊어졌습니다.');
+      });
+
+      // 채팅멤버 관련 소켓 연결
+      const chatmemberSocket = io('/chatmember', {
+        withCredentials: true,
+        transports: ['websocket', 'polling'],
+        extraHeaders: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1:5500',
+        },
+      });
+
+      // 블랙리스트 추가
+      function createBlacklist() {
+        const userId = document.getElementById('userId').value;
+        const chatRoomId = document.getElementById('chatRoomId').value;
+
+        const createChatblacklistDto = {
+          user_id: parseInt(userId),
+          chatting_room_id: parseInt(chatRoomId),
+        };
+
+        console.log('📤 블랙리스트 추가 요청:', {
+          userId: parseInt(userId),
+          createChatblacklistDto,
+        });
+
+        socket.emit('createBlacklist', {
+          userId: parseInt(userId),
+          createChatblacklistDto,
+        });
+      }
+
+      // 블랙리스트 추가 완료 리스너
+      socket.on('blacklistCreated', async (blacklist) => {
+        console.log('📥 블랙리스트 추가됨:', blacklist);
+        alert(`블랙리스트에 추가되었습니다.\n블랙리스트 ID: ${blacklist.id}`);
+
+        // 채팅멤버 목록 조회하여 강제 퇴장 처리
+        chatmemberSocket.emit('findAllChatMember');
+      });
+
+      // 전체 블랙리스트 조회
+      function getAllBlacklists() {
+        console.log('📤 전체 블랙리스트 조회 요청');
+        socket.emit('findAllBlacklist');
+      }
+
+      // 블랙리스트 목록 수신 리스너
+      socket.on('allBlacklists', (blacklists) => {
+        console.log('📥 블랙리스트 목록 수신:', blacklists);
+        const blacklistList = document.getElementById('blacklistList');
+        blacklistList.innerHTML = '';
+        blacklists.forEach((blacklist) => {
+          blacklistList.innerHTML += `
+                    <div class="blacklist-item">
+                        블랙리스트 ID: ${blacklist.id},
+                        차단된 사용자 ID: ${blacklist.user_id},
+                        채팅방 ID: ${blacklist.chatting_room_id}
+                    </div>`;
+        });
+      });
+
+      // 블랙리스트 상세 조회
+      function findOneBlacklist() {
+        const blacklistId = document.getElementById('searchBlacklistId').value;
+        console.log('📤 블랙리스트 상세 조회 요청:', {
+          blacklistId: parseInt(blacklistId),
+        });
+        socket.emit('findOneBlacklist', {
+          blacklistId: parseInt(blacklistId),
+        });
+      }
+
+      // 블랙리스트 상세 정보 수신 리스너
+      socket.on('blacklistDetails', (blacklist) => {
+        console.log('📥 블랙리스트 상세 정보 수신:', blacklist);
+        const blacklistDetails = document.getElementById('blacklistDetails');
+        blacklistDetails.innerHTML = `
+                <div class="blacklist-item">
+                    <h3>블랙리스트 상세 정보</h3>
+                    <p>블랙리스트 ID: ${blacklist.id}</p>
+                    <p>차단된 사용자 ID: ${blacklist.user_id}</p>
+                    <p>채팅방 ID: ${blacklist.chatting_room_id}</p>
+                    <p>생성일: ${blacklist.created_at}</p>
+                </div>`;
+      });
+
+      // 블랙리스트 해제
+      function removeBlacklist() {
+        const blacklistId = document.getElementById('removeBlacklistId').value;
+        console.log('📤 블랙리스트 해제 요청:', {
+          blacklistId: parseInt(blacklistId),
+        });
+        socket.emit('removeBlacklist', {
+          blacklistId: parseInt(blacklistId),
+        });
+      }
+
+      // 블랙리스트 해제 완료 리스너
+      socket.on('blacklistRemoved', (data) => {
+        console.log('📥 블랙리스트 해제 완료:', data);
+        alert(`블랙리스트에서 해제되었습니다. (ID: ${data.blacklistId})`);
+      });
+
+      // 채팅멤버 목록 수신 및 처리
+      chatmemberSocket.on('allChatMembers', (chatmembers) => {
+        console.log('�� 채팅멤버 목록 수신:', chatmembers);
+        const blacklistedUserId = document.getElementById('userId').value;
+        const blacklistedRoomId = document.getElementById('chatRoomId').value;
+
+        // 블랙리스트 추가된 사용자의 채팅멤버 찾기
+        const targetMember = chatmembers.find(
+          (member) =>
+            member.user_id === parseInt(blacklistedUserId) &&
+            member.chatting_room_id === parseInt(blacklistedRoomId),
+        );
+
+        if (targetMember) {
+          console.log('🚫 차단된 사용자의 채팅멤버 발견:', targetMember);
+          // 채팅방에서 강제 퇴장
+          chatmemberSocket.emit('deleteChatMember', {
+            chatmemberId: targetMember.id,
+          });
+        }
+      });
+
+      // 에러 처리
+      socket.on('error', (error) => {
+        console.error('❌ 오류 발생:', error);
+        let errorMessage = '오류가 발생했습니다: ';
+
+        switch (error.message) {
+          case 'BLACKLIST_ALREADY_EXISTS':
+            errorMessage += '이미 차단된 사용자입니다.';
+            break;
+          case 'USER_NOT_FOUND':
+            errorMessage += '존재하지 않는 사용자입니다.';
+            break;
+          case 'CHATROOM_NOT_FOUND':
+            errorMessage += '존재하지 않는 채팅방입니다.';
+            break;
+          case 'BLACKLIST_NOT_FOUND':
+            errorMessage += '블랙리스트 정보를 찾을 수 없습니다.';
+            break;
+          default:
+            errorMessage += error.message;
+        }
+
+        alert(errorMessage);
+      });
+    </script>
+  </body>
+</html>
