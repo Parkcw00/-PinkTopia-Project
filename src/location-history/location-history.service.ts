@@ -135,12 +135,4 @@ export class LocationHistoryService {
 
     return records[0]; // ✅ 7개 유지 후 최신 데이터 반환
   }
-
-  /**
-   * ✅ 사용자 탈퇴 시 DB & valkey 데이터 삭제
-   */
-  async delete(user_id: number): Promise<void> {
-    await this.repository.deleteByUserId(user_id);
-    await this.valkeyService.del(`LocationHistory:${user_id}`);
-  }
 }
