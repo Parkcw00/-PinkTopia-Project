@@ -35,7 +35,7 @@ export class UpdateEventDto {
     description: '수정할 이벤트 이미지 URL',
     required: false,
   })
-  image?: string | null;
+  image?: string;
 
   @IsOptional()
   @IsString()
