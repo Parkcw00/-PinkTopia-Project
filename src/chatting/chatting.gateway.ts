@@ -177,17 +177,20 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
         user.id
       );
 
-      // 퇴장하는 클라이언트의 소켓만 방에서 나가도록 수정
-      await client.leave(`room_${data.roomId}`);
-
-      // 퇴장 메시지 브로드캐스트 (닉네임 사용)
+      // 퇴장 메시지 브로드캐스트 (닉네임 포함)
       this.server.to(`room_${data.roomId}`).emit('userLeft', {
         userId: user.id,
         nickname: chatMember.user.nickname
       });
 
-      // 퇴장한 사용자의 소켓 연결만 해제
-      client.disconnect(true);
+      // 잠시 대기하여 메시지가 전송될 시간을 확보
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // 채팅방에서 소켓 연결 해제
+      await client.leave(`room_${data.roomId}`);
+
+      // 채팅방 멤버에서도 제거
+      await this.chatmemberService.deleteChatMember(chatMember.id);
 
       return { success: true };
     } catch (error) {

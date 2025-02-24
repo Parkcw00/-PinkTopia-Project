@@ -282,9 +282,12 @@
         // 초대 링크 공유 함수 수정
         async function shareInviteLink(roomId) {
             try {
+                // 경로 수정: /public/invite.html로 변경
                 const inviteLink = `/public/invite.html?roomId=${roomId}`;
-                await navigator.clipboard.writeText(window.location.origin + inviteLink);
-                alert('초대 링크가 클립보드에 복사되었습니다!\n' + window.location.origin + inviteLink);
+                const fullLink = window.location.origin + inviteLink;
+                
+                await navigator.clipboard.writeText(fullLink);
+                alert('초대 링크가 클립보드에 복사되었습니다!\n' + fullLink);
                 
                 // 또는 특정 사용자에게 이메일로 보내기
                 const userId = prompt('초대할 사용자 ID를 입력하세요:');

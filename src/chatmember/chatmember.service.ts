@@ -108,7 +108,7 @@ export class ChatmemberService {
 
   // 채팅방 나가기
   async deleteChatMember(chatmemberId: number) {
-    return this.chatmemberRepository.deleteChatmember(chatmemberId);
+    return this.chatmemberRepositoryTypeorm.delete(chatmemberId);
   }
 
   async findByRoomAndUser(chatting_room_id: number, user_id: number) {
