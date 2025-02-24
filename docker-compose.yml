@@ -1,0 +1,15 @@
+services:
+  valkey:
+    image: valkey/valkey:latest
+    environment:
+      - ALLOW_EMPTY_PASSWORD=no
+      - VALKEY_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+      - VALKEY_PASSWORD=${VALKEY_PASSWORD} # 환경 변수에서 비밀번호 가져옴
+    ports:
+      - '6379:6379'
+    volumes:
+      - 'valkey_data:/valkey/data'
+
+volumes:
+  valkey_data:
+    driver: local

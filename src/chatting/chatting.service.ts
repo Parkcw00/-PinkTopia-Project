@@ -104,5 +104,4 @@ export class ChattingService {
 
     return this.chattingCustomRepository.findAll(chatting_room_id);
   }
-
 }

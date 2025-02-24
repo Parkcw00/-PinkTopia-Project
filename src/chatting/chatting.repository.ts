@@ -52,7 +52,7 @@ export class ChattingRepository {
         where: {
           user_id: userId,
           chatting_room_id: parseInt(chattingRoomId),
-        }
+        },
       });
       console.log('멤버 확인 결과:', member);
       return !!member;
