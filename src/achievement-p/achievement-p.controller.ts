@@ -17,8 +17,6 @@ import {
 import { UserGuard } from '../user/guards/user-guard';
 import { AdminGuard } from '../user/guards/admin.guard';
 import { AchievementPService } from './achievement-p.service';
-import { CreateAchievementPDto } from './dto/create-achievement-p.dto';
-import { UpdateAchievementPDto } from './dto/update-achievement-p.dto';
 
 @Controller('achievement-p')
 export class AchievementPController {
