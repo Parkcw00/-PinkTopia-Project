@@ -22,7 +22,8 @@ export class ValkeyService implements OnModuleDestroy {
   }
 
   async get(key: string) {
-    return await this.client.get(key);
+    const data = await this.client.get(key);
+    return data ? JSON.parse(data) : null; // JSON 데이터를 다시 객체로 변환
   }
 
   async del(key: string) {

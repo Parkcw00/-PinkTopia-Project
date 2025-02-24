@@ -174,6 +174,7 @@ export class UserService {
       throw new BadRequestException('비밀번호를 입력해 주세요');
     }
 
+    // 1️⃣ 🔹 DB에서 유저 정보 조회
     const existEmail = await this.userRepository.findEmail(email);
     if (!existEmail) {
       throw new BadRequestException('존재하는지 않는 이메일입니다.');
@@ -188,6 +189,7 @@ export class UserService {
       throw new BadRequestException('비밀번호가 틀렸습니다.');
     }
 
+    // 2️⃣ 🔹 JWT Payload 생성
     const payload = {
       id: existEmail.id,
       email: existEmail.email,
@@ -204,6 +206,7 @@ export class UserService {
       throw new InternalServerErrorException('관리자에게 문의해 주세요');
     }
 
+    // 3️⃣ 🔹 Access Token & Refresh Token 생성
     const accessToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
       expiresIn: accessTokenExpiresIn,
@@ -217,6 +220,7 @@ export class UserService {
       refreshTokenExpiresIn.length - 1,
     );
 
+    // 4️⃣ 🔹 HTTP 응답 헤더 및 쿠키 설정
     res.setHeader('Authorization', `Bearer ${accessToken}`);
     res.cookie('refreshToken', refreshToken, {
       maxAge: 1000 * 60 * 60 * 24 * +refreshTokenExpiresIn,
@@ -225,6 +229,22 @@ export class UserService {
     if (this.logOutUsers[existEmail.id]) {
       delete this.logOutUsers[existEmail.id];
     }
+
+    // 5️⃣ 🔹 Valkey(발키)에 유저 정보 저장 (12시간 후 자동 삭제)
+    const cacheKey = `user:${existEmail.email}`;
+    const userData = {
+      id: existEmail.id,
+      email: existEmail.email,
+      nickname: existEmail.nickname,
+      profile_image: existEmail.profile_image,
+      collection_point: existEmail.collection_point,
+      pink_gem: existEmail.pink_gem,
+      pink_dia: existEmail.pink_dia,
+      role: existEmail.role,
+    };
+
+    await this.valkeyService.set(cacheKey, userData, 60 * 60 * 12); // 12시간 (초 단위)
+
     return res.status(200).json({ message: '로그인이 되었습니다.' });
   }
 
@@ -236,6 +256,11 @@ export class UserService {
     });
     res.setHeader('Authorization', `Bearer ${accessToken}`);
     res.clearCookie('refreshToken');
+
+    // 🔹 Valkey에서 해당 유저 정보 삭제 (DB는 건드리지 않음)
+    const cacheKey = `user:${user.email}`;
+    await this.valkeyService.del(cacheKey);
+
     this.logOutUsers[user.id] = true;
     return res.status(200).json({ message: '로그아웃이 되었습니다.' });
   }
