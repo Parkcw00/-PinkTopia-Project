@@ -88,18 +88,18 @@ export class ChattingRoomService {
       throw new BadRequestException('이미 해당 채팅방의 멤버가 아닙니다.');
     }
 
-    await this.chattingRoomRepository.deleteChatMember(chattingRoomId, user.id);
-    const members =
-      await this.chattingRoomRepository.findAllChatMembers(chattingRoomId);
-
-    if (isMember.admin === true && members.length > 0) {
-      const randomNumber = Math.floor(Math.random() * members.length);
-      const newAdmin = members[randomNumber].user_id;
-      await this.chattingRoomRepository.getAdmin(chattingRoomId, newAdmin);
-    } else if (members.length === 0) {
-      await this.chattingRoomRepository.deleteChattingRoom(chattingRoomId);
-      return { message: `채팅방을 나가셨습니다. 채팅방이 삭제되었습니다.` };
+    // 관리자인 경우에만 관리자 위임 처리
+    if (isMember.admin === true) {
+      const members = await this.chattingRoomRepository.findAllChatMembers(chattingRoomId);
+      if (members.length > 1) {  // 자신을 제외한 다른 멤버가 있는 경우
+        // 자신을 제외한 다른 멤버 중에서 새로운 관리자 선택
+        const otherMembers = members.filter(member => member.user_id !== user.id);
+        const randomNumber = Math.floor(Math.random() * otherMembers.length);
+        const newAdmin = otherMembers[randomNumber].user_id;
+        await this.chattingRoomRepository.getAdmin(chattingRoomId, newAdmin);
+      }
     }
+
     return { message: `채팅방을 나가셨습니다.` };
   }
 

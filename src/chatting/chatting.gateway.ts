@@ -133,7 +133,7 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
 
   // 채팅 메시지 전송
   @SubscribeMessage('sendMessage')
-  async handleMessage(client: Socket, data: { roomId: number; message: string }) {
+  async handleMessage(client: Socket, data: { roomId: number; message: string; type?: string }) {
     try {
       console.log('메시지 수신:', data, client.data);
       
@@ -155,6 +155,7 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
         userId: user.id,
         nickname: chatMember.user.nickname || user.email,
         message: data.message,
+        type: data.type || 'text',
         timestamp: new Date().toISOString()
       };
       console.log('전송할 메시지 데이터:', messageData);
@@ -175,7 +176,7 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
   // 채팅방 퇴장
   @SubscribeMessage('leaveRoom')
   async handleLeaveRoom(
-    @MessageBody() data: { userId: number; roomId: number },
+    @MessageBody() data: { userId: number; roomId: number; nickname: string },
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -185,26 +186,26 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
         throw new WsException('인증되지 않은 사용자입니다.');
       }
 
-      // 채팅멤버 정보 조회 (소켓 연결 해제 전에 수행)
+      // 채팅멤버 정보 조회
       const chatMember = await this.chatmemberService.findByRoomAndUser(
         data.roomId,
         user.id
       );
 
-      // 퇴장 메시지 브로드캐스트 (닉네임 포함)
-      this.server.to(`room_${data.roomId}`).emit('userLeft', {
+      // 먼저 퇴장 메시지를 브로드캐스트
+      await this.server.to(`room_${data.roomId}`).emit('userLeft', {
         userId: user.id,
         nickname: chatMember.user.nickname
       });
 
       // 잠시 대기하여 메시지가 전송될 시간을 확보
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // 채팅방에서 소켓 연결 해제
       await client.leave(`room_${data.roomId}`);
 
       // 채팅방 멤버에서도 제거
-      await this.chatmemberService.deleteChatMember(chatMember.id);
+      await this.chatmemberService.deleteChatMember(user.id, data.roomId);
 
       return { success: true };
     } catch (error) {
@@ -217,5 +218,23 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
   handleDisconnect(client: Socket) {
     console.log('클라이언트 연결 종료:', client.id);
     // 다른 사용자의 연결은 유지
+  }
+
+  @SubscribeMessage('fileUploaded')
+  async handleFileUploaded(client: Socket, data: { roomId: number; fileUrl: string }) {
+    try {
+      console.log('파일 업로드 알림:', data);
+
+      // 업로드된 파일 정보를 같은 방의 모든 사용자에게 전송
+      this.server.to(`room_${data.roomId}`).emit('newFile', {
+        fileUrl: data.fileUrl,
+        timestamp: new Date().toISOString()
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error('파일 업로드 알림 중 에러:', error);
+      return { success: false, message: error.message };
+    }
   }
 }

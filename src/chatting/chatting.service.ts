@@ -8,12 +8,14 @@ import { ChattingRepository } from './chatting.repository';
 import { S3Service } from '../s3/s3.service';
 import { UploadChattingDto } from './dto/create-upload-chatting.dto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Chatting } from './entities/chatting.entity';
 
 @Injectable()
 export class ChattingService {
   constructor(
     @InjectRepository(Chatting)
+    private readonly chattingRepository: Repository<Chatting>,
     private readonly s3Service: S3Service,
     private readonly chattingCustomRepository: ChattingRepository,
   ) {}
@@ -65,6 +67,11 @@ export class ChattingService {
 
       if (!isMember) {
         throw new ForbiddenException('메시지 업로드 권한이 없습니다.');
+      }
+
+      // 파일 형식 검증 추가
+      if (!file.mimetype.startsWith('image/')) {
+        throw new BadRequestException('이미지 파일만 업로드할 수 있습니다.');
       }
 
       const imageUrl = await this.s3Service.uploadFile(file);

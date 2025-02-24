@@ -120,7 +120,9 @@
       <div id="chatBox" class="chat-box"></div>
       <div class="input-area">
         <input type="text" id="messageInput" placeholder="메시지를 입력하세요" onkeypress="handleKeyPress(event)">
+        <input type="file" id="fileInput" style="display: none;" onchange="uploadFile(event)">
         <button class="button" onclick="sendMessage()">전송</button>
+        <button class="button" onclick="document.getElementById('fileInput').click()">파일 업로드</button>
         <button class="button" onclick="leaveRoom()">나가기</button>
       </div>
     </div>
@@ -129,6 +131,7 @@
       let socket;
       let currentRoomId;
       let currentUserId; // 현재 사용자 ID 변수 추가
+      let currentUserNickname; // 현재 사용자 닉네임 변수 추가
       
       // 페이지 로드 시 인증 확인
       document.addEventListener('DOMContentLoaded', async () => {
@@ -156,27 +159,12 @@
             const checkData = await checkResponse.json();
             console.log('멤버 확인 데이터:', checkData);
 
-            // 멤버가 아닌 경우 멤버로 추가 시도
+            // 멤버가 아닌 경우 입장 불가
             if (!checkResponse.ok) {
-                console.log('멤버가 아님, 멤버 추가 시도');
-                const joinResponse = await fetch(`http://localhost:3000/chatmember`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': accessToken,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        chatting_room_id: parseInt(roomId)
-                    })
-                });
-
-                console.log('멤버 추가 응답:', joinResponse.status);
-                const joinData = await joinResponse.json();
-                console.log('멤버 추가 데이터:', joinData);
-
-                if (!joinResponse.ok) {
-                    throw new Error('채팅방 멤버 등록에 실패했습니다.');
-                }
+                console.log('멤버가 아님, 입장 불가');
+                alert('채팅방 멤버가 아닙니다. 입장할 수 없습니다.');
+                window.location.href = '/public/chattingrooms.html';
+                return;
             }
 
             // 멤버 정보 가져오기
@@ -192,7 +180,9 @@
 
             if (data && data.user_id) {
                 currentUserId = data.user_id;
+                currentUserNickname = data.nickname;
                 console.log('현재 사용자 ID:', currentUserId);
+                console.log('현재 사용자 닉네임:', currentUserNickname);
 
                 // socket.io 연결 설정
                 socket = io('http://localhost:3000/chatting', {
@@ -229,27 +219,39 @@
           
           const chatBox = document.getElementById('chatBox');
           const messageDiv = document.createElement('div');
-          const isMyMessage = data.userId === currentUserId;
           
-          messageDiv.className = `message ${isMyMessage ? 'my-message' : ''}`;
-          
-          const timestamp = new Date(data.timestamp).toLocaleTimeString();
-          
-          if (isMyMessage) {
-              messageDiv.innerHTML = `
-                  <div class="message-content">
-                      <span class="message-text">${data.message}</span>
-                      <span class="timestamp">${timestamp}</span>
-                  </div>
-              `;
+          // 시스템 메시지인 경우
+          if (data.type === 'system') {
+            messageDiv.className = 'message system';
+            messageDiv.innerHTML = `
+              <div class="message-content">
+                <span class="message-text">${data.message}</span>
+                <span class="timestamp">${new Date(data.timestamp).toLocaleTimeString()}</span>
+              </div>
+            `;
           } else {
+            // 일반 메시지 처리 (기존 코드)
+            const isMyMessage = data.userId === currentUserId;
+            messageDiv.className = `message ${isMyMessage ? 'my-message' : ''}`;
+            
+            const timestamp = new Date(data.timestamp).toLocaleTimeString();
+            
+            if (isMyMessage) {
               messageDiv.innerHTML = `
-                  <div class="message-content">
-                      <div class="nickname">${data.nickname}</div>
-                      <span class="message-text">${data.message}</span>
-                      <span class="timestamp">${timestamp}</span>
-                  </div>
+                <div class="message-content">
+                  <span class="message-text">${data.message}</span>
+                  <span class="timestamp">${timestamp}</span>
+                </div>
               `;
+            } else {
+              messageDiv.innerHTML = `
+                <div class="message-content">
+                  <div class="nickname">${data.nickname}</div>
+                  <span class="message-text">${data.message}</span>
+                  <span class="timestamp">${timestamp}</span>
+                </div>
+              `;
+            }
           }
           
           chatBox.appendChild(messageDiv);
@@ -263,17 +265,20 @@
 
         socket.on('userLeft', (data) => {
           console.log('사용자 퇴장:', data);
-          
-          // 퇴장한 사용자가 자신이 아닌 경우에만 메시지 표시
-          if (data.userId !== currentUserId) {
-              const nickname = data.nickname || '알 수 없는 사용자';
-              addSystemMessage(`${nickname}님이 퇴장하셨습니다.`);
-          }
+          // 모든 사용자에게 퇴장 메시지 표시
+          addSystemMessage(`${data.nickname}님이 퇴장하셨습니다.`);
         });
 
         socket.on('error', (error) => {
           console.error('소켓 에러:', error);
           addSystemMessage('오류가 발생했습니다.');
+        });
+
+        // 멤버가 완전히 나갔을 때의 이벤트 리스너 추가
+        socket.on('memberLeft', (data) => {
+          console.log('멤버 퇴장:', data);
+          // 시스템 메시지로 표시
+          addSystemMessage(data.message);
         });
       }
 
@@ -298,27 +303,22 @@
         }
       }
 
-      // 채팅방 나가기 함수
+      // 채팅방 임시 나가기 함수
       async function leaveRoom() {
-        try {
-            const response = await fetch(`http://localhost:3000/chattingroom/out/${currentRoomId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': localStorage.getItem('accessToken')
-                }
-            });
+        if (!confirm('정말로 채팅방을 나가시겠습니까?')) {
+            return;
+        }
 
-            if (response.ok) {
-                socket.emit('leaveRoom', {
+        try {
+            if (socket) {
+                socket.emit('temporaryLeaveChatRoom', {
                     userId: currentUserId,
-                    roomId: currentRoomId
+                    roomId: currentRoomId,
+                    nickname: currentUserNickname
                 });
-                
-                window.location.href = '/public/chattingrooms.html';
-            } else {
-                const error = await response.json();
-                throw new Error(error.message || '채팅방 나가기에 실패했습니다.');
+                socket.disconnect();
             }
+            window.location.href = '/public/chattingrooms.html';
         } catch (error) {
             console.error('채팅방 나가기 실패:', error);
             alert(error.message || '채팅방 나가기에 실패했습니다.');
@@ -337,7 +337,12 @@
         const chatBox = document.getElementById('chatBox');
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message system';
-        messageDiv.innerHTML = `<div class="message-content">${message}</div>`;
+        messageDiv.innerHTML = `
+            <div class="message-content">
+                <span class="message-text">${message}</span>
+                <span class="timestamp">${new Date().toLocaleTimeString()}</span>
+            </div>
+        `;
         chatBox.appendChild(messageDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
       }
@@ -358,6 +363,48 @@
           `).join('');
         }
       }
+
+      // 파일 업로드 함수
+async function uploadFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  // 클라이언트 측에서 파일 형식 검증
+  if (!file.type.startsWith('image/')) {
+    alert('이미지 파일만 업로드할 수 있습니다.');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const response = await fetch(`http://localhost:3000/chattingroom/${currentRoomId}/upload`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `${localStorage.getItem('accessToken')}`
+      },
+      body: formData
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('파일 업로드 성공:', data);
+      
+      // 파일 업로드 성공 시 소켓 이벤트 발생
+      socket.emit('fileUploaded', {
+        roomId: parseInt(currentRoomId),
+        fileUrl: data.message
+      });
+    } else {
+      const error = await response.json();
+      throw new Error(error.message || '파일 업로드에 실패했습니다.');
+    }
+  } catch (error) {
+    console.error('파일 업로드 실패:', error);
+    alert(error.message || '파일 업로드에 실패했습니다.');
+  }
+}
     </script>
   </body>
 </html>
