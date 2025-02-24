@@ -8,14 +8,12 @@ import { ChattingRepository } from './chatting.repository';
 import { S3Service } from '../s3/s3.service';
 import { UploadChattingDto } from './dto/create-upload-chatting.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { Chatting } from './entities/chatting.entity';
 
 @Injectable()
 export class ChattingService {
   constructor(
     @InjectRepository(Chatting)
-    private readonly chattingRepository: Repository<Chatting>,
     private readonly s3Service: S3Service,
     private readonly chattingCustomRepository: ChattingRepository,
   ) {}
@@ -105,26 +103,5 @@ export class ChattingService {
     }
 
     return this.chattingCustomRepository.findAll(chatting_room_id);
-  }
-
-  async saveMessage(roomId: number, userId: number, message: string) {
-    try {
-      console.log('메시지 저장 시도:', { roomId, userId, message });
-
-      const newMessage = this.chattingRepository.create({
-        chatting_room_id: roomId,
-        user_id: userId,
-        message: message,
-        type: 'text',
-      });
-
-      const savedMessage = await this.chattingRepository.save(newMessage);
-      console.log('저장된 메시지:', savedMessage);
-
-      return savedMessage;
-    } catch (error) {
-      console.error('메시지 저장 중 에러:', error);
-      throw error;
-    }
   }
 }
