@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsOptional, IsDateString, MaxLength, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsDateString,
+  MaxLength,
+  IsEnum,
+} from 'class-validator';
 
 export class CreateEventDto {
   @IsString()
@@ -14,16 +20,29 @@ export class CreateEventDto {
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  @ApiProperty({ example: 'https://example.com/event-image.jpg', description: '이벤트 이미지 URL', required: false })
+  @ApiProperty({
+    example: 'https://example.com/event-image.jpg',
+    description: '이벤트 이미지 URL',
+    required: false,
+  })
   image?: string;
 
   @IsOptional()
   @IsDateString()
-  @ApiProperty({ example: '2025-03-13', description: '이벤트 만료 날짜 (YYYY-MM-DD)', required: false })
+  @ApiProperty({
+    example: '2025-03-13',
+    description: '이벤트 만료 날짜 (YYYY-MM-DD)',
+    required: false,
+  })
   expiration_at?: string;
 
   @IsOptional()
   @IsEnum(['active', 'closed'])
-  @ApiProperty({ example: 'active', enum: ['active', 'closed'], description: '이벤트 상태', required: false })
+  @ApiProperty({
+    example: 'active',
+    enum: ['active', 'closed'],
+    description: '이벤트 상태',
+    required: false,
+  })
   status?: string;
 }
