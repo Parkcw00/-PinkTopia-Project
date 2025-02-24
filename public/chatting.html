@@ -263,8 +263,12 @@
 
         socket.on('userLeft', (data) => {
           console.log('사용자 퇴장:', data);
-          const nickname = data.nickname || '알 수 없는 사용자';
-          addSystemMessage(`${nickname}님이 퇴장하셨습니다.`);
+          
+          // 퇴장한 사용자가 자신이 아닌 경우에만 메시지 표시
+          if (data.userId !== currentUserId) {
+              const nickname = data.nickname || '알 수 없는 사용자';
+              addSystemMessage(`${nickname}님이 퇴장하셨습니다.`);
+          }
         });
 
         socket.on('error', (error) => {
@@ -306,8 +310,8 @@
 
             if (response.ok) {
                 socket.emit('leaveRoom', {
-                    roomId: currentRoomId,
-                    userId: currentUserId
+                    userId: currentUserId,
+                    roomId: currentRoomId
                 });
                 
                 window.location.href = '/public/chattingrooms.html';
