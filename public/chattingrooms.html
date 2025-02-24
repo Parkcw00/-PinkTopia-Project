@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>채팅방 목록</title>
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
     <style>
         .container {
             max-width: 800px;
@@ -127,6 +128,10 @@
     <div class="container">
         <h1>채팅방 목록</h1>
         
+        <script>
+            let socket;  // 전역 socket 변수 선언
+        </script>
+
         <!-- 채팅방 직접 입장 폼 추가 -->
         <div class="join-room-form">
             <input type="text" id="roomInput" placeholder="채팅방 ID 또는 초대 링크 입력">

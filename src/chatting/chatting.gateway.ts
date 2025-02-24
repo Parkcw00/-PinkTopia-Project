@@ -25,8 +25,10 @@ interface ChatMessage {
 @WebSocketGateway({
   namespace: 'chatting',
   cors: {
-    origin: ['http://localhost:3000', 'http://127.0.0.1:5500'],
+    origin: ['http://localhost:3000', 'http://127.0.0.1:5500', 'http://localhost:5500'],
     credentials: true,
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Authorization', 'Content-Type']
   },
 })
 export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -43,25 +45,34 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
 
   async handleConnection(client: Socket) {
     try {
+      console.log('소켓 연결 시도:', client.id);  // 연결 시도 로그
       const token = client.handshake.auth.token;
+      console.log('받은 토큰:', token);  // 토큰 확인
 
       if (!token) {
+        console.log('토큰 없음');
         throw new WsException('인증 토큰이 없습니다.');
       }
 
+      // Bearer 토큰에서 실제 토큰 추출
       const tokenWithoutBearer = token.replace('Bearer ', '');
+      console.log('처리된 토큰:', tokenWithoutBearer);
 
       try {
         const decoded = this.jwtService.verify(tokenWithoutBearer, {
           secret: this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY')
         });
+        console.log('토큰 검증 성공:', decoded);  // 디코딩된 정보 확인
 
         client.data.user = decoded;
+        console.log('클라이언트 데이터 설정:', client.data);  // 클라이언트 데이터 확인
       } catch (error) {
+        console.log('토큰 검증 실패:', error);
         throw new WsException('유효하지 않은 토큰입니다.');
       }
 
     } catch (error) {
+      console.error('연결 처리 중 에러:', error);
       client.disconnect();
     }
   }
@@ -124,10 +135,11 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
   @SubscribeMessage('sendMessage')
   async handleMessage(client: Socket, data: { roomId: number; message: string }) {
     try {
-      console.log('메시지 수신:', data);
+      console.log('메시지 수신:', data, client.data);
       
       const user = client.data.user;
       if (!user) {
+        console.log('인증되지 않은 사용자');
         throw new WsException('인증되지 않은 사용자입니다.');
       }
 
@@ -136,14 +148,16 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
         data.roomId,
         user.id
       );
+      console.log('채팅 멤버 정보:', chatMember);
 
       // 메시지 저장 및 브로드캐스트
       const messageData = {
         userId: user.id,
-        nickname: chatMember.user.nickname || user.email, // 닉네임이 없으면 이메일 사용
+        nickname: chatMember.user.nickname || user.email,
         message: data.message,
         timestamp: new Date().toISOString()
       };
+      console.log('전송할 메시지 데이터:', messageData);
 
       // DB에 메시지 저장
       await this.chattingService.create(user, data.roomId.toString(), {message: data.message});

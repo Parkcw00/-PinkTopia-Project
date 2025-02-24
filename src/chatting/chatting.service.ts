@@ -23,6 +23,7 @@ export class ChattingService {
     chatting_room_id: string,
     createChattingDto: CreateChattingDto,
   ) {
+    console.log(user, chatting_room_id, createChattingDto);
     try {
       const isMember = await this.chattingCustomRepository.isMember(
         user.id,
