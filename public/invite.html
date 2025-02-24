@@ -32,7 +32,7 @@
                 // 이미 로그인된 경우 바로 채팅방 입장 처리
                 try {
                     // 채팅방 멤버 확인
-                    const memberCheckResponse = await fetch(`http://localhost:3000/chatmember/check/${roomId}`, {
+                    const memberCheckResponse = await fetch(`/chatmember/check/${roomId}`, {
                         headers: {
                             'Authorization': accessToken
                         }
@@ -45,7 +45,7 @@
                     }
 
                     // 멤버가 아니라면 새로 가입
-                    const joinResponse = await fetch(`http://localhost:3000/chatmember`, {
+                    const joinResponse = await fetch(`/chatmember`, {
                         method: 'POST',
                         headers: {
                             'Authorization': accessToken,
