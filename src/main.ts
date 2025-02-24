@@ -3,9 +3,17 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
+import { readFileSync } from 'fs';
+import * as https from 'https';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  //const app = await NestFactory.create(AppModule);
+  //위치추적 허용
+  const httpsOptions = {
+    key: readFileSync('server.key'),
+    cert: readFileSync('server.cert'),
+  };
+  const app = await NestFactory.create(AppModule, { httpsOptions });
   app.use(cookieParser());
   const options = new DocumentBuilder()
     .setTitle('Your API Title')
@@ -25,6 +33,8 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api-docs', app, document);
+
+  ////위치 허용/////////
 
   app.useGlobalPipes(
     new ValidationPipe({

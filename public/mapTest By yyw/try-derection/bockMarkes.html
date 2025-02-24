@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>코드분석1 - 사용자 위치를 중심으로 지도 열기</title>
+  <title>북마크 인포윈도</title>
   <style>
     html,
     body {
@@ -53,10 +53,24 @@
         draggable: true  // 이동 가능한 마커 여부
       },
       {
-        position: new kakao.maps.LatLng(36.340309, 127.389999),
+        position: new kakao.maps.LatLng(36.340309, 127.39),
         imageUrl: 'https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FN5k03%2FbtsMn0l4BNf%2F0Lk5if43ncFTjl9rzKCE61%2Fimg.png',
         size: new kakao.maps.Size(100, 100),
-        info: '북마커 위치',
+        info: '북마커 위치1',
+        draggable: false  // 이동 불가능한 마커
+      },
+      {
+        position: new kakao.maps.LatLng(36.340509, 127.3901),
+        imageUrl: 'https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FN5k03%2FbtsMn0l4BNf%2F0Lk5if43ncFTjl9rzKCE61%2Fimg.png',
+        size: new kakao.maps.Size(100, 100),
+        info: '북마커 위치2',
+        draggable: false  // 이동 불가능한 마커
+      },
+      {
+        position: new kakao.maps.LatLng(36.340709, 127.3902),
+        imageUrl: 'https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FN5k03%2FbtsMn0l4BNf%2F0Lk5if43ncFTjl9rzKCE61%2Fimg.png',
+        size: new kakao.maps.Size(100, 100),
+        info: '북마커 위치3',
         draggable: false  // 이동 불가능한 마커
       }
     ];
