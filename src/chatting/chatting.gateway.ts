@@ -146,7 +146,7 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
       };
 
       // DB에 메시지 저장
-      await this.chattingService.saveMessage(data.roomId, user.id, data.message);
+      await this.chattingService.create(user, data.roomId.toString(), {message: data.message});
 
       // 같은 방의 모든 사용자에게 메시지 전송
       this.server.to(`room_${data.roomId}`).emit('message', messageData);

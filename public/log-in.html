@@ -88,7 +88,7 @@
         </form>
         <div class="signup-link">
           <span>계정이 없으신가요? </span>
-          <a href="/sign-up.html">회원가입</a>
+          <a href="/public/sign-up.html">회원가입</a>
         </div>
       </div>
     </div>
@@ -105,7 +105,7 @@
 
           try {
             const response = await fetch(
-              'http://localhost:3000/user/auth/login',
+              '/user/auth/login',
               {
                 method: 'POST',
                 headers: {

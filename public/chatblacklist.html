@@ -81,7 +81,7 @@
     </div>
 
     <script>
-      const socket = io('http://localhost:3000/chatblacklist', {
+      const socket = io('/chatblacklist', {
         withCredentials: true,
         transports: ['websocket', 'polling'],
         extraHeaders: {
@@ -100,7 +100,7 @@
       });
 
       // 채팅멤버 관련 소켓 연결
-      const chatmemberSocket = io('http://localhost:3000/chatmember', {
+      const chatmemberSocket = io('/chatmember', {
         withCredentials: true,
         transports: ['websocket', 'polling'],
         extraHeaders: {
