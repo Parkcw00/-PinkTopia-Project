@@ -8,8 +8,21 @@ export class DirectionService {
     return 'This action adds a new direction';
   }
 
-  findAll() {
-    return `This action returns all direction`;
+  async findAll() {
+    const keys = await this.redisClient.keys('bookmark:*');
+    const bookmarks = [];
+
+    for (const key of keys) {
+      const data = await this.redisClient.hgetall(key);
+      bookmarks.push({
+        id: key.replace('bookmark:', ''),
+        title: data.title,
+        latitude: parseFloat(data.latitude),
+        longitude: parseFloat(data.longitude),
+      });
+    }
+
+    return bookmarks;
   }
 
   findOne(id: number) {

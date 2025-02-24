@@ -63,6 +63,7 @@ export class SubAchievementService {
     await pipeline.exec(); // 🚀 일괄 실행 (반드시 await 사용)
 
     console.log(`✅ ${dbSub.length}개의 서브업적이 Valkey에 저장되었습니다.`);
+
     return {
       message: `✅ ${dbSub.length}개의 서브업적이 Valkey에 저장되었습니다.`,
     };
