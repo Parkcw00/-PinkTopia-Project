@@ -40,12 +40,12 @@ export class LocationHistoryRepository {
   }
 
   /**
-   * ✅ 최신 위치 데이터를 조회 (updateDB, updateValkey에서 사용)
+   * ✅ 가장 오래된 위치 데이터를 조회
    */
-  async findLatestByUserId(user_id: number): Promise<LocationHistory | null> {
+  async findOldestByUserId(user_id: number): Promise<LocationHistory | null> {
     return await this.entity.findOne({
       where: { user_id },
-      order: { timestamp: 'DESC' }, // 최신 데이터 가져오기
+      order: { timestamp: 'ASC' }, // 가장 오래된 데이터를 가져오기
     });
   }
 

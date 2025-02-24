@@ -12,18 +12,6 @@ export class LocationHistoryService {
   ) {}
 
   /**
-   * ✅ 로그인 시 DB 데이터를 valkey(캐시)에 저장
-   */
-  async createValkey(user_id: number): Promise<LocationHistory[]> {
-    const loginLH = await this.repository.getLogin(user_id);
-
-    await this.valkeyService.del(`LocationHistory:${user_id}`);
-    await this.valkeyService.set(`LocationHistory:${user_id}`, loginLH);
-
-    return loginLH; // ✅ 저장된 데이터를 반환
-  }
-
-  /**
    * ✅ 회원가입 시 기본 7개의 위치 데이터를 생성
    */
   async createDB(user_id: number): Promise<LocationHistory[]> {
@@ -34,6 +22,20 @@ export class LocationHistoryService {
     }
     return defaultRecords;
   }
+  /**
+   * ✅ 로그인 시 DB 데이터를 valkey(캐시)에 저장
+   */
+  async createValkey(user_id: number): Promise<LocationHistory[]> {
+    const loginLH = await this.repository.getLogin(user_id);
+
+    await this.valkeyService.del(`LocationHistory:${user_id}`);
+    await this.valkeyService.rpush(
+      `LocationHistory:${user_id}`,
+      JSON.stringify(loginLH),
+    );
+
+    return loginLH; // ✅ 저장된 데이터를 반환
+  }
 
   /**
    * ✅ 10초마다 실행되는 valkey(캐시) 업데이트
@@ -42,26 +44,52 @@ export class LocationHistoryService {
     user_id: number,
     updateDto: UpdateLocationHistoryDto,
   ): Promise<void> {
-    let history = await this.repository.findLatestByUserId(user_id);
+    console.log(`✅ [Service] updateValkey() 실행 - user_id: ${user_id}`);
 
-    if (history) {
-      history.latitude = updateDto.latitude ?? history.latitude;
-      history.longitude = updateDto.longitude ?? history.longitude;
-      history.timestamp = updateDto.timestamp ?? new Date(); // ✅ timestamp 적용
+    // ✅ Valkey(캐시) 초기화
+    await this.valkeyService.del(`LocationHistory:${user_id}`);
+    console.log(`✅ [Service] 기존 Valkey 데이터 삭제 완료`);
 
-      await this.repository.save(history);
-    } else {
-      history = await this.repository.create7(
+    // ✅ DB에서 최신 데이터 가져오기
+    let records = await this.repository.getLogin(user_id);
+    console.log(
+      `✅ [Service] 현재 저장된 위치 데이터 개수 (DB 기준): ${records.length}`,
+    );
+
+    if (records.length < 7) {
+      // ✅ 7개 미만이면 새로운 데이터를 추가
+      await this.repository.create7(
         user_id,
         updateDto.latitude,
         updateDto.longitude,
-        updateDto.timestamp ?? new Date(), // ✅ timestamp 적용
+        updateDto.timestamp ?? new Date(),
       );
+    } else {
+      // ✅ 7개 이상이면 가장 오래된 데이터를 찾아 최신 위치로 업데이트
+      let oldestHistory = await this.repository.findOldestByUserId(user_id);
+      if (oldestHistory) {
+        oldestHistory.latitude = updateDto.latitude;
+        oldestHistory.longitude = updateDto.longitude;
+        oldestHistory.timestamp = updateDto.timestamp ?? new Date();
+        await this.repository.save(oldestHistory);
+      }
     }
 
-    // ✅ valkey(캐시) 업데이트 추가
-    await this.valkeyService.set(`LocationHistory:${user_id}`, history);
+    // ✅ Valkey(캐시)에서 7개 초과 데이터 삭제
+    records = await this.repository.getLogin(user_id);
+    if (records.length > 7) {
+      const excessRecords = records.slice(0, records.length - 7); // ✅ 초과 데이터 찾기
+      for (const record of excessRecords) {
+        await this.repository.deleteByUserId(record.id); // ✅ 초과 데이터 삭제
+      }
+    }
+
+    // ✅ Valkey에 최신 7개 데이터 저장
+    records = await this.repository.getLogin(user_id);
+    await this.valkeyService.set(`LocationHistory:${user_id}`, records);
+    console.log(`✅ [Service] Valkey에 최신 위치 데이터 저장 완료`);
   }
+
   /**
    * ✅ 10분마다 실행되는 DB 업데이트
    */
@@ -69,29 +97,43 @@ export class LocationHistoryService {
     user_id: number,
     updateDto: UpdateLocationHistoryDto,
   ): Promise<LocationHistory> {
-    let history = await this.repository.findLatestByUserId(user_id);
+    console.log(`✅ [Service] updateDB() 실행 - user_id: ${user_id}`);
 
-    if (history) {
-      history.latitude = updateDto.latitude ?? history.latitude;
-      history.longitude = updateDto.longitude ?? history.longitude;
-      history.timestamp = new Date();
+    // ✅ DB에서 최신 데이터 가져오기
+    let records = await this.repository.getLogin(user_id);
+    console.log(
+      `✅ [Service] 현재 저장된 위치 데이터 개수 (DB 기준): ${records.length}`,
+    );
 
-      // ✅ save()가 LocationHistory를 반환하므로 문제 없음
-      const updatedHistory = await this.repository.save(history);
-      // console.log('✅ updateDB()에서 업데이트된 데이터:', updatedHistory);
-      return updatedHistory;
-    } else {
-      // ✅ 새 데이터를 생성하고 반환
-      const newHistory = await this.repository.create7(
+    if (records.length < 7) {
+      // ✅ 7개 미만이면 새로운 데이터를 추가
+      return await this.repository.create7(
         user_id,
         updateDto.latitude,
         updateDto.longitude,
-        new Date(),
+        updateDto.timestamp ?? new Date(),
       );
-
-      console.log('✅ updateDB()에서 새로 생성된 데이터:', newHistory);
-      return newHistory;
+    } else {
+      // ✅ 7개 이상이면 가장 오래된 데이터를 찾아 최신 위치로 업데이트
+      let oldestHistory = await this.repository.findOldestByUserId(user_id);
+      if (oldestHistory) {
+        oldestHistory.latitude = updateDto.latitude;
+        oldestHistory.longitude = updateDto.longitude;
+        oldestHistory.timestamp = updateDto.timestamp ?? new Date();
+        return await this.repository.save(oldestHistory);
+      }
     }
+
+    // ✅ DB에서도 7개 초과 데이터 삭제
+    records = await this.repository.getLogin(user_id);
+    if (records.length > 7) {
+      const excessRecords = records.slice(0, records.length - 7); // ✅ 초과 데이터 찾기
+      for (const record of excessRecords) {
+        await this.repository.deleteByUserId(record.id); // ✅ 초과 데이터 삭제
+      }
+    }
+
+    return records[0]; // ✅ 7개 유지 후 최신 데이터 반환
   }
 
   /**
