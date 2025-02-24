@@ -81,4 +81,3 @@ export class LocationHistoryController {
     return { message: '위치 기록 삭제 완료' };
   }
 }
-*/

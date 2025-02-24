@@ -16,15 +16,15 @@ export class DirectionController {
   constructor(private readonly directionService: DirectionService) {}
 
   // 북마크 만들기
-  @Post()
-  create(@Body() createDirectionDto: CreateDirectionDto) {
-    return this.directionService.create(createDirectionDto);
+  @Get('bookmarke')
+  async getAllSubAchievements() {
+    return this.directionService.createBookmarks();
   }
-
+  /*
   @Get()
   findAll() {
     return this.directionService.findAll();
-  }
+  }*/
 
   @Get(':id')
   findOne(@Param('id') id: string) {

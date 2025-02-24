@@ -2,8 +2,6 @@ import {
   Controller,
   Get,
   Res,
-  Get,
-  Res,
   Request,
   Post,
   Body,
@@ -20,7 +18,6 @@ import {
 } from '@nestjs/common';
 import { UserGuard } from '../user/guards/user-guard';
 import { AdminGuard } from '../user/guards/admin.guard';
-import { AdminGuard } from '../user/guards/admin.guard';
 import { SubAchievementService } from './sub-achievement.service';
 import { CreateSubAchievementDto } from './dto/create-sub-achievement.dto';
 import { UpdateSubAchievementDto } from './dto/update-sub-achievement.dto';
@@ -31,14 +28,7 @@ export class SubAchievementController {
   constructor(private readonly service: SubAchievementService) {}
 
   // db 읽어서 발키로 다 올리는 로직 추가
-  @UseGuards(UserGuard, AdminGuard)
-  @Post('fill-valkey')
-  async fillValkey() {
-    return await await this.service.fillValkey();
-  }
-
-  // db 읽어서 발키로 다 올리는 로직 추가
-  @UseGuards(UserGuard, AdminGuard)
+  //@UseGuards(UserGuard, AdminGuard)
   @Post('fill-valkey')
   async fillValkey() {
     return await await this.service.fillValkey();

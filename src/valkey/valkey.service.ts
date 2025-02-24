@@ -2,6 +2,11 @@ import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 @Injectable()
 export class ValkeyService implements OnModuleDestroy {
+  async hgetall(key: string): Promise<Record<string, any>> {
+    const result = await this.client.hgetall(key);
+    return result ?? {}; // 데이터가 없으면 빈 객체 반환
+  }
+
   findOne(arg0: { where: { user_id: any }; order: { timestamp: string } }) {
     throw new Error('Method not implemented.');
   }

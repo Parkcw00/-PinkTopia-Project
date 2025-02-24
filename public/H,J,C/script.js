@@ -75,4 +75,26 @@ markerData.forEach(function (data) {
 
   infowindow.open(map, marker);
   markers.push(marker);
+
+  fetch('http://localhost:3000/direction/bookmarke')
+    .then((response) => response.json())
+    .then((data) => {
+      data.forEach((item) => {
+        var position = new kakao.maps.LatLng(item.latitude, item.longitude);
+
+        var marker = new kakao.maps.Marker({
+          position: position,
+          map: map,
+        });
+
+        var infowindow = new kakao.maps.InfoWindow({
+          content: `<div style="padding:5px;">${item.title} <br>
+                  <a href="https://map.kakao.com/link/map/${item.title},${item.latitude},${item.longitude}" target="_blank" style="color:skyblue">큰지도보기</a> 
+                  <a href="https://map.kakao.com/link/to/${item.title},${item.latitude},${item.longitude}" target="_blank" style="color:blue">길찾기</a></div>`,
+        });
+
+        infowindow.open(map, marker);
+      });
+    })
+    .catch((error) => console.error('Error fetching data:', error));
 });
