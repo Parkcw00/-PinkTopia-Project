@@ -47,4 +47,12 @@ export class ChatmemberController {
   deleteChatMember(@Param('id') id: string) {
     return this.chatmemberService.deleteChatMember(+id);
   }
+
+  @ApiOperation({ summary: '채팅방 멤버 확인' })
+  @UseGuards(UserGuard)
+  @Get('check/:roomId')
+  async checkChatMember(@Param('roomId') roomId: string, @Request() req) {
+    const userId = req.user.id;
+    return await this.chatmemberService.findByRoomAndUser(+roomId, userId);
+  }
 }

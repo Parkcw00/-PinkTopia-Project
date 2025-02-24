@@ -1,7 +1,8 @@
 <!doctype html>
-<html>
+<html lang="ko">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>다음 지도 API</title>
   </head>
   <body>
@@ -83,6 +84,42 @@
         // 마커 위에 인포윈도우를 표시합니다. 두번째 파라미터인 marker를 넣어주지 않으면 지도 위에 표시됩니다
         infowindow.open(map, marker);
       }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const isInvite = urlParams.get('invite');
+        const roomId = urlParams.get('roomId');
+        
+        // 초대 링크로 접속한 경우
+        if (isInvite && roomId) {
+          // 초대 정보를 localStorage에 저장
+          localStorage.setItem('pendingInvite', JSON.stringify({
+            type: 'invite',
+            roomId: roomId,
+            timestamp: new Date().getTime()
+          }));
+        }
+
+        // 로그인 상태 확인
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+          // 로그인되지 않은 경우 로그인 페이지로 이동
+          window.location.href = './login.html';
+        } else {
+          // 로그인된 경우 초대 정보 확인
+          const pendingInvite = localStorage.getItem('pendingInvite');
+          if (pendingInvite) {
+            const inviteData = JSON.parse(pendingInvite);
+            // 초대 정보 삭제
+            localStorage.removeItem('pendingInvite');
+            // 채팅방으로 직접 이동
+            window.location.href = `./chatting.html?roomId=${inviteData.roomId}`;
+          } else {
+            // 일반 접속인 경우 채팅방 목록으로 이동
+            window.location.href = './chattingrooms.html';
+          }
+        }
+      });
     </script>
   </body>
 </html>

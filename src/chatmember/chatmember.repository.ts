@@ -44,12 +44,12 @@ export class ChatmemberRepository {
   }
 
   // 특정 채팅방 내에서 유저 조회
-  async findByUserIdAndChattingRoomId(userId: number, chattingRoomId: number) {
-    return this.chatmemberRepository.findOne({
-      where: {
-        user_id: userId,
-        chatting_room_id: chattingRoomId,
-      },
-    });
+  async findByUserIdAndChattingRoomId(userId: number, roomId: number) {
+    return this.chatmemberRepository
+      .createQueryBuilder('chatmember')
+      .leftJoinAndSelect('chatmember.user', 'user')
+      .where('chatmember.user_id = :userId', { userId })
+      .andWhere('chatmember.chatting_room_id = :roomId', { roomId })
+      .getOne();
   }
 }

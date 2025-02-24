@@ -2,12 +2,14 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { Any, DataSource } from 'typeorm';
 import { ChattingRoomRepository } from './chattingroom.repository';
 import * as nodemailer from 'nodemailer';
+import { CreateChattingRoomDto } from './dto/create-chattingroom.dto';
 
 @Injectable()
 export class ChattingRoomService {
@@ -19,19 +21,60 @@ export class ChattingRoomService {
   ) {}
 
   // 채팅방 생성
-  async createChattingRoom(user: any) {
-    const chattingRoom = await this.chattingRoomRepository.createChattingRoom();
+  async createChattingRoom(
+    user: any,
+    CreateChattingRoomDto: CreateChattingRoomDto,
+  ) {
+    const chattingRoom: any =
+      await this.chattingRoomRepository.createChattingRoom(
+        CreateChattingRoomDto,
+      );
+    console.log(`채팅방 생성`, typeof chattingRoom.id);
     const addChatMember = await this.chattingRoomRepository.addChatMember(
       chattingRoom.id,
       user.id,
     );
-    return { message: `채팅방이 생성되었습니다.` };
+    return { message: `채팅방이 생성되었습니다.`, id: chattingRoom.id };
   }
 
   // 채팅방 조회
   async getChattingRoom(user: any) {
-    const chattingRoom = await this.chattingRoomRepository.findChattingRoom();
-    return { message: `채팅방 목록입니다.`, chattingRoom };
+    // Fetch all chat member entries for the user
+    const chatMembers =
+      await this.chattingRoomRepository.findChatMemberByUserId(user.id);
+
+    // Extract chat room IDs from the chat member entries
+    const chattingRoomIds = chatMembers.map(
+      (member) => member.chatting_room_id,
+    );
+
+    // Fetch chat rooms and their members' nicknames
+    const chattingRooms = await Promise.all(
+      chattingRoomIds.map(async (id) => {
+        const room = await this.chattingRoomRepository.findChattingRoomById(id);
+        if (!room) return null;
+
+        const members =
+          await this.chattingRoomRepository.findAllChatMembers(id);
+        const memberNicknames = await Promise.all(
+          members.map(async (member) => {
+            const user = await this.chattingRoomRepository.findId(
+              member.user_id,
+            );
+            return user?.nickname || 'Unknown';
+          }),
+        );
+
+        // Include the title in the returned object
+        return {
+          id: room.id,
+          title: room.title,
+          members: memberNicknames.join(', '),
+        };
+      }),
+    ).then((rooms) => rooms.filter((room) => room !== null));
+
+    return { message: `채팅방 목록입니다.`, chattingRooms };
   }
 
   // 채팅방 나가기
@@ -207,7 +250,8 @@ export class ChattingRoomService {
       },
     });
 
-    const inviteUrl = `${process.env.BASE_URL || 'http://localhost:3000/'}chattingroom/${chattingRoomId}/join`;
+    // 초대 링크 형식 수정 (서버 포트로 변경)
+    const inviteUrl = `${process.env.BASE_URL || 'http://localhost:3000'}/invite.html?roomId=${chattingRoomId}`;
 
     const mailOptions = {
       from: NODEMAILER_USER,
@@ -217,5 +261,69 @@ export class ChattingRoomService {
       <h2>초대링크: <a href="${inviteUrl}">${inviteUrl}</a></h2>`,
     };
     await transporter.sendMail(mailOptions);
+  }
+
+  // 채팅방 멤버 확인
+  async checkChatMember(userId: number, chattingRoomId: number) {
+    try {
+      console.log('멤버 확인 서비스 시작:', { userId, chattingRoomId });
+
+      // 채팅방이 존재하는지 먼저 확인
+      const chattingRoom = await this.chattingRoomRepository.checkChattingRoom(chattingRoomId);
+      console.log('채팅방 확인 결과:', chattingRoom);
+      
+      if (!chattingRoom) {
+        throw new BadRequestException('존재하지 않는 채팅방입니다.');
+      }
+
+      // 채팅방 멤버인지 확인
+      const isMember = await this.chattingRoomRepository.findChatMember(
+        chattingRoomId,
+        userId,
+      );
+      console.log('멤버 확인 결과:', isMember);
+
+      if (!isMember) {
+        throw new BadRequestException('해당 채팅멤버가 존재하지 않습니다.');
+      }
+
+      // 채팅방의 모든 멤버 정보 조회
+      const allMembers = await this.chattingRoomRepository.findAllChatMembers(chattingRoomId);
+      console.log('전체 멤버 조회 결과:', allMembers);
+
+      const response = {
+        success: true,
+        data: {
+          member: {
+            id: isMember.user_id,
+            isAdmin: isMember.admin
+          },
+          allMembers: allMembers.map(member => ({
+            id: member.user_id,
+            isAdmin: member.admin
+          }))
+        }
+      };
+
+      console.log('최종 응답:', response);
+      return response;
+    } catch (error) {
+      console.error('멤버 확인 중 에러 (서비스):', error);
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        `채팅 멤버 확인 중 오류가 발생했습니다: ${error.message}`
+      );
+    }
+  }
+
+  // 특정 채팅방 조회
+  async findChattingRoomById(id: number) {
+    const chattingRoom = await this.chattingRoomRepository.findChattingRoomById(id);
+    if (!chattingRoom) {
+      throw new NotFoundException('존재하지 않는 채팅방입니다.');
+    }
+    return chattingRoom;
   }
 }
