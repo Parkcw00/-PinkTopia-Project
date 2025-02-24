@@ -69,15 +69,4 @@ export class LocationHistoryController {
   async updateDB(@Request() req, @Body() updateDto: UpdateLocationHistoryDto) {
     return await this.locationHistoryService.updateDB(req.user.id, updateDto);
   }
-
-  /**
-   * ✅ 사용자 탈퇴 시, 해당 유저의 모든 위치 기록 데이터를 삭제합니다.
-   * 엔드포인트: **DELETE /location-history**
-   */
-  @UseGuards(UserGuard)
-  @Delete()
-  async delete(@Request() req) {
-    await this.locationHistoryService.delete(req.user.id);
-    return { message: '위치 기록 삭제 완료' };
-  }
 }

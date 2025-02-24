@@ -22,7 +22,6 @@ export class UserGuard implements CanActivate {
     private configService: ConfigService,
     private readonly valkeyService: ValkeyService,
   ) {}
-
   async canActivate(context: ExecutionContext) {
     const reqest = context.switchToHttp().getRequest();
     const response: Response = context.switchToHttp().getResponse();
@@ -50,23 +49,19 @@ export class UserGuard implements CanActivate {
       });
     }
     let newAccessToken: any;
-
     // 둘 다 존재하지 않는 경우
     if (!accessToken && !refreshToken) {
       throw new UnauthorizedException('로그인을 진행해 주세요');
     }
-
     // access token 존재, refresh token 존재x, 만료기간
     if (accessToken && !refreshToken && accessDecoded.exp < currentTime) {
       throw new UnauthorizedException('다시 로그인 해주세요.');
     }
-
     // access token만 존재하지 않는 경우, refresh token 존재, 만료기간
     if (!accessToken && refreshToken && refreshDecoded.exp < currentTime) {
       response.clearCookie('refreshToken');
       throw new UnauthorizedException('다시 로그인 해주세요.');
     }
-
     // 둘 다 존재, 둘다 만료기간 지난것
     if (
       refreshToken &&
@@ -76,7 +71,6 @@ export class UserGuard implements CanActivate {
       response.clearCookie('refreshToken');
       throw new UnauthorizedException('다시 로그인 해주세요.');
     }
-
     // 위 조건 통과하는 애들 access token만 존재(만료x) or refresh token만 존재(만료x) or 둘다 존재(refresh token 만료x)
     // 이 중 access token 재부여할건? refreshToken만 and 만료xrefreshToken과 만료된 accessToken 가진것
     // new access token 발급
@@ -92,7 +86,6 @@ export class UserGuard implements CanActivate {
       newAccessToken = await this.makeAccessToken(payload);
       accessToken = newAccessToken;
     }
-
     // access token 검증
     const decoded = this.jwtService.verify(accessToken, {
       secret: accessTokenKey,
@@ -122,10 +115,8 @@ export class UserGuard implements CanActivate {
     } catch (err) {
       throw new InternalServerErrorException('오류가 발생하였습니다.');
     }
-
     return true; // 요청 허용
   }
-
   // access token 생성 메서드
   private async makeAccessToken(payload: object) {
     const accessTokenExpiresIn = this.configService.get<string>(
