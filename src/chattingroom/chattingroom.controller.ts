@@ -103,4 +103,14 @@ export class ChattingRoomController {
   ) {
     return this.chattingRoomService.joinChattingRoom(req.user, chattingRoomId);
   }
+
+  // 채팅방 멤버 확인 API
+  @UseGuards(UserGuard)
+  @Get(':chattingRoomId/chatmember')
+  async checkChatMember(
+    @Request() req,
+    @Param('chattingRoomId') chattingRoomId: string
+  ) {
+    return await this.chattingRoomService.checkChatMember(req.user.id, Number(chattingRoomId));
+  }
 }

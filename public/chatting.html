@@ -53,68 +53,21 @@
       .button:hover {
         background-color: #45a049;
       }
-      #roomList {
-        border: 1px solid #ddd;
-        padding: 10px;
-        margin-top: 20px;
-        border-radius: 4px;
-      }
-      
-      #roomList ul {
-        list-style: none;
-        padding: 0;
-      }
-      
-      #roomList li:hover {
-        color: #2196F3;
-      }
-
-      #loginSection {
-        margin-bottom: 20px;
-      }
-
-      #loginSection input {
-        margin-right: 10px;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-      }
-
-      .user-info {
-        margin-bottom: 15px;
-        padding: 10px;
-        background-color: #f8f9fa;
-        border-radius: 4px;
-      }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1>채팅</h1>
+      <h1 class="chat-title">채팅</h1>
 
-      <!-- 로그인 섹션 추가 -->
-      <div id="loginSection">
-        <input type="email" id="userEmail" placeholder="이메일" />
-        <input type="password" id="userPassword" placeholder="비밀번호" />
-        <button class="button" onclick="login()">로그인</button>
-        <p id="loginStatus" style="color: red;"></p>
-      </div>
-
-      <!-- 채팅방 입장 섹션 (초기에는 숨김) -->
-      <div id="joinSection" style="display: none;">
-        <div class="user-info">
-          <span>로그인된 사용자: </span>
-          <span id="userNickname"></span>
-          <button class="button" onclick="logout()" style="background-color: #dc3545">로그아웃</button>
-        </div>
+      <!-- 채팅방 입장 섹션 - 숨김 처리 -->
+      <div id="joinSection" style="display: none">
+        <input type="number" id="userId" placeholder="사용자 ID" />
         <input type="number" id="roomId" placeholder="채팅방 ID" />
         <button class="button" onclick="joinRoom()">입장하기</button>
-        <button class="button" onclick="getChatRooms()" style="background-color: #2196F3">채팅방 목록</button>
-        <div id="roomList" style="margin-top: 20px;"></div>
       </div>
 
-      <!-- 채팅 섹션 -->
-      <div id="chatSection" style="display: none">
+      <!-- 채팅 섹션 - 기본적으로 표시 -->
+      <div id="chatSection">
         <div id="chatBox" class="chat-box"></div>
         <div class="input-area">
           <input
@@ -136,315 +89,234 @@
     </div>
 
     <script>
-      let currentUser = null;
       let currentRoomId = null;
-      let accessToken = null;
-      let socket = null;
+      let socket = null; // 전역 변수로 socket 선언
+      
+      // 페이지 로드 시 인증 확인
+      window.addEventListener('load', () => {
+        // URL에서 roomId 가져오기
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomId = urlParams.get('roomId');
+        currentRoomId = roomId;  // roomId 저장
+        
+        // localStorage에서 인증 토큰 가져오기
+        const accessToken = localStorage.getItem('accessToken');
 
-      // 소켓 연결 함수
-      function connectSocket() {
-        const socketOptions = {
-          withCredentials: true,
-          transports: ['websocket', 'polling'],
-          extraHeaders: {
-            'Access-Control-Allow-Origin': 'http://127.0.0.1:5500'
-          },
-          auth: {
-            token: accessToken
-          }
-        };
-
-        if (accessToken) {
-          socketOptions.extraHeaders['Authorization'] = `Bearer ${accessToken}`;
+        if (!accessToken) {
+            window.location.href = 'login.html';
+            return;
         }
 
-        socket = io('http://localhost:3000/chatting', socketOptions);
+        // socket 초기화
+        socket = io('http://localhost:3000/chatting', {
+            withCredentials: true,
+            auth: {
+                token: accessToken
+            },
+            extraHeaders: {
+                'Authorization': `Bearer ${accessToken}`  // Authorization 헤더 추가
+            }
+        });
 
         // 소켓 이벤트 리스너 설정
-        socket.on('connect', () => {
-          console.log('🟢 서버와 연결되었습니다.');
-          console.log('소켓 ID:', socket.id);
-        });
+        setupSocketListeners();
 
-        socket.on('disconnect', () => {
-          console.log('🔴 서버와 연결이 끊어졌습니다.');
-        });
+        // 채팅방 입장
+        if (roomId) {
+            // 먼저 채팅 멤버인지 확인
+            fetch(`http://localhost:3000/chattingroom/${roomId}/chatmember`, {  // 엔드포인트 수정
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Accept': 'application/json'
+                },
+                credentials: 'include'
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('채팅 멤버 확인 응답:', data);
+                
+                // 멤버인 경우에만 소켓 연결 시도
+                if (!data.message || data.message !== '해당 채팅멤버가 존재하지 않습니다.') {
+                    console.log('채팅 멤버 확인 완료:', data);
+                    
+                    // 멤버 확인 후 소켓 연결
+                    socket.emit('joinRoom', { 
+                        roomId,
+                        token: accessToken
+                    }, (response) => {
+                        if (response.success) {
+                            console.log(`채팅방 ${roomId}에 입장했습니다.`);
+                            // 채팅방 정보 요청
+                            socket.emit('getRoomInfo', { roomId }, (roomInfo) => {
+                                if (roomInfo.success) {
+                                    console.log('채팅방 정보:', roomInfo);
+                                    initializeChatRoom(roomId, roomInfo.data);
+                                }
+                            });
+                        } else {
+                            console.error('채팅방 입장 실패:', response.message);
+                            alert('채팅방 입장에 실패했습니다.');
+                            window.location.href = 'login.html';
+                        }
+                    });
+                } else {
+                    console.error('채팅 멤버가 아닙니다.');
+                    alert('해당 채팅방의 멤버가 아닙니다.');
+                    window.location.href = 'login.html';
+                }
+            })
+            .catch(error => {
+                console.error('채팅 멤버 확인 실패:', error);
+                alert('채팅 멤버 확인에 실패했습니다.');
+                window.location.href = 'login.html';
+            });
+        }
+      });
 
+      function setupSocketListeners() {
         // 새 메시지 수신
         socket.on('newMessage', (data) => {
-          const chatBox = document.getElementById('chatBox');
-          const messageDiv = document.createElement('div');
-          messageDiv.className = 'message';
-          messageDiv.innerHTML = `
-            <span class="nickname">${data.nickname}</span>
-            <span class="content">${data.message}</span>
-            <span class="timestamp">${new Date(data.timestamp).toLocaleTimeString()}</span>
-          `;
-          chatBox.appendChild(messageDiv);
-          chatBox.scrollTop = chatBox.scrollHeight;
+            console.log('새 메시지 수신:', data);
+            const chatBox = document.getElementById('chatBox');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerHTML = `
+                <span class="nickname">${data.nickname || '익명'}</span>
+                <span class="content">${data.message}</span>
+                <span class="timestamp">${new Date().toLocaleTimeString()}</span>
+            `;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
         });
 
         // 사용자 입장/퇴장 메시지
         socket.on('userJoined', (data) => {
-          addSystemMessage(`${data.nickname}${data.message}`);
+            addSystemMessage(`${data.nickname}님이 입장하셨습니다.`);
         });
 
         socket.on('userLeft', (data) => {
-          addSystemMessage(`${data.nickname}${data.message}`);
+            addSystemMessage(`${data.nickname}님이 퇴장하셨습니다.`);
         });
 
         // 에러 처리
         socket.on('error', (error) => {
-          console.error('❌ 오류 발생:', error);
-          let errorMessage = '오류가 발생했습니다: ';
-
-          switch (error.message) {
-            case 'USER_BLACKLISTED':
-              errorMessage = '차단된 사용자입니다. 채팅에 참여할 수 없습니다.';
-              document.getElementById('joinSection').style.display = 'block';
-              document.getElementById('chatSection').style.display = 'none';
-              break;
-            case 'CHATMEMBER_OR_USER_NOT_FOUND':
-              errorMessage = '채팅방 멤버 또는 사용자 정보를 찾을 수 없습니다.';
-              document.getElementById('joinSection').style.display = 'block';
-              document.getElementById('chatSection').style.display = 'none';
-              break;
-            case 'CHATMEMBER_NOT_FOUND':
-              errorMessage = '채팅방 멤버가 아닙니다.';
-              break;
-            default:
-              errorMessage += error.message;
-          }
-
-          alert(errorMessage);
-        });
-      }
-
-      // 로그인 함수
-      async function login() {
-        const email = document.getElementById('userEmail').value;
-        const password = document.getElementById('userPassword').value;
-
-        if (!email || !password) {
-          document.getElementById('loginStatus').textContent = '이메일과 비밀번호를 입력해주세요.';
-          return;
-        }
-
-        try {
-          const response = await fetch('http://localhost:3000/user/auth/login', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({ email, password })
-          });
-
-          if (!response.ok) {
-            throw new Error('로그인에 실패했습니다.');
-          }
-
-          // Authorization 헤더에서 accessToken 추출
-          const authHeader = response.headers.get('Authorization');
-          console.log('Authorization 헤더:', authHeader);
-
-          if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            throw new Error('인증 토큰을 받지 못했습니다.');
-          }
-
-          accessToken = authHeader.split(' ')[1];
-          console.log('저장된 토큰:', accessToken);
-
-          const data = await response.json();
-          console.log('로그인 응답:', data);
-
-          try {
-            // JWT 토큰을 디코드하여 사용자 정보 추출
-            const [header, payload, signature] = accessToken.split('.');
-            const decodedPayload = JSON.parse(atob(payload));
-            console.log('토큰 페이로드:', decodedPayload);
-
-            currentUser = {
-              id: decodedPayload.id,
-              email: decodedPayload.email,
-              nickname: decodedPayload.email.split('@')[0] // 임시로 이메일에서 추출
-            };
-          } catch (error) {
-            console.error('토큰 디코딩 실패:', error);
-            // 토큰 디코딩 실패 시 기본값 설정
-            currentUser = {
-              id: 1,
-              email: email,
-              nickname: email.split('@')[0]
-            };
-          }
-          
-          console.log('현재 유저:', currentUser);
-          
-          // 소켓 연결
-          connectSocket();
-          
-          // 로그인 성공 시 UI 업데이트
-          document.getElementById('loginSection').style.display = 'none';
-          document.getElementById('joinSection').style.display = 'block';
-          document.getElementById('userNickname').textContent = currentUser.nickname;
-          
-          // 채팅방 목록 자동 조회
-          getChatRooms();
-        } catch (error) {
-          console.error('로그인 에러:', error);
-          document.getElementById('loginStatus').textContent = error.message;
-        }
-      }
-
-      // 로그아웃 함수
-      async function logout() {
-        try {
-          await fetch('http://localhost:3000/user/auth/logout', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${accessToken}`
-            },
-            credentials: 'include'
-          });
-
-          if (socket) {
-            socket.disconnect();
-            socket = null;
-          }
-
-          currentUser = null;
-          accessToken = null;
-          
-          // UI 초기화
-          document.getElementById('loginSection').style.display = 'block';
-          document.getElementById('joinSection').style.display = 'none';
-          document.getElementById('chatSection').style.display = 'none';
-          document.getElementById('roomList').innerHTML = '';
-          document.getElementById('userEmail').value = '';
-          document.getElementById('userPassword').value = '';
-          document.getElementById('loginStatus').textContent = '';
-        } catch (error) {
-          console.error('로그아웃 실패:', error);
-        }
-      }
-
-      // 채팅방 입장
-      function joinRoom() {
-        if (!currentUser) {
-          alert('로그인이 필요합니다.');
-          return;
-        }
-        
-        const roomId = document.getElementById('roomId').value;
-        if (!roomId) {
-          alert('채팅방 ID를 입력해주세요.');
-          return;
-        }
-
-        socket.emit('joinRoom', {
-          userId: currentUser.id,
-          roomId: parseInt(roomId)
+            console.error('Socket error:', error);
+            alert(error.message || '오류가 발생했습니다.');
         });
 
-        document.getElementById('chatSection').style.display = 'block';
-      }
+        // 멤버 목록 업데이트
+        socket.on('memberUpdate', (data) => {
+            console.log('멤버 업데이트:', data);
+            if (data.members) {
+                updateMemberList(data.members);
+            }
+        });
+    }
 
-      // 메시지 전송
-      function sendMessage() {
+    // 메시지 전송 함수
+    function sendMessage() {
         const messageInput = document.getElementById('messageInput');
         const message = messageInput.value.trim();
-
-        if (message) {
-          socket.emit('sendMessage', {
-            userId: currentUser.id,
-            roomId: currentRoomId,
-            message: message,
-          });
-          messageInput.value = '';
+        
+        if (message && currentRoomId && socket) {
+            console.log('메시지 전송:', { roomId: currentRoomId, message });
+            socket.emit('sendMessage', {
+                roomId: currentRoomId,
+                message: message
+            }, (response) => {
+                if (response.success) {
+                    messageInput.value = '';
+                } else {
+                    console.error('메시지 전송 실패:', response.message);
+                }
+            });
         }
-      }
+    }
 
-      // Enter 키로 메시지 전송
-      function handleKeyPress(event) {
+    // 채팅방 나가기 함수
+    function leaveRoom() {
+        if (currentRoomId && socket) {
+            socket.emit('leaveRoom', { roomId: currentRoomId }, (response) => {
+                if (response.success) {
+                    window.location.href = 'login.html';
+                } else {
+                    console.error('채팅방 나가기 실패:', response.message);
+                }
+            });
+        }
+    }
+
+    // Enter 키로 메시지 전송
+    function handleKeyPress(event) {
         if (event.key === 'Enter') {
-          sendMessage();
+            sendMessage();
         }
-      }
+    }
 
-      // 채팅방 퇴장
-      function leaveRoom() {
-        socket.emit('leaveRoom', {
-          userId: currentUser.id,
-          roomId: currentRoomId,
-        });
-
-        document.getElementById('joinSection').style.display = 'block';
-        document.getElementById('chatSection').style.display = 'none';
-        document.getElementById('chatBox').innerHTML = '';
-      }
-
-      // 시스템 메시지 추가
-      function addSystemMessage(message) {
+    // 시스템 메시지 추가
+    function addSystemMessage(message) {
         const chatBox = document.getElementById('chatBox');
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message system';
         messageDiv.textContent = message;
         chatBox.appendChild(messageDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
-      }
+    }
 
-      // 채팅방 목록 조회
-      async function getChatRooms() {
-        console.log('getChatRooms 호출됨');
-        console.log('현재 유저:', currentUser);
+    // 채팅방 UI 초기화 함수
+    function initializeChatRoom(roomId, roomInfo) {
+        // 채팅방 제목과 멤버 정보 설정
+        const chatTitle = document.querySelector('.chat-title');
+        chatTitle.textContent = `채팅방 ${roomId}`;
+        
+        // 멤버 목록 표시 영역 추가
+        const memberList = document.createElement('div');
+        memberList.className = 'member-list';
+        memberList.innerHTML = `
+            <h3>참여자 목록</h3>
+            <ul>
+                ${roomInfo.members.map(member => `
+                    <li>${member.nickname}</li>
+                `).join('')}
+            </ul>
+        `;
+        document.querySelector('.container').insertBefore(memberList, document.querySelector('#chatSection'));
 
-        if (!currentUser) {
-          alert('로그인이 필요합니다.');
-          return;
+        // 스타일 추가
+        const style = document.createElement('style');
+        style.textContent = `
+            .member-list {
+                margin-bottom: 20px;
+                padding: 10px;
+                background-color: #f8f9fa;
+                border-radius: 4px;
+            }
+            .member-list h3 {
+                margin: 0 0 10px 0;
+                color: #333;
+            }
+            .member-list ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+            .member-list li {
+                padding: 5px 0;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // 멤버 목록 업데이트 함수
+    function updateMemberList(members) {
+        const memberList = document.querySelector('.member-list ul');
+        if (memberList) {
+            memberList.innerHTML = members.map(member => `
+                <li>${member.nickname}</li>
+            `).join('');
         }
-
-        try {
-          const response = await fetch(`http://localhost:3000/chattingroom`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${accessToken}`
-            },
-            credentials: 'include'
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-
-          const data = await response.json();
-          console.log('채팅방 목록 응답:', data);
-          
-          const roomList = document.getElementById('roomList');
-          roomList.innerHTML = '<h3>참여 중인 채팅방 목록</h3>';
-          
-          if (data.chattingRooms && data.chattingRooms.length > 0) {
-            const ul = document.createElement('ul');
-            data.chattingRooms.forEach(room => {
-              const li = document.createElement('li');
-              li.style.cursor = 'pointer';
-              li.style.marginBottom = '10px';
-              li.innerHTML = `채팅방 ${room.id} (${room.admin ? '관리자' : '멤버'})`;
-              li.onclick = () => {
-                document.getElementById('roomId').value = room.id;
-              };
-              ul.appendChild(li);
-            });
-            roomList.appendChild(ul);
-          } else {
-            roomList.innerHTML += '<p>참여 중인 채팅방이 없습니다.</p>';
-          }
-        } catch (error) {
-          console.error('채팅방 목록 조회 실패:', error);
-          alert('채팅방 목록을 불러오는데 실패했습니다.');
-        }
-      }
+    }
     </script>
   </body>
 </html>
