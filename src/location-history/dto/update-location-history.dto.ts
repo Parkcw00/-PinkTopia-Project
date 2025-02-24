@@ -36,5 +36,5 @@ export class UpdateLocationHistoryDto extends PartialType(
   @ApiProperty({ description: '타임스탬프' })
   @IsOptional()
   @IsDate()
-  timestamp: Date;
+  timestamp?: Date;
 }

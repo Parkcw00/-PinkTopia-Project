@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LocationHistory } from './entities/location-history.entity';
-import { number } from 'joi';
 
 @Injectable()
 export class LocationHistoryRepository {
@@ -10,36 +9,57 @@ export class LocationHistoryRepository {
     @InjectRepository(LocationHistory)
     private entity: Repository<LocationHistory>,
   ) {}
-  async create7(user_id: number): Promise<LocationHistory> {
-    const newHistory = await this.entity.create({
-      latitude: 0.0,
-      longitude: 0.0,
-      user_id: user_id,
-      timestamp: new Date(),
+
+  /**
+   * ✅ 7개의 기본 위치 데이터 중 하나를 생성
+   */
+  async create7(
+    user_id: number,
+    latitude: number = 0,
+    longitude: number = 0,
+    timestamp: Date = new Date(),
+  ): Promise<LocationHistory> {
+    const newHistory = this.entity.create({
+      user_id,
+      latitude,
+      longitude,
+      timestamp,
     });
-    return await this.entity.save(newHistory);
+
+    return await this.entity.save(newHistory); // ✅ 생성된 데이터를 반환
   }
+
+  /**
+   * ✅ 특정 유저 ID의 모든 위치 데이터를 가져옴 (로그인 시 사용)
+   */
   async getLogin(user_id: number): Promise<LocationHistory[]> {
-    return await this.entity.find({ where: { user_id } });
+    return await this.entity.find({
+      where: { user_id },
+      order: { timestamp: 'ASC' }, // 오래된 데이터부터 가져오기
+    });
   }
-  //   /**
-  //   * 유저 ID에 해당하는 데이터 중 timestamp가 가장 오래된(수정 기한이 가장 오래된) 레코드를 조회합니다.
-  //   * @param userId 유저 식별자
-  //   * @returns 가장 오래된 LocationHistory 엔티티
-  //   */
 
-  //  async getOldestRecord(userId: number): Promise<LocationHistory> {
-  //    return this.findOne({
-  //      where: { user_id: userId },
-  //      order: { timestamp: 'ASC' },
-  //    });
-  //  }
+  /**
+   * ✅ 최신 위치 데이터를 조회 (updateDB, updateValkey에서 사용)
+   */
+  async findLatestByUserId(user_id: number): Promise<LocationHistory | null> {
+    return await this.entity.findOne({
+      where: { user_id },
+      order: { timestamp: 'DESC' }, // 최신 데이터 가져오기
+    });
+  }
 
-  //  /**
-  //   * 특정 유저 ID에 해당하는 모든 LocationHistory 데이터를 삭제합니다.
-  //   * @param userId 유저 식별자
-  //   */
-  //  async deleteByUserId(userId: number): Promise<void> {
-  //    await this.delete({ user_id: userId });
-  //  }
+  /**
+   * ✅ 위치 기록 데이터 저장 (updateValkey, updateDB에서 사용)
+   */
+  async save(history: LocationHistory): Promise<LocationHistory> {
+    return await this.entity.save(history); // ✅ 올바르게 반환
+  }
+
+  /**
+   * ✅ 특정 사용자 ID의 모든 위치 기록 삭제 (유저 탈퇴 시 사용)
+   */
+  async deleteByUserId(user_id: number): Promise<void> {
+    await this.entity.delete({ user_id });
+  }
 }
