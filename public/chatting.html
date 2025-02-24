@@ -145,42 +145,27 @@
             return;
         }
 
-        // 채팅 멤버 확인
         try {
-            console.log('채팅방 입장 시도:', roomId);
-            
-            const checkResponse = await fetch(`http://localhost:3000/chatmember/check/${roomId}`, {
-                headers: {
-                    'Authorization': accessToken
-                }
-            });
-            
-            console.log('멤버 확인 응답:', checkResponse.status);
-            const checkData = await checkResponse.json();
-            console.log('멤버 확인 데이터:', checkData);
-
-            // 멤버가 아닌 경우 입장 불가
-            if (!checkResponse.ok) {
-                console.log('멤버가 아님, 입장 불가');
-                alert('채팅방 멤버가 아닙니다. 입장할 수 없습니다.');
-                window.location.href = '/public/chattingrooms.html';
-                return;
-            }
-
-            // 멤버 정보 가져오기
+            // 채팅 멤버 확인 (한 번만 요청)
             const memberResponse = await fetch(`http://localhost:3000/chatmember/check/${roomId}`, {
                 headers: {
                     'Authorization': accessToken
                 }
             });
             
-            console.log('멤버 정보 조회 응답:', memberResponse.status);
+            if (!memberResponse.ok) {
+                console.log('멤버가 아님, 입장 불가');
+                alert('채팅방 멤버가 아닙니다. 입장할 수 없습니다.');
+                window.location.href = '/public/chattingrooms.html';
+                return;
+            }
+
             const data = await memberResponse.json();
             console.log('멤버 정보 데이터:', data);
 
             if (data && data.user_id) {
                 currentUserId = data.user_id;
-                currentUserNickname = data.nickname;
+                currentUserNickname = data.user.nickname;
                 console.log('현재 사용자 ID:', currentUserId);
                 console.log('현재 사용자 닉네임:', currentUserNickname);
 
@@ -195,7 +180,7 @@
                 // 소켓 연결 후 방 입장
                 socket.emit('joinRoom', { roomId: parseInt(roomId) });
 
-                // 소켓 이벤트 리스너 설정 (setupSocketListeners 함수만 호출)
+                // 소켓 이벤트 리스너 설정
                 setupSocketListeners();
                 initializeChatRoom(roomId);
             } else {
@@ -230,7 +215,7 @@
               </div>
             `;
           } else {
-            // 일반 메시지 처리 (기존 코드)
+            // 일반 메시지 처리
             const isMyMessage = data.userId === currentUserId;
             messageDiv.className = `message ${isMyMessage ? 'my-message' : ''}`;
             
@@ -256,17 +241,6 @@
           
           chatBox.appendChild(messageDiv);
           chatBox.scrollTop = chatBox.scrollHeight;
-        });
-
-        socket.on('userJoined', (data) => {
-          console.log('사용자 입장:', data);
-          addSystemMessage(`${data.nickname}님이 입장하셨습니다.`);
-        });
-
-        socket.on('userLeft', (data) => {
-          console.log('사용자 퇴장:', data);
-          // 모든 사용자에게 퇴장 메시지 표시
-          addSystemMessage(`${data.nickname}님이 퇴장하셨습니다.`);
         });
 
         socket.on('error', (error) => {

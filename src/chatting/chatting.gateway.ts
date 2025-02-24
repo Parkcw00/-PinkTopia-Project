@@ -111,10 +111,12 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
         // 채팅방 입장
         await client.join(`room_${data.roomId}`);
         
-        // 입장 메시지 브로드캐스트 (닉네임 사용)
-        this.server.to(`room_${data.roomId}`).emit('userJoined', {
-          userId: user.id,
-          nickname: chatMember.user.nickname // 닉네임 사용
+        // 입장 메시지 전송
+        this.server.to(`room_${data.roomId}`).emit('message', {
+          type: 'system',
+          roomId: data.roomId,
+          message: `${chatMember.user.nickname}님이 입장하셨습니다.`,
+          timestamp: new Date()
         });
 
         return { success: true };
@@ -150,7 +152,7 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
       );
       console.log('채팅 멤버 정보:', chatMember);
 
-      // 메시지 저장 및 브로드캐스트
+      // 메시지 저장 및 브로드캐스트 (한 번만)
       const messageData = {
         userId: user.id,
         nickname: chatMember.user.nickname || user.email,
@@ -158,12 +160,11 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
         type: data.type || 'text',
         timestamp: new Date().toISOString()
       };
-      console.log('전송할 메시지 데이터:', messageData);
 
       // DB에 메시지 저장
       await this.chattingService.create(user, data.roomId.toString(), {message: data.message});
 
-      // 같은 방의 모든 사용자에게 메시지 전송
+      // 메시지 전송
       this.server.to(`room_${data.roomId}`).emit('message', messageData);
 
       return { success: true };

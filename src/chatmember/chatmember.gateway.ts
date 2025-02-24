@@ -7,6 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatmemberService } from './chatmember.service';
+import { ChattingGateway } from '../chatting/chatting.gateway';
 
 @WebSocketGateway({
   namespace: '/chatmember',
@@ -24,7 +25,10 @@ export class ChatmemberGateway {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly chatmemberService: ChatmemberService) {}
+  constructor(
+    private readonly chatmemberService: ChatmemberService,
+    private readonly chattingGateway: ChattingGateway,
+  ) {}
 
   // 채팅멤버 생성
   @SubscribeMessage('createChatmember')
@@ -105,8 +109,8 @@ export class ChatmemberGateway {
     try {
       await this.chatmemberService.deleteChatMember(data.userId, data.roomId);
       
-      // 채팅방의 모든 멤버에게 퇴장 메시지 전송
-      this.server.to(`room_${data.roomId}`).emit('message', {
+      // 채팅 게이트웨이를 통해 메시지 전송
+      this.chattingGateway.server.to(`room_${data.roomId}`).emit('message', {
         type: 'system',
         roomId: data.roomId,
         message: `${data.nickname}님이 채팅방을 완전히 나가셨습니다.`,
