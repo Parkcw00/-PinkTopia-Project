@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>채팅방 목록</title>
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .room-list {
+            margin-top: 20px;
+        }
+        .room-item {
+            padding: 15px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .room-item:hover {
+            background-color: #f5f5f5;
+        }
+        .create-room {
+            margin-bottom: 20px;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .join-room-form {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .join-room-form input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .join-room-form button {
+            background-color: #2196F3;
+        }
+        .join-room-form button:hover {
+            background-color: #1976D2;
+        }
+        .room-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        .share-btn {
+            background-color: #2196F3;
+        }
+        .share-btn:hover {
+            background-color: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>채팅방 목록</h1>
+        
+        <!-- 채팅방 직접 입장 폼 추가 -->
+        <div class="join-room-form">
+            <input type="text" id="roomInput" placeholder="채팅방 ID 또는 초대 링크 입력">
+            <button class="button" onclick="joinDirectRoom()">채팅방 입장</button>
+        </div>
+
+        <div class="create-room">
+            <button class="button" onclick="createRoom()">새 채팅방 만들기</button>
+        </div>
+        
+        <div class="room-list" id="roomList">
+            <!-- 채팅방 목록이 여기에 동적으로 추가됨 -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                redirectToLogin();
+                return;
+            }
+
+            // 채팅방 목록 불러오기
+            loadRooms();
+        });
+
+        async function loadRooms() {
+            try {
+                const response = await fetch('http://localhost:3000/chattingroom', {
+                    headers: {
+                        'Authorization': localStorage.getItem('accessToken')
+                    }
+                });
+                const result = await response.json();
+                
+                // chattingRooms 배열 추출
+                const data = result.chattingRooms;
+                if (!Array.isArray(data)) {
+                    console.error('잘못된 데이터 형식:', result);
+                    throw new Error('채팅방 데이터 형식이 올바르지 않습니다.');
+                }
+                
+                const roomList = document.getElementById('roomList');
+                roomList.innerHTML = '';
+                
+                data.forEach(room => {
+                    addRoomToList(room);
+                });
+            } catch (error) {
+                console.error('채팅방 목록 로딩 실패:', error);
+                alert('채팅방 목록을 불러오는데 실패했습니다.');
+            }
+        }
+
+        async function createRoom() {
+            try {
+                const response = await fetch('http://localhost:3000/chattingroom', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': localStorage.getItem('accessToken'),
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const room = await response.json();
+                    await joinRoom(room.id);
+                } else {
+                    throw new Error('채팅방 생성 실패');
+                }
+            } catch (error) {
+                console.error('채팅방 생성 실패:', error);
+                alert('채팅방 생성에 실패했습니다.');
+            }
+        }
+
+        async function joinRoom(roomId) {
+            try {
+                // 먼저 채팅방 멤버인지 확인
+                const checkResponse = await fetch(`http://localhost:3000/chatmember/check/${roomId}`, {
+                    headers: {
+                        'Authorization': localStorage.getItem('accessToken')
+                    }
+                });
+
+                // 멤버가 아닌 경우에도 바로 채팅방으로 이동하지 말고, 먼저 멤버로 추가
+                if (!checkResponse.ok) {
+                    // 멤버가 아니라면 새로 생성
+                    const response = await fetch(`http://localhost:3000/chatmember`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': localStorage.getItem('accessToken'),
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            chatting_room_id: roomId
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || '채팅방 입장 실패');
+                    }
+                }
+
+                // 멤버 확인 또는 생성이 성공하면 채팅방으로 이동
+                window.location.href = `/public/chatting.html?roomId=${roomId}`;
+
+            } catch (error) {
+                console.error('채팅방 입장 실패:', error);
+                alert(error.message || '채팅방 입장에 실패했습니다.');
+            }
+        }
+
+        // 채팅방 ID로 직접 입장하는 함수 추가
+        async function joinDirectRoom() {
+            const input = document.getElementById('roomInput').value.trim();
+            if (!input) {
+                alert('채팅방 ID 또는 초대 링크를 입력해주세요.');
+                return;
+            }
+
+            try {
+                let roomId;
+                
+                // URL인지 확인
+                if (input.includes('/chattingroom/')) {
+                    // URL에서 채팅방 ID 추출
+                    const urlParts = input.split('/');
+                    roomId = urlParts[urlParts.indexOf('chattingroom') + 1];
+                    if (roomId.includes('join')) {
+                        roomId = roomId.split('/')[0];
+                    }
+                } else {
+                    // 숫자만 입력한 경우
+                    roomId = input;
+                }
+
+                if (!roomId || isNaN(roomId)) {
+                    throw new Error('올바른 채팅방 ID 또는 초대 링크를 입력해주세요.');
+                }
+
+                // 채팅방 존재 여부 확인
+                const checkResponse = await fetch(`http://localhost:3000/chattingroom/${roomId}`, {
+                    headers: {
+                        'Authorization': localStorage.getItem('accessToken')
+                    }
+                });
+
+                if (!checkResponse.ok) {
+                    throw new Error('존재하지 않는 채팅방입니다.');
+                }
+
+                // 채팅방 멤버 확인
+                const memberCheckResponse = await fetch(`http://localhost:3000/chatmember/check/${roomId}`, {
+                    headers: {
+                        'Authorization': localStorage.getItem('accessToken')
+                    }
+                });
+
+                if (memberCheckResponse.ok) {
+                    // 이미 멤버라면 바로 입장
+                    window.location.href = `/public/chatting.html?roomId=${roomId}`;
+                    return;
+                }
+
+                // 멤버가 아니라면 새로 가입
+                const joinResponse = await fetch(`http://localhost:3000/chatmember`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': localStorage.getItem('accessToken'),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chatting_room_id: parseInt(roomId)
+                    })
+                });
+
+                if (joinResponse.ok) {
+                    window.location.href = `/public/chatting.html?roomId=${roomId}`;
+                } else {
+                    const errorData = await joinResponse.json();
+                    throw new Error(errorData.message || '채팅방 입장에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('채팅방 입장 실패:', error);
+                alert(error.message || '채팅방 입장에 실패했습니다.');
+            }
+        }
+
+        // 초대 링크 생성 및 공유 버튼 추가
+        function addRoomToList(room) {
+            const roomElement = document.createElement('div');
+            roomElement.className = 'room-item';
+            roomElement.innerHTML = `
+                <h3>${room.title || '채팅방 ' + room.id}</h3>
+                <p>참여자: ${room.members}</p>
+                <div class="room-actions">
+                    <button onclick="joinRoom(${room.id})" class="button">입장</button>
+                    <button onclick="shareInviteLink(${room.id})" class="button share-btn">초대 링크 공유</button>
+                </div>
+            `;
+            document.getElementById('roomList').appendChild(roomElement);
+        }
+
+        // 초대 링크 공유 함수 수정
+        async function shareInviteLink(roomId) {
+            try {
+                // 경로 수정: /public/invite.html로 변경
+                const inviteLink = `/public/invite.html?roomId=${roomId}`;
+                const fullLink = window.location.origin + inviteLink;
+                
+                await navigator.clipboard.writeText(fullLink);
+                alert('초대 링크가 클립보드에 복사되었습니다!\n' + fullLink);
+                
+                // 또는 특정 사용자에게 이메일로 보내기
+                const userId = prompt('초대할 사용자 ID를 입력하세요:');
+                if (userId) {
+                    const response = await fetch(`http://localhost:3000/chattingroom/${roomId}/send-url`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': localStorage.getItem('accessToken'),
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            userId: parseInt(userId)
+                        })
+                    });
+
+                    if (response.ok) {
+                        alert('초대 메일이 성공적으로 전송되었습니다!');
+                    } else {
+                        const error = await response.json();
+                        throw new Error(error.message);
+                    }
+                }
+            } catch (error) {
+                console.error('초대 링크 공유 실패:', error);
+                alert(error.message || '초대 링크 공유에 실패했습니다.');
+            }
+        }
+
+        // 다른 페이지 이동 URL들도 수정
+        function redirectToLogin() {
+            window.location.href = '/public/login.html';
+        }
+    </script>
+</body>
+</html> 

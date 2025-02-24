@@ -4,6 +4,7 @@ import { Chatmember } from 'src/chatmember/entities/chatmember.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { ChattingRoom } from './entities/chattingroom.entity';
+import { IsNull } from 'typeorm';
 
 @Injectable()
 export class ChattingRoomRepository {
@@ -17,8 +18,10 @@ export class ChattingRoomRepository {
   ) {}
 
   // 채팅방 만들기
-  async createChattingRoom() {
-    const newChattingRoom = this.chattingRoomrepository.create();
+  async createChattingRoom(createChattingRoomDto) {
+      const newChattingRoom = this.chattingRoomrepository.create({
+        ...createChattingRoomDto,
+      });
     console.log(newChattingRoom);
     return await this.chattingRoomrepository.save(newChattingRoom);
   }
@@ -34,19 +37,37 @@ export class ChattingRoomRepository {
 
   // 채팅방 멤버인지 확인
   async findChatMember(chatting_room_id: number, user_id: number) {
-    return await this.chatMemberRepository.findOne({
-      where: {
-        chatting_room_id,
-        user_id,
-      },
+    console.log('멤버 조회 시도:', { chatting_room_id, user_id });
+    
+    try {
+      const member = await this.chatMemberRepository
+        .createQueryBuilder('chatmember')
+        .where('chatmember.chatting_room_id = :chatting_room_id', { chatting_room_id })
+        .andWhere('chatmember.user_id = :user_id', { user_id })
+        .leftJoinAndSelect('chatmember.user', 'user')
+        .getOne();
+
+      console.log('조회된 멤버:', member);
+      return member;
+    } catch (error) {
+      console.error('멤버 조회 중 에러:', error);
+      throw error;
+    }
+  }
+
+  async findChatMemberByUserId(user_id: number) {
+    return await this.chatMemberRepository.find({
+      where: { user_id },
     });
   }
 
   // 채팅방 전체 멤버 조회
   async findAllChatMembers(chatting_room_id: number) {
-    return await this.chatMemberRepository.find({
-      where: { chatting_room_id },
-    });
+    return await this.chatMemberRepository
+      .createQueryBuilder('chatmember')
+      .where('chatmember.chatting_room_id = :chatting_room_id', { chatting_room_id })
+      .leftJoinAndSelect('chatmember.user', 'user')
+      .getMany();
   }
 
   // 어드민 권한 부여
@@ -79,7 +100,7 @@ export class ChattingRoomRepository {
   }
 
   // 채팅방 조회
-  async findChattingRoom() {
+  async findChattingRoom(id: number) {
     return await this.chattingRoomrepository.find();
   }
 

@@ -7,15 +7,18 @@ import { CreateChattingDto } from './dto/create-chatting.dto';
 import { ChattingRepository } from './chatting.repository';
 import { S3Service } from '../s3/s3.service';
 import { UploadChattingDto } from './dto/create-upload-chatting.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Chatting } from './entities/chatting.entity';
 
 @Injectable()
 export class ChattingService {
   constructor(
-    private readonly chattingRepository: ChattingRepository,
+    @InjectRepository(Chatting)
+    private readonly chattingRepository: Repository<Chatting>,
     private readonly s3Service: S3Service,
-  ) {
-    // S3 초기화 코드 제거
-  }
+    private readonly chattingCustomRepository: ChattingRepository,
+  ) {}
 
   async create(
     user: any,
@@ -23,7 +26,7 @@ export class ChattingService {
     createChattingDto: CreateChattingDto,
   ) {
     try {
-      const isMember = await this.chattingRepository.isMember(
+      const isMember = await this.chattingCustomRepository.isMember(
         user.id,
         chatting_room_id,
       );
@@ -33,7 +36,7 @@ export class ChattingService {
       }
 
       console.log(isMember);
-      return this.chattingRepository.create(
+      return this.chattingCustomRepository.create(
         user,
         chatting_room_id,
         createChattingDto,
@@ -56,7 +59,7 @@ export class ChattingService {
     file: Express.Multer.File,
   ) {
     try {
-      const isMember = await this.chattingRepository.isMember(
+      const isMember = await this.chattingCustomRepository.isMember(
         user.id,
         chatting_room_id,
       );
@@ -74,7 +77,7 @@ export class ChattingService {
       };
 
       // 채팅 테이블에 저장
-      return this.chattingRepository.create(
+      return this.chattingCustomRepository.create(
         user,
         chatting_room_id,
         createChattingDto,
@@ -92,7 +95,7 @@ export class ChattingService {
   }
 
   async findAll(user: any, chatting_room_id: string) {
-    const isMember = await this.chattingRepository.isMember(
+    const isMember = await this.chattingCustomRepository.isMember(
       user.id,
       chatting_room_id,
     );
@@ -101,6 +104,27 @@ export class ChattingService {
       throw new ForbiddenException('채팅방에 접근 권한이 없습니다.');
     }
 
-    return this.chattingRepository.findAll(chatting_room_id);
+    return this.chattingCustomRepository.findAll(chatting_room_id);
+  }
+
+  async saveMessage(roomId: number, userId: number, message: string) {
+    try {
+      console.log('메시지 저장 시도:', { roomId, userId, message });
+
+      const newMessage = this.chattingRepository.create({
+        chatting_room_id: roomId,
+        user_id: userId,
+        message: message,
+        type: 'text'
+      });
+
+      const savedMessage = await this.chattingRepository.save(newMessage);
+      console.log('저장된 메시지:', savedMessage);
+
+      return savedMessage;
+    } catch (error) {
+      console.error('메시지 저장 중 에러:', error);
+      throw error;
+    }
   }
 }

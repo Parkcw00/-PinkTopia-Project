@@ -8,12 +8,14 @@ import {
   Delete,
   UseGuards,
   Request,
+  NotFoundException,
 } from '@nestjs/common';
 import { UserGuard } from 'src/user/guards/user-guard';
 import { ChattingRoomService } from './chattingroom.service';
 import { ChangeAdmin } from './dto/change-admin.dto';
 import { InviteUser } from './dto/invite-user.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CreateChattingRoomDto } from './dto/create-chattingroom.dto'
 
 @ApiTags('채팅방 기능')
 @Controller('chattingroom')
@@ -24,8 +26,8 @@ export class ChattingRoomController {
   @ApiOperation({ summary: '채팅방 생성' })
   @UseGuards(UserGuard)
   @Post('')
-  createChattingRoom(@Request() req) {
-    return this.chattingRoomService.createChattingRoom(req.user);
+  createChattingRoom(@Request() req, @Body() CreateChattingRoomDto: CreateChattingRoomDto) {
+    return this.chattingRoomService.createChattingRoom(req.user, CreateChattingRoomDto);
   }
 
   // 채팅방 조회
@@ -101,5 +103,52 @@ export class ChattingRoomController {
     @Param('chattingRoomId') chattingRoomId: number,
   ) {
     return this.chattingRoomService.joinChattingRoom(req.user, chattingRoomId);
+  }
+
+  // 채팅방 멤버 확인 API
+  @UseGuards(UserGuard)
+  @Get(':chattingRoomId/chatmember')
+  async checkChatMember(
+    @Request() req,
+    @Param('chattingRoomId') chattingRoomId: string
+  ) {
+    try {
+      console.log('멤버 확인 요청:', {
+        userId: req.user.id,
+        chattingRoomId: parseInt(chattingRoomId)
+      });
+
+      const result = await this.chattingRoomService.checkChatMember(
+        req.user.id,
+        parseInt(chattingRoomId)
+      );
+
+      console.log('멤버 확인 결과:', result);
+      return result;
+    } catch (error) {
+      console.error('멤버 확인 중 에러:', error);
+      throw error;
+    }
+  }
+
+  // 특정 채팅방 조회 엔드포인트 추가
+  @UseGuards(UserGuard)
+  @Get(':id')
+  async getChattingRoomById(
+    @Request() req,
+    @Param('id') id: number
+  ) {
+    try {
+      const chattingRoom = await this.chattingRoomService.findChattingRoomById(id);
+      if (!chattingRoom) {
+        throw new NotFoundException('존재하지 않는 채팅방입니다.');
+      }
+      return {
+        success: true,
+        data: chattingRoom
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 }

@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>채팅 멤버 관리</title>
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+    <style>
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .section {
+        margin-bottom: 30px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      .button {
+        padding: 8px 15px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .button:hover {
+        background-color: #45a049;
+      }
+      #memberList {
+        margin-top: 20px;
+      }
+      .member-item {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>채팅 멤버 관리</h1>
+
+      <!-- 채팅 멤버 생성 섹션 -->
+      <div class="section">
+        <h2>채팅 멤버 생성</h2>
+        <input type="number" id="userId" placeholder="사용자 ID" />
+        <input type="text" id="chatRoomId" placeholder="채팅방 ID" />
+        <button class="button" onclick="createChatMember()">멤버 생성</button>
+      </div>
+
+      <!-- 채팅 멤버 목록 섹션 -->
+      <div class="section">
+        <h2>채팅 멤버 목록</h2>
+        <button class="button" onclick="getAllChatMembers()">
+          멤버 목록 조회
+        </button>
+        <div id="memberList"></div>
+      </div>
+
+      <!-- 채팅 멤버 상세 조회 섹션 -->
+      <div class="section">
+        <h2>채팅 멤버 상세 조회</h2>
+        <input type="number" id="searchMemberId" placeholder="멤버 ID" />
+        <button class="button" onclick="findOneChatMember()">멤버 조회</button>
+        <div id="memberDetails"></div>
+      </div>
+
+      <!-- 채팅방 나가기 섹션 -->
+      <div class="section">
+        <h2>채팅방 나가기</h2>
+        <input type="number" id="deleteMemberId" placeholder="멤버 ID" />
+        <button class="button" onclick="deleteChatMember()">
+          채팅방 나가기
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const socket = io('http://localhost:3000/chatmember', {
+        withCredentials: true,
+        transports: ['websocket', 'polling'],
+        extraHeaders: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1:5500',
+        },
+      });
+
+      // 소켓 연결/해제 이벤트
+      socket.on('connect', () => {
+        console.log('🟢 서버와 연결되었습니다.');
+        console.log('소켓 ID:', socket.id);
+      });
+
+      socket.on('disconnect', () => {
+        console.log('🔴 서버와 연결이 끊어졌습니다.');
+      });
+
+      // 채팅 멤버 생성
+      function createChatMember() {
+        const userId = document.getElementById('userId').value;
+        const chatRoomId = document.getElementById('chatRoomId').value;
+
+        const createChatmemberDto = {
+          chatting_room_id: parseInt(chatRoomId),
+          admin: false, // 기본값으로 false 설정
+        };
+
+        console.log('📤 채팅 멤버 생성 요청:', {
+          userId: parseInt(userId),
+          createChatmemberDto: createChatmemberDto,
+        });
+
+        socket.emit('createChatmember', {
+          userId: parseInt(userId),
+          createChatmemberDto: createChatmemberDto,
+        });
+      }
+
+      // 이벤트 리스너
+      socket.on('chatmemberCreated', (chatmember) => {
+        console.log('📥 새로운 채팅 멤버가 생성됨:', chatmember);
+        alert(`채팅 멤버가 생성되었습니다.\n멤버 ID: ${chatmember.id}`);
+      });
+
+      // 전체 멤버 조회
+      function getAllChatMembers() {
+        console.log('📤 전체 멤버 목록 조회 요청');
+        socket.emit('findAllChatMember');
+      }
+
+      // 전체 멤버 조회 결과 리스너
+      socket.on('allChatMembers', (chatmembers) => {
+        console.log('📥 전체 멤버 목록 수신:', chatmembers);
+        const memberList = document.getElementById('memberList');
+        memberList.innerHTML = '';
+        chatmembers.forEach((member) => {
+          memberList.innerHTML += `
+            <div class="member-item">
+              멤버 ID: ${member.id},
+              사용자 ID: ${member.user_id},
+              채팅방 ID: ${member.chatting_room_id}
+            </div>`;
+        });
+      });
+
+      // 특정 멤버 조회
+      function findOneChatMember() {
+        const chatmemberId = document.getElementById('searchMemberId').value;
+        console.log('📤 특정 멤버 조회 요청:', {
+          chatmemberId: parseInt(chatmemberId),
+        });
+        socket.emit('findOneChatMember', {
+          chatmemberId: parseInt(chatmemberId),
+        });
+      }
+
+      // 상세 조회 결과 리스너
+      socket.on('chatmemberDetails', (chatmember) => {
+        console.log('📥 멤버 상세 정보 수신:', chatmember);
+        const memberDetails = document.getElementById('memberDetails');
+        memberDetails.innerHTML = `
+          <div class="member-item">
+            <h3>멤버 상세 정보</h3>
+            <p>멤버 ID: ${chatmember.id}</p>
+            <p>사용자 ID: ${chatmember.user_id}</p>
+            <p>채팅방 ID: ${chatmember.chatting_room_id}</p>
+            <p>관리자 여부: ${chatmember.admin ? '예' : '아니오'}</p>
+            <h4>사용자 정보</h4>
+            <p>닉네임: ${chatmember.user.nickname}</p>
+            <p>이메일: ${chatmember.user.email}</p>
+            <p>프로필 이미지: ${chatmember.user.profile_image}</p>
+            <p>생년월일: ${chatmember.user.birthday}</p>
+          </div>`;
+      });
+
+      // 채팅방 나가기
+      function deleteChatMember() {
+        const chatmemberId = document.getElementById('deleteMemberId').value;
+        console.log('📤 채팅방 나가기 요청:', {
+          chatmemberId: parseInt(chatmemberId),
+        });
+        socket.emit('deleteChatMember', {
+          chatmemberId: parseInt(chatmemberId),
+        });
+      }
+
+      // 채팅방 나가기 완료 리스너
+      socket.on('chatmemberDeleted', (data) => {
+        console.log('📥 채팅방 나가기 완료:', data);
+        alert(`채팅방에서 나갔습니다. (멤버 ID: ${data.chatmemberId})`);
+      });
+
+      // 블랙리스트 관련 소켓 연결
+      const blacklistSocket = io('http://localhost:3000/chatblacklist', {
+        withCredentials: true,
+        transports: ['websocket', 'polling'],
+        extraHeaders: {
+          'Access-Control-Allow-Origin': 'http://127.0.0.1:5500',
+        },
+      });
+
+      // 블랙리스트 이벤트 리스너
+      blacklistSocket.on('allBlacklists', (blacklists) => {
+        console.log('📥 블랙리스트 업데이트 수신:', blacklists);
+        // 현재 사용자가 블랙리스트에 추가되었는지 확인
+        const userId = document.getElementById('userId').value;
+        const chatRoomId = document.getElementById('chatRoomId').value;
+
+        const isBlacklisted = blacklists.some(
+          (blacklist) =>
+            blacklist.user_id === parseInt(userId) &&
+            blacklist.chatting_room_id === parseInt(chatRoomId),
+        );
+
+        if (isBlacklisted) {
+          console.log('❌ 사용자가 블랙리스트에 추가됨');
+          alert(
+            '해당 채팅방에서 차단되었습니다. 자동으로 채팅방에서 나갑니다.',
+          );
+          // 채팅방 나가기 처리
+          const chatmemberId =
+            /* 현재 chatmember ID */
+            socket.emit('deleteChatMember', { chatmemberId });
+        }
+      });
+
+      // 에러 메시지 개선
+      socket.on('error', (error) => {
+        console.error('❌ 오류 발생:', error);
+        let errorMessage = '오류가 발생했습니다: ';
+
+        switch (error.message) {
+          case 'USER_BLACKLISTED':
+            errorMessage += '해당 사용자는 차단되어 있습니다.';
+            break;
+          case 'CHATMEMBER_NOT_FOUND':
+            errorMessage += '채팅 멤버를 찾을 수 없습니다.';
+            break;
+          case 'CHATMEMBER_ALREADY_EXISTS':
+            errorMessage += '이미 채팅방에 참여중입니다.';
+            break;
+          default:
+            errorMessage += error.message;
+        }
+
+        alert(errorMessage);
+      });
+    </script>
+  </body>
+</html>
