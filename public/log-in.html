@@ -104,17 +104,14 @@
           const password = document.getElementById('password').value;
 
           try {
-            const response = await fetch(
-              '/user/auth/login',
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-                credentials: 'include',
+            const response = await fetch('/user/auth/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
               },
-            );
+              body: JSON.stringify({ email, password }),
+              credentials: 'include',
+            });
 
             const data = await response.json();
 
