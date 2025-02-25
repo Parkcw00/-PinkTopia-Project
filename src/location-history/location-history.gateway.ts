@@ -12,7 +12,11 @@ import { UpdateLocationHistoryDto } from './dto/update-location-history.dto';
 @WebSocketGateway({
   namespace: '/location',
   cors: {
-    origin: ['http://127.0.0.1:5500', 'http://localhost:5500'], // ✅ CORS 정책 설정
+    origin: [
+      'http://127.0.0.1:5500',
+      'http://localhost:5500',
+      'http://127.0.0.1:3000',
+    ], // ✅ CORS 정책 설정
     credentials: true, // ✅ 쿠키 및 인증 정보 포함
   },
 })

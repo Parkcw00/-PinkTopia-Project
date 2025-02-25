@@ -9,6 +9,7 @@ import { ChattingModule } from 'src/chatting/chatting.module';
 import { UserModule } from 'src/user/user.module';
 import { ChattingRoomModule } from 'src/chattingroom/chattingroom.module';
 import { ChatblacklistModule } from 'src/chatblacklist/chatblacklist.module';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 import { ChatmemberGateway } from './chatmember.gateway';
 import { ChattingGateway } from '../chatting/chatting.gateway';
 
@@ -19,6 +20,7 @@ import { ChattingGateway } from '../chatting/chatting.gateway';
     UserModule,
     ChattingRoomModule,
     ChatblacklistModule,
+    ValkeyModule,
   ],
   controllers: [ChatmemberController],
   providers: [ChatmemberGateway, ChatmemberService, ChatmemberRepository],

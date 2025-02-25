@@ -5,9 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Collection } from './entities/collection.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Pinkmong } from 'src/pinkmong/entities/pinkmong.entity';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Collection, User, Pinkmong])],
+  imports: [
+    TypeOrmModule.forFeature([Collection, User, Pinkmong]),
+    ValkeyModule,
+  ],
   controllers: [CollectionController],
   providers: [CollectionService],
 })

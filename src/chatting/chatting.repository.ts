@@ -44,7 +44,18 @@ export class ChattingRepository {
       nickname: result.user.nickname,
     }));
   }
-
+  async getUserNickname(user_id: any) {
+    const user = await this.chattingRepository.findOne({
+      where: { user_id: user_id },
+      relations: ['user'], // User 엔티티와의 관계를 가져옵니다.
+      select: {
+        user: {
+          nickname: true,
+        },
+      },
+    });
+    return user; // 유저의 닉네임 반환
+  }
   async isMember(userId: number, chattingRoomId: string): Promise<boolean> {
     try {
       console.log('멤버 확인 시도:', { userId, chattingRoomId });

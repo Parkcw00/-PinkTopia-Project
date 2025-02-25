@@ -11,6 +11,7 @@ import { S3Module } from '../s3/s3.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ChattingController } from './chatting.controller';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ChattingController } from './chatting.controller';
       }),
       inject: [ConfigService],
     }),
+    ValkeyModule,
   ],
   controllers: [ChattingController],
   providers: [ChattingGateway, ChattingService, ChattingRepository],
