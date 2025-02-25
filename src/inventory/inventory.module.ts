@@ -6,10 +6,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Inventory } from './entities/inventory.entity';
 import { Item } from 'src/item/entities/item.entity';
 import { ItemRepository } from 'src/item/item.repository';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 @Module({
-  imports: [TypeOrmModule.forFeature([Inventory, Item])],
+  imports: [TypeOrmModule.forFeature([Inventory, Item]), ValkeyModule],
   controllers: [InventoryController],
   providers: [InventoryService, InventoryRepository, ItemRepository],
-  exports: [InventoryService]
+  exports: [InventoryService],
 })
 export class InventoryModule {}

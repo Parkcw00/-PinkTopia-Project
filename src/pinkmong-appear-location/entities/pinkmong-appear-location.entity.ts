@@ -19,11 +19,23 @@ export class PinkmongAppearLocation {
   @Column({ type: 'varchar', nullable: false })
   title: string;
 
-  @Column({ type: 'varchar', nullable: false })
-  latitude: string;
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 7,
+    nullable: false,
+    default: 0,
+  })
+  latitude: number;
 
-  @Column({ type: 'varchar', nullable: false })
-  longitude: string;
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 7,
+    nullable: false,
+    default: 0,
+  })
+  longitude: number;
 
   @Column({
     type: 'enum',

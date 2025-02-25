@@ -1,34 +1,54 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { PinkmongAppearLocationService } from './pinkmong-appear-location.service';
-import { CreatePinkmongAppearLocationDto } from './dto/create-pinkmong-appear-location.dto';
+import {
+  Controller,
+  Post,
+  Get,
+  Delete,
+  Param,
+  Body,
+  ParseIntPipe,
+  Patch,
+} from '@nestjs/common';
+import { PinkmongAppearLocationService } from 'src/pinkmong-appear-location/pinkmong-appear-location.service';
+import { CreatePinkmongAppearLocationDto } from 'src/pinkmong-appear-location/dto/create-pinkmong-appear-location.dto';
+import { PinkmongAppearLocation } from 'src/pinkmong-appear-location/entities/pinkmong-appear-location.entity';
 import { UpdatePinkmongAppearLocationDto } from './dto/update-pinkmong-appear-location.dto';
 
 @Controller('pinkmong-appear-location')
 export class PinkmongAppearLocationController {
-  constructor(private readonly pinkmongAppearLocationService: PinkmongAppearLocationService) {}
+  constructor(private readonly service: PinkmongAppearLocationService) {}
+
+  ///발키 임시/////////
+  // db 읽어서 발키로 다 올리는 로직 추가
+  //@UseGuards(UserGuard, AdminGuard)
+  @Post('fill-valkey')
+  async fillValkey() {
+    return await await this.service.fillValkey();
+  }
+
+  /////
 
   @Post()
-  create(@Body() createPinkmongAppearLocationDto: CreatePinkmongAppearLocationDto) {
-    return this.pinkmongAppearLocationService.create(createPinkmongAppearLocationDto);
+  async createLocation(
+    @Body() dto: CreatePinkmongAppearLocationDto,
+  ): Promise<PinkmongAppearLocation> {
+    return this.service.createLocation(dto);
   }
 
   @Get()
-  findAll() {
-    return this.pinkmongAppearLocationService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pinkmongAppearLocationService.findOne(+id);
+  async getAllLocations(): Promise<PinkmongAppearLocation[]> {
+    return this.service.getAllLocations();
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePinkmongAppearLocationDto: UpdatePinkmongAppearLocationDto) {
-    return this.pinkmongAppearLocationService.update(+id, updatePinkmongAppearLocationDto);
+  async updateLocation(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateDto: UpdatePinkmongAppearLocationDto,
+  ): Promise<PinkmongAppearLocation> {
+    return this.service.updateLocation(id, updateDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.pinkmongAppearLocationService.remove(+id);
+  async deleteLocation(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    return this.service.deleteLocation(id);
   }
 }
