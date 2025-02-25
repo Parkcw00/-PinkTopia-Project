@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { PostModule } from './post/post.module';
 import { DirectionModule } from './direction/direction.module';
 import { RankingModule } from './ranking/ranking.module';
-import { ChattingroomModule } from './chattingroom/chattingroom.module';
+import { ChattingRoomModule } from './chattingroom/chattingroom.module';
 import { ChattingModule } from './chatting/chatting.module';
 import { AchievementPModule } from './achievement-p/achievement-p.module';
 import { SubAchievementModule } from './sub-achievement/sub-achievement.module';
@@ -25,11 +25,12 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AchievementCModule } from './achievement-c/achievement-c.module';
 import { StoreItemModule } from './store-item/store-item.module';
+import { S3Module } from './s3/s3.module';
+import { LocationHistoryModule } from './location-history/location-history.module';
+import { PinkmongAppearLocationModule } from './pinkmong-appear-location/pinkmong-appear-location.module';
 
 const typeOrmModuleOptions = {
-  useFactory: async (
-    configService: ConfigService,
-  ): Promise<TypeOrmModuleOptions> => ({
+  useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
     namingStrategy: new SnakeNamingStrategy(),
     type: 'mysql',
     username: configService.get('DB_USERNAME'),
@@ -45,7 +46,7 @@ const typeOrmModuleOptions = {
     // ],
     /// 개발, dev 인
     synchronize: configService.get('DB_SYNC'), //true, // 기존 테이블이 있다면 자동으로 수정됨
-    // migrationsRun: true, // 앱 실행 시 마이그레이션 적용
+    migrationsRun: !configService.get('DB_SYNC'), // 앱 실행 시 마이그레이션 적용
 
     logging: true,
   }),
@@ -74,20 +75,23 @@ const typeOrmModuleOptions = {
     EventModule,
     PinkmongModule,
     AchievementModule,
-    AchievementCModule,
     ItemModule,
     InventoryModule,
     CollectionModule,
     CatchPinkmongModule,
     SubAchievementModule,
     AchievementPModule,
+    AchievementCModule,
     ChattingModule,
-    ChattingroomModule,
+    ChattingRoomModule,
     RankingModule,
     DirectionModule,
     ChatmemberModule,
     ChatblacklistModule,
     StoreItemModule,
+    S3Module,
+    LocationHistoryModule,
+    PinkmongAppearLocationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -4,11 +4,12 @@ import { Pinkmong } from './entities/pinkmong.entity';
 import { PinkmongService } from './pinkmong.service';
 import { PinkmongController } from './pinkmong.controller';
 import { PinkmongRepository } from './pinkmong.repository';
+import { S3Service } from 'src/s3/s3.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Pinkmong])],
   controllers: [PinkmongController],
-  providers: [PinkmongService, PinkmongRepository], //핑크몽 레포지토리 추가
+  providers: [PinkmongService, PinkmongRepository, S3Service], //핑크몽 레포지토리 추가
   exports: [PinkmongRepository],
 })
 export class PinkmongModule {}

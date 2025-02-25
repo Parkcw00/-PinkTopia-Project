@@ -19,11 +19,14 @@ export class ChattingRoom {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @CreateDateColumn()
+  @Column({ type: 'varchar', nullable: false })
+  title: string;
+
+  @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
-  @DeleteDateColumn()
-  deleted_at: Date;
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deleted_at: Date | null;
 
   @OneToMany(() => Chatting, (chatting) => chatting.chattingRoom)
   chatting: Chatting[];

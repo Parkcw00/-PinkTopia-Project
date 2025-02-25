@@ -1,4 +1,6 @@
 export enum AchievementCategory {
-  GWANGJU_FOOD = '광주 맛집',
-  DAEJEON_BAKERY_TOUR = '대전 빵집 투어',
+  JEJU_TOUR = 'JEJU_TOUR',
+  SEOUL_TOUR = 'SEOUL_TOUR',
+  FOOD_TOUR = 'FOOD_TOUR',
 }
+// req body는 위에 값으로 기록

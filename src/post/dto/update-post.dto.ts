@@ -6,11 +6,18 @@ import { IsOptional, IsString } from 'class-validator';
 export class UpdatePostDto extends PartialType(CreatePostDto) {
   @IsOptional()
   @IsString()
-  @ApiProperty({ example: '댓글 내용' })
+  @ApiProperty({ example: '게시글 제목' })
   title: string;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ example: '댓글 내용' })
+  @ApiProperty({ example: '게시글 내용' })
   content: string;
+
+  @ApiProperty({
+    type: 'array',
+    items: { type: 'string', format: 'binary' },
+    description: '업로드할 파일들',
+  })
+  files?: Express.Multer.File[];
 }

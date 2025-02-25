@@ -1,41 +1,23 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateStoreItemDto } from './dto/create-store-item.dto';
 import { UpdateStoreItemDto } from './dto/update-store-item.dto';
 import { StoreItem } from './entities/store-item.entity';
 import { StoreItemRepository } from './store-item.repository';
-import * as AWS from 'aws-sdk';
+import { S3Service } from 'src/s3/s3.service';
+import { CreateStoreItemDto } from './dto/create-store-item.dto';
 
 @Injectable()
 export class StoreItemService {
-  private s3: AWS.S3;
-
-  constructor(private storeItemRepository: StoreItemRepository) {
-    this.s3 = new AWS.S3({
-      region: process.env.AWS_REGION || 'ap-northeast-2',
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY || '',
-        secretAccessKey: process.env.AWS_SECRET_KEY || '',
-      },
-    });
-  }
+  constructor(
+    private readonly storeItemRepository: StoreItemRepository,
+    private readonly s3Service: S3Service,
+  ) {}
 
   async addShopItem(
     req: Request,
     createStoreItemDto: CreateStoreItemDto,
     file: Express.Multer.File,
   ): Promise<StoreItem> {
-    const uniqueFileName = `${Date.now()}-${file.originalname}`;
-
-    const params = {
-      Bucket: process.env.AWS_BUCKET_NAME || '',
-      Key: uniqueFileName,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-      ACL: 'public-read',
-    };
-
-    const uploadResult = await this.s3.upload(params).promise();
-    const item_image = uploadResult.Location;
+    const item_image = await this.s3Service.uploadFile(file);
 
     const storeItemData = {
       ...createStoreItemDto,
@@ -43,18 +25,6 @@ export class StoreItemService {
     };
 
     const storeItem = await this.storeItemRepository.addShopItem(storeItemData);
-    return storeItem;
-  }
-
-  async findAll(): Promise<StoreItem[]> {
-    return this.storeItemRepository.findAll();
-  }
-
-  async findOne(id: number): Promise<StoreItem> {
-    const storeItem = await this.storeItemRepository.storeItemFindOne(id);
-    if (!storeItem) {
-      throw new NotFoundException('존재하지 않는 상점 아이템입니다.');
-    }
     return storeItem;
   }
 
@@ -67,7 +37,6 @@ export class StoreItemService {
     if (!storeItem) {
       throw new NotFoundException('존재하지 않는 상점 아이템입니다.');
     }
-
     return this.storeItemRepository.updateStoreItem(id, updateStoreItemDto);
   }
 

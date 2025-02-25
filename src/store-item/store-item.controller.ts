@@ -41,17 +41,6 @@ export class StoreItemController {
   }
 
   @ApiOperation({ summary: '상점 아이템 조회' })
-  @Get()
-  findAll() {
-    return this.storeItemService.findAll();
-  }
-
-  // @ApiOperation({ summary: '상점 아이템 상세 조회' })
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.storeItemService.findOne(+id);
-  // }
-
   @ApiOperation({ summary: '상점 아이템 수정' })
   @UseGuards(UserGuard, AdminGuard)
   @Patch(':id')
