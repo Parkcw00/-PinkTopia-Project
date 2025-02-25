@@ -8,8 +8,7 @@ import { User } from '../user/entities/user.entity';
 import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
 import { AchievementC } from '../achievement-c/entities/achievement-c.entity';
 import { Achievement } from '../achievement/entities/achievement.entity';
-import { ValkeyModule } from '../valkey/valkey.module';
-import { ValkeyService } from 'src/valkey/valkey.service';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
