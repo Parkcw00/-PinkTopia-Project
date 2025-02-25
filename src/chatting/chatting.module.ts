@@ -25,11 +25,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
     }),
   ],
-  providers: [
-    ChattingGateway,
-    ChattingService,
-    ChattingRepository,
-  ],
-  exports: [ChattingService, ChattingRepository]
+  providers: [ChattingGateway, ChattingService, ChattingRepository],
+  exports: [ChattingService, ChattingRepository],
 })
 export class ChattingModule {}

@@ -4,7 +4,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
 import { PostRepository } from './post.repository';
 import { S3Service } from '../s3/s3.service';
-import { ValkeyService } from 'src/valkey/valkey.service';
+import { ValkeyService } from '../valkey/valkey.service';
 
 @Injectable()
 export class PostService {
@@ -24,6 +24,7 @@ export class PostService {
     const { title, content } = createPostDto;
     const imageUrls = await this.s3Service.uploadFiles(files); // S3Service 사용
 
+    await this.valkeyService.del(`posts:`);
     return await this.postRepository.createPost(
       user_id,
       title,
@@ -34,6 +35,12 @@ export class PostService {
 
   async findPosts(): Promise<Post[]> {
     const posts = await this.postRepository.findPosts();
+
+    const cachedPosts: any = await this.valkeyService.get(`posts:`);
+    if (cachedPosts) {
+      console.log(cachedPosts);
+      return cachedPosts; // 캐시된 데이터 반환
+    }
     await this.valkeyService.set(`posts:`, posts, 60);
     return posts;
   }
@@ -43,6 +50,12 @@ export class PostService {
     if (!post) {
       throw new NotFoundException(`게시글을 찾을 수 없습니다.`);
     }
+    const cachedPost: any = await this.valkeyService.get(`post:${id}`);
+    if (cachedPost) {
+      console.log(cachedPost);
+      return cachedPost; // 캐시된 데이터 반환
+    }
+    await this.valkeyService.set(`post:${id}`, post, 60);
     return post;
   }
 
@@ -75,16 +88,20 @@ export class PostService {
     const imageUrls = files ? await this.s3Service.uploadFiles(files) : [];
 
     // 게시글 업데이트
-    await this.postRepository.updatePost(id, {
+    const updatedPost = await this.postRepository.updatePost(id, {
       title,
       content,
       post_image: imageUrls,
     });
+
+    await this.valkeyService.del(`posts:`);
+    return updatedPost;
   }
 
   async deletePost(user_id: number, id: number) {
     await this.verifyMessage(id, user_id);
     await this.postRepository.deletePost(id);
+    await this.valkeyService.del(`posts:`);
   }
 
   private async verifyMessage(id: number, user_id: number) {
