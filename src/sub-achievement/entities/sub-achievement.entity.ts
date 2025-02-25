@@ -33,8 +33,29 @@ export class SubAchievement {
   @Column({ type: 'varchar', length: 255, nullable: false })
   title: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: false })
-  conditions: string;
+  @Column({ type: 'text', nullable: false })
+  content: string;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 7,
+    nullable: false,
+    default: 0,
+  })
+  latitude: number;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 7,
+    nullable: false,
+    default: 0,
+  })
+  longitude: number;
+
+  @Column({ type: 'json', nullable: true })
+  sub_achievement_images: string[];
 
   @Column({
     type: 'enum',
@@ -59,6 +80,6 @@ export class SubAchievement {
   @OneToMany(
     () => AchievementP,
     (achievement_p) => achievement_p.sub_achievement,
-  ) // 카드 엔티티와 1:n 관계 설정
+  )
   achievement_p: AchievementP[];
 }
