@@ -72,12 +72,33 @@ export class StoreItemService {
     req: Request,
     id: number,
     updateStoreItemDto: UpdateStoreItemDto,
+    file?: Express.Multer.File, // 🔹 파일을 받을 수 있도록 추가
   ): Promise<StoreItem | null> {
     const storeItem = await this.storeItemRepository.storeItemFindOne(id);
     if (!storeItem) {
       throw new NotFoundException('존재하지 않는 상점 아이템입니다.');
     }
-    return this.storeItemRepository.updateStoreItem(id, updateStoreItemDto);
+    // 🔹 파일이 존재하면 S3에 업로드 후 URL 업데이트
+    let item_image = storeItem.item_image; // 기존 이미지 유지
+    if (file) {
+      item_image = await this.s3Service.uploadFile(file);
+    }
+
+    const updatedData = {
+      ...updateStoreItemDto,
+      item_image, // 🔹 새 이미지가 있으면 업데이트
+    };
+
+    const updatedItem = await this.storeItemRepository.updateStoreItem(
+      id,
+      updatedData,
+    );
+
+    // 🔹 Valkey 캐시 갱신 (중요)
+    const cacheKey = `store_item:${id}`;
+    await this.valkeyService.set(cacheKey, updatedItem, 300);
+
+    return updatedItem;
   }
 
   // 🔹 상점 아이템 삭제 (기존 로직 유지 - Valkey 사용 X)
