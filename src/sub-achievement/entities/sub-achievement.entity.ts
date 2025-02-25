@@ -7,7 +7,8 @@ import {
   DeleteDateColumn,
   ManyToOne,
   JoinColumn,
-  OneToMany,Unique
+  OneToMany,
+  Unique,
 } from 'typeorm';
 import { SubAchievementMissionType } from '../enums/sub-achievement-mission-type.enum';
 import { Achievement } from 'src/achievement/entities/achievement.entity';
@@ -30,10 +31,10 @@ export class SubAchievement {
   achievement_id: number;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
-  title: string; 
+  title: string;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
-  conditions: string; 
+  conditions: string;
 
   @Column({
     type: 'enum',
@@ -56,7 +57,7 @@ export class SubAchievement {
   deleted_at: Date;
 
   @OneToMany(
-    () => AchievementP,    
+    () => AchievementP,
     (achievement_p) => achievement_p.sub_achievement,
   ) // 카드 엔티티와 1:n 관계 설정
   achievement_p: AchievementP[];
