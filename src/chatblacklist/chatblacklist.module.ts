@@ -7,6 +7,7 @@ import { UserModule } from 'src/user/user.module';
 import { User } from 'src/user/entities/user.entity';
 import { ChatblacklistRepository } from './chatblacklist.repository';
 import { ChattingRoomModule } from 'src/chattingroom/chattingroom.module';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 import { ChatblacklistGateway } from './chatblacklist.gateway';
 
 @Module({
@@ -14,6 +15,7 @@ import { ChatblacklistGateway } from './chatblacklist.gateway';
     TypeOrmModule.forFeature([Chatblacklist, User]),
     UserModule,
     ChattingRoomModule,
+    ValkeyModule,
   ],
   controllers: [ChatblacklistController],
   providers: [
