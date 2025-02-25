@@ -37,8 +37,11 @@ function displayMarker(locPosition, message) {
   infowindow.open(map, marker);
   map.setCenter(locPosition);
 }
-
+// 여기서 북마커 호출
+// src\direction\direction.controller.ts
+// localhost:3000/direction/bookmarke  를 패치로 가져오기
 var markerData = [
+  // <- 가져온 북마커로 배열 생성.  반복문으로 적절하게 넣기
   {
     position: new kakao.maps.LatLng(36.3275, 127.4268),
     imageUrl:
@@ -56,6 +59,10 @@ var markerData = [
     draggable: false,
   },
 ];
+/** 북마커 추가*/
+// 패치
+
+/** */
 
 var markers = [];
 markerData.forEach(function (data) {
@@ -75,26 +82,4 @@ markerData.forEach(function (data) {
 
   infowindow.open(map, marker);
   markers.push(marker);
-
-  fetch('http://localhost:3000/direction/bookmarke')
-    .then((response) => response.json())
-    .then((data) => {
-      data.forEach((item) => {
-        var position = new kakao.maps.LatLng(item.latitude, item.longitude);
-
-        var marker = new kakao.maps.Marker({
-          position: position,
-          map: map,
-        });
-
-        var infowindow = new kakao.maps.InfoWindow({
-          content: `<div style="padding:5px;">${item.title} <br>
-                  <a href="https://map.kakao.com/link/map/${item.title},${item.latitude},${item.longitude}" target="_blank" style="color:skyblue">큰지도보기</a> 
-                  <a href="https://map.kakao.com/link/to/${item.title},${item.latitude},${item.longitude}" target="_blank" style="color:blue">길찾기</a></div>`,
-        });
-
-        infowindow.open(map, marker);
-      });
-    })
-    .catch((error) => console.error('Error fetching data:', error));
 });
