@@ -112,6 +112,13 @@
         display: table;
         clear: both;
       }
+
+      .message-content img {
+        max-width: 200px;
+        border-radius: 8px;
+        margin: 5px 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
     </style>
   </head>
   <body>
@@ -138,7 +145,6 @@
           onkeypress="handleKeyPress(event)"
         />
         <button class="button" onclick="sendMessage()">전송</button>
-        <button class="button" onclick="document.getElementById('fileInput').click()">파일 업로드</button>
         <button class="button" onclick="leaveRoom()">나가기</button>
         <div
           id="upload-progress"
@@ -246,7 +252,7 @@
         });
 
         socket.on('message', (data) => {
-          console.log('메시지 수신:', data); // 디버깅용
+          console.log('메시지 수신:', data);
 
           const chatBox = document.getElementById('chatBox');
           const messageDiv = document.createElement('div');
@@ -267,10 +273,23 @@
             
             const timestamp = new Date(data.timestamp).toLocaleTimeString();
             
+            // 이미지 URL인지 확인하는 정규식
+            const imageUrlPattern = /^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i;
+            const isImageUrl = imageUrlPattern.test(data.message);
+            
+            let messageContent;
+            if (isImageUrl) {
+              // 이미지 메시지인 경우
+              messageContent = `<img src="${data.message}" alt="Shared image" style="max-width: 200px; border-radius: 8px;">`;
+            } else {
+              // 일반 텍스트 메시지인 경우
+              messageContent = `<span class="message-text">${data.message}</span>`;
+            }
+            
             if (isMyMessage) {
               messageDiv.innerHTML = `
                 <div class="message-content">
-                  <span class="message-text">${data.message}</span>
+                  ${messageContent}
                   <span class="timestamp">${timestamp}</span>
                 </div>
               `;
@@ -278,7 +297,7 @@
               messageDiv.innerHTML = `
                 <div class="message-content">
                   <div class="nickname">${data.nickname}</div>
-                  <span class="message-text">${data.message}</span>
+                  ${messageContent}
                   <span class="timestamp">${timestamp}</span>
                 </div>
               `;
