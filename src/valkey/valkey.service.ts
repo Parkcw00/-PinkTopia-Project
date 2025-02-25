@@ -6,10 +6,6 @@ export class ValkeyService implements OnModuleDestroy {
     const data = await this.client.hgetall(key);
     return data && Object.keys(data).length > 0 ? data : null; // 데이터가 있으면 반환, 없으면 null
   }
-  /* async hgetall(key: string): Promise<Record<string, any>> {
-    const result = await this.client.hgetall(key);
-    return result ?? {}; // 데이터가 없으면 빈 객체 반환
-  }*/
 
   findOne(arg0: { where: { user_id: any }; order: { timestamp: string } }) {
     throw new Error('Method not implemented.');
@@ -89,6 +85,30 @@ export class ValkeyService implements OnModuleDestroy {
     const data = await this.client.hgetall(key);
     return data ? data : null;
   }*/
+  async getKeysByPattern(
+    pattern: string,
+    count: number = 100,
+  ): Promise<string[]> {
+    let cursor = '0';
+    let keys: string[] = [];
+
+    do {
+      const [newCursor, foundKeys]: [string, string[]] = await this.client.scan(
+        cursor,
+        'MATCH',
+        pattern,
+        'COUNT',
+        count.toString(),
+      );
+
+      cursor = newCursor;
+      if (Array.isArray(foundKeys)) {
+        keys = keys.concat(foundKeys);
+      }
+    } while (cursor !== '0');
+
+    return keys;
+  }
 
   onModuleDestroy() {
     this.client.quit();
@@ -102,4 +122,32 @@ export class ValkeyService implements OnModuleDestroy {
   getClient(): Redis {
     return this.client;
   }
+
+  // type 메서드 구현
+  async type(key: string): Promise<string> {
+    return this.client.type(key); // Redis 'type' 명령어 사용
+  }
+
+  async getString(key: string): Promise<string | null> {
+    try {
+      const value = await this.client.get(key);
+      return value;
+    } catch (error) {
+      console.error(`Redis GET Error: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /*
+  async zrange(
+    key: string,
+    start: number,
+    end: number,
+    withScores: string,
+  ): Promise<any[]> {
+    return this.client.zrange(key, start, end, withScores);
+  }
+  async smembers(key: string): Promise<string[]> {
+    return this.client.smembers(key);
+  }*/
 }

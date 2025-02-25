@@ -1,36 +1,23 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-  ParseIntPipe,
-} from '@nestjs/common';
-import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
-import { PinkmongAppearLocation } from '../pinkmong-appear-location/entities/pinkmong-appear-location.entity';
-import { CreateDirectionDto } from './dto/create-direction.dto';
-import { UpdateDirectionDto } from './dto/update-direction.dto';
-import { S3Service } from '../s3/s3.service';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ValkeyService } from '../valkey/valkey.service';
-import { Entity } from 'typeorm';
 
 @Injectable()
 export class DirectionService {
-  constructor(
-    private readonly subEntity: SubAchievement,
-    private readonly pinkEntity: PinkmongAppearLocation,
-    private readonly s3Service: S3Service,
-    private readonly valkeyService: ValkeyService,
-  ) {}
+  constructor(private readonly valkeyService: ValkeyService) {}
 
   async createBookmarks() {
     // ✅ Redis SCAN을 사용하여 패턴에 맞는 키들을 가져옴
-    const keysS: any = await this.valkeyService.get(
-      `sub-achievement:${this.subEntity.id}`,
+
+    // 서브업적 키만 가져옴
+    const keysS: string[] =
+      await this.valkeyService.getKeysByPattern(`sub-achievement:*`);
+    console.log('🔍 keyssS 확인:', keysS);
+
+    // 핑크몽 발생위치 키만 가져옴
+    const keysP: string[] = await this.valkeyService.getKeysByPattern(
+      `pinkmong-appear-location:*`,
     );
-    console.log('🔍 keysS 확인:', keysS);
-    const keysP: any = await this.valkeyService.get(
-      `pinkEntity:${this.pinkEntity.id}`,
-    );
-    console.log('🔍 keysP 확인:', keysP);
+    console.log('🔍 keyssP 확인:', keysP);
 
     const bookmarksS: Array<{
       title: any;
@@ -53,11 +40,14 @@ export class DirectionService {
       deleted_at: any;
     }> = [];
 
+    // 반복문 2번째 돌았을 때  부터 문제 발생
     if (!keysS || keysS.length < 1) {
       throw new NotFoundException('발키에 서브업적 데이터가 없습니다.');
     }
-    for (const key of keysS) {
-      let data = await this.valkeyService.hgetall(key);
+    // 반복문 돌면서 키값으로 데이터 읽어오기
+    for (let keyS of keysS) {
+      const data: any = await this.valkeyService.get(keyS);
+
       if (data && Object.keys(data).length > 0) {
         bookmarksS.push({
           title: data.title,
@@ -72,12 +62,16 @@ export class DirectionService {
         });
       }
     }
+    console.log('타입확인', bookmarksS);
 
     if (!keysP || keysP.length < 1) {
       throw new NotFoundException('발키에 핑크몽 리스트트 데이터가 없습니다.');
     }
-    for (const key of keysP) {
-      let dataP = await this.valkeyService.hgetall(key);
+
+    for (let keyP of keysP) {
+      const dataP: any = await this.valkeyService.get(keyP);
+      console.log('타입확인', dataP);
+
       if (dataP && Object.keys(dataP).length > 0) {
         bookmarksP.push({
           title: dataP.title,
@@ -90,38 +84,8 @@ export class DirectionService {
       }
     }
 
+    console.log(`왔음`);
+    console.log({ bookmarksS, bookmarksP });
     return { bookmarksS, bookmarksP };
-  }
-  /*
-  // Redis SCAN을 활용하여 키 목록 가져오기
-  private async scanKeys(pattern: string): Promise<string[]> {
-    let cursor = '0';
-    let keys: string[] = [];
-
-    do {
-      const [newCursor, foundKeys] = await this.valkeyService
-        //.getClient()
-        .hgetall
-        //.scan(cursor, 'MATCH', pattern);
-      cursor = newCursor;
-      keys = keys.concat(foundKeys);
-    } while (cursor !== '0');
-
-    return keys;
-  }
-
-
-*/
-
-  findOne(id: number) {
-    return `This action returns a #${id} direction`;
-  }
-
-  update(id: number, updateDirectionDto: UpdateDirectionDto) {
-    return `This action updates a #${id} direction`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} direction`;
   }
 }

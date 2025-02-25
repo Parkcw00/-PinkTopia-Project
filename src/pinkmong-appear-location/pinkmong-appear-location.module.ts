@@ -5,9 +5,15 @@ import { PinkmongAppearLocationController } from './pinkmong-appear-location.con
 import { PinkmongAppearLocationRepository } from './pinkmong-appear-location.repository';
 import { PinkmongAppearLocation } from './entities/pinkmong-appear-location.entity';
 
+import { ValkeyModule } from '../valkey/valkey.module';
+import { ValkeyService } from 'src/valkey/valkey.service';
 @Module({
   imports: [TypeOrmModule.forFeature([PinkmongAppearLocation])],
   controllers: [PinkmongAppearLocationController],
-  providers: [PinkmongAppearLocationService, PinkmongAppearLocationRepository],
+  providers: [
+    ValkeyService,
+    PinkmongAppearLocationService,
+    PinkmongAppearLocationRepository,
+  ],
 })
 export class PinkmongAppearLocationModule {}
