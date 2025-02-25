@@ -153,7 +153,7 @@ export class ChattingRoomService {
   async sendInviteUrl(
     user: any,
     chattingRoomId: number,
-    receiveUserId: number,
+    receiveUserId: string,
   ) {
     const isMember = await this.chattingRoomRepository.findChatMember(
       chattingRoomId,
@@ -164,14 +164,14 @@ export class ChattingRoomService {
       throw new BadRequestException('당신은 해당 채팅방의 멤버가 아닙니다.');
     }
 
-    const isExist = await this.chattingRoomRepository.findId(receiveUserId);
+    const isExist = await this.chattingRoomRepository.findByNickname(receiveUserId);
     if (!isExist) {
       throw new BadRequestException('존재하지 않는 유저입니다.');
     }
 
     const isMember2 = await this.chattingRoomRepository.findChatMember(
       chattingRoomId,
-      receiveUserId,
+      isExist.id,
     );
     if (isMember2) {
       throw new BadRequestException(

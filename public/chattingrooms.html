@@ -324,19 +324,18 @@
             document.getElementById('roomList').appendChild(roomElement);
         }
 
-        // 초대 링크 공유 함수 복구
+        // 초대 링크 공유 함수
         async function shareInviteLink(roomId) {
             try {
-                // 초대 링크 형식 수정
                 const inviteLink = `/chattingroom/${roomId}/join`;
                 const fullLink = window.location.origin + inviteLink;
                 
                 await navigator.clipboard.writeText(fullLink);
                 alert('초대 링크가 클립보드에 복사되었습니다!\n' + fullLink);
                 
-                // 특정 사용자에게 이메일로 보내기
-                const userId = prompt('초대할 사용자 ID를 입력하세요:');
-                if (userId) {
+                // 닉네임으로 초대하기
+                const nickname = prompt('초대할 사용자의 닉네임을 입력하세요:');
+                if (nickname) {
                     const response = await fetch(`/chattingroom/${roomId}/send-url`, {
                         method: 'POST',
                         headers: {
@@ -344,7 +343,7 @@
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            userId: parseInt(userId)
+                            nickname: nickname
                         })
                     });
 
