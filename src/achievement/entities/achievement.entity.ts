@@ -29,9 +29,8 @@ export class Achievement {
   @Column({ type: 'varchar', length: 255, nullable: false })
   reward: string;
 
-  
-  @Column({ type: 'text', nullable: false }) 
-  content: string; 
+  @Column({ type: 'text', nullable: false })
+  content: string;
 
   // 만료일 컬럼 추가, 자동생성 아님 2025-05-22
   @Column({ type: 'date', nullable: true })
