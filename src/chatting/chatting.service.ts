@@ -14,8 +14,6 @@ import { Chatting } from './entities/chatting.entity';
 @Injectable()
 export class ChattingService {
   constructor(
-    @InjectRepository(Chatting)
-    private readonly chattingRepository: Repository<Chatting>,
     private readonly s3Service: S3Service,
     private readonly chattingCustomRepository: ChattingRepository,
   ) {}
@@ -112,5 +110,4 @@ export class ChattingService {
 
     return this.chattingCustomRepository.findAll(chatting_room_id);
   }
-
 }

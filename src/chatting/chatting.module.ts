@@ -10,6 +10,7 @@ import { ChatblacklistModule } from '../chatblacklist/chatblacklist.module';
 import { S3Module } from '../s3/s3.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ChattingController } from './chatting.controller';
 
 @Module({
   imports: [
@@ -25,11 +26,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
     }),
   ],
-  providers: [
-    ChattingGateway,
-    ChattingService,
-    ChattingRepository,
-  ],
-  exports: [ChattingService, ChattingRepository, ChattingGateway]
+  controllers: [ChattingController],
+  providers: [ChattingGateway, ChattingService, ChattingRepository],
+  exports: [ChattingService, ChattingRepository, ChattingGateway],
 })
 export class ChattingModule {}
