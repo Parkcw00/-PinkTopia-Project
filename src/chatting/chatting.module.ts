@@ -10,6 +10,7 @@ import { ChatblacklistModule } from '../chatblacklist/chatblacklist.module';
 import { S3Module } from '../s3/s3.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
       inject: [ConfigService],
     }),
+    ValkeyModule,
   ],
   providers: [ChattingGateway, ChattingService, ChattingRepository],
   exports: [ChattingService, ChattingRepository],

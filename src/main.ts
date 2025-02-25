@@ -19,7 +19,11 @@ async function bootstrap() {
   // 정적 파일 제공 설정
   app.use('/public', express.static(join(__dirname, '..', 'public')));
   app.enableCors({
-    origin: ['http://127.0.0.1:5500', 'http://localhost:5500'],
+    origin: [
+      'http://127.0.0.1:5500',
+      'http://localhost:5500',
+      'http://127.0.0.1:3000',
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
     allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],

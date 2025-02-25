@@ -38,12 +38,11 @@ export class CommentService {
       throw new NotFoundException(`게시물이 존재하지 않습니다.`);
     }
     const comments = await this.commentRepository.findComments(post_id);
-    const cachedcomments: any = await this.valkeyService.get(
+    const cachedComments: any = await this.valkeyService.get(
       `comments:${post_id}`,
     );
-    if (cachedcomments) {
-      console.log(comments);
-      return comments; // 캐시된 데이터 반환
+    if (cachedComments) {
+      return cachedComments; // 캐시된 데이터 반환
     }
     await this.valkeyService.set(`comments:${post_id}`, comments, 60);
     return comments;

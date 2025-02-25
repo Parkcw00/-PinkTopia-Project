@@ -8,8 +8,7 @@ import { User } from '../user/entities/user.entity';
 import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
 import { AchievementC } from '../achievement-c/entities/achievement-c.entity';
 import { Achievement } from '../achievement/entities/achievement.entity';
-import { ValkeyModule } from '../valkey/valkey.module';
-import { ValkeyService } from 'src/valkey/valkey.service';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -22,7 +21,7 @@ import { ValkeyService } from 'src/valkey/valkey.service';
     ValkeyModule,
   ], // ✅ TypeORM 모듈에 AchievementP 등록
   controllers: [AchievementPController],
-  providers: [ValkeyService, AchievementPService, AchievementPRepository], // ✅ Repository 등록
+  providers: [AchievementPService, AchievementPRepository], // ✅ Repository 등록
   exports: [AchievementPService, AchievementPRepository], // ✅ 다른 모듈에서 사용 가능하도록 export
 })
 export class AchievementPModule {}
