@@ -23,14 +23,12 @@
       function checkAccessToken() {
         const accessToken = localStorage.getItem('accessToken');
         if (!accessToken) {
-          window.location.href = '/public/login.html';
+          window.location.href = '/public/log-in.html';
         }
         return accessToken; // accessToken을 반환
       }
 
       const accessToken = checkAccessToken();
-      let userId;
-      console.log(accessToken);
 
       function parseJwt(token) {
         const base64Url = token.split('.')[1];
@@ -39,7 +37,6 @@
       }
 
       const decodedToken = parseJwt(accessToken);
-      console.log('Decoded Token:', decodedToken);
 
       function sendLocation() {
         if (navigator.geolocation) {
@@ -57,8 +54,9 @@
           alert('Geolocation을 지원하지 않는 브라우저입니다.');
         }
       }
-
-      setInterval(sendLocation, 10000);
+      if (accessToken) {
+        setInterval(sendLocation, 10000);
+      }
 
       socket.on('locationUpdated', (data) => {
         console.log('✅ 서버 응답:', data);
@@ -83,8 +81,9 @@
           .then((data) => console.log('✅ 위치 데이터 로드:', data))
           .catch((error) => console.error('❌ 위치 데이터 로드 실패:', error));
       }
-
-      requestLocationHistory(); // 로그인 후 위치 데이터를 가져옴
+      if (accessToken) {
+        requestLocationHistory();
+      } // 로그인 후 위치 데이터를 가져옴
     </script>
   </body>
 </html>
