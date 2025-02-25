@@ -251,7 +251,7 @@ export class ChattingRoomService {
     });
 
     // 초대 링크 형식 수정 (서버 포트로 변경)
-    const inviteUrl = `${process.env.BASE_URL || 'http://localhost:3000'}/invite.html?roomId=${chattingRoomId}`;
+    const inviteUrl = `${process.env.BASE_URL || 'http://localhost:3000'}/public/invite.html?roomId=${chattingRoomId}`;
 
     const mailOptions = {
       from: NODEMAILER_USER,

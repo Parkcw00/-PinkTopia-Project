@@ -327,7 +327,7 @@
         // 초대 링크 공유 함수
         async function shareInviteLink(roomId) {
             try {
-                const inviteLink = `/chattingroom/${roomId}/join`;
+                const inviteLink = `/public/chattingroom/${roomId}/join`;
                 const fullLink = window.location.origin + inviteLink;
                 
                 await navigator.clipboard.writeText(fullLink);
