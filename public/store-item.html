@@ -89,7 +89,7 @@
     <script>
         async function fetchStoreItems() {
             try {
-                const response = await fetch('/store-item');
+                const response = await fetch('http://localhost:3000/store-item');
                 const items = await response.json();
                 const storeContainer = document.getElementById('store-items');
 
