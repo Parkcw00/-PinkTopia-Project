@@ -31,10 +31,6 @@ export class Pinkmong {
   @Column({ type: 'varchar', length: 255 })
   pinkmong_image: string;
 
-  /** 핑크몽 위치 URL (선택 사항) */
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  location_url?: string;
-
   /** 핑크몽 설명 (긴 텍스트) */
   @Column({ type: 'text' })
   explain: string;
