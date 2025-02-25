@@ -16,9 +16,18 @@ export class DirectionController {
   constructor(private readonly directionService: DirectionService) {}
 
   // 북마크 만들기
-  @Get('bookmarke')
+  @Get('bookmark')
   async getAllSubAchievements() {
-    return this.directionService.createBookmarks();
+    console.log('🚀 GET /direction/bookmark 요청 받음');
+
+    try {
+      const result = await this.directionService.createBookmarks();
+      console.log('✅ 북마크 데이터:', result);
+      return result;
+    } catch (error) {
+      console.error('❌ 북마크 가져오기 실패:', error.message);
+      throw error;
+    }
   }
   /*
   @Get()
