@@ -13,7 +13,8 @@ async function bootstrap() {
   // cert: readFileSync('server.cert'),
   // };
   const app = await NestFactory.create(AppModule); //, { httpsOptions });
-
+  // ✅ CORS 활성화 (모든 요청 허용)
+  app.enableCors();
   app.use(cookieParser());
   // 정적 파일 제공 설정
   app.use('/public', express.static(join(__dirname, '..', 'public')));
