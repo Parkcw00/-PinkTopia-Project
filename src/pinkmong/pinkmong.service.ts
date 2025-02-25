@@ -1,7 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PinkmongRepository } from './pinkmong.repository';
 import { Pinkmong } from './entities/pinkmong.entity';
-import * as AWS from 'aws-sdk';
+import { CreatePinkmongDto } from './dto/create-pinkmong.dto';
+import { UpdatePinkmongDto } from './dto/update-pinkmong.dto';
+import { S3Service } from '../s3/s3.service';
 
 /**
  * PinkmongService
@@ -10,19 +12,10 @@ import * as AWS from 'aws-sdk';
  */
 @Injectable()
 export class PinkmongService {
-  private s3: AWS.S3;
-
   constructor(
     private readonly pinkmongRepository: PinkmongRepository, // 레포지토리 주입
-  ) {
-    this.s3 = new AWS.S3({
-      region: process.env.AWS_REGION || 'ap-northeast-2',
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY || '',
-        secretAccessKey: process.env.AWS_SECRET_KEY || '',
-      },
-    });
-  }
+    private readonly s3Service: S3Service, // S3 서비스 주입
+  ) {}
 
   /**
    * 모든 핑크몽 조회
@@ -55,26 +48,18 @@ export class PinkmongService {
    * param file - 업로드된 파일
    * returns 생성 완료 메시지 반환
    */
-  async createPinkmong(body: any, file: Express.Multer.File) {
-    const uniqueFileName = `${Date.now()}-${file.originalname}`;
-
-    const params = {
-      Bucket: process.env.AWS_BUCKET_NAME || '',
-      Key: uniqueFileName,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-      ACL: 'public-read',
-    };
-
-    const uploadResult = await this.s3.upload(params).promise();
-    const pinkmong_image = uploadResult.Location;
+  async createPinkmong(
+    createPinkmongDto: CreatePinkmongDto,
+    file: Express.Multer.File,
+  ) {
+    const pinkmong_image = await this.s3Service.uploadFile(file);
 
     const pinkmongData = {
-      ...body,
+      ...createPinkmongDto,
       pinkmong_image,
     };
 
-    return await this.pinkmongRepository.createPinkmong(pinkmongData);
+    return this.pinkmongRepository.createPinkmong(pinkmongData);
   }
 
   /**
@@ -85,12 +70,15 @@ export class PinkmongService {
    * returns 수정 완료 메시지 반환
    * throws NotFoundException - 핑크몽이 존재하지 않을 경우 예외 발생
    */
-  async updatePinkmong(pinkmongId: number, data: Partial<Pinkmong>) {
+  async updatePinkmong(
+    pinkmongId: number,
+    updatePinkmongDto: UpdatePinkmongDto,
+  ) {
     const pinkmong = await this.pinkmongRepository.findById(pinkmongId);
     if (!pinkmong)
       throw new NotFoundException({ message: '핑크몽이 존재하지 않습니다.' });
 
-    Object.assign(pinkmong, data);
+    Object.assign(pinkmong, updatePinkmongDto);
     await this.pinkmongRepository.updatePinkmong(pinkmong);
     return { message: '핑크몽 수정이 완료 되었습니다.' };
   }

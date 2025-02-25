@@ -1,4 +1,5 @@
 import { SubAchievement } from 'src/sub-achievement/entities/sub-achievement.entity';
+import { Achievement } from 'src/achievement/entities/achievement.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Entity,
@@ -34,6 +35,16 @@ export class AchievementP {
 
   @Column({ type: 'int', nullable: false })
   sub_achievement_id: number; // camelCase 스타일로 변경
+
+// 업적 id
+  @ManyToOne(() => Achievement, (achievement) => achievement.achievement_c, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'achievement_id' })
+  achievement: Achievement;//
+
+  @Column({ type: 'int', nullable: false })
+  achievement_id: number;//
 
   @Column({ type: 'boolean', default: false, nullable: false }) // default 값 수정
   complete: boolean;

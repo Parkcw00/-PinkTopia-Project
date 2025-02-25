@@ -1,45 +1,62 @@
 import {
   Controller,
   Get,
+  Res,
+  Request,
   Post,
   Body,
   Patch,
   Param,
+  UseGuards,
   Delete,
+  Query,
+  BadRequestException,
+  NotFoundException,
+  ParseIntPipe,
 } from '@nestjs/common';
+import { UserGuard } from '../user/guards/user-guard';
+import { AdminGuard } from '../user/guards/admin.guard';
 import { AchievementPService } from './achievement-p.service';
-import { CreateAchievementPDto } from './dto/create-achievement-p.dto';
-import { UpdateAchievementPDto } from './dto/update-achievement-p.dto';
 
 @Controller('achievement-p')
 export class AchievementPController {
-  constructor(private readonly achievementPService: AchievementPService) {}
+  constructor(private readonly APService: AchievementPService) {}
 
-  @Post()
-  create(@Body() createAchievementPDto: CreateAchievementPDto) {
-    return this.achievementPService.create(createAchievementPDto);
+  // 로그인 시 유저의 업적P 발키로 올리기
+  @UseGuards(UserGuard)
+  @Post('fill-valkey')
+  async fillValkey(@Request() req) {
+    return await await this.APService.fillValkey(req.user.id);
   }
 
-  @Get()
-  findAll() {
-    return this.achievementPService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.achievementPService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateAchievementPDto: UpdateAchievementPDto,
+  // 수행으로 등록
+  @UseGuards(UserGuard)
+  @Post('/subAchievementId/:subAchievementId')
+  async post(
+    @Request() req,
+    @Param('subAchievementId') subAchievementId: string,
   ) {
-    return this.achievementPService.update(+id, updateAchievementPDto);
+    console.log('P 생성 컨트롤러');
+    return this.APService.post(req.user, subAchievementId);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.achievementPService.remove(+id);
+  // 잘못 등록된 경우 삭제
+  @UseGuards(UserGuard)
+  @Delete('/subAchievementId/:subAchievementId')
+  async deleteByUserNSub(
+    @Request() req,
+    @Param('subAchievementId') subAchievementId: string,
+  ) {
+    return this.APService.deleteByUserNSub(req.user.id, subAchievementId);
+  }
+
+  // 잘못 등록된 경우 삭제
+  //@UseGuards(UserGuard, AdminGuard)
+  @Delete('chievement_p_Id/:achievementPId')
+  async deleteByPId(
+    @Request() request,
+    @Param('achievementPId') achievementPId: string,
+  ) {
+    return this.APService.deleteByPId(achievementPId);
   }
 }

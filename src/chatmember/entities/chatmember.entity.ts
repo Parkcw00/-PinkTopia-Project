@@ -6,6 +6,8 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn
 } from 'typeorm';
 
 @Entity({
@@ -24,7 +26,9 @@ export class Chatmember {
   @Column()
   admin: boolean;
 
-  @ManyToOne(() => ChattingRoom, (chattingRoom) => chattingRoom.chatmember)
+  @ManyToOne(() => ChattingRoom, (chattingRoom) => chattingRoom.chatmember, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'chatting_room_id' })
   chattingRoom: ChattingRoom;
   @Column()

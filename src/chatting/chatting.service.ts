@@ -5,22 +5,18 @@ import {
 } from '@nestjs/common';
 import { CreateChattingDto } from './dto/create-chatting.dto';
 import { ChattingRepository } from './chatting.repository';
-import * as AWS from 'aws-sdk';
-import { awsConfig } from '../../aws.config';
+import { S3Service } from '../s3/s3.service';
 import { UploadChattingDto } from './dto/create-upload-chatting.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Chatting } from './entities/chatting.entity';
 
 @Injectable()
 export class ChattingService {
-  private s3: AWS.S3;
-  constructor(private readonly chattingRepository: ChattingRepository) {
-    this.s3 = new AWS.S3({
-      region: process.env.AWS_REGION || 'ap-northeast-2',
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY || '',
-        secretAccessKey: process.env.AWS_SECRET_KEY || '',
-      },
-    });
-  }
+  constructor(
+    @InjectRepository(Chatting)
+    private readonly s3Service: S3Service,
+    private readonly chattingCustomRepository: ChattingRepository,
+  ) {}
 
   async create(
     user: any,
@@ -28,7 +24,7 @@ export class ChattingService {
     createChattingDto: CreateChattingDto,
   ) {
     try {
-      const isMember = await this.chattingRepository.isMember(
+      const isMember = await this.chattingCustomRepository.isMember(
         user.id,
         chatting_room_id,
       );
@@ -38,7 +34,7 @@ export class ChattingService {
       }
 
       console.log(isMember);
-      return this.chattingRepository.create(
+      return this.chattingCustomRepository.create(
         user,
         chatting_room_id,
         createChattingDto,
@@ -61,7 +57,7 @@ export class ChattingService {
     file: Express.Multer.File,
   ) {
     try {
-      const isMember = await this.chattingRepository.isMember(
+      const isMember = await this.chattingCustomRepository.isMember(
         user.id,
         chatting_room_id,
       );
@@ -70,18 +66,7 @@ export class ChattingService {
         throw new ForbiddenException('메시지 업로드 권한이 없습니다.');
       }
 
-      const uniqueFileName = `${Date.now()}-${file.originalname}`;
-
-      const params = {
-        Bucket: awsConfig.bucketName || '',
-        Key: uniqueFileName,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-        ACL: 'public-read',
-      };
-
-      const uploadResult = await this.s3.upload(params).promise();
-      const imageUrl = uploadResult.Location;
+      const imageUrl = await this.s3Service.uploadFile(file);
 
       // 채팅 메시지 생성 DTO
       const createChattingDto: UploadChattingDto = {
@@ -90,7 +75,7 @@ export class ChattingService {
       };
 
       // 채팅 테이블에 저장
-      return this.chattingRepository.create(
+      return this.chattingCustomRepository.create(
         user,
         chatting_room_id,
         createChattingDto,
@@ -108,7 +93,7 @@ export class ChattingService {
   }
 
   async findAll(user: any, chatting_room_id: string) {
-    const isMember = await this.chattingRepository.isMember(
+    const isMember = await this.chattingCustomRepository.isMember(
       user.id,
       chatting_room_id,
     );
@@ -117,6 +102,6 @@ export class ChattingService {
       throw new ForbiddenException('채팅방에 접근 권한이 없습니다.');
     }
 
-    return this.chattingRepository.findAll(chatting_room_id);
+    return this.chattingCustomRepository.findAll(chatting_room_id);
   }
 }
