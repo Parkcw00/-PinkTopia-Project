@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이벤트 목록</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background-color: #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .tab.active {
+            background-color: #ff69b4;
+            color: white;
+        }
+
+        .event-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            text-align: left;
+        }
+
+        .event-image {
+            width: 150px;
+            /* 🔥 정사각형 크기 설정 */
+            height: 150px;
+            /* 🔥 정사각형 크기 설정 */
+            object-fit: cover;
+            /* 🔥 이미지가 찌그러지지 않도록 자동 조정 */
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+
+
+        .event-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .event-status {
+            margin-top: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .status-active {
+            color: green;
+        }
+
+        .status-closed {
+            color: red;
+        }
+
+        .event-description {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        /* 🔥 자세히 보기 버튼 스타일 추가 */
+        .details-button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .details-button:hover {
+            background-color: #ff4da6;
+            transform: scale(1.05);
+        }
+
+        .details-button:active {
+            background-color: #ff3385;
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>이벤트 목록</h2>
+
+        <!-- 상단 탭 메뉴 -->
+        <div class="tabs">
+            <div class="tab active" onclick="filterEvents('all')">전체 이벤트</div>
+            <div class="tab" onclick="filterEvents('active')">진행 중</div>
+            <div class="tab" onclick="filterEvents('closed')">종료됨</div>
+        </div>
+
+
+        <div id="eventList"></div>
+    </div>
+
+    <script>
+        let events = []; // 모든 이벤트 저장
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                console.log("이벤트 데이터를 불러오는 중...");
+
+                const response = await fetch('http://localhost:3000/event/events');
+
+                if (!response.ok) {
+                    throw new Error(`HTTP 오류 발생: ${response.status}`);
+                }
+
+                const responseData = await response.json();
+                events = responseData.events;
+                console.log("✅ API에서 받은 이벤트 데이터:", events);
+
+                filterEvents('all');
+
+            } catch (error) {
+                console.error('이벤트 불러오기 실패:', error);
+                document.getElementById('eventList').innerHTML = `<p>이벤트 정보를 불러오는 중 오류가 발생했습니다: ${error.message}</p>`;
+            }
+        });
+
+        function filterEvents(status) {
+            const eventList = document.getElementById('eventList');
+            eventList.innerHTML = "";
+
+            let filteredEvents = (status === 'all') ? events : events.filter(event => event.status === status);
+
+            console.log(`✅ ${status} 필터링된 이벤트 목록:`, filteredEvents);
+
+            if (filteredEvents.length === 0) {
+                eventList.innerHTML = `<p>해당 이벤트가 없습니다.</p>`;
+                return;
+            }
+
+            filteredEvents.forEach(event => {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'event-item';
+                eventDiv.innerHTML = `
+                    ${event.image ? `<img src="${event.image}" alt="이벤트 이미지" class="event-image">` : ''}
+                    <div class="event-title">${event.title}</div>
+                    <div class="event-status ${event.status === 'active' ? 'status-active' : 'status-closed'}">
+                        ${event.status === 'active' ? '진행 중' : '종료됨'}
+                    </div>
+                    <div class="event-description">${event.content}</div>
+                    <button class="details-button" onclick="goToEventDetail(${event.id})">자세히 보기</button>
+                `;
+                eventList.appendChild(eventDiv);
+            });
+
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`.tab[onclick="filterEvents('${status}')"]`).classList.add('active');
+        }
+
+        function goToEventDetail(eventId) {
+            window.location.href = `event-detail.html?id=${eventId}`;
+        }
+    </script>
+
+</body>
+
+</html>

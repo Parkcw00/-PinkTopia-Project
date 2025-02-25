@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이벤트 상세 정보</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .event-image {
+            width: 250px;
+            /* 🔥 정사각형 크기 설정 */
+            height: 250px;
+            /* 🔥 정사각형 크기 설정 */
+            object-fit: cover;
+            /* 🔥 이미지 비율 유지하면서 정사각형 형태로 표시 */
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .event-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .event-status {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .status-active {
+            color: green;
+        }
+
+        .status-closed {
+            color: red;
+        }
+
+        .event-description {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .back-button {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .back-button:hover {
+            background-color: #ff4da6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>이벤트 상세 정보</h2>
+        <img id="eventImage" class="event-image" src="" alt="이벤트 이미지">
+        <div id="eventTitle" class="event-title"></div>
+        <div id="eventStatus" class="event-status"></div>
+        <div id="eventDescription" class="event-description"></div>
+        <button class="back-button" onclick="goBack()">목록으로 돌아가기</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventId = urlParams.get('id');
+
+            if (!eventId) {
+                alert("잘못된 접근입니다.");
+                window.location.href = "event.html";
+                return;
+            }
+
+            try {
+                console.log(`이벤트 상세 정보를 불러오는 중... ID: ${eventId}`);
+
+                const response = await fetch(`http://localhost:3000/event/${eventId}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP 오류 발생: ${response.status}`);
+                }
+
+                const event = await response.json();
+                console.log("✅ API에서 받은 이벤트 데이터:", event);
+
+                document.getElementById('eventTitle').textContent = event.title;
+                document.getElementById('eventStatus').textContent = (event.status === 'active') ? '진행 중' : '종료됨';
+                document.getElementById('eventStatus').className = `event-status ${event.status === 'active' ? 'status-active' : 'status-closed'}`;
+                document.getElementById('eventDescription').textContent = event.content;
+
+                if (event.image) {
+                    document.getElementById('eventImage').src = event.image;
+                } else {
+                    document.getElementById('eventImage').style.display = 'none';
+                }
+
+            } catch (error) {
+                console.error('이벤트 상세 정보 불러오기 실패:', error);
+                document.querySelector('.container').innerHTML = `<p>이벤트 정보를 불러오는 중 오류가 발생했습니다: ${error.message}</p>`;
+            }
+        });
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+
+</html>

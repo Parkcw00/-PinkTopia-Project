@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>실시간 위치 업데이트</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_REAL_KAKAO_API_KEY"></script>
+</head>
+
+<body>
+    <h1>실시간 위치 업데이트</h1>
+    <script>
+        const socket = io('/location', {
+            withCredentials: true,
+            extraHeaders: {
+                'Access-Control-Allow-Origin': '*'
+            }
+        });
+
+        let userId = prompt("Enter your User ID");
+
+        function sendLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const data = {
+                        userId: Number(userId),
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    socket.emit('updateLocation', data);
+                });
+            } else {
+                alert('Geolocation을 지원하지 않는 브라우저입니다.');
+            }
+        }
+
+        setInterval(sendLocation, 10000);
+
+        socket.on('locationUpdated', (data) => {
+            console.log('✅ 서버 응답:', data);
+        });
+
+        socket.on('error', (error) => {
+            console.error('❌ 서버 오류:', error);
+        });
+
+        // ✅ 로그인 후 위치 데이터를 요청
+        function requestLocationHistory() {
+            fetch('http://localhost:3000/location-history/valkey', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId })
+            })
+                .then(response => response.json())
+                .then(data => console.log('✅ 위치 데이터 로드:', data))
+                .catch(error => console.error('❌ 위치 데이터 로드 실패:', error));
+        }
+
+        requestLocationHistory(); // 로그인 후 위치 데이터를 가져옴
+    </script>
+
+</body>
+
+</html>

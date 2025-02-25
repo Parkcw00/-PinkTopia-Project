@@ -17,6 +17,15 @@ async function bootstrap() {
   });
 
   app.use(cookieParser());
+
+  app.use((req, res, next) => {
+    res.cookie('your-cookie-name', 'your-cookie-value', {
+      httpOnly: true,
+      secure: true, // HTTPS 환경에서만 사용 가능
+      sameSite: 'none', // ✅ 서드파티 쿠키 허용
+    });
+    next();
+  });
   // 정적 파일 제공 설정
   app.use('/public', express.static(join(__dirname, '..', 'public')));
   const options = new DocumentBuilder()
@@ -42,7 +51,7 @@ async function bootstrap() {
       stopAtFirstError: true,
     }),
   );
-  
+
   await app.listen(process.env.PORT ?? 3000);
   console.log(`Application is running on: ${await app.getUrl()}`);
 }

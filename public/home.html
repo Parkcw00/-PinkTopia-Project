@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>홈 | PinkTopia</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            background-color: #ff69b4;
+            padding: 15px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .menu a {
+            display: block;
+            width: calc(33.333% - 20px);
+            padding: 20px;
+            text-align: center;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav">
+        <div>PinkTophia</div>
+        <div id="authMenu">
+            <a href="log-in.html">로그인</a>
+            <a href="sign-up.html">회원가입</a>
+        </div>
+    </div>
+    <div class="container">
+        <h1>홈</h1>
+        <div class="menu" id="menuList">
+            <a href="events.html">이벤트</a>
+            <a href="shop.html">아이템샵</a>
+            <a href="community.html">게시글 (커뮤니티)</a>
+            <a href="ranking.html">랭킹</a>
+            <a href="pinkmong.html">핑크몽 조회</a>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const accessToken = localStorage.getItem("accessToken");
+            const menuList = document.getElementById("menuList");
+            const authMenu = document.getElementById("authMenu");
+
+            if (accessToken) {
+                authMenu.innerHTML = '<a href="mypage.html">마이페이지</a> <a href="#" onclick="logout()">로그아웃</a>';
+                menuList.innerHTML += `
+                    <a href="chattingrooms.html">채팅</a>
+                    <a href="pinkmong-dex.html">핑크몽 도감</a>
+                    <a href="inventory.html">인벤토리 아이템</a>
+                    <a href="achievements.html">업적</a>
+                `;
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem("accessToken");
+            window.location.reload();
+        }
+    </script>
+</body>
+
+</html>

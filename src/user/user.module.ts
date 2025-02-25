@@ -9,6 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserGuard } from './guards/user-guard';
 import { InventoryModule } from 'src/inventory/inventory.module';
+import { ValkeyService } from 'src/valkey/valkey.service';
 import { AchievementCRepository } from 'src/achievement-c/achievement-c.repository';
 
 @Global()
@@ -36,7 +37,7 @@ import { AchievementCRepository } from 'src/achievement-c/achievement-c.reposito
     InventoryModule,
   ],
   controllers: [UserController, UsersController],
-  providers: [UserService, UserRepository, UserGuard],
+  providers: [UserService, UserRepository, UserGuard, ValkeyService],
   exports: [UserGuard, JwtModule, UserRepository, UserService],
 })
 export class UserModule {}
