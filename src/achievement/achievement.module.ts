@@ -8,9 +8,11 @@ import { AchievementController } from './achievement.controller';
 import { AchievementC } from '../achievement-c/entities/achievement-c.entity';
 import { AchievementRepository } from './achievement.repository';
 import { User } from '../user/entities/user.entity';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Achievement, SubAchievement, AchievementC, User]),
+    ValkeyModule,
   ], // ✅ TypeOrmModule에 엔터티 추가
   controllers: [AchievementController],
   providers: [S3Service, AchievementService, AchievementRepository], // ✅ AchievementRepository 등록

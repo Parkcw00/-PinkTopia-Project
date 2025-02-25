@@ -6,9 +6,13 @@ import { AchievementCRepository } from './achievement-c.repository';
 import { AchievementC } from './entities/achievement-c.entity';
 import { AchievementP } from '../achievement-p/entities/achievement-p.entity'; // ✅ AchievementP도 추가
 import { User } from '../user/entities/user.entity';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AchievementC, AchievementP, User])], // ✅ TypeOrmModule에 엔터티 추가
+  imports: [
+    TypeOrmModule.forFeature([AchievementC, AchievementP, User]),
+    ValkeyModule,
+  ], // ✅ TypeOrmModule에 엔터티 추가
   controllers: [AchievementCController],
   providers: [AchievementCService, AchievementCRepository], // ✅ Repository 등록
   exports: [AchievementCService, AchievementCRepository], // ✅ 다른 모듈에서 사용 가능하도록 export
