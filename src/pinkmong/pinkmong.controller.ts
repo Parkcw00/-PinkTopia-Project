@@ -28,7 +28,10 @@ export class PinkmongController {
   @Post()
   @UseGuards(UserGuard, AdminGuard)
   @UseInterceptors(FileInterceptor('file'))
-  createPinkmong(@Body() createPinkmongDto: CreatePinkmongDto, @UploadedFile() file: Express.Multer.File) {
+  createPinkmong(
+    @Body() createPinkmongDto: CreatePinkmongDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
     return this.pinkmongService.createPinkmong(createPinkmongDto, file);
   }
 
@@ -56,8 +59,17 @@ export class PinkmongController {
    */
   @Patch(':pinkmongId')
   @UseGuards(UserGuard, AdminGuard)
-  updatePinkmong(@Param('pinkmongId') pinkmongId: number, @Body() updatePinkmongDto: UpdatePinkmongDto) {
-    return this.pinkmongService.updatePinkmong(pinkmongId, updatePinkmongDto);
+  @UseInterceptors(FileInterceptor('file')) // 🔹 파일 업로드 지원
+  updatePinkmong(
+    @Param('pinkmongId') pinkmongId: number,
+    @Body() updatePinkmongDto: UpdatePinkmongDto,
+    @UploadedFile() file?: Express.Multer.File, // 🔹 파일 추가
+  ) {
+    return this.pinkmongService.updatePinkmong(
+      pinkmongId,
+      updatePinkmongDto,
+      file,
+    );
   }
 
   /**
