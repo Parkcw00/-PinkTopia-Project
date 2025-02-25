@@ -20,27 +20,4 @@ export class DirectionController {
   async getAllSubAchievements() {
     return this.directionService.createBookmarks();
   }
-  /*
-  @Get()
-  findAll() {
-    return this.directionService.findAll();
-  }*/
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.directionService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateDirectionDto: UpdateDirectionDto,
-  ) {
-    return this.directionService.update(+id, updateDirectionDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.directionService.remove(+id);
-  }
 }

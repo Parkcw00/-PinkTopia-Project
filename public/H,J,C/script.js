@@ -37,7 +37,7 @@ function displayMarker(locPosition, message) {
   infowindow.open(map, marker);
   map.setCenter(locPosition);
 }
-
+// 여기서 북마커 호출
 var markerData = [
   {
     position: new kakao.maps.LatLng(36.3275, 127.4268),
