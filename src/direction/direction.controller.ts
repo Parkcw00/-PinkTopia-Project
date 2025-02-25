@@ -15,15 +15,16 @@ import { UpdateDirectionDto } from './dto/update-direction.dto';
 export class DirectionController {
   constructor(private readonly directionService: DirectionService) {}
 
-  @Post()
-  create(@Body() createDirectionDto: CreateDirectionDto) {
-    return this.directionService.create(createDirectionDto);
+  // 북마크 만들기
+  @Get('bookmarke')
+  async getAllSubAchievements() {
+    return this.directionService.createBookmarks();
   }
-
+  /*
   @Get()
   findAll() {
     return this.directionService.findAll();
-  }
+  }*/
 
   @Get(':id')
   findOne(@Param('id') id: string) {

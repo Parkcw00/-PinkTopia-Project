@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2</title>
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<!--정확도 옵션 추가
+getCurrentPosition 함수에서 enableHighAccuracy: true 옵션을 추가하면 GPS를 활용해 더 정확한 위치를 가져올 수 있습니다.-->
+
+<body>
+  <div id="map"></div>
+  <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=5dc1bc6ffb574e60204390643bad8557"></script>
+  <script>
+
+    var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+      mapOption = {
+        center: new kakao.maps.LatLng(0, 0), // 지도의 중심좌표
+        // level: 10 // 지도의 확대 레벨 
+        level: 5 // 확대 레벨 (값을 낮추면 더 자세히 보임)
+      };
+
+    var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+
+    // HTML5의 geolocation으로 사용할 수 있는지 확인합니다 
+    if (navigator.geolocation) {
+
+      // GeoLocation을 이용해서 접속 위치를 얻어옵니다
+      navigator.geolocation.getCurrentPosition(function (position) {
+
+        var lat = position.coords.latitude, // 위도
+          lon = position.coords.longitude; // 경도
+
+        var locPosition = new kakao.maps.LatLng(lat, lon), // 마커가 표시될 위치를 geolocation으로 얻어온 좌표로 생성합니다
+          message = '<div style="padding:5px;">여기에 계신가요?!</div>'; // 인포윈도우에 표시될 내용입니다
+
+        // 마커와 인포윈도우를 표시합니다
+        displayMarker(locPosition, message);
+
+      });
+
+    } else { // HTML5의 GeoLocation을 사용할 수 없을때 마커 표시 위치와 인포윈도우 내용을 설정합니다
+
+      var locPosition = new kakao.maps.LatLng(0, 0),
+        message = 'geolocation을 사용할수 없어요..'
+
+      displayMarker(locPosition, message);
+    }
+
+    // 지도에 마커와 인포윈도우를 표시하는 함수입니다
+    function displayMarker(locPosition, message) {
+
+      // 마커를 생성합니다
+      var marker = new kakao.maps.Marker({
+        map: map,
+        position: locPosition
+      });
+
+      var iwContent = message, // 인포윈도우에 표시할 내용
+        iwRemoveable = true;
+
+      // 인포윈도우를 생성합니다
+      var infowindow = new kakao.maps.InfoWindow({
+        content: iwContent,
+        removable: iwRemoveable
+      });
+
+      // 인포윈도우를 마커위에 표시합니다 
+      infowindow.open(map, marker);
+
+      // 지도 중심좌표를 접속위치로 변경합니다
+      map.setCenter(locPosition);
+    }
+
+    // 4. 마커 데이터 배열 (각 마커의 위치, 이미지, 정보 등 포함)
+    var markerData = [
+      {
+        position: new kakao.maps.LatLng(36.3275, 127.4268), // 마커 위치
+        imageUrl: 'https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fch0TFq%2FbtsMojyLajz%2FbWu5fv0Ox11EuAlSI9RxA1%2Fimg.png',
+        size: new kakao.maps.Size(100, 100), // 마커 이미지 크기
+        info: '성심당 케익 부띠크!', // 인포윈도우에 표시할 정보
+        draggable: true  // 이동 가능한 마커 여부
+      },
+      {
+        position: new kakao.maps.LatLng(36.340309, 127.39),
+        imageUrl: 'https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FN5k03%2FbtsMn0l4BNf%2F0Lk5if43ncFTjl9rzKCE61%2Fimg.png',
+        size: new kakao.maps.Size(100, 100),
+        info: '북마커 위치1',
+        draggable: false  // 이동 불가능한 마커
+      },
+      {
+        position: new kakao.maps.LatLng(36.340509, 127.3901),
+        imageUrl: 'https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FN5k03%2FbtsMn0l4BNf%2F0Lk5if43ncFTjl9rzKCE61%2Fimg.png',
+        size: new kakao.maps.Size(100, 100),
+        info: '북마커 위치2',
+        draggable: false  // 이동 불가능한 마커
+      },
+      {
+        position: new kakao.maps.LatLng(36.340709, 127.3902),
+        imageUrl: 'https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FN5k03%2FbtsMn0l4BNf%2F0Lk5if43ncFTjl9rzKCE61%2Fimg.png',
+        size: new kakao.maps.Size(100, 100),
+        info: '북마커 위치3',
+        draggable: false  // 이동 불가능한 마커
+      }
+    ];
+
+    // 5. 마커 배열을 활용하여 지도에 추가
+    var markers = [];
+    markerData.forEach(function (data) {
+      var markerImage = new kakao.maps.MarkerImage(data.imageUrl, data.size);
+      var marker = new kakao.maps.Marker({
+        position: data.position, // 마커 위치 지정
+        image: markerImage, // 마커 이미지 설정
+        map: map, // 해당 마커를 지도에 표시
+        draggable: data.draggable  // 마커 이동 가능 여부 설정
+      });
+
+      // 6. 마커 클릭 시 표시될 인포윈도우 설정
+      var infowindow = new kakao.maps.InfoWindow({
+        content: `<div style="padding:5px;">${data.info} <br>
+                  <a href="https://map.kakao.com/link/map/${data.info},${data.position.getLat()},${data.position.getLng()}" target="_blank" style="color:skyblue">큰지도보기</a> 
+                  <a href="https://map.kakao.com/link/to/${data.info},${data.position.getLat()},${data.position.getLng()}" target="_blank" style="color:blue">길찾기</a></div>`
+      });
+
+      // 7. 기본적으로 인포윈도우 열어두기
+      infowindow.open(map, marker);
+
+      // 8. 마커 배열에 추가
+      markers.push(marker);
+    });
+  </script>
+</body>
+
+</html>

@@ -19,6 +19,9 @@ export class Achievement {
   @Column({ type: 'varchar', length: 255, nullable: false })
   title: string;
 
+  @Column({ type: 'json', nullable: true })
+  achievement_images: string[];
+
   @Column({
     type: 'enum',
     enum: AchievementCategory,
@@ -29,9 +32,8 @@ export class Achievement {
   @Column({ type: 'varchar', length: 255, nullable: false })
   reward: string;
 
-  
-  @Column({ type: 'text', nullable: false }) 
-  content: string; 
+  @Column({ type: 'text', nullable: false })
+  content: string;
 
   // 만료일 컬럼 추가, 자동생성 아님 2025-05-22
   @Column({ type: 'date', nullable: true })
@@ -54,4 +56,5 @@ export class Achievement {
 
   @OneToMany(() => AchievementC, (achievement_c) => achievement_c.achievement) // 카드 엔티티와 1:n 관계 설정
   achievement_c: AchievementC[];
+  static achievement_images: any;
 }
