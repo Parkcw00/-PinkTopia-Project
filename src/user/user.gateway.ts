@@ -1,8 +1,14 @@
-import { WebSocketGateway, WebSocketServer, SubscribeMessage, ConnectedSocket } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  WebSocketServer,
+  SubscribeMessage,
+  ConnectedSocket,
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { UserService } from './user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { ValkeyService } from 'src/valkey/valkey.service';
 
 @WebSocketGateway({
   cors: {
@@ -18,6 +24,7 @@ export class UserGateway {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly valkeyService: ValkeyService,
   ) {}
 
   @SubscribeMessage('checkAuth')
@@ -30,8 +37,10 @@ export class UserGateway {
 
       // 쿠키 문자열을 파싱하여 refreshToken 추출
       const cookieArray = cookies.split(';');
-      const refreshTokenCookie = cookieArray.find(cookie => cookie.trim().startsWith('refreshToken='));
-      
+      const refreshTokenCookie = cookieArray.find((cookie) =>
+        cookie.trim().startsWith('refreshToken='),
+      );
+
       if (!refreshTokenCookie) {
         return { success: false, message: 'refresh token이 없습니다.' };
       }
@@ -40,7 +49,7 @@ export class UserGateway {
 
       // refreshToken 검증
       const decoded = this.jwtService.verify(refreshToken, {
-        secret: this.configService.get<string>('REFRESH_TOKEN_SECRET_KEY')
+        secret: this.configService.get<string>('REFRESH_TOKEN_SECRET_KEY'),
       });
 
       if (!decoded) {
@@ -48,20 +57,22 @@ export class UserGateway {
       }
 
       // 로그아웃된 사용자인지 확인
-      if (this.userService.logOutUsers[decoded.id]) {
+      if (await this.valkeyService.get(`logOutUsers:${decoded.id}`)) {
         return { success: false, message: '로그아웃된 사용자입니다.' };
       }
 
       // 사용자 정보 조회
-      const userInfo = await this.userService.getMyInfo({ email: decoded.email });
-      
+      const userInfo = await this.userService.getMyInfo({
+        email: decoded.email,
+      });
+
       return {
         success: true,
         user: {
           id: userInfo.id,
           email: userInfo.email,
-          nickname: userInfo.nickname
-        }
+          nickname: userInfo.nickname,
+        },
       };
     } catch (error) {
       console.error('인증 확인 중 오류:', error);
@@ -75,19 +86,21 @@ export class UserGateway {
       const cookies = client.handshake.headers.cookie;
       if (cookies) {
         const cookieArray = cookies.split(';');
-        const refreshTokenCookie = cookieArray.find(cookie => cookie.trim().startsWith('refreshToken='));
-        
+        const refreshTokenCookie = cookieArray.find((cookie) =>
+          cookie.trim().startsWith('refreshToken='),
+        );
+
         if (refreshTokenCookie) {
           const refreshToken = refreshTokenCookie.split('=')[1];
           const decoded = this.jwtService.verify(refreshToken, {
-            secret: this.configService.get<string>('REFRESH_TOKEN_SECRET_KEY')
+            secret: this.configService.get<string>('REFRESH_TOKEN_SECRET_KEY'),
           });
-          
+
           // 로그아웃 상태 저장
-          this.userService.logOutUsers[decoded.id] = true;
+          this.valkeyService.set(`logOutUsers:${decoded.id}`, true);
         }
       }
-      
+
       client.disconnect();
       return { success: true, message: '로그아웃되었습니다.' };
     } catch (error) {
@@ -95,4 +108,4 @@ export class UserGateway {
       return { success: false, message: '로그아웃 중 오류가 발생했습니다.' };
     }
   }
-} 
+}
