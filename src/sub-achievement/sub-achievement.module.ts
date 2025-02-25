@@ -6,7 +6,9 @@ import { SubAchievementRepository } from './sub-achievement.repository';
 import { SubAchievement } from './entities/sub-achievement.entity';
 import { AchievementC } from '../achievement-c/entities/achievement-c.entity';
 import { User } from '../user/entities/user.entity';
-import { ValkeyModule } from 'src/valkey/valkey.module';
+import { S3Service } from 'src/s3/s3.service';
+import { ValkeyModule } from '../valkey/valkey.module';
+import { ValkeyService } from 'src/valkey/valkey.service';
 
 @Module({
   imports: [
@@ -14,7 +16,12 @@ import { ValkeyModule } from 'src/valkey/valkey.module';
     ValkeyModule,
   ], // ✅ TypeOrmModule에 엔터티 추가
   controllers: [SubAchievementController],
-  providers: [SubAchievementService, SubAchievementRepository], // ✅ Repository 등록
+  providers: [
+    SubAchievementService,
+    SubAchievementRepository,
+    S3Service,
+    ValkeyService,
+  ], // ✅ Repository 등록
   exports: [SubAchievementService, SubAchievementRepository], // ✅ 다른 모듈에서 사용 가능하도록 export
 })
 export class SubAchievementModule {}

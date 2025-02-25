@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { S3Service } from 'src/s3/s3.service';
 import { Achievement } from './entities/achievement.entity';
 import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
 import { AchievementService } from './achievement.service';
@@ -14,7 +15,7 @@ import { ValkeyModule } from 'src/valkey/valkey.module';
     ValkeyModule,
   ], // ✅ TypeOrmModule에 엔터티 추가
   controllers: [AchievementController],
-  providers: [AchievementService, AchievementRepository], // ✅ AchievementRepository 등록
+  providers: [S3Service, AchievementService, AchievementRepository], // ✅ AchievementRepository 등록
   exports: [AchievementService, AchievementRepository], // ✅ 다른 모듈에서도 사용할 수 있도록 export
 })
 export class AchievementModule {}

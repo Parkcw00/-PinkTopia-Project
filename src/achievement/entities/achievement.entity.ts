@@ -19,6 +19,9 @@ export class Achievement {
   @Column({ type: 'varchar', length: 255, nullable: false })
   title: string;
 
+  @Column({ type: 'json', nullable: true })
+  achievement_images: string[];
+
   @Column({
     type: 'enum',
     enum: AchievementCategory,
@@ -53,4 +56,5 @@ export class Achievement {
 
   @OneToMany(() => AchievementC, (achievement_c) => achievement_c.achievement) // 카드 엔티티와 1:n 관계 설정
   achievement_c: AchievementC[];
+  static achievement_images: any;
 }
