@@ -38,7 +38,7 @@ export class UserService {
     // Valkey에서 먼저 조회
     const cachedData = await this.valkeyService.get(cacheKey);
     if (cachedData) {
-      return JSON.parse(cachedData);
+      return cachedData;
     }
 
     // Valkey에 데이터가 없으면 DB에서 조회 후 캐싱
@@ -55,7 +55,7 @@ export class UserService {
     // Valkey에서 먼저 조회
     const cachedData = await this.valkeyService.get(cacheKey);
     if (cachedData) {
-      return JSON.parse(cachedData);
+      return cachedData;
     }
 
     // Valkey에 데이터가 없으면 DB에서 조회 후 캐싱

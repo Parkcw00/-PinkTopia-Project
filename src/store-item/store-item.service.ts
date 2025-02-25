@@ -19,9 +19,9 @@ export class StoreItemService {
     const cacheKey = 'store_items';
 
     // Valkey에서 먼저 조회
-    const cachedData = await this.valkeyService.get(cacheKey);
-    if (cachedData) {
-      return JSON.parse(cachedData);
+    const cachedData = await this.valkeyService.get<StoreItem[]>(cacheKey);
+    if (cachedData !== null) {
+      return cachedData as StoreItem[]; // 👈 강제 타입 지정
     }
 
     // Valkey에 데이터가 없으면 DB에서 조회 후 캐싱
@@ -36,9 +36,9 @@ export class StoreItemService {
     const cacheKey = `store_item:${id}`;
 
     // Valkey에서 먼저 조회
-    const cachedData = await this.valkeyService.get(cacheKey);
-    if (cachedData) {
-      return JSON.parse(cachedData);
+    const cachedData = await this.valkeyService.get<StoreItem>(cacheKey);
+    if (cachedData !== null) {
+      return cachedData as StoreItem; // 👈 강제 타입 지정
     }
 
     // Valkey에 데이터가 없으면 DB에서 조회 후 캐싱
