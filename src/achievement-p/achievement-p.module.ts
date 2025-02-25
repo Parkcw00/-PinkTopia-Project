@@ -21,7 +21,7 @@ import { ValkeyModule } from 'src/valkey/valkey.module';
     ValkeyModule,
   ], // ✅ TypeORM 모듈에 AchievementP 등록
   controllers: [AchievementPController],
-  providers: [ValkeyService, AchievementPService, AchievementPRepository], // ✅ Repository 등록
+  providers: [AchievementPService, AchievementPRepository], // ✅ Repository 등록
   exports: [AchievementPService, AchievementPRepository], // ✅ 다른 모듈에서 사용 가능하도록 export
 })
 export class AchievementPModule {}
