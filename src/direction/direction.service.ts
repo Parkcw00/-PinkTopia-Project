@@ -23,14 +23,17 @@ export class DirectionService {
 
   async createBookmarks() {
     // ✅ Redis SCAN을 사용하여 패턴에 맞는 키들을 가져옴
-    const keysS: any = await this.valkeyService.get(
-      `sub-achievement:${this.subEntity.id}`,
+
+    // 서브업적 키만 가져옴
+    const keysS =
+      await this.valkeyService.getKeysByPattern(`sub-achievement:*`);
+    console.log('🔍 keyssS 확인:', keysS);
+
+    // 핑크몽 발생위치 키만 가져옴
+    const keysP: any = await this.valkeyService.getKeysByPattern(
+      `pinkmong-appear-location:*`,
     );
-    console.log('🔍 keysS 확인:', keysS);
-    const keysP: any = await this.valkeyService.get(
-      `pinkEntity:${this.pinkEntity.id}`,
-    );
-    console.log('🔍 keysP 확인:', keysP);
+    console.log('🔍 keyssP 확인:', keysP);
 
     const bookmarksS: Array<{
       title: any;
@@ -56,8 +59,58 @@ export class DirectionService {
     if (!keysS || keysS.length < 1) {
       throw new NotFoundException('발키에 서브업적 데이터가 없습니다.');
     }
-    for (const key of keysS) {
-      let data = await this.valkeyService.hgetall(key);
+    // 반복문 돌면서 키값으로 데이터 읽어오기
+    for (let keyS of keysS) {
+      /*  if (type !== 'hash') {
+        console.warn(`Skipping non-hash key: ${keyS}`);
+        continue;
+      }*/
+
+      //  let data = await this.valkeyService.hgetall(keyS);
+      const dataStr = await this.valkeyService.get(keysS);
+      const data = dataStr ? JSON.parse(dataStr) : null;
+      console.log('타입확인', data);
+      switch (data) {
+        case 'hash':
+          console.log(`type : hash`);
+          let data = await this.valkeyService.hgetall(keyS);
+          // 기존 로직
+          break;
+
+        case 'string':
+          console.log(`type : string`);
+          let stringValue = await this.valkeyService.get(keyS);
+          //console.warn(`Processing string key: ${keyS}`);
+          break;
+
+        case 'list':
+          console.log(`type : list`);
+          let listValues = await this.valkeyService.lrange(keyS, 0, -1);
+          //console.warn(`Processing list key: ${keyS}`);
+          break;
+
+        case 'set':
+          console.log(`type :set`);
+          //let setValues = await this.valkeyService.smembers(keyS);
+          //console.warn(`Processing set key: ${keyS}`);
+          break;
+
+        case 'zset':
+          console.log(`type : zset`);
+          /* let zsetValues = await this.valkeyService.zrange(
+            keyS,
+            0,
+            -1,
+            'WITHSCORES',
+          );*/
+          //console.warn(`Processing sorted set key: ${keyS}`);
+          break;
+
+        default:
+          console.log(`type : default`);
+        //console.warn(`Skipping unsupported type (${type}) for key: ${keyS}`);
+      }
+
       if (data && Object.keys(data).length > 0) {
         bookmarksS.push({
           title: data.title,
@@ -66,7 +119,7 @@ export class DirectionService {
           mission_type: data.mission_type,
           content: data.content,
           expiration_at: data.expiration_at,
-          sub_achievement_images: data.sub_achievement_images,
+          sub_achievement_images: JSON.parse(data.sub_achievement_images),
           achievement_id: data.achievement_id,
           deleted_at: data.deleted_at,
         });
@@ -76,8 +129,15 @@ export class DirectionService {
     if (!keysP || keysP.length < 1) {
       throw new NotFoundException('발키에 핑크몽 리스트트 데이터가 없습니다.');
     }
-    for (const key of keysP) {
-      let dataP = await this.valkeyService.hgetall(key);
+
+    for (const keyP of keysP) {
+      const type = await this.valkeyService.type(keyP);
+      if (type !== 'hash') {
+        console.warn(`Skipping non-hash key: ${keyP}`);
+        continue;
+      }
+
+      let dataP = await this.valkeyService.hgetall(keyP);
       if (dataP && Object.keys(dataP).length > 0) {
         bookmarksP.push({
           title: dataP.title,
@@ -89,29 +149,10 @@ export class DirectionService {
         });
       }
     }
-
+    console.log(`왔음`);
+    console.log({ bookmarksS, bookmarksP });
     return { bookmarksS, bookmarksP };
   }
-  /*
-  // Redis SCAN을 활용하여 키 목록 가져오기
-  private async scanKeys(pattern: string): Promise<string[]> {
-    let cursor = '0';
-    let keys: string[] = [];
-
-    do {
-      const [newCursor, foundKeys] = await this.valkeyService
-        //.getClient()
-        .hgetall
-        //.scan(cursor, 'MATCH', pattern);
-      cursor = newCursor;
-      keys = keys.concat(foundKeys);
-    } while (cursor !== '0');
-
-    return keys;
-  }
-
-
-*/
 
   findOne(id: number) {
     return `This action returns a #${id} direction`;

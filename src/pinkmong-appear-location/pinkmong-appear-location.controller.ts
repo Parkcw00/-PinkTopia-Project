@@ -17,6 +17,16 @@ import { UpdatePinkmongAppearLocationDto } from './dto/update-pinkmong-appear-lo
 export class PinkmongAppearLocationController {
   constructor(private readonly service: PinkmongAppearLocationService) {}
 
+  ///발키 임시/////////
+  // db 읽어서 발키로 다 올리는 로직 추가
+  //@UseGuards(UserGuard, AdminGuard)
+  @Post('fill-valkey')
+  async fillValkey() {
+    return await await this.service.fillValkey();
+  }
+
+  /////
+
   @Post()
   async createLocation(
     @Body() dto: CreatePinkmongAppearLocationDto,
