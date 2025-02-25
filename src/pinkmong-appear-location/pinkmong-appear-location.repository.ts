@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PinkmongAppearLocation } from 'src/pinkmong-appear-location/entities/pinkmong-appear-location.entity';
 import { CreatePinkmongAppearLocationDto } from './dto/create-pinkmong-appear-location.dto';
@@ -12,6 +12,12 @@ export class PinkmongAppearLocationRepository {
     private readonly repo: Repository<PinkmongAppearLocation>,
   ) {}
 
+  // ✅ 추가된 코드: Valkey 저장용 데이터 조회
+  async findAllForValkey(): Promise<PinkmongAppearLocation[]> {
+    return await this.repo.find({
+      where: { deleted_at: IsNull() }, // ✅ 삭제되지 않은 데이터만 조회
+    });
+  }
   // 새로운 위치 생성 후 DB 저장
   async createLocation(
     createDto: CreatePinkmongAppearLocationDto,
