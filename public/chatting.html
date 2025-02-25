@@ -466,10 +466,68 @@
       }
 
       // 채팅방 UI 초기화 함수 수정 - 소켓 이벤트 리스너 설정 제거
-      function initializeChatRoom(roomId) {
-        // 채팅방 제목과 멤버 정보 설정만 수행
-        const chatTitle = document.querySelector('.chat-title');
-        chatTitle.textContent = `채팅방 ${roomId}`;
+      async function initializeChatRoom(roomId) {
+        try {
+          // 채팅방 제목 설정
+          const chatTitle = document.querySelector('.chat-title');
+          chatTitle.textContent = `채팅방 ${roomId}`;
+
+          // 과거 채팅 기록 불러오기
+          const response = await fetch(`/chattingroom/${roomId}/chattings`, {
+            headers: {
+              'Authorization': localStorage.getItem('accessToken')
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error('채팅 기록을 불러오는데 실패했습니다.');
+          }
+
+          const chatHistory = await response.json();
+          
+          // 채팅 기록 표시
+          const chatBox = document.getElementById('chatBox');
+          chatHistory.forEach(chat => {
+            const messageDiv = document.createElement('div');
+            const isMyMessage = chat.nickname === currentUserNickname;
+            messageDiv.className = `message ${isMyMessage ? 'my-message' : ''}`;
+            
+            // 이미지 URL인지 확인
+            const imageUrlPattern = /^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i;
+            const isImageUrl = imageUrlPattern.test(chat.message);
+            
+            let messageContent;
+            if (isImageUrl) {
+              messageContent = `<img src="${chat.message}" alt="Shared image" style="max-width: 200px; border-radius: 8px;">`;
+            } else {
+              messageContent = `<span class="message-text">${chat.message}</span>`;
+            }
+
+            if (isMyMessage) {
+              messageDiv.innerHTML = `
+                <div class="message-content">
+                  ${messageContent}
+                </div>
+              `;
+            } else {
+              messageDiv.innerHTML = `
+                <div class="message-content">
+                  <div class="nickname">${chat.nickname}</div>
+                  ${messageContent}
+                </div>
+              `;
+            }
+
+            chatBox.appendChild(messageDiv);
+          });
+
+          // 스크롤을 가장 아래로 이동
+          chatBox.scrollTop = chatBox.scrollHeight;
+
+        } catch (error) {
+          console.error('채팅방 초기화 실패:', error);
+          addSystemMessage('채팅 기록을 불러오는데 실패했습니다.');
+        }
       }
 
       // 멤버 목록 업데이트 함수
