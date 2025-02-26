@@ -13,6 +13,7 @@ import { ValkeyService } from 'src/valkey/valkey.service';
     PinkmongAppearLocationService,
     PinkmongAppearLocationRepository,
     ValkeyService,
-  ],
+  ],exports:[PinkmongAppearLocationService,
+    PinkmongAppearLocationRepository,]
 })
 export class PinkmongAppearLocationModule {}
