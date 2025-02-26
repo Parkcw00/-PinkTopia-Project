@@ -21,7 +21,7 @@ import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  // logOutUsers: { [key: number]: boolean } = {};
+  logOutUsers: { [key: number]: boolean } = {};
 
   constructor(
     private readonly userRepository: UserRepository,
@@ -31,12 +31,38 @@ export class UserService {
     private readonly valkeyService: ValkeyService,
   ) {}
 
+  // 🔹 컬렉션 포인트 랭킹 조회 (Valkey 적용)
   async getRanking() {
-    return await this.userRepository.findUsersByCollectionPoint();
+    const cacheKey = 'ranking:collection_point';
+
+    // Valkey에서 먼저 조회
+    const cachedData = await this.valkeyService.get(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
+
+    // Valkey에 데이터가 없으면 DB에서 조회 후 캐싱
+    const rankingData = await this.userRepository.findUsersByCollectionPoint();
+    await this.valkeyService.set(cacheKey, rankingData, 300); // 5분 캐싱
+
+    return rankingData;
   }
 
+  // 🔹 업적 랭킹 조회 (Valkey 적용)
   async getRankingAchievement() {
-    return await this.userRepository.findUsersByAchievement();
+    const cacheKey = 'ranking:achievement';
+
+    // Valkey에서 먼저 조회
+    const cachedData = await this.valkeyService.get(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
+
+    // Valkey에 데이터가 없으면 DB에서 조회 후 캐싱
+    const rankingData = await this.userRepository.findUsersByAchievement();
+    await this.valkeyService.set(cacheKey, rankingData, 300); // 5분 캐싱
+
+    return rankingData;
   }
 
   // 회원가입
@@ -152,6 +178,7 @@ export class UserService {
       throw new BadRequestException('비밀번호를 입력해 주세요');
     }
 
+    // 1️⃣ 🔹 DB에서 유저 정보 조회
     const existEmail = await this.userRepository.findEmail(email);
     if (!existEmail) {
       throw new BadRequestException('존재하는지 않는 이메일입니다.');
@@ -181,6 +208,7 @@ export class UserService {
       throw new InternalServerErrorException('관리자에게 문의해 주세요');
     }
 
+    // 3️⃣ 🔹 Access Token & Refresh Token 생성
     const accessToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
       expiresIn: accessTokenExpiresIn,
@@ -203,10 +231,25 @@ export class UserService {
       path: '/',
       domain: 'localhost',
     });
-    // if (this.logOutUsers[existEmail.id]) {
-    //   delete this.logOutUsers[existEmail.id];
-    // }
-    await this.valkeyService.del(`logoutUser:${existEmail.id}`);
+    if (this.logOutUsers[existEmail.id]) {
+      delete this.logOutUsers[existEmail.id];
+    }
+
+    // 5️⃣ 🔹 Valkey(발키)에 유저 정보 저장 (12시간 후 자동 삭제)
+    const cacheKey = `user:${existEmail.email}`;
+    const userData = {
+      id: existEmail.id,
+      email: existEmail.email,
+      nickname: existEmail.nickname,
+      profile_image: existEmail.profile_image,
+      collection_point: existEmail.collection_point,
+      pink_gem: existEmail.pink_gem,
+      pink_dia: existEmail.pink_dia,
+      role: existEmail.role,
+    };
+
+    await this.valkeyService.set(cacheKey, userData, 60 * 60 * 12); // 12시간 (초 단위)
+
     return res.status(200).json({ message: '로그인이 되었습니다.' });
   }
 
@@ -218,8 +261,12 @@ export class UserService {
     });
     res.setHeader('Authorization', `Bearer ${accessToken}`);
     res.clearCookie('refreshToken');
-    // this.logOutUsers[user.id] = true;
-    await this.valkeyService.set(`logoutUser:${user.id}`, 'true');
+
+    // 🔹 Valkey에서 해당 유저 정보 삭제 (DB는 건드리지 않음)
+    const cacheKey = `user:${user.email}`;
+    await this.valkeyService.del(cacheKey);
+
+    this.logOutUsers[user.id] = true;
     return res.status(200).json({ message: '로그아웃이 되었습니다.' });
   }
 
