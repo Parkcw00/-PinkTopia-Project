@@ -163,4 +163,4 @@ markerData.forEach(function (data) {
 
   infowindow.open(map, marker);
   markers.push(marker);
-});
+});*/
