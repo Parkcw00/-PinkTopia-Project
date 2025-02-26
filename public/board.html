@@ -268,19 +268,28 @@
           const postList = document.getElementById('postList');
           postList.innerHTML = '';
 
-          posts.forEach((post) => {
+          for (const post of posts) {
+            const userResponse = await fetch(
+              `http://localhost:3000/users/${post.user_id}`,
+              {
+                headers: {
+                  Authorization: `${localStorage.getItem('accessToken')}`,
+                },
+              },
+            );
+            const user = await userResponse.json();
             const postElement = document.createElement('div');
             postElement.className = 'post-item';
             postElement.onclick = () => showPostDetail(post.id);
             postElement.innerHTML = `
                         <div class="post-title">${post.title}</div>
                         <div class="post-info">
-                            작성자: ${post.user_id} |
+                            작성자: ${user.nickname} |
                             작성일: ${new Date(post.created_at).toLocaleString()}
                         </div>
                     `;
             postList.appendChild(postElement);
-          });
+          }
         } catch (error) {
           console.error('게시글 로딩 실패:', error);
         }
@@ -295,11 +304,20 @@
           });
           const post = await response.json();
           currentPostId = postId;
+          const userResponse = await fetch(
+            `http://localhost:3000/users/${post.user_id}`,
+            {
+              headers: {
+                Authorization: `${localStorage.getItem('accessToken')}`,
+              },
+            },
+          );
+          const user = await userResponse.json();
 
           document.getElementById('modalTitle').textContent = post.title;
           document.getElementById('modalContent').textContent = post.content;
           document.getElementById('modalInfo').textContent =
-            `작성자: ${post.user_id} | 작성일: ${new Date(post.created_at).toLocaleString()}`;
+            `작성자: ${user.nickname} | 작성일: ${new Date(post.created_at).toLocaleString()}`;
 
           // 이미지 섹션 추가
           const fileSection = document.createElement('div');
@@ -337,19 +355,27 @@
           console.log(comments);
           const commentList = document.getElementById('commentList');
           commentList.innerHTML = '';
-
-          comments.forEach((comment) => {
+          for (const comment of comments) {
+            const userResponse = await fetch(
+              `http://localhost:3000/users/${comment.user_id}`,
+              {
+                headers: {
+                  Authorization: `${localStorage.getItem('accessToken')}`,
+                },
+              },
+            );
+            const user = await userResponse.json();
             const commentElement = document.createElement('div');
             commentElement.className = 'comment-item';
             commentElement.innerHTML = `
                         <div>${comment.content}</div>
                         <div class="post-info">
-                            ${comment.user_id} |
+                            ${user.nickname} |
                             ${new Date(comment.created_at).toLocaleString()}
                         </div>
                     `;
             commentList.appendChild(commentElement);
-          });
+          }
         } catch (error) {
           console.error('댓글 로딩 실패:', error);
         }
