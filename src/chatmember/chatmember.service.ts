@@ -107,8 +107,25 @@ export class ChatmemberService {
   }
 
   // 채팅방 나가기
-  async deleteChatMember(chatmemberId: number) {
-    return this.chatmemberRepositoryTypeorm.delete(chatmemberId);
+  async deleteChatMember(userId: number, roomId: number) {
+    const member = await this.chatmemberRepository.findByUserIdAndChattingRoomId(
+        userId,
+        roomId
+    );
+
+    if (!member) {
+        throw new NotFoundException('해당 채팅방의 멤버가 아닙니다.');
+    }
+
+    await this.chatmemberRepositoryTypeorm
+        .createQueryBuilder()
+        .delete()
+        .from(Chatmember)
+        .where('user_id = :userId', { userId })
+        .andWhere('chatting_room_id = :roomId', { roomId })
+        .execute();
+
+    return { message: '채팅방에서 나갔습니다.' };
   }
 
   async findByRoomAndUser(chatting_room_id: number, user_id: number) {

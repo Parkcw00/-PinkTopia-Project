@@ -117,7 +117,7 @@
         max-width: 200px;
         border-radius: 8px;
         margin: 5px 0;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       }
     </style>
   </head>
@@ -198,31 +198,28 @@
         }
 
         try {
-          // 채팅 멤버 확인 (한 번만 요청)
-          const memberResponse = await fetch(
-            `http://localhost:3000/chatmember/check/${roomId}`,
-            {
-              headers: {
-                Authorization: accessToken,
-              },
-            },
-          );
+            // 채팅 멤버 확인 (한 번만 요청)
+            const memberResponse = await fetch(`http://localhost:3000/chatmember/check/${roomId}`, {
+                headers: {
+                    'Authorization': accessToken
+                }
+            });
+            
+            if (!memberResponse.ok) {
+                console.log('멤버가 아님, 입장 불가');
+                alert('채팅방 멤버가 아닙니다. 입장할 수 없습니다.');
+                window.location.href = '/public/chattingrooms.html';
+                return;
+            }
 
-          if (!memberResponse.ok) {
-            console.log('멤버가 아님, 입장 불가');
-            alert('채팅방 멤버가 아닙니다. 입장할 수 없습니다.');
-            window.location.href = '/public/chattingrooms.html';
-            return;
-          }
+            const data = await memberResponse.json();
+            console.log('멤버 정보 데이터:', data);
 
-          const data = await memberResponse.json();
-          console.log('멤버 정보 데이터:', data);
-
-          if (data && data.user_id) {
-            currentUserId = data.user_id;
-            currentUserNickname = data.user.nickname;
-            console.log('현재 사용자 ID:', currentUserId);
-            console.log('현재 사용자 닉네임:', currentUserNickname);
+            if (data && data.user_id) {
+                currentUserId = data.user_id;
+                currentUserNickname = data.user.nickname;
+                console.log('현재 사용자 ID:', currentUserId);
+                console.log('현재 사용자 닉네임:', currentUserNickname);
 
             // socket.io 연결 설정
             socket = io('http://localhost:3000/chatting', {
@@ -235,12 +232,12 @@
             // 소켓 연결 후 방 입장
             socket.emit('joinRoom', { roomId: parseInt(roomId) });
 
-            // 소켓 이벤트 리스너 설정
-            setupSocketListeners();
-            initializeChatRoom(roomId);
-          } else {
-            throw new Error('채팅방 멤버 정보를 가져올 수 없습니다.');
-          }
+                // 소켓 이벤트 리스너 설정
+                setupSocketListeners();
+                initializeChatRoom(roomId);
+            } else {
+                throw new Error('채팅방 멤버 정보를 가져올 수 없습니다.');
+            }
         } catch (error) {
           console.error('채팅방 입장 실패:', error);
           alert(error.message || '채팅방 입장에 실패했습니다.');
@@ -259,7 +256,7 @@
 
           const chatBox = document.getElementById('chatBox');
           const messageDiv = document.createElement('div');
-
+          
           // 시스템 메시지인 경우
           if (data.type === 'system') {
             messageDiv.className = 'message system';
@@ -273,13 +270,13 @@
             // 일반 메시지 처리
             const isMyMessage = data.userId === currentUserId;
             messageDiv.className = `message ${isMyMessage ? 'my-message' : ''}`;
-
+            
             const timestamp = new Date(data.timestamp).toLocaleTimeString();
-
+            
             // 이미지 URL인지 확인하는 정규식
             const imageUrlPattern = /^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i;
             const isImageUrl = imageUrlPattern.test(data.message);
-
+            
             let messageContent;
             if (isImageUrl) {
               // 이미지 메시지인 경우
@@ -288,7 +285,7 @@
               // 일반 텍스트 메시지인 경우
               messageContent = `<span class="message-text">${data.message}</span>`;
             }
-
+            
             if (isMyMessage) {
               messageDiv.innerHTML = `
                 <div class="message-content">
@@ -431,15 +428,15 @@
         }
 
         try {
-          if (socket) {
-            socket.emit('temporaryLeaveChatRoom', {
-              userId: currentUserId,
-              roomId: currentRoomId,
-              nickname: currentUserNickname,
-            });
-            socket.disconnect();
-          }
-          window.location.href = '/public/chattingrooms.html';
+            if (socket) {
+                socket.emit('temporaryLeaveChatRoom', {
+                    userId: currentUserId,
+                    roomId: currentRoomId,
+                    nickname: currentUserNickname
+                });
+                socket.disconnect();
+            }
+            window.location.href = '/public/chattingrooms.html';
         } catch (error) {
           console.error('채팅방 나가기 실패:', error);
           alert(error.message || '채팅방 나가기에 실패했습니다.');
@@ -478,8 +475,8 @@
           // 과거 채팅 기록 불러오기
           const response = await fetch(`/chattingroom/${roomId}/chattings`, {
             headers: {
-              Authorization: localStorage.getItem('accessToken'),
-            },
+              'Authorization': localStorage.getItem('accessToken')
+            }
           });
 
           if (!response.ok) {
@@ -487,18 +484,18 @@
           }
 
           const chatHistory = await response.json();
-
+          
           // 채팅 기록 표시
           const chatBox = document.getElementById('chatBox');
-          chatHistory.forEach((chat) => {
+          chatHistory.forEach(chat => {
             const messageDiv = document.createElement('div');
             const isMyMessage = chat.nickname === currentUserNickname;
             messageDiv.className = `message ${isMyMessage ? 'my-message' : ''}`;
-
+            
             // 이미지 URL인지 확인
             const imageUrlPattern = /^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i;
             const isImageUrl = imageUrlPattern.test(chat.message);
-
+            
             let messageContent;
             if (isImageUrl) {
               messageContent = `<img src="${chat.message}" alt="Shared image" style="max-width: 200px; border-radius: 8px;">`;
@@ -526,6 +523,7 @@
 
           // 스크롤을 가장 아래로 이동
           chatBox.scrollTop = chatBox.scrollHeight;
+
         } catch (error) {
           console.error('채팅방 초기화 실패:', error);
           addSystemMessage('채팅 기록을 불러오는데 실패했습니다.');
