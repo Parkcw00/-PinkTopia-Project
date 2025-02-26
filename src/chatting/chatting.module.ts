@@ -12,6 +12,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ChattingController } from './chatting.controller';
 import { ValkeyModule } from 'src/valkey/valkey.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ValkeyModule } from 'src/valkey/valkey.module';
       inject: [ConfigService],
     }),
     ValkeyModule,
+    UserModule,
   ],
   controllers: [ChattingController],
   providers: [ChattingGateway, ChattingService, ChattingRepository],
