@@ -62,7 +62,7 @@ export class DirectionService {
         });
       }
     }
-    console.log('타입확인', bookmarksS);
+    // console.log('타입확인', bookmarksS);
 
     if (!keysP || keysP.length < 1) {
       throw new NotFoundException('발키에 핑크몽 리스트트 데이터가 없습니다.');
@@ -70,7 +70,7 @@ export class DirectionService {
 
     for (let keyP of keysP) {
       const dataP: any = await this.valkeyService.get(keyP);
-      console.log('타입확인', dataP);
+      // console.log('타입확인', dataP);
 
       if (dataP && Object.keys(dataP).length > 0) {
         bookmarksP.push({
@@ -84,8 +84,8 @@ export class DirectionService {
       }
     }
 
-    console.log(`왔음`);
-    console.log({ bookmarksS, bookmarksP });
+    // console.log(`왔음`);
+    //console.log({ bookmarksS, bookmarksP });
     return { bookmarksS, bookmarksP };
   }
 }
