@@ -30,21 +30,32 @@ export class LocationHistoryController {
    */
   @Post('default')
   async createDB(@Body('user_id', ParseIntPipe) user_id: number) {
-    const locationHistory = await this.locationHistoryService.createDB(user_id);
+    const locationHistory =
+      await this.locationHistoryService.createDefault(user_id);
     return { message: '기본 위치 데이터 생성 완료', locationHistory };
   }
-  /**
-   * ✅ 로그인 시, DB의 위치 데이터를 valkey(캐싱)에 저장합니다.
-   * 엔드포인트: **POST /location-history/valkey**
-   */
-  @UseGuards(UserGuard)
-  @Post('valkey')
-  async createValkey(@Request() req) {
-    const updatedValkey = await this.locationHistoryService.createValkey(
-      req.user.id,
-    );
-    return { message: 'valkey 저장 완료', data: updatedValkey };
-  }
+  // /**
+  //  * ✅
+  //  * 엔드포인트: **POST /location-history/valkey**
+  //  */
+  // @UseGuards(UserGuard)
+  // @Post('valkey')
+  // async createValkey(@Request() req) {
+  //   console.log(
+  //     `✅ [Controller] 로그인 후 createValkey() 실행 - user_id: ${req.user.id}`,
+  //   );
+
+  //   // ✅ 로그인 시 DB에서 최신 위치 데이터를 가져와 Valkey에 저장
+  //   const updatedValkey = await this.locationHistoryService.createDBValkey(
+  //     req.user.id,
+  //   );
+  //   console.log(
+  //     `✅ [Controller] createValkey() 완료 - 저장된 데이터:`,
+  //     updatedValkey,
+  //   );
+
+  //   return { message: 'Valkey 저장 완료', data: updatedValkey };
+  // }
 
   /**
    * ✅ 10초마다 실행되어, 최신 위치 데이터를 valkey에 업데이트합니다.
@@ -66,7 +77,11 @@ export class LocationHistoryController {
    */
   @UseGuards(UserGuard)
   @Patch('db')
-  async updateDB(@Request() req, @Body() updateDto: UpdateLocationHistoryDto) {
-    return await this.locationHistoryService.updateDB(req.user.id, updateDto);
+  async updateDB(@Request() req) {
+    console.log(`✅ [Controller] updateDB() 실행 - user_id: ${req.user.id}`);
+
+    // ✅ Valkey 데이터를 가져와서 DB 최신화
+    await this.locationHistoryService.updateDB(req.user.id);
+    return { message: 'DB 최신화 완료' };
   }
 }
