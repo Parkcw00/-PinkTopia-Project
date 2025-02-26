@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>핑크몽 상점</title>
+    <title>아이템 상점</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -14,28 +14,59 @@
             text-align: center;
         }
 
+        .navbar {
+            background-color: #ff56b0;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            position: relative;
+        }
+
+        .navbar .nav-links {
+            position: absolute;
+            right: 15px;
+        }
+
+        .navbar span {
+            font-weight: bold;
+        }
+
+        .navbar .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 0.8em;
+        }
+
+        .navbar .nav-links a:hover {
+            text-decoration: underline;
+        }
+
         h1 {
-            color: #ff1493;
+            color: #ff62b6;
             padding: 20px;
             font-size: 32px;
             font-weight: bold;
         }
 
         .store-container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
         }
 
         .store-item {
             background: white;
             padding: 15px;
             border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(255, 20, 147, 0.3);
+            box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
             text-align: center;
-            width: 220px;
             transition: transform 0.2s;
         }
 
@@ -45,26 +76,26 @@
 
         .store-item img {
             width: 100%;
-            height: 160px;
+            height: 200px;
             object-fit: cover;
             border-radius: 15px;
-            border: 3px solid #ff1493;
+            border: 3px solid #f38fc5;
         }
 
         .store-item h3 {
             margin: 10px 0;
             font-size: 20px;
-            color: #ff1493;
+            color: #9c195f;
         }
 
         .store-item p {
             margin: 5px 0;
-            color: #d63384;
+            color: #2c121f;
             font-size: 16px;
         }
 
         .store-item button {
-            background-color: #ff69b4;
+            background-color: #f575b5;
             color: white;
             border: none;
             padding: 12px;
@@ -102,21 +133,22 @@
                 const storeContainer = document.getElementById('store-items');
 
                 storeContainer.innerHTML = items.map(item => `
-                    <div class="store-item">
-                        <img src="${item.item_image}" alt="${item.name}">
-                        <h3>${item.name}</h3>
-                        <p>가격: ${item.price} 핑크젬</p>
-                        <button onclick="buyItem(${item.id})">구매</button>
-                    </div>
-                `).join('');
+            <div class="store-item">
+                <img src="${item.item_image}" alt="${item.name}">
+                <h3>${item.name}</h3>
+                <p>젬 : ${item.gem_price} 핑크젬</p>
+                <p>다이아 : ${item.dia_price} 다이아</p>
+                ${item.potion ? `<p>포션 시간: ${item.potion_time}초</p>` : ''}
+                <button onclick="buyItem('${item.name}')">구매</button>
+            </div>
+        `).join('');
             } catch (error) {
                 console.error('상점 아이템을 불러오는 중 오류 발생:', error);
             }
         }
 
-        function buyItem(itemId) {
-            alert(`아이템 ID ${itemId} 구매 요청`);
-            // 여기에서 구매 API 요청을 추가할 수 있음
+        function buyItem(itemname) {
+            alert(`⭐ 아이템 ${itemname} 구매 요청 ⭐`);
         }
 
         fetchStoreItems();

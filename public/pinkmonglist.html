@@ -9,22 +9,89 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
+            background-color: #fff0f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            background-color: #ff69b4;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.5em;
+        }
+
+        .navbar span {
+            font-weight: bold;
+        }
+
+        .navbar .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 0.8em;
+        }
+
+        .navbar .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        h1 {
+            color: #eb68a9;
+            font-size: 2.5em;
+            margin-top: 20px;
+            text-shadow: 2px 2px 5px rgba(252, 122, 193, 0.3);
+        }
+
+        .filter-container {
+            margin: 20px auto;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0px 0px 10px rgba(241, 145, 193, 0.5);
+        }
+
+        select,
+        button {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ff69b4;
+            margin: 5px;
+        }
+
+        button {
+            background-color: #ff69b4;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #f846a5;
         }
 
         table {
             width: 80%;
             margin: 20px auto;
             border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 0px 10px rgba(255, 147, 201, 0.5);
         }
 
         th,
         td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 12px;
         }
 
         th {
-            background-color: #f4a7c4;
+            background-color: #ff69b4;
+            color: white;
         }
 
         td a {
@@ -34,31 +101,57 @@
         }
 
         td a:hover {
-            color: #f4a7c4;
+            color: #fa7cbf;
         }
 
-        .common {
-            color: green;
+        .pagination {
+            margin-top: 20px;
         }
 
-        .rare {
-            color: blue;
+        .pagination button {
+            margin: 5px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            background-color: #ff61b0;
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
         }
 
-        .epic {
-            color: purple;
-        }
-
-        .legendary {
-            color: rgb(209, 178, 0);
-            font-size: 1.1em;
-            text-shadow: 1px 1px 5px rgb(255, 217, 0);
+        .pagination button:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
         }
     </style>
 </head>
 
 <body>
+    <div class="navbar">
+        <span>PinkTopia</span>
+        <div class="nav-links">
+            <a href="/public/log-in.html">로그인</a>
+            <a href="/public/sign-up.html">회원가입</a>
+        </div>
+    </div>
+
     <h1>핑크몽 조회</h1>
+    <div class="filter-container">
+        <label for="grade-filter">등급:</label>
+        <select id="grade-filter">
+            <option value="">전체</option>
+            <option value="common">일반</option>
+            <option value="rare">희귀</option>
+            <option value="epic">에픽</option>
+            <option value="legendary">전설</option>
+        </select>
+        <label for="region-filter">서식지:</label>
+        <select id="region-filter">
+            <option value="">전체</option>
+        </select>
+        <button onclick="applyFilters()">필터 적용</button>
+    </div>
+
     <table>
         <thead>
             <tr>
@@ -70,43 +163,98 @@
                 <th>상세보기</th>
             </tr>
         </thead>
-        <tbody id="pinkmong-list">
-            <!-- 핑크몽 데이터가 여기에 추가될 예정 -->
-        </tbody>
+        <tbody id="pinkmong-list"></tbody>
     </table>
 
+    <div class="pagination">
+        <button id="prev-btn" onclick="changePage(-1)" disabled>이전</button>
+        <span id="page-info">1</span>
+        <button id="next-btn" onclick="changePage(1)">다음</button>
+    </div>
+
     <script>
+        let pinkmongs = [];
+        let filteredPinkmongs = [];
+        let currentPage = 1;
+        const itemsPerPage = 20;
+
         async function fetchPinkmongs() {
             try {
-                const response = await fetch('http://localhost:3000/pinkmong/pinkmongs'); // 서버 주소 명확히 지정
-                if (!response.ok) throw new Error('네트워크 응답이 올바르지 않습니다.');
+                const response = await fetch('http://localhost:3000/pinkmong/pinkmongs');
+                if (!response.ok) throw new Error('네트워크 오류');
                 const data = await response.json();
 
                 if (!Array.isArray(data.pinkmongs)) {
-                    console.error('올바른 데이터 형식이 아닙니다:', data);
+                    console.error('잘못된 데이터 형식:', data);
                     return;
                 }
 
-                const tableBody = document.getElementById('pinkmong-list');
-                tableBody.innerHTML = '';
-
-                data.pinkmongs.forEach(pinkmong => {
-                    const row = `<tr>
-                        <td>${pinkmong.id}</td>
-                        <td>${pinkmong.name}</td>
-                        <td>${pinkmong.region_theme || '테마 없음'}</td>
-                        <td>${pinkmong.pinkmong_image ? `<img src="${pinkmong.pinkmong_image}" alt="${pinkmong.name}" width="50">` : '이미지 없음'}</td>
-                        <td class="${pinkmong.grade || 'common'}">${pinkmong.grade || '등급 없음'}</td>
-                        <td><a href="pinkmong-detail.html?id=${pinkmong.id}">상세보기</a></td>
-                    </tr>`;
-                    tableBody.innerHTML += row;
-                });
+                pinkmongs = data.pinkmongs;
+                populateRegionFilter();
+                applyFilters();
             } catch (error) {
                 console.error('핑크몽 데이터를 불러오는 중 오류 발생:', error);
             }
         }
 
-        document.addEventListener('DOMContentLoaded', fetchPinkmongs);
+        function populateRegionFilter() {
+            const regionFilter = document.getElementById("region-filter");
+            regionFilter.innerHTML = `<option value="">전체</option>`;
+            const regions = [...new Set(pinkmongs.map(p => p.region_theme).filter(Boolean))];
+            regions.forEach(region => {
+                const option = document.createElement("option");
+                option.value = region;
+                option.textContent = region;
+                regionFilter.appendChild(option);
+            });
+        }
+
+        function applyFilters() {
+            const grade = document.getElementById("grade-filter").value;
+            const region = document.getElementById("region-filter").value;
+
+            filteredPinkmongs = pinkmongs.filter(p =>
+                (grade === "" || p.grade === grade) &&
+                (region === "" || p.region_theme === region)
+            );
+
+            currentPage = 1;
+            displayPinkmongs();
+        }
+
+        function displayPinkmongs() {
+            const tableBody = document.getElementById("pinkmong-list");
+            tableBody.innerHTML = "";
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedData = filteredPinkmongs.slice(start, end);
+
+            paginatedData.forEach(pinkmong => {
+                tableBody.innerHTML += `<tr>
+                    <td>${pinkmong.id}</td>
+                    <td>${pinkmong.name}</td>
+                    <td>${pinkmong.region_theme || '테마 없음'}</td>
+                    <td><img src="${pinkmong.pinkmong_image}" width="50"></td>
+                    <td>${pinkmong.grade || '등급 없음'}</td>
+                    <td><a href="pinkmong-detail.html?id=${pinkmong.id}">상세보기</a></td>
+                </tr>`;
+            });
+
+            document.getElementById("prev-btn").disabled = currentPage === 1;
+            document.getElementById("next-btn").disabled = end >= filteredPinkmongs.length;
+        }
+
+        function changePage(offset) {
+            currentPage += offset;
+
+            // 페이지 정보 업데이트
+            document.getElementById("page-info").textContent = currentPage;
+
+            displayPinkmongs();
+        }
+
+        document.addEventListener("DOMContentLoaded", fetchPinkmongs);
     </script>
 </body>
 
