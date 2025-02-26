@@ -7,6 +7,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatmemberService } from './chatmember.service';
+import { ChattingGateway } from '../chatting/chatting.gateway';
 
 @WebSocketGateway({
   namespace: '/chatmember',
@@ -24,7 +25,10 @@ export class ChatmemberGateway {
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly chatmemberService: ChatmemberService) {}
+  constructor(
+    private readonly chatmemberService: ChatmemberService,
+    private readonly chattingGateway: ChattingGateway,
+  ) {}
 
   // 채팅멤버 생성
   @SubscribeMessage('createChatmember')
@@ -77,16 +81,45 @@ export class ChatmemberGateway {
     }
   }
 
-  // 채팅방 나가기
-  @SubscribeMessage('deleteChatMember')
-  async handleDeleteChatMember(
-    @MessageBody() data: { chatmemberId: number },
+  // 채팅방 임시 나가기 (멤버 유지)
+  @SubscribeMessage('temporaryLeaveChatRoom')
+  async handleTemporaryLeave(
+    @MessageBody() data: { userId: number; roomId: number; nickname: string },
     @ConnectedSocket() client: Socket,
   ) {
     try {
-      await this.chatmemberService.deleteChatMember(data.chatmemberId);
+      // 소켓 이벤트만 처리하고 멤버는 삭제하지 않음
+      client.emit('userLeft', { 
+        userId: data.userId, 
+        roomId: data.roomId,
+        nickname: data.nickname 
+      });
+    } catch (error) {
+      console.error('Error leaving chat room:', error);
+      client.emit('error', { message: 'Failed to leave chat room' });
+    }
+  }
+
+  // 채팅방 완전히 나가기 (멤버 삭제)
+  @SubscribeMessage('permanentLeaveChatRoom')
+  async handlePermanentLeave(
+    @MessageBody() data: { userId: number; roomId: number; nickname: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      await this.chatmemberService.deleteChatMember(data.userId, data.roomId);
+      
+      // 채팅 게이트웨이를 통해 메시지 전송
+      this.chattingGateway.server.to(`room_${data.roomId}`).emit('message', {
+        type: 'system',
+        roomId: data.roomId,
+        message: `${data.nickname}님이 채팅방을 완전히 나가셨습니다.`,
+        timestamp: new Date(),
+      });
+
       // 개별 클라이언트에게 삭제 완료 알림
-      client.emit('chatmemberDeleted', { chatmemberId: data.chatmemberId });
+      client.emit('chatmemberDeleted', { userId: data.userId, roomId: data.roomId });
+      
       // 모든 클라이언트에게 업데이트된 목록 전송
       const allChatmembers = await this.chatmemberService.findAllChatMember();
       this.server.emit('allChatMembers', allChatmembers);
