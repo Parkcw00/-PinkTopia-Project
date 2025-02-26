@@ -21,8 +21,8 @@ import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  logOutUsers: any;
-  // logOutUsers: { [key: number]: boolean } = {};
+  // logOutUsers: any;
+  logOutUsers: { [key: number]: boolean } = {};
 
   constructor(
     private readonly userRepository: UserRepository,
