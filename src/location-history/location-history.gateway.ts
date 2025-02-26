@@ -33,7 +33,7 @@ export class LocationHistoryGateway {
    * 최신 위치를 업데이트하고, 가장 오래된 7번째 기록을 삭제
    */
   @SubscribeMessage('updateLocation')
-  async handleLocationUpdate(
+  async handleLocationUpdateValkey(
     @MessageBody()
     data: { userId: number; latitude: number; longitude: number },
     @ConnectedSocket() client: Socket,
@@ -46,6 +46,21 @@ export class LocationHistoryGateway {
     };
 
     await this.locationHistoryService.updateValkey(data.userId, updateDto);
+    client.emit('locationUpdated', { message: '위치 업데이트 완료' });
+  }
+
+  /**
+   * ✅ 10분마다 실행되는 DB 업데이트 요청 (현재 10분마다 실행)
+   */
+  @SubscribeMessage('updateLocationDB')
+  async handleLocationUpdateDB(
+    @MessageBody()
+    data: { userId: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    console.log('✅ [WebSocket] 사용자 위치 업데이트 요청:', data);
+
+    await this.locationHistoryService.updateDB(data.userId);
     client.emit('locationUpdated', { message: '위치 업데이트 완료' });
   }
 }

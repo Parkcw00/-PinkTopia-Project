@@ -6,7 +6,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script
       type="text/javascript"
-      src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_REAL_KAKAO_API_KEY"
+      src="//dapi.kakao.com/v2/maps/sdk.js?appkey=620f82a72553514014eda92cefcbbaf3"
     ></script>
   </head>
 
@@ -23,6 +23,9 @@
       function checkAccessToken() {
         const accessToken = localStorage.getItem('accessToken');
         if (!accessToken) {
+          console.error(
+            '❌ Access Token이 없습니다. 로그인 페이지로 이동합니다.',
+          );
           window.location.href = '/public/log-in.html';
         }
         return accessToken; // accessToken을 반환
@@ -54,6 +57,17 @@
               sendLocation();
             }
           }, 10000); // 10초마다 위치 전송
+
+          setInterval(() => {
+            if (isTokenExpired()) {
+              socket.disconnect();
+              alert('엑세스 토큰이 만료되었습니다. 다시 로그인하세요.');
+              window.location.href = '/public/log-in.html';
+            } else {
+              sendLocation10(); // ✅ 1분마다 실행되는 함수 수정
+            }
+          }, 60000); // 1분마다 실행
+
           requestLocationHistory();
         } else {
           socket.disconnect(); // 소켓 연결 종료
@@ -63,7 +77,6 @@
       }
 
       startLocationUpdates();
-
       function sendLocation() {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition((position) => {
@@ -81,6 +94,37 @@
         }
       }
 
+      function sendLocation10() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((position) => {
+            const data = {
+              userId: decodedToken.id,
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              timestamp: new Date().toISOString(),
+            };
+
+            socket.emit('updateLocationDB', data);
+
+            // 10분마다 회사 DB에 사용자 위치 저장
+            fetch('/location-history/db', {
+              method: 'PATCH',
+              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: accessToken,
+              },
+              body: JSON.stringify(data),
+            })
+              .then((response) => response.json())
+              .then((resData) => console.log('✅ 위치 저장 성공:', resData))
+              .catch((error) => console.error('❌ 위치 저장 실패:', error));
+          });
+        } else {
+          alert('Geolocation을 지원하지 않는 브라우저입니다.');
+        }
+      }
+
       socket.on('locationUpdated', (data) => {
         console.log('✅ 서버 응답:', data);
       });
@@ -91,8 +135,8 @@
 
       // ✅ 로그인 후 위치 데이터를 요청
       function requestLocationHistory() {
-        fetch('http://localhost:3000/location-history/valkey', {
-          method: 'POST',
+        fetch('/location-history/valkey', {
+          method: 'PATCH',
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
