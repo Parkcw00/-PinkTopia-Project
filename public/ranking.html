@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>랭킹 | PinkTopia</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        background-color: #ff69b4;
+        padding: 15px;
+        color: white;
+        font-weight: bold;
+      }
+
+      .nav a {
+        color: white;
+        text-decoration: none;
+        margin: 0 10px;
+      }
+
+      .ranking-section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin: 20px 0;
+        padding: 20px;
+      }
+
+      .ranking-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+
+      .ranking-table th,
+      .ranking-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .ranking-table th {
+        background-color: #ff69b4;
+        color: white;
+      }
+
+      .ranking-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      .ranking-table tr:hover {
+        background-color: #f5f5f5;
+      }
+
+      .rank {
+        font-weight: bold;
+        color: #ff69b4;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .tab {
+        padding: 10px 20px;
+        background-color: #f0f0f0;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      .tab.active {
+        background-color: #ff69b4;
+        color: white;
+      }
+
+      .ranking-section {
+        display: none;
+      }
+
+      .ranking-section.active {
+        display: block;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="nav">
+      <div>
+        <a href="home.html" style="text-decoration: none; color: white"
+          >PinkTophia</a
+        >
+      </div>
+      <div id="authMenu">
+        <a href="log-in.html">로그인</a>
+        <a href="sign-up.html">회원가입</a>
+      </div>
+    </div>
+    <div class="container">
+      <h1>랭킹</h1>
+
+      <div class="tabs">
+        <div class="tab active" onclick="showRanking('point')">포인트 랭킹</div>
+        <div class="tab" onclick="showRanking('achievement')">
+          업적 달성 랭킹
+        </div>
+      </div>
+
+      <div class="ranking-section active" id="pointRankingSection">
+        <h2>포인트 랭킹</h2>
+        <table class="ranking-table" id="pointRanking">
+          <thead>
+            <tr>
+              <th>순위</th>
+              <th>닉네임</th>
+              <th>포인트</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="ranking-section" id="achievementRankingSection">
+        <h2>업적 달성 랭킹</h2>
+        <table class="ranking-table" id="achievementRanking">
+          <thead>
+            <tr>
+              <th>순위</th>
+              <th>닉네임</th>
+              <th>달성 업적 수</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const accessToken = localStorage.getItem('accessToken');
+        const authMenu = document.getElementById('authMenu');
+
+        if (accessToken) {
+          authMenu.innerHTML =
+            '<a href="mypage.html">마이페이지</a> <a href="#" onclick="logout()">로그아웃</a>';
+        }
+
+        fetchRankings();
+      });
+
+      function showRanking(type) {
+        // 모든 탭과 섹션의 active 클래스 제거
+        document
+          .querySelectorAll('.tab')
+          .forEach((tab) => tab.classList.remove('active'));
+        document
+          .querySelectorAll('.ranking-section')
+          .forEach((section) => section.classList.remove('active'));
+
+        // 선택된 탭과 섹션에 active 클래스 추가
+        if (type === 'point') {
+          document.querySelector('.tab:first-child').classList.add('active');
+          document
+            .getElementById('pointRankingSection')
+            .classList.add('active');
+        } else {
+          document.querySelector('.tab:last-child').classList.add('active');
+          document
+            .getElementById('achievementRankingSection')
+            .classList.add('active');
+        }
+      }
+
+      async function logout() {
+        localStorage.removeItem('accessToken');
+        await fetch(`http://localhost:3000/user/auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${localStorage.getItem('accessToken')}`,
+          },
+        });
+        window.location.reload();
+      }
+
+      async function fetchRankings() {
+        try {
+          // 포인트 랭킹 가져오기
+          const pointResponse = await fetch('/user/ranking/point');
+          const pointData = await pointResponse.json();
+          displayRanking('pointRanking', pointData, 'collection_point');
+
+          // 업적 랭킹 가져오기
+          const achievementResponse = await fetch('/user/ranking/achievement');
+          const achievementData = await achievementResponse.json();
+          displayRanking(
+            'achievementRanking',
+            achievementData,
+            'achievementCount',
+          );
+        } catch (error) {
+          console.error(
+            '랭킹 데이터를 가져오는 중 오류가 발생했습니다:',
+            error,
+          );
+        }
+      }
+
+      function displayRanking(tableId, data, scoreField) {
+        const tbody = document.querySelector(`#${tableId} tbody`);
+        tbody.innerHTML = '';
+
+        data.forEach((user, index) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+                    <td class="rank">${index + 1}</td>
+                    <td>${user.nickname}</td>
+                    <td>${user[scoreField]}</td>
+                `;
+          tbody.appendChild(row);
+        });
+      }
+    </script>
+  </body>
+</html>
