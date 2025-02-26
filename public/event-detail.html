@@ -102,7 +102,7 @@
             try {
                 console.log(`이벤트 상세 정보를 불러오는 중... ID: ${eventId}`);
 
-                const response = await fetch(`http://localhost:3000/event/${eventId}`);
+                const response = await fetch(`/event/${eventId}`);
 
                 if (!response.ok) {
                     throw new Error(`HTTP 오류 발생: ${response.status}`);
