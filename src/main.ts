@@ -17,7 +17,7 @@ async function bootstrap() {
   app.enableCors();
   app.use(cookieParser());
   // 정적 파일 제공 설정
-  app.use('/public', express.static(join(__dirname, '..', 'public')));
+  // app.use('/public', express.static(join(__dirname, '..', 'public')));
   app.enableCors({
     origin: [
       'http://127.0.0.1:5500',
@@ -41,7 +41,7 @@ async function bootstrap() {
     next();
   });
   // 정적 파일 제공 설정
-  app.use('/public', express.static(join(__dirname, '..', 'public')));
+  // app.use('/public', express.static(join(__dirname, '..', 'public')));
   const options = new DocumentBuilder()
     .setTitle('Your API Title')
     .addBearerAuth()
@@ -57,8 +57,8 @@ async function bootstrap() {
     .addTag('Your API Tag')
     .addBearerAuth() // JWT 베어러 인증 추가
     .build();
-  const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('api-docs', app, document);
+  // const document = SwaggerModule.createDocument(app, options);
+  // SwaggerModule.setup('api-docs', app, document);
 
   app.useGlobalPipes(
     new ValidationPipe({
