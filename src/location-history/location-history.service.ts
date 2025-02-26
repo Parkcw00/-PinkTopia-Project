@@ -26,20 +26,6 @@ export class LocationHistoryService {
 
     return defaultRecords;
   }
-  // /**
-  //  * ✅ 로그인 시 valkey를 불러온다??
-  //  */
-  // async createDBValkey(user_id: number): Promise<LocationHistory[]> {
-  //   const loginLH = await this.repository.getLogin(user_id);
-
-  //   await this.valkeyService.del(`LocationHistory:${user_id}`);
-  //   await this.valkeyService.set(
-  //     `LocationHistory:${user_id}`,
-  //     JSON.stringify(loginLH),
-  //   );
-
-  //   return loginLH; // ✅ 저장된 데이터를 반환
-  // }
 
   /**
    * ✅ 10초마다 실행되는 valkey(캐시) 업데이트
@@ -97,38 +83,67 @@ export class LocationHistoryService {
   async updateDB(user_id: number): Promise<void> {
     console.log(`✅ [Service] updateDB() 실행 - user_id: ${user_id}`);
 
-    // ✅ Valkey에서 최신 위치 데이터 가져오기
-    const latestData: UpdateLocationHistoryDto | null =
-      await this.valkeyService.get(`LocationHistory:${user_id}`);
+    let records: UpdateLocationHistoryDto[] = [];
 
-    if (!latestData) {
+    try {
+      let rawData: string | null = await this.valkeyService.get(
+        `LocationHistory:${user_id}`,
+      );
+
+      if (typeof rawData === 'string') {
+        try {
+          const parsedData = JSON.parse(rawData); // JSON 변환
+
+          if (Array.isArray(parsedData)) {
+            records = parsedData.map((item) => {
+              if (typeof item === 'string') {
+                return JSON.parse(item); // 문자열인 경우 다시 JSON 변환
+              }
+              return item; // 이미 객체라면 그대로 사용
+            });
+          } else {
+            console.error(
+              `❌ [Service] Valkey 데이터가 배열이 아님:`,
+              parsedData,
+            );
+          }
+        } catch (error) {
+          console.error(`❌ [Service] Valkey JSON 변환 오류:`, error);
+        }
+      } else {
+        console.error(
+          `❌ [Service] Valkey에서 받은 데이터가 문자열이 아님:`,
+          rawData,
+        );
+      }
+    } catch (error) {
+      console.error(`❌ [Service] Valkey 데이터 가져오기 실패:`, error);
+    }
+
+    if (records.length === 0) {
       console.log(
-        `⚠️ [Service] updateDB() - Valkey에서 데이터 없음, 업데이트 중단`,
+        `⚠️ [Service] updateDB() - Valkey에 데이터 없음, 업데이트 중단`,
       );
       return;
     }
 
-    console.log(`✅ [Service] Valkey에서 가져온 최신 데이터:`, latestData);
-
-    // ✅ 가장 오래된 데이터 가져와서 업데이트
     let oldestHistory = await this.repository.findOldestByUserId(user_id);
-
-    if (oldestHistory) {
-      oldestHistory.latitude = latestData.latitude;
-      oldestHistory.longitude = latestData.longitude;
-      oldestHistory.timestamp = latestData.timestamp ?? new Date();
-
-      await this.repository.save(oldestHistory);
-      console.log(`✅ [Service] DB 최신화 완료 - 기존 데이터 업데이트됨`);
-    } else {
-      // ✅ 기존 데이터가 없으면 새로운 데이터 생성
-      await this.repository.create7(
-        user_id,
-        latestData.latitude,
-        latestData.longitude,
-        latestData.timestamp ?? new Date(),
-      );
-      console.log(`✅ [Service] DB 최신화 완료 - 새로운 데이터 생성됨`);
+    for (const updateDto of records) {
+      if (oldestHistory) {
+        oldestHistory.latitude = updateDto.latitude;
+        oldestHistory.longitude = updateDto.longitude;
+        oldestHistory.timestamp = updateDto.timestamp ?? new Date();
+        await this.repository.save(oldestHistory);
+      } else {
+        oldestHistory = await this.repository.create7(
+          user_id,
+          updateDto.latitude,
+          updateDto.longitude,
+          updateDto.timestamp ?? new Date(),
+        );
+      }
     }
+
+    console.log(`✅ [Service] updateDB() 완료 - DB에 최신 데이터 반영됨`);
   }
 }
