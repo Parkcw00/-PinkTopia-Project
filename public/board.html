@@ -96,8 +96,24 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         max-height: 80vh;
         overflow-y: auto;
+        position: relative;
       }
 
+      .close-btn {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        font-size: 24px;
+        color: #666;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+      }
+
+      .close-btn:hover {
+        color: #ff69b4;
+      }
       .file-section {
         margin: 20px 0;
       }
@@ -170,8 +186,9 @@
     </div>
 
     <!-- 게시글 상세 모달 -->
-    <div class="post-modal" id="postModal">
-      <div class="modal-content">
+    <div class="post-modal" id="postModal" onclick="closeModal()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="close-btn" onclick="closeModal()">×</button>
         <h2 id="modalTitle"></h2>
         <div class="post-info" id="modalInfo"></div>
         <br />
@@ -186,13 +203,12 @@
           <button class="write-btn" onclick="addComment()">댓글 작성</button>
           <div class="comment-list" id="commentList"></div>
         </div>
-        <button class="write-btn" onclick="closeModal()">닫기</button>
       </div>
     </div>
 
     <!-- 게시글 작성 모달 -->
-    <div class="post-modal" id="writeModal">
-      <div class="modal-content">
+    <div class="post-modal" id="writeModal" onclick="closeWriteModal()">
+      <div class="modal-content" onclick="event.stopPropagation()">
         <h2>글쓰기</h2>
         <input
           type="text"
