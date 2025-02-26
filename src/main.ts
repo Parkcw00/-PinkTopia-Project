@@ -13,8 +13,7 @@ async function bootstrap() {
   // cert: readFileSync('server.cert'),
   // };
   const app = await NestFactory.create(AppModule); //, { httpsOptions });
-  // ✅ CORS 활성화 (모든 요청 허용)
-  app.enableCors();
+
   app.use(cookieParser());
   // 정적 파일 제공 설정
   app.use('/public', express.static(join(__dirname, '..', 'public')));
@@ -23,6 +22,7 @@ async function bootstrap() {
       'http://127.0.0.1:5500',
       'http://localhost:5500',
       'http://127.0.0.1:3000',
+      'http://localhost:3000', // 백엔드 실행 주소
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
@@ -40,8 +40,7 @@ async function bootstrap() {
     });
     next();
   });
-  // 정적 파일 제공 설정
-  app.use('/public', express.static(join(__dirname, '..', 'public')));
+
   const options = new DocumentBuilder()
     .setTitle('Your API Title')
     .addBearerAuth()
