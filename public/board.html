@@ -96,8 +96,24 @@
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
         max-height: 80vh;
         overflow-y: auto;
+        position: relative;
       }
 
+      .close-btn {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        font-size: 24px;
+        color: #666;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+      }
+
+      .close-btn:hover {
+        color: #ff69b4;
+      }
       .file-section {
         margin: 20px 0;
       }
@@ -151,7 +167,11 @@
 
   <body>
     <div class="nav">
-      <div>PinkTophia</div>
+      <div>
+        <a href="home.html" style="text-decoration: none; color: white"
+          >PinkTophia</a
+        >
+      </div>
       <div id="authMenu">
         <a href="log-in.html">로그인</a>
         <a href="sign-up.html">회원가입</a>
@@ -170,8 +190,9 @@
     </div>
 
     <!-- 게시글 상세 모달 -->
-    <div class="post-modal" id="postModal">
-      <div class="modal-content">
+    <div class="post-modal" id="postModal" onclick="closeModal()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="close-btn" onclick="closeModal()">×</button>
         <h2 id="modalTitle"></h2>
         <div class="post-info" id="modalInfo"></div>
         <br />
@@ -186,13 +207,12 @@
           <button class="write-btn" onclick="addComment()">댓글 작성</button>
           <div class="comment-list" id="commentList"></div>
         </div>
-        <button class="write-btn" onclick="closeModal()">닫기</button>
       </div>
     </div>
 
     <!-- 게시글 작성 모달 -->
-    <div class="post-modal" id="writeModal">
-      <div class="modal-content">
+    <div class="post-modal" id="writeModal" onclick="closeWriteModal()">
+      <div class="modal-content" onclick="event.stopPropagation()">
         <h2>글쓰기</h2>
         <input
           type="text"
@@ -268,19 +288,28 @@
           const postList = document.getElementById('postList');
           postList.innerHTML = '';
 
-          posts.forEach((post) => {
+          for (const post of posts) {
+            const userResponse = await fetch(
+              `http://localhost:3000/users/${post.user_id}`,
+              {
+                headers: {
+                  Authorization: `${localStorage.getItem('accessToken')}`,
+                },
+              },
+            );
+            const user = await userResponse.json();
             const postElement = document.createElement('div');
             postElement.className = 'post-item';
             postElement.onclick = () => showPostDetail(post.id);
             postElement.innerHTML = `
                         <div class="post-title">${post.title}</div>
                         <div class="post-info">
-                            작성자: ${post.user_id} |
+                            작성자: ${user.nickname} |
                             작성일: ${new Date(post.created_at).toLocaleString()}
                         </div>
                     `;
             postList.appendChild(postElement);
-          });
+          }
         } catch (error) {
           console.error('게시글 로딩 실패:', error);
         }
@@ -295,11 +324,20 @@
           });
           const post = await response.json();
           currentPostId = postId;
+          const userResponse = await fetch(
+            `http://localhost:3000/users/${post.user_id}`,
+            {
+              headers: {
+                Authorization: `${localStorage.getItem('accessToken')}`,
+              },
+            },
+          );
+          const user = await userResponse.json();
 
           document.getElementById('modalTitle').textContent = post.title;
           document.getElementById('modalContent').textContent = post.content;
           document.getElementById('modalInfo').textContent =
-            `작성자: ${post.user_id} | 작성일: ${new Date(post.created_at).toLocaleString()}`;
+            `작성자: ${user.nickname} | 작성일: ${new Date(post.created_at).toLocaleString()}`;
 
           // 이미지 섹션 추가
           const fileSection = document.createElement('div');
@@ -337,19 +375,27 @@
           console.log(comments);
           const commentList = document.getElementById('commentList');
           commentList.innerHTML = '';
-
-          comments.forEach((comment) => {
+          for (const comment of comments) {
+            const userResponse = await fetch(
+              `http://localhost:3000/users/${comment.user_id}`,
+              {
+                headers: {
+                  Authorization: `${localStorage.getItem('accessToken')}`,
+                },
+              },
+            );
+            const user = await userResponse.json();
             const commentElement = document.createElement('div');
             commentElement.className = 'comment-item';
             commentElement.innerHTML = `
                         <div>${comment.content}</div>
                         <div class="post-info">
-                            ${comment.user_id} |
+                            ${user.nickname} |
                             ${new Date(comment.created_at).toLocaleString()}
                         </div>
                     `;
             commentList.appendChild(commentElement);
-          });
+          }
         } catch (error) {
           console.error('댓글 로딩 실패:', error);
         }

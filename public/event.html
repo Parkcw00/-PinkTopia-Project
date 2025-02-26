@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>이벤트 목록</title>
+    <title>이벤트 | PinkTophia</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -66,8 +66,6 @@
             margin-right: auto;
         }
 
-
-
         .event-title {
             font-size: 18px;
             font-weight: bold;
@@ -118,10 +116,44 @@
             background-color: #ff3385;
             transform: scale(0.95);
         }
+
+        /* 네비게이션 바 스타일 수정 */
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            background-color: #ff69b4;
+            padding: 15px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        /* 불필요한 네비게이션 관련 스타일 제거 */
+        .menu-icon,
+        .logo-container,
+        .logo-text,
+        #authMenu {
+            display: none;
+        }
     </style>
 </head>
 
 <body>
+    <!-- 네비게이션 바 추가 -->
+    <div class="nav">
+        <div>
+            <a href="/public/home.html">PinkTophia</a>
+        </div>
+        <div>
+            <a href="/public/home.html">홈으로</a>
+        </div>
+    </div>
+
     <div class="container">
         <h2>이벤트 목록</h2>
 
@@ -131,7 +163,6 @@
             <div class="tab" onclick="filterEvents('active')">진행 중</div>
             <div class="tab" onclick="filterEvents('closed')">종료됨</div>
         </div>
-
 
         <div id="eventList"></div>
     </div>
@@ -197,7 +228,6 @@
             window.location.href = `event-detail.html?id=${eventId}`;
         }
     </script>
-
 </body>
 
 </html>
