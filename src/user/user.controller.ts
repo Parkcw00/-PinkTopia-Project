@@ -70,6 +70,7 @@ export class UserController {
   @ApiOperation({ summary: '로그인' })
   @Post('/auth/login')
   async logIn(@Body() logInDto: LogInDto, @Res() res: Response) {
+    console.log(`------>`,logInDto);
     return await this.userService.logIn(logInDto.email, logInDto.password, res);
   }
 

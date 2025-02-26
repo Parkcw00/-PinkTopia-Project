@@ -184,7 +184,7 @@ export class UserService {
     if (!existEmail) {
       throw new BadRequestException('존재하는지 않는 이메일입니다.');
     }
-
+    console.log(`------>`,existEmail);
     if (existEmail.email_verify === false) {
       throw new BadRequestException('이메일 인증을 진행해 주세요');
     }
