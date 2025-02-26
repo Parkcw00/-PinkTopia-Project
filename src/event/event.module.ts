@@ -5,9 +5,10 @@ import { EventService } from './event.service';
 import { EventController } from './event.controller';
 import { EventRepository } from './event.repository';
 import { ValkeyModule } from 'src/valkey/valkey.module';
+import { S3Module } from '../s3/s3.module'; // S3 모듈 추가
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Event]), ValkeyModule],
+  imports: [TypeOrmModule.forFeature([Event]), S3Module, ValkeyModule],
   controllers: [EventController],
   providers: [EventService, EventRepository], //레포지토리 추가
   exports: [EventRepository],

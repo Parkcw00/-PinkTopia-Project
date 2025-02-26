@@ -1,137 +1,140 @@
 <!doctype html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>로그인 | PinkTophia</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
-      body {
-        background-color: #f8f9fa;
-        height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0;
-        padding: 0;
-      }
-      .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100%;
-        width: 100%;
-        padding: 1rem;
-      }
-      .login-container {
-        background-color: white;
-        padding: 2rem;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 400px;
-      }
-      .login-title {
-        text-align: center;
-        color: #ff69b4;
-        margin-bottom: 1.5rem;
-      }
-      .form-control:focus {
-        border-color: #ff69b4;
-        box-shadow: 0 0 0 0.2rem rgba(255, 105, 180, 0.25);
-      }
-      .btn-pink {
-        background-color: #ff69b4;
-        border-color: #ff69b4;
-        color: white;
-      }
-      .btn-pink:hover {
-        background-color: #ff4da6;
-        border-color: #ff4da6;
-        color: white;
-      }
-      .signup-link {
-        text-align: center;
-        margin-top: 1rem;
-      }
-      .signup-link a {
-        color: #ff69b4;
-        text-decoration: none;
-      }
-      .signup-link a:hover {
-        text-decoration: underline;
-      }
+        body {
+            background-color: #f8f9fa;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            padding: 1rem;
+        }
+
+        .login-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-title {
+            text-align: center;
+            color: #ff69b4;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-control:focus {
+            border-color: #ff69b4;
+            box-shadow: 0 0 0 0.2rem rgba(255, 105, 180, 0.25);
+        }
+
+        .btn-pink {
+            background-color: #ff69b4;
+            border-color: #ff69b4;
+            color: white;
+        }
+
+        .btn-pink:hover {
+            background-color: #ff4da6;
+            border-color: #ff4da6;
+            color: white;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .signup-link a {
+            color: #ff69b4;
+            text-decoration: none;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
     </style>
-  </head>
-  <body>
+</head>
+
+<body>
     <div class="container">
-      <div class="login-container">
-        <h2 class="login-title">로그인</h2>
-        <form id="loginForm">
-          <div class="mb-3">
-            <label for="email" class="form-label">이메일</label>
-            <input type="email" class="form-control" id="email" required />
-          </div>
-          <div class="mb-3">
-            <label for="password" class="form-label">비밀번호</label>
-            <input
-              type="password"
-              class="form-control"
-              id="password"
-              required
-            />
-          </div>
-          <button type="submit" class="btn btn-pink w-100">로그인</button>
-        </form>
-        <div class="signup-link">
-          <span>계정이 없으신가요? </span>
-          <a href="/public/sign-up.html">회원가입</a>
+        <div class="login-container">
+            <h2 class="login-title">로그인</h2>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label for="email" class="form-label">이메일</label>
+                    <input type="email" class="form-control" id="email" required />
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">비밀번호</label>
+                    <input type="password" class="form-control" id="password" required />
+                </div>
+                <button type="submit" class="btn btn-pink w-100">로그인</button>
+            </form>
+            <div class="signup-link">
+                <span>계정이 없으신가요? </span>
+                <a href="/public/sign-up.html">회원가입</a>
+            </div>
         </div>
-      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      document
-        .getElementById('loginForm')
-        .addEventListener('submit', async (e) => {
-          e.preventDefault();
+        document
+            .getElementById('loginForm')
+            .addEventListener('submit', async (e) => {
+                e.preventDefault();
 
-          const email = document.getElementById('email').value;
-          const password = document.getElementById('password').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
 
-          try {
-            const response = await fetch(
-              '/user/auth/login',
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-                credentials: 'include',
-              },
-            );
+                try {
+                    const response = await fetch('/user/auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, password }),
+                        credentials: 'include',
+                    });
 
-            const data = await response.json();
+                    const data = await response.json();
 
-            if (response.ok) {
-              const token = response.headers.get('Authorization');
-              if (token) {
-                localStorage.setItem('accessToken', token);
-              }
-              window.location.href = '/';
-            } else {
-              alert(data.message || '로그인에 실패했습니다.');
-            }
-          } catch (error) {
-            console.error('Error:', error);
-            alert('로그인 중 오류가 발생했습니다.');
-          }
-        });
+                    if (response.ok) {
+                        const token = response.headers.get('Authorization');
+                        if (token) {
+                            localStorage.setItem('accessToken', token);
+                        }
+
+                        alert('환영합니다!'); // ✅ 로그인 성공 시 환영 메시지 출력
+                        window.location.href = '/public/home.html'; // ✅ 홈 화면으로 이동
+                    } else {
+                        alert(data.message || '로그인에 실패했습니다.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('로그인 중 오류가 발생했습니다.');
+                }
+            });
     </script>
-  </body>
+</body>
+
 </html>

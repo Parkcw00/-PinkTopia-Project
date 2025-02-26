@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>핑크몽 조회</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f4a7c4;
+        }
+
+        td a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+
+        td a:hover {
+            color: #f4a7c4;
+        }
+
+        .common {
+            color: green;
+        }
+
+        .rare {
+            color: blue;
+        }
+
+        .epic {
+            color: purple;
+        }
+
+        .legendary {
+            color: rgb(209, 178, 0);
+            font-size: 1.1em;
+            text-shadow: 1px 1px 5px rgb(255, 217, 0);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>핑크몽 조회</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Number</th>
+                <th>이름</th>
+                <th>서식지</th>
+                <th>이미지</th>
+                <th>등급</th>
+                <th>상세보기</th>
+            </tr>
+        </thead>
+        <tbody id="pinkmong-list">
+            <!-- 핑크몽 데이터가 여기에 추가될 예정 -->
+        </tbody>
+    </table>
+
+    <script>
+        async function fetchPinkmongs() {
+            try {
+                const response = await fetch('http://localhost:3000/pinkmong/pinkmongs'); // 서버 주소 명확히 지정
+                if (!response.ok) throw new Error('네트워크 응답이 올바르지 않습니다.');
+                const data = await response.json();
+
+                if (!Array.isArray(data.pinkmongs)) {
+                    console.error('올바른 데이터 형식이 아닙니다:', data);
+                    return;
+                }
+
+                const tableBody = document.getElementById('pinkmong-list');
+                tableBody.innerHTML = '';
+
+                data.pinkmongs.forEach(pinkmong => {
+                    const row = `<tr>
+                        <td>${pinkmong.id}</td>
+                        <td>${pinkmong.name}</td>
+                        <td>${pinkmong.region_theme || '테마 없음'}</td>
+                        <td>${pinkmong.pinkmong_image ? `<img src="${pinkmong.pinkmong_image}" alt="${pinkmong.name}" width="50">` : '이미지 없음'}</td>
+                        <td class="${pinkmong.grade || 'common'}">${pinkmong.grade || '등급 없음'}</td>
+                        <td><a href="pinkmong-detail.html?id=${pinkmong.id}">상세보기</a></td>
+                    </tr>`;
+                    tableBody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error('핑크몽 데이터를 불러오는 중 오류 발생:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchPinkmongs);
+    </script>
+</body>
+
+</html>
