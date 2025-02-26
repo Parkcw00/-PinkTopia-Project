@@ -2,24 +2,25 @@
 user_direction : 사용자의 좌표 {위도(숫자):경도(숫자)}
 bookmark_direction : 비교할 북마커 들의 좌표 배열 [{위도(숫자):경도(숫자)},...] */
 
-
 import { IsArray, IsNumber, IsObject, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class CoordinatesDto {
   @IsNumber()
+  @IsObject()
   latitude: number;
 
   @IsNumber()
+  @IsObject()
   longitude: number;
 }
 
 export class CompareDirection {
-  @IsObject()
   @ValidateNested()
+  @IsArray()
   @Type(() => CoordinatesDto)
   user_direction: CoordinatesDto;
-/*
+  /*
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CoordinatesDto)

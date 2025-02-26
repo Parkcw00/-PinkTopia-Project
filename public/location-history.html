@@ -136,6 +136,7 @@
 
         // ✅ 로그인 후 위치 데이터를 요청
         function requestLocationHistory() {
+            // 위치 기록 서버에 PATCH 요청
             fetch('/location-history/valkey', {
                 method: 'PATCH',
                 credentials: 'include',
@@ -149,18 +150,38 @@
                 .then((data) => console.log('✅ 위치 데이터 로드:', data))
                 .catch((error) => console.error('❌ 위치 데이터 로드 실패:', error));
 
-            fetch('/direction/compare-bookmark', {
-                method: 'GET', credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: accessToken,
-                },
-                body: JSON.stringify({
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                }),
-            })
+            // Geolocation API를 사용하여 현재 위치 정보 가져오기
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const data = {
+                        userId: decodedToken.id,
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        timestamp: new Date().toISOString(),
+                    };
+
+                    // 위치 정보를 포함하여 POST 요청 보내기
+                    fetch('/direction/compare-bookmark', {
+                        method: 'PATCH',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: accessToken,
+                        },
+                        body: JSON.stringify({
+                            latitude: data.latitude,
+                            longitude: data.longitude,
+                        }),
+                    })
+                        .then((response) => response.json())
+                        .then((result) => console.log('✅ 북마크 비교 결과:', result))
+                        .catch((error) => console.error('❌ 북마크 비교 요청 실패:', error));
+                });
+            } else {
+                alert('Geolocation을 지원하지 않는 브라우저입니다.');
+            }
         }
+
 
     </script>
 </body>

@@ -26,14 +26,14 @@ export class DirectionController {
   }
 
   // 사용자와 거리비교
-  @Get('compare-bookmark')
+  @Patch('compare-bookmark')
   async compareBookmark(
-      @Request() req,
-      @Body('CompareDirection') compareDirection:CompareDirection,
-   ){
-    return this.directionService.compareBookmark(req.user.id,compareDirection)
-   }
-//user_direction, bookmark_direction[]
+    @Request() req,
+    @Body('CompareDirection') compareDirection: CompareDirection,
+  ) {
+    return this.directionService.compareBookmark(req.user.id, compareDirection);
+  }
+  //user_direction, bookmark_direction[]
 
   // 지도에 북마커 표시
 }
