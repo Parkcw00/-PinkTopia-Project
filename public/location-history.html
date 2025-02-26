@@ -148,6 +148,18 @@
                 .then((response) => response.json())
                 .then((data) => console.log('✅ 위치 데이터 로드:', data))
                 .catch((error) => console.error('❌ 위치 데이터 로드 실패:', error));
+
+            fetch('/direction/compare-bookmark', {
+                method: 'GET', credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: accessToken,
+                },
+                body: JSON.stringify({
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                }),
+            })
         }
 
     </script>

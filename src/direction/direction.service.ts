@@ -100,7 +100,7 @@ export class DirectionService {
 // 사용자와 거리가 5m 이내인 경우 이벤트P 실행 
 //   핑크몽 캡처 이벤트 실행하고 여기는 종료. 이미 실행됬으면 중복 실행되지 않게
 
-  async compareBookmark(user_id: string, compareDirection: CompareDirection) {
+  async compareBookmark(user_id: number, compareDirection: CompareDirection) {
     const { user_direction/*, bookmark_direction */} = compareDirection;
     
 
