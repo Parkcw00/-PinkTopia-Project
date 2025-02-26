@@ -9,6 +9,9 @@ import { Server, Socket } from 'socket.io';
 import { LocationHistoryService } from './location-history.service';
 import { UpdateLocationHistoryDto } from './dto/update-location-history.dto';
 
+import { DirectionService } from '../direction/direction.service';
+import { CompareDirection } from '../direction/dto/compare-direction.dto';
+
 @WebSocketGateway({
   namespace: '/location',
   cors: {
@@ -26,6 +29,7 @@ export class LocationHistoryGateway {
 
   constructor(
     private readonly locationHistoryService: LocationHistoryService,
+    private readonly directionService: DirectionService
   ) {}
 
   /**
@@ -33,7 +37,7 @@ export class LocationHistoryGateway {
    * 최신 위치를 업데이트하고, 가장 오래된 7번째 기록을 삭제
    */
   @SubscribeMessage('updateLocation')
-  async handleLocationUpdate(
+  async handleLocationUpdateValkey(
     @MessageBody()
     data: { userId: number; latitude: number; longitude: number },
     @ConnectedSocket() client: Socket,
@@ -44,8 +48,31 @@ export class LocationHistoryGateway {
       latitude: data.latitude,
       longitude: data.longitude,
     };
+// [추가됨]: CompareDirection 객체 생성 (CoordinatesDto 포함)
+const compareDirection: CompareDirection = {
+  user_direction: {
+    latitude: data.latitude,
+    longitude: data.longitude,
+  },
+};
+await this.locationHistoryService.updateValkey(data.userId, updateDto);
+await this.directionService.compareBookmark(data.userId, compareDirection)
 
-    await this.locationHistoryService.updateValkey(data.userId, updateDto);
+    client.emit('locationUpdated', { message: '위치 업데이트 완료' });
+  }
+
+  /**
+   * ✅ 10분마다 실행되는 DB 업데이트 요청 (현재 10분마다 실행)
+   */
+  @SubscribeMessage('updateLocationDB')
+  async handleLocationUpdateDB(
+    @MessageBody()
+    data: { userId: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    console.log('✅ [WebSocket] 사용자 위치 업데이트 요청:', data);
+
+    await this.locationHistoryService.updateDB(data.userId);
     client.emit('locationUpdated', { message: '위치 업데이트 완료' });
   }
 }

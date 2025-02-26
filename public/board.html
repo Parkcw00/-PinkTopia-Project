@@ -18,21 +18,110 @@
         padding: 20px;
       }
 
+      /* 네비게이션 바 스타일 */
       .nav {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         background-color: #ff69b4;
         padding: 15px;
         color: white;
         font-weight: bold;
+        position: relative;
+        height: 50px;
       }
 
-      .nav a {
-        color: white;
+      /* 햄버거 메뉴 아이콘 스타일 */
+      .menu-icon {
+        position: absolute;
+        left: 15px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        z-index: 2;
+      }
+
+      .menu-icon .hamburger {
+        width: 25px;
+        height: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .menu-icon .hamburger span {
+        display: block;
+        height: 3px;
+        width: 100%;
+        background-color: white;
+        border-radius: 3px;
+        transition: all 0.3s ease;
+      }
+
+      /* 로고 컨테이너 스타일 */
+      .nav .logo-container {
+        position: absolute;
+        left: 50px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+      }
+
+      .nav img {
+        width: 45px;
+        height: 45px;
+        border-radius: 0;
+        object-fit: cover;
+      }
+
+      /* 로고 텍스트 */
+      .nav .logo-text {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 24px;
+      }
+
+      /* 사이드바 스타일 */
+      .sidebar {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        background-color: #ff69b4;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+        box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .sidebar a {
+        padding: 15px 25px;
         text-decoration: none;
-        margin: 0 10px;
+        font-size: 18px;
+        color: white;
+        display: block;
+        transition: 0.3s;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       }
 
+      .sidebar a:hover {
+        background-color: #ff4da6;
+      }
+
+      .close-sidebar {
+        position: absolute;
+        top: 15px;
+        right: 25px;
+        font-size: 36px;
+        cursor: pointer;
+        color: white;
+      }
+
+      /* 기존 board.html 스타일 유지 */
       .board-header {
         display: flex;
         justify-content: space-between;
@@ -166,18 +255,53 @@
   </head>
 
   <body>
+    <!-- 네비게이션 바 -->
     <div class="nav">
-      <div>
-        <a href="home.html" style="text-decoration: none; color: white"
-          >PinkTophia</a
-        >
+      <div class="menu-icon" onclick="openSidebar()">
+        <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
       </div>
-      <div id="authMenu">
-        <a href="log-in.html">로그인</a>
-        <a href="sign-up.html">회원가입</a>
+      <div class="logo-container">
+        <img src="/public/images/123.jpg" alt="PinkTopia Logo">
+      </div>
+      <div class="logo-text">
+        <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
       </div>
     </div>
 
+    <!-- 사이드바 -->
+    <div id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+      </div>
+      <div class="sidebar-content">
+        <a href="/public/home.html">홈</a>
+        <a href="/public/event.html">이벤트</a>
+        <a href="/public/store-item.html">아이템샵</a>
+        <a href="/public/board.html">게시글 (커뮤니티)</a>
+        <a href="/public/ranking.html">랭킹</a>
+        <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
+        <!-- 로그인 시 표시될 메뉴들 -->
+        <div id="loggedInMenu" style="display: none;">
+          <a href="/public/chattingrooms.html">채팅</a>
+          <a href="/public/pinkmong-dex.html">핑크몽 개인 도감</a>
+          <a href="/public/inventory.html">인벤토리 아이템</a>
+          <a href="/public/achievements.html">업적</a>
+          <a href="/public/mypage.html">마이페이지</a>
+          <a href="#" onclick="logout()">로그아웃</a>
+        </div>
+        <!-- 로그인 안 된 경우 표시될 메뉴들 -->
+        <div id="loggedOutMenu">
+          <a href="/public/log-in.html">로그인</a>
+          <a href="/public/sign-up.html">회원가입</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 기존 컨텐츠 -->
     <div class="container">
       <div class="board-header">
         <h1>게시판</h1>
@@ -493,6 +617,26 @@
         });
         window.location.reload();
       }
+
+      function openSidebar() {
+        document.getElementById('sidebar').style.width = "250px";
+      }
+
+      function closeSidebar() {
+        document.getElementById('sidebar').style.width = "0";
+      }
+
+      document.addEventListener("DOMContentLoaded", function() {
+        const accessToken = localStorage.getItem("accessToken");
+        
+        if (accessToken) {
+          document.getElementById('loggedInMenu').style.display = 'block';
+          document.getElementById('loggedOutMenu').style.display = 'none';
+        } else {
+          document.getElementById('loggedInMenu').style.display = 'none';
+          document.getElementById('loggedOutMenu').style.display = 'block';
+        }
+      });
     </script>
   </body>
 </html>

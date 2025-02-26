@@ -57,9 +57,14 @@ export class LocationHistoryRepository {
   }
 
   /**
-   * ✅ 특정 사용자 ID의 모든 위치 기록 삭제 (유저 탈퇴 시 사용)
+   * ✅ 모든 유저 ID 조회 (updateDBForAllUsers()에서 사용됨)
    */
-  async deleteByUserId(user_id: number): Promise<void> {
-    await this.entity.delete({ user_id });
+  async getAllUserIds(): Promise<number[]> {
+    const users = await this.entity
+      .createQueryBuilder('location_history')
+      .select('DISTINCT user_id')
+      .getRawMany();
+
+    return users.map((user) => user.user_id);
   }
 }
