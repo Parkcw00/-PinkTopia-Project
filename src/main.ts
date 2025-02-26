@@ -17,6 +17,16 @@ async function bootstrap() {
   app.use(cookieParser());
   // 정적 파일 제공 설정
   app.use('/public', express.static(join(__dirname, '..', 'public')));
+
+  // ✅ "/" 요청이 들어오면 home.html을 반환하도록 설정
+  app.use((req, res, next) => {
+    if (req.path === '/') {
+      res.sendFile(join(__dirname, '..', 'public', 'home.html'));
+    } else {
+      next();
+    }
+  });
+
   app.enableCors({
     origin: [
       'http://127.0.0.1:5500',
@@ -56,6 +66,7 @@ async function bootstrap() {
     .addTag('Your API Tag')
     .addBearerAuth() // JWT 베어러 인증 추가
     .build();
+
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api-docs', app, document);
 

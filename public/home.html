@@ -60,8 +60,8 @@
     <div class="nav">
         <div>PinkTophia</div>
         <div id="authMenu">
-            <a href="log-in.html">로그인</a>
-            <a href="sign-up.html">회원가입</a>
+            <a href="/public/log-in.html">로그인</a>
+            <a href="/public/sign-up.html">회원가입</a>
         </div>
     </div>
     <div class="container">
@@ -81,13 +81,18 @@
             const authMenu = document.getElementById("authMenu");
 
             if (accessToken) {
-                authMenu.innerHTML = '<a href="mypage.html">마이페이지</a> <a href="#" onclick="logout()">로그아웃</a>';
+                authMenu.innerHTML = `
+        <a href="mypage.html">마이페이지</a>
+        <a href="#" onclick="logout()">로그아웃</a>
+      `;
+
+                // ✅ 로그인 상태일 때 추가 메뉴 표시
                 menuList.innerHTML += `
-                    <a href="chattingrooms.html">채팅</a>
-                    <a href="pinkmong-dex.html">핑크몽 도감</a>
-                    <a href="inventory.html">인벤토리 아이템</a>
-                    <a href="achievements.html">업적</a>
-                `;
+        <a href="chattingrooms.html">채팅</a>
+        <a href="pinkmong-dex.html">핑크몽 도감</a>
+        <a href="inventory.html">인벤토리 아이템</a>
+        <a href="achievements.html">업적</a>
+      `;
             }
         });
 
