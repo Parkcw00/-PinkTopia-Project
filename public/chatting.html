@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
@@ -94,7 +94,7 @@
 
       .button {
         padding: 10px 20px;
-        background-color: #4CAF50;
+        background-color: #4caf50;
         color: white;
         border: none;
         border-radius: 4px;
@@ -138,7 +138,12 @@
       <div class="chat-title">채팅방</div>
       <div id="chatBox" class="chat-box"></div>
       <div class="input-area">
-        <input type="text" id="messageInput" placeholder="메시지를 입력하세요" onkeypress="handleKeyPress(event)">
+        <input
+          type="text"
+          id="messageInput"
+          placeholder="메시지를 입력하세요"
+          onkeypress="handleKeyPress(event)"
+        />
         <button class="button" onclick="sendMessage()">전송</button>
         <button class="button" onclick="leaveRoom()">나가기</button>
       </div>
@@ -149,93 +154,93 @@
       let currentRoomId;
       let currentUserId; // 현재 사용자 ID 변수 추가
       let currentUserNickname; // 현재 사용자 닉네임 변수 추가
-      
+
       // 페이지 로드 시 인증 확인
       document.addEventListener('DOMContentLoaded', async () => {
         const urlParams = new URLSearchParams(window.location.search);
         const roomId = urlParams.get('roomId');
         currentRoomId = roomId;
-        
+
         const accessToken = localStorage.getItem('accessToken');
         if (!accessToken) {
-            window.location.href = '/public/login.html';
-            return;
+          window.location.href = '/public/login.html';
+          return;
         }
 
         // 채팅 멤버 확인
         try {
-            console.log('채팅방 입장 시도:', roomId);
-            
-            const checkResponse = await fetch(`http://localhost:3000/chatmember/check/${roomId}`, {
-                headers: {
-                    'Authorization': accessToken
-                }
+          console.log('채팅방 입장 시도:', roomId);
+
+          const checkResponse = await fetch(`/chatmember/check/${roomId}`, {
+            headers: {
+              Authorization: accessToken,
+            },
+          });
+
+          console.log('멤버 확인 응답:', checkResponse.status);
+          const checkData = await checkResponse.json();
+          console.log('멤버 확인 데이터:', checkData);
+
+          // 멤버가 아닌 경우 멤버로 추가 시도
+          if (!checkResponse.ok) {
+            console.log('멤버가 아님, 멤버 추가 시도');
+            const joinResponse = await fetch(`/chatmember`, {
+              method: 'POST',
+              headers: {
+                Authorization: accessToken,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                chatting_room_id: parseInt(roomId),
+              }),
             });
-            
-            console.log('멤버 확인 응답:', checkResponse.status);
-            const checkData = await checkResponse.json();
-            console.log('멤버 확인 데이터:', checkData);
 
-            // 멤버가 아닌 경우 멤버로 추가 시도
-            if (!checkResponse.ok) {
-                console.log('멤버가 아님, 멤버 추가 시도');
-                const joinResponse = await fetch(`http://localhost:3000/chatmember`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': accessToken,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        chatting_room_id: parseInt(roomId)
-                    })
-                });
+            console.log('멤버 추가 응답:', joinResponse.status);
+            const joinData = await joinResponse.json();
+            console.log('멤버 추가 데이터:', joinData);
 
-                console.log('멤버 추가 응답:', joinResponse.status);
-                const joinData = await joinResponse.json();
-                console.log('멤버 추가 데이터:', joinData);
-
-                if (!joinResponse.ok) {
-                    throw new Error('채팅방 멤버 등록에 실패했습니다.');
-                }
+            if (!joinResponse.ok) {
+              throw new Error('채팅방 멤버 등록에 실패했습니다.');
             }
+          }
 
-            // 멤버 정보 가져오기
-            const memberResponse = await fetch(`http://localhost:3000/chatmember/check/${roomId}`, {
-                headers: {
-                    'Authorization': accessToken
-                }
+          // 멤버 정보 가져오기
+          const memberResponse = await fetch(`/chatmember/check/${roomId}`, {
+            headers: {
+              Authorization: accessToken,
+            },
+          });
+
+          console.log('멤버 정보 조회 응답:', memberResponse.status);
+          const data = await memberResponse.json();
+          console.log('멤버 정보 데이터:', data);
+
+          if (data && data.user_id) {
+            currentUserId = data.user_id;
+            currentUserNickname = data.nickname;
+            console.log('현재 사용자 ID:', currentUserId);
+
+            // socket.io 연결 설정
+            socket = io('/chatting', {
+              withCredentials: true,
+              auth: {
+                token: accessToken,
+              },
             });
-            
-            console.log('멤버 정보 조회 응답:', memberResponse.status);
-            const data = await memberResponse.json();
-            console.log('멤버 정보 데이터:', data);
 
-            if (data && data.user_id) {
-                currentUserId = data.user_id;
-                currentUserNickname = data.nickname;
-                console.log('현재 사용자 ID:', currentUserId);
+            // 소켓 연결 후 방 입장
+            socket.emit('joinRoom', { roomId: parseInt(roomId) });
 
-                // socket.io 연결 설정
-                socket = io('http://localhost:3000/chatting', {
-                    withCredentials: true,
-                    auth: {
-                        token: accessToken
-                    }
-                });
-
-                // 소켓 연결 후 방 입장
-                socket.emit('joinRoom', { roomId: parseInt(roomId) });
-
-                // 소켓 이벤트 리스너 설정 (setupSocketListeners 함수만 호출)
-                setupSocketListeners();
-                initializeChatRoom(roomId);
-            } else {
-                throw new Error('채팅방 멤버 정보를 가져올 수 없습니다.');
-            }
+            // 소켓 이벤트 리스너 설정 (setupSocketListeners 함수만 호출)
+            setupSocketListeners();
+            initializeChatRoom(roomId);
+          } else {
+            throw new Error('채팅방 멤버 정보를 가져올 수 없습니다.');
+          }
         } catch (error) {
-            console.error('채팅방 입장 실패:', error);
-            alert(error.message || '채팅방 입장에 실패했습니다.');
-            window.location.href = '/public/chattingrooms.html';
+          console.error('채팅방 입장 실패:', error);
+          alert(error.message || '채팅방 입장에 실패했습니다.');
+          window.location.href = '/public/chattingrooms.html';
         }
       });
 
@@ -246,25 +251,25 @@
         });
 
         socket.on('message', (data) => {
-          console.log('메시지 수신:', data);  // 디버깅용
-          
+          console.log('메시지 수신:', data); // 디버깅용
+
           const chatBox = document.getElementById('chatBox');
           const messageDiv = document.createElement('div');
           const isMyMessage = data.userId === currentUserId;
-          
+
           messageDiv.className = `message ${isMyMessage ? 'my-message' : ''}`;
-          
+
           const timestamp = new Date(data.timestamp).toLocaleTimeString();
-          
+
           if (isMyMessage) {
-              messageDiv.innerHTML = `
+            messageDiv.innerHTML = `
                   <div class="message-content">
                       <span class="message-text">${data.message}</span>
                       <span class="timestamp">${timestamp}</span>
                   </div>
               `;
           } else {
-              messageDiv.innerHTML = `
+            messageDiv.innerHTML = `
                   <div class="message-content">
                       <div class="nickname">${data.nickname}</div>
                       <span class="message-text">${data.message}</span>
@@ -272,7 +277,7 @@
                   </div>
               `;
           }
-          
+
           chatBox.appendChild(messageDiv);
           chatBox.scrollTop = chatBox.scrollHeight;
         });
@@ -284,8 +289,9 @@
 
         socket.on('userLeft', (data) => {
           console.log('사용자 퇴장:', data);
-          if (data.userId !== currentUserId) {  // 자신의 퇴장이 아닌 경우에만 메시지 표시
-              addSystemMessage(`${data.nickname}님이 퇴장하셨습니다.`);
+          if (data.userId !== currentUserId) {
+            // 자신의 퇴장이 아닌 경우에만 메시지 표시
+            addSystemMessage(`${data.nickname}님이 퇴장하셨습니다.`);
           }
         });
 
@@ -299,55 +305,55 @@
       async function sendMessage() {
         const messageInput = document.getElementById('messageInput');
         const message = messageInput.value.trim();
-        
+
         if (message && socket && currentRoomId) {
-            try {
-                socket.emit('sendMessage', {
-                    roomId: currentRoomId,
-                    message: message
-                });
-                
-                // 입력창 초기화
-                messageInput.value = '';
-            } catch (error) {
-                console.error('메시지 전송 실패:', error);
-                alert('메시지 전송에 실패했습니다.');
-            }
+          try {
+            socket.emit('sendMessage', {
+              roomId: currentRoomId,
+              message: message,
+            });
+
+            // 입력창 초기화
+            messageInput.value = '';
+          } catch (error) {
+            console.error('메시지 전송 실패:', error);
+            alert('메시지 전송에 실패했습니다.');
+          }
         }
       }
 
       // 채팅방 나가기 함수
       async function leaveRoom() {
         if (!confirm('정말로 채팅방을 나가시겠습니까?')) {
-            return;
+          return;
         }
 
         try {
-            // 서버에 나가기 요청
-            const response = await fetch(`/chattingroom/out/${currentRoomId}`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': localStorage.getItem('accessToken')
-                }
-            });
+          // 서버에 나가기 요청
+          const response = await fetch(`/chattingroom/out/${currentRoomId}`, {
+            method: 'PATCH',
+            headers: {
+              Authorization: localStorage.getItem('accessToken'),
+            },
+          });
 
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || '채팅방 나가기에 실패했습니다.');
-            }
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || '채팅방 나가기에 실패했습니다.');
+          }
 
-            // 나가기 메시지 전송
-            socket.emit('leaveRoom', {
-                roomId: currentRoomId,
-                userId: currentUserId,
-                nickname: currentUserNickname
-            });
+          // 나가기 메시지 전송
+          socket.emit('leaveRoom', {
+            roomId: currentRoomId,
+            userId: currentUserId,
+            nickname: currentUserNickname,
+          });
 
-            // 채팅방 목록으로 이동
-            window.location.href = '/public/chattingrooms.html';
+          // 채팅방 목록으로 이동
+          window.location.href = '/public/chattingrooms.html';
         } catch (error) {
-            console.error('채팅방 나가기 실패:', error);
-            alert(error.message || '채팅방 나가기에 실패했습니다.');
+          console.error('채팅방 나가기 실패:', error);
+          alert(error.message || '채팅방 나가기에 실패했습니다.');
         }
       }
 
@@ -384,9 +390,13 @@
       function updateMemberList(members) {
         const memberList = document.querySelector('.member-list ul');
         if (memberList) {
-          memberList.innerHTML = members.map(member => `
+          memberList.innerHTML = members
+            .map(
+              (member) => `
             <li>${member.nickname}</li>
-          `).join('');
+          `,
+            )
+            .join('');
         }
       }
     </script>

@@ -68,7 +68,7 @@
 
       // ✅ 로그인 후 위치 데이터를 요청
       function requestLocationHistory() {
-        fetch('http://localhost:3000/location-history/valkey', {
+        fetch('/location-history/valkey', {
           method: 'POST',
           credentials: 'include',
           headers: {

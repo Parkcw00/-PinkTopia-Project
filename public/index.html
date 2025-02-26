@@ -2,7 +2,7 @@
 <html lang="ko">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>다음 지도 API</title>
   </head>
   <body>
@@ -22,7 +22,7 @@
       var map = new kakao.maps.Map(mapContainer, mapOption);
 
       // 웹소켓 연결
-      var socket = io('http://localhost:3000');
+      var socket = io('http://13.209.49.187:3000');
 
       // GPS 데이터 수신
       socket.on('receiveGpsData', function (data) {
@@ -89,15 +89,18 @@
         const urlParams = new URLSearchParams(window.location.search);
         const isInvite = urlParams.get('invite');
         const roomId = urlParams.get('roomId');
-        
+
         // 초대 링크로 접속한 경우
         if (isInvite && roomId) {
           // 초대 정보를 localStorage에 저장
-          localStorage.setItem('pendingInvite', JSON.stringify({
-            type: 'invite',
-            roomId: roomId,
-            timestamp: new Date().getTime()
-          }));
+          localStorage.setItem(
+            'pendingInvite',
+            JSON.stringify({
+              type: 'invite',
+              roomId: roomId,
+              timestamp: new Date().getTime(),
+            }),
+          );
         }
 
         // 로그인 상태 확인
