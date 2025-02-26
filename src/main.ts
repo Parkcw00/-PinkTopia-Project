@@ -23,8 +23,8 @@ async function bootstrap() {
       'http://127.0.0.1:5500',
       'http://localhost:5500',
       'http://127.0.0.1:3000',
-      'http://13.209.49.187:3000', // EC2 IP 추가
-      'http://13.209.49.187:5500', // EC2 IP의 클라이언트 포트도 추가
+      'http://3.34.52.21:3000', // EC2 IP 추가
+      'http://3.34.52.21:5500', // EC2 IP의 클라이언트 포트도 추가
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,

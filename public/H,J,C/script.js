@@ -68,7 +68,9 @@ let markerData = [
 // ✅ 서버에서 북마커 데이터 가져오기
 console.log('📡 북마커 데이터를 요청합니다!'); // ✅ fetch 실행 전 확인 로그
 
-fetch('http://localhost:3000/direction/bookmarke')
+fetch('/direction/bookmarke', {
+  headers: { 'Cache-Control': 'no-cache' },
+})
   .then((response) => {
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
