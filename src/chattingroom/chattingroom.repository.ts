@@ -5,6 +5,7 @@ import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { ChattingRoom } from './entities/chattingroom.entity';
 import { IsNull } from 'typeorm';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class ChattingRoomRepository {
@@ -15,6 +16,7 @@ export class ChattingRoomRepository {
     private chatMemberRepository: Repository<Chatmember>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private dataSource: DataSource,
   ) {}
 
   // 채팅방 만들기
@@ -128,5 +130,15 @@ export class ChattingRoomRepository {
       user_id,
       admin: false,
     });
+  }
+
+  // 닉네임으로 사용자 찾기 메서드 추가
+  async findByNickname(nickname: string) {
+    const user = await this.dataSource
+      .getRepository(User)
+      .findOne({
+        where: { nickname }
+      });
+    return user;
   }
 }
