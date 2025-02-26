@@ -47,8 +47,13 @@ export class LocationHistoryService {
             const parsedItem =
               typeof item === 'string' ? JSON.parse(item) : item;
             return {
-              ...parsedItem,
-              timestamp: parsedItem.timestamp ?? new Date(),
+              latitude: parsedItem.latitude, // ✅ userId를 제외
+              longitude: parsedItem.longitude,
+              timestamp:
+                parsedItem.timestamp &&
+                !isNaN(new Date(parsedItem.timestamp).getTime())
+                  ? new Date(parsedItem.timestamp)
+                  : new Date(), // ✅ timestamp가 없거나 비정상적인 값이면 현재 시간으로 대체
             };
           })
         : [];
@@ -57,14 +62,26 @@ export class LocationHistoryService {
       records = [];
     }
 
-    if (records.length < 7) {
+    if (records.length === 0) {
+      // ✅ 최초 저장 시 값이 제대로 들어가도록 보장
       records.push({
-        ...updateDto,
+        latitude: updateDto.latitude ?? null,
+        longitude: updateDto.longitude ?? null,
+        timestamp: updateDto.timestamp ?? new Date(),
+      });
+    } else if (records.length < 7) {
+      records.push({
+        latitude: updateDto.latitude,
+        longitude: updateDto.longitude,
         timestamp: updateDto.timestamp ?? new Date(),
       });
     } else {
       records.shift();
-      records.push(updateDto);
+      records.push({
+        latitude: updateDto.latitude,
+        longitude: updateDto.longitude,
+        timestamp: updateDto.timestamp ?? new Date(),
+      });
     }
 
     // ✅ Valkey에 최신 위치 데이터 저장 (7개까지만 유지)
