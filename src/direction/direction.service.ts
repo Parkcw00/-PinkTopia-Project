@@ -4,6 +4,7 @@ import { AchievementPService } from '../achievement-p/achievement-p.service';
 import { CompareDirection } from './dto/compare-direction.dto';
 import { getDistance } from 'geolib';
 import axios from 'axios'; // HTTP 요청을 보내기 위한 클라이언트 라이브러리
+import { isPointWithinRadius } from 'geolib';
 
 @Injectable()
 export class DirectionService {
@@ -128,19 +129,20 @@ export class DirectionService {
       );
 
       // 5m 이내의 북마커 필터링
+
       const nearBybookmarksS = allData
         .flat() // 중첩 배열을 단일 배열로 변환
         .filter((bookmark: any) => {
           if (!bookmark.latitude || !bookmark.longitude) return false;
 
-          const distance = getDistance(
+          return isPointWithinRadius(
             { latitude: user_direction[0], longitude: user_direction[1] },
             {
               latitude: parseFloat(bookmark.latitude),
               longitude: parseFloat(bookmark.longitude),
             },
+            5, // 반경 5m 내에 있는지 체크
           );
-          return distance <= 5;
         });
 
       // 도착위치 배열: nearBybookmarksS;
@@ -200,15 +202,18 @@ export class DirectionService {
       const allData = await Promise.all(
         keysP.map((key) => this.valkeyService.getString(key)),
       );
-      console.log('확인중');
       // 5m 이내의 북마커 중 가장 가까운 것 하나만 반환
+
       const nearestBookmarkP = allData
         .flat() // 중첩 배열을 단일 배열로 변환
         .filter((bookmark: any) => bookmark.latitude && bookmark.longitude) // 유효한 데이터 필터링
         .map((bookmark: any) => ({
           ...bookmark,
           distance: getDistance(
-            { latitude: user_direction[0], longitude: user_direction[1] },
+            {
+              latitude: user_direction.latitude,
+              longitude: user_direction.longitude,
+            },
             {
               latitude: parseFloat(bookmark.latitude),
               longitude: parseFloat(bookmark.longitude),
@@ -218,8 +223,6 @@ export class DirectionService {
         .filter((bookmark) => bookmark.distance <= 5) // 5m 이내만 필터링
         .sort((a, b) => a.distance - b.distance) // 가장 가까운 순으로 정렬
         .at(0); // 가장 가까운 하나만 가져오기
-
-      return nearestBookmarkP || null; // 결과 없으면 null 반환
 
       // 이벤트 실행
       // 5m 이내 북마크가 있으면 해당 테마에 맞는 캐치핑크몽 API 호출

@@ -166,11 +166,13 @@
                         credentials: 'include',
                         headers: {
                             'Content-Type': 'application/json',
-                            Authorization: accessToken,
+                            Authorization: `${accessToken}`,
                         },
                         body: JSON.stringify({
-                            latitude: data.latitude,
-                            longitude: data.longitude,
+                            user_direction: {
+                                latitude: data.latitude,
+                                longitude: data.longitude,
+                            },
                         }),
                     })
                         .then((response) => response.json())

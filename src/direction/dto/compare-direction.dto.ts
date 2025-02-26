@@ -5,24 +5,27 @@ bookmark_direction : 비교할 북마커 들의 좌표 배열 [{위도(숫자):�
 import { IsArray, IsNumber, IsObject, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
-class CoordinatesDto {
+export class CoordinatesDto {
   @IsNumber()
-  @IsObject()
   latitude: number;
 
   @IsNumber()
-  @IsObject()
   longitude: number;
 }
 
 export class CompareDirection {
   @ValidateNested()
-  @IsArray()
   @Type(() => CoordinatesDto)
-  user_direction: CoordinatesDto;
-  /*
+  user_direction: CoordinatesDto; // 단일 객체로 수정
+}
+
+// export class CompareDirection {
+//   @ValidateNested()
+//   @IsObject()
+//   @Type(() => CoordinatesDto)
+//   user_direction: CoordinatesDto;
+/*
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CoordinatesDto)
   bookmark_direction: CoordinatesDto[];*/
-}
