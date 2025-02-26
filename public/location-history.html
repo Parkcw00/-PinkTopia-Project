@@ -38,6 +38,44 @@
 
         const decodedToken = parseJwt(accessToken);
 
+        function isTokenExpired(token) {
+            const exp = decodedToken.exp * 1000; // 만료 시간을 밀리초로 변환
+            return Date.now() >= exp; // 현재 시간이 만료 시간보다 크면 true
+        }
+
+        function startLocationUpdates() {
+            if (accessToken && !isTokenExpired()) {
+                setInterval(() => {
+                    if (isTokenExpired()) {
+                        socket.disconnect(); // 소켓 연결 종료
+                        alert('엑세스 토큰이 만료되었습니다. 다시 로그인하세요.');
+                        window.location.href = '/public/log-in.html'; // 로그인 페이지로 리다이렉트
+                    } else {
+                        sendLocation();
+
+                    }
+                }, 10000); // 10초마다 위치 전송
+
+                setInterval(() => {
+                    if (isTokenExpired()) {
+                        socket.disconnect();
+                        alert('엑세스 토큰이 만료되었습니다. 다시 로그인하세요.');
+                        window.location.href = '/public/log-in.html';
+                    } else {
+                        sendLocation10(); // ✅ 1분마다 실행되는 함수 수정
+                    }
+                }, 60000); // 1분마다 실행
+
+
+                requestLocationHistory();
+            } else {
+                socket.disconnect(); // 소켓 연결 종료
+                alert('엑세스 토큰이 만료되었습니다. 다시 로그인하세요.');
+                window.location.href = '/public/log-in.html'; // 로그인 페이지로 리다이렉트
+            }
+        }
+
+        startLocationUpdates();
         function sendLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((position) => {
@@ -54,9 +92,7 @@
                 alert('Geolocation을 지원하지 않는 브라우저입니다.');
             }
         }
-        if (accessToken) {
-            setInterval(sendLocation, 10000); // 10
-        }
+
         function sendLocation10() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((position) => {
@@ -70,7 +106,7 @@
                     socket.emit('updateLocationDB', data);
 
                     // 10분마다 회사 DB에 사용자 위치 저장
-                    fetch('http://localhost:3000/location-history/db', {
+                    fetch('/location-history/db', {
                         method: 'PATCH',
                         credentials: 'include',
                         headers: {
@@ -88,9 +124,7 @@
             }
         }
 
-        if (accessToken) {
-            setInterval(sendLocation10, 60000); // 10분(600,000ms)마다 실행
-        }
+
 
         socket.on('locationUpdated', (data) => {
             console.log('✅ 서버 응답:', data);
@@ -102,7 +136,7 @@
 
         // ✅ 로그인 후 위치 데이터를 요청
         function requestLocationHistory() {
-            fetch('http://localhost:3000/location-history/valkey', {
+            fetch('/location-history/valkey', {
                 method: 'PATCH',
                 credentials: 'include',
                 headers: {
@@ -115,9 +149,7 @@
                 .then((data) => console.log('✅ 위치 데이터 로드:', data))
                 .catch((error) => console.error('❌ 위치 데이터 로드 실패:', error));
         }
-        if (accessToken) {
-            requestLocationHistory();
-        } // 로그인 후 위치 데이터를 가져옴
+
     </script>
 </body>
 
