@@ -198,11 +198,13 @@ export class DirectionService {
       const allData = await Promise.all(
         keysP.map((key) => this.valkeyService.getString(key)),
       );
+
       // 5m 이내의 북마커 중 가장 가까운 것 하나만 반환
       let nearestBookmarkP: any = allData.flat(); // 중첩 배열을 단일 배열로 변환
       nearestBookmarkP = nearestBookmarkP.filter((bookmark: any) => {
         bookmark = JSON.parse(bookmark); // JSON.parse 하나를 객체로 만들려고 하는거 //왜안되는지 찾으쇼
         if (bookmark.latitude && bookmark.longitude) {
+          // 위치가 제대로 들어가있는지 확인용
           return bookmark;
         }
       }); // 유효한 데이터 필터링
@@ -227,8 +229,8 @@ export class DirectionService {
         .at(0); // 가장 가까운 하나만 가져오기
 
       // 이벤트 실행
-      // 5m 이내 북마크가 있으면 해당 테마에 맞는 캐치핑크몽 API 호출
-      //여기다가 웹소캣 해야될거같아~~~~~~
+      // 5m 이내 북마크가 있으면 해당 테마에 맞는 캐치핑크몽 API 호출 웹소캣이 필요없는가..? <<
+
       if (nearestBookmarkP) {
         console.log(
           `이벤트 실행: 유저 ${user_id}가 북마크 [${nearestBookmarkP.title}] 주변에 진입했습니다.`,

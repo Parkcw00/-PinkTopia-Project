@@ -55,8 +55,7 @@ export class AchievementPService {
     };
   }
 
-  async post(user: any, subId: string): Promise<AchievementP> {
-    const user_id = user.id;
+  async post(user_id: number, subId: string): Promise<AchievementP> {
     const idS = Number(subId);
     if (!idS) {
       console.log('idS불량');
@@ -101,10 +100,12 @@ export class AchievementPService {
 
     // Redis 저장할 키 생성 (고유 ID 자동 생성되므로 따로 안 넣음)
     const key = `achievementP:${idS}:${Date.now()}`;
-
+    console.log('dataP', dataP);
+    console.log('key', key);
     // Redis에 저장
     await this.valkeyService.set(key, dataP);
     const createP = await this.repository.createP(dataP);
+    console.log('createP', createP);
     if (!createP) {
       console.log('생성실패');
       throw new BadRequestException('생성 실패했습니다.');
