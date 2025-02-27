@@ -31,7 +31,7 @@ export class CatchPinkmongService {
       return { message: `이미 다른 핑크몽이 등장 중입니다!` };
     }
 
-    // ✅ 4. 등급 결정 (전설: 5%, 희귀: 35%, 보통: 60%)
+    // ✅ 4. 등급 결정 (전설: 5%, 초희귀:10% 희귀: 35%, 보통: 50%)
     const r = Math.random();
     let selectedGrade: string;
     if (r < 0.05) {
