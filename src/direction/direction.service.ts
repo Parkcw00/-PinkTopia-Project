@@ -5,7 +5,7 @@ import { CompareDirection } from './dto/compare-direction.dto';
 import { getDistance, isPointWithinRadius } from 'geolib';
 import axios, { all } from 'axios'; // HTTP 요청을 보내기 위한 클라이언트 라이브러리
 import { DirectionGateway } from './/direction.gateway';
-
+import { Socket } from 'socket.io';
 import { number } from 'joi';
 
 @Injectable()
@@ -107,7 +107,11 @@ export class DirectionService {
   // 사용자와 거리가 5m 이내인 경우 이벤트P 실행
   //   핑크몽 캡처 이벤트 실행하고 여기는 종료. 이미 실행됬으면 중복 실행되지 않게
 
-  async compareBookmark(user_id: number, compareDirection: CompareDirection) {
+  async compareBookmark(
+    user_id: number,
+    compareDirection: CompareDirection,
+    client: Socket,
+  ) {
     const { user_direction /*, bookmark_direction */ } = compareDirection;
 
     /** Sub업적 */
@@ -135,14 +139,6 @@ export class DirectionService {
       let nearBybookmarksS = allData.flat();
       nearBybookmarksS = nearBybookmarksS.filter((bookmark: any) => {
         if (!bookmark.latitude || !bookmark.longitude) return false;
-        console.log('===========================');
-        console.log(user_direction.latitude);
-        console.log(user_direction.longitude);
-        console.log('===========================');
-        console.log(bookmark.latitude);
-        console.log(bookmark.longitude);
-        console.log('===========================');
-
         const result1 = getDistance(
           {
             latitude: user_direction.latitude,
@@ -153,7 +149,6 @@ export class DirectionService {
             longitude: Number(bookmark.longitude),
           }, // 반경 5m 내에 있는지 체크
         );
-        console.log('거리', result1);
         const result = isPointWithinRadius(
           {
             latitude: user_direction.latitude,
@@ -165,10 +160,8 @@ export class DirectionService {
           },
           5, // 반경 5m 내에 있는지 체크
         );
-        console.log('결과', result);
         return result;
       });
-      console.log('nearBybookmarksS1', nearBybookmarksS);
 
       // nearBybookmarksS2 = nearBybookmarksS1.filter((bookmark: any) => {
       //   if (!bookmark.latitude || !bookmark.longitude) return false;
@@ -218,7 +211,6 @@ export class DirectionService {
           console.log(
             `이벤트 실행: 유저 ${user_id}가 서브 업적 북마크 [${bookmark.title}] 주변에 진입했습니다.`,
           );
-          console.log('bookmark', bookmark);
           try {
             await this.APService.post(user_id, bookmark.id);
           } catch (error) {
@@ -247,27 +239,16 @@ export class DirectionService {
       const allData = await Promise.all(
         keysP.map((key) => this.valkeyService.getString(key)),
       );
-      console.clear();
-      console.log('allData', allData);
       // 5m 이내의 북마커 중 가장 가까운 것 하나만 반환
       let nearestBookmarkP: any = allData.flat(); // 중첩 배열을 단일 배열로 변환
-      console.log('nearestBookmarkP1', nearestBookmarkP);
       nearestBookmarkP = nearestBookmarkP.filter((bookmark: any) => {
         bookmark = JSON.parse(bookmark); // JSON.parse 하나를 객체로 만들려고 하는거 //왜안되는지 찾으쇼
         if (bookmark.latitude && bookmark.longitude) {
           return bookmark;
         }
       }); // 유효한 데이터 필터링
-      console.log('nearestBookmarkP2', nearestBookmarkP);
       nearestBookmarkP = nearestBookmarkP.map((bookmark: any) => {
         bookmark = JSON.parse(bookmark);
-        console.log('=================================================');
-        console.log('user_direction.latitude', user_direction.latitude);
-        console.log('user_direction.longitude', user_direction.longitude);
-        console.log('=================================================');
-        console.log('bookmark.latitude', bookmark.latitude);
-        console.log('bookmark.longitude', bookmark.longitude);
-        console.log('=================================================');
         const distance = getDistance(
           {
             latitude: user_direction.latitude,
@@ -278,19 +259,13 @@ export class DirectionService {
             longitude: parseFloat(bookmark.longitude),
           },
         );
-        console.log('bookmark', bookmark, typeof bookmark);
-        console.log('distance', distance);
         const test = { ...bookmark };
-        console.log('test', test);
         return { ...bookmark, distance };
       });
-      console.log('nearestBookmarkP3', nearestBookmarkP);
       nearestBookmarkP = nearestBookmarkP
         .filter((bookmark) => bookmark.distance <= 5) // 5m 이내만 필터링
         .sort((a, b) => a.distance - b.distance) // 가장 가까운 순으로 정렬
         .at(0); // 가장 가까운 하나만 가져오기
-
-      console.log('결과:', nearestBookmarkP);
 
       // 이벤트 실행
       // 5m 이내 북마크가 있으면 해당 테마에 맞는 캐치핑크몽 API 호출
@@ -300,6 +275,7 @@ export class DirectionService {
           `이벤트 실행: 유저 ${user_id}가 북마크 [${nearestBookmarkP.title}] 주변에 진입했습니다.`,
         );
         this.directionGateway.sendPopup(
+          client,
           user_id,
           `핑크몽 [${nearestBookmarkP.title}]에 접근했습니다!`,
         );
@@ -316,12 +292,10 @@ export class DirectionService {
             );
             console.log(
               `핑크몽 API 호출 성공 (테마: ${nearestBookmarkP.region_theme}):`,
-              response.data,
             );
           } catch (error) {
             console.error(
               `핑크몽 API 호출 실패 (테마: ${nearestBookmarkP.region_theme}):`,
-              error,
             );
           }
         } else {
