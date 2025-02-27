@@ -55,8 +55,8 @@ export class AchievementPService {
     };
   }
 
-  async post(user: any, subId: string): Promise<AchievementP> {
-    const user_id = user.id;
+  async post(user_id:number, subId: string): Promise<AchievementP> {
+   
     const idS = Number(subId);
     if (!idS) {
       console.log('idS불량');

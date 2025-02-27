@@ -37,7 +37,7 @@ export class AchievementPController {
     @Param('subAchievementId') subAchievementId: string,
   ) {
     console.log('P 생성 컨트롤러');
-    return this.APService.post(req.user, subAchievementId);
+    return this.APService.post(req.user.id, subAchievementId);
   }
 
   // 잘못 등록된 경우 삭제
