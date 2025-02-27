@@ -33,6 +33,14 @@ export class CollectionController {
     const userId = req.user.id;
     return this.collectionService.findCollectionsByUser(userId);
   }
+
+  @Get('status')
+  @UseGuards(UserGuard)
+  async getCollectionStatus(@Request() req) {
+    const result = await this.collectionService.getCollectionStatus(req.user.id);
+    return result;
+  }
+
   // @Patch('collections/:collectionId')
   // update(
   //   @Param('collectionId') collectionId: string,
