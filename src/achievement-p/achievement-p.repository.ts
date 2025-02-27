@@ -24,6 +24,13 @@ export class AchievementPRepository {
     private readonly entityU: Repository<User>,
   ) {}
 
+  // 유저의 업적P 가져오기
+  async findPByUser(user_id: number): Promise<AchievementP[] | []> {
+    return await this.entityP.find({
+      where: { user_id },
+    });
+  }
+
   // 하나만 조회 - S
   async findSub(id: number): Promise<SubAchievement | null> {
     return await this.entityS.findOne({ where: { id } });

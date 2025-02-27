@@ -8,6 +8,7 @@ import { User } from '../user/entities/user.entity';
 import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
 import { AchievementC } from '../achievement-c/entities/achievement-c.entity';
 import { Achievement } from '../achievement/entities/achievement.entity';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -17,6 +18,7 @@ import { Achievement } from '../achievement/entities/achievement.entity';
       AchievementC,
       Achievement,
     ]),
+    ValkeyModule,
   ], // ✅ TypeORM 모듈에 AchievementP 등록
   controllers: [AchievementPController],
   providers: [AchievementPService, AchievementPRepository], // ✅ Repository 등록

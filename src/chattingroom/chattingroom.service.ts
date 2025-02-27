@@ -34,7 +34,7 @@ export class ChattingRoomService {
       chattingRoom.id,
       user.id,
     );
-    return { message: `채팅방이 생성되었습니다.` };
+    return { message: `채팅방이 생성되었습니다.`, id: chattingRoom.id };
   }
 
   // 채팅방 조회

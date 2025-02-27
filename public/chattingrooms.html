@@ -67,6 +67,60 @@
         .share-btn:hover {
             background-color: #1976D2;
         }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .modal-content {
+            position: relative;
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .modal-header {
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            margin: 0;
+            color: #333;
+        }
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        .modal-body input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .close {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        .close:hover {
+            color: #000;
+        }
     </style>
 </head>
 <body>
@@ -88,6 +142,23 @@
         </div>
     </div>
 
+    <!-- 모달 추가 -->
+    <div id="createRoomModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="modal-header">
+                <h2>새 채팅방 만들기</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="roomTitle" placeholder="채팅방 제목을 입력하세요">
+            </div>
+            <div class="modal-footer">
+                <button class="button" onclick="closeModal()">취소</button>
+                <button class="button" onclick="createRoomWithTitle()">생성</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const accessToken = localStorage.getItem('accessToken');
@@ -102,7 +173,7 @@
 
         async function loadRooms() {
             try {
-                const response = await fetch('http://localhost:3000/chattingroom', {
+                const response = await fetch('/chattingroom', {
                     headers: {
                         'Authorization': localStorage.getItem('accessToken')
                     }
@@ -129,31 +200,13 @@
         }
 
         async function createRoom() {
-            try {
-                const response = await fetch('http://localhost:3000/chattingroom', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': localStorage.getItem('accessToken'),
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (response.ok) {
-                    const room = await response.json();
-                    await joinRoom(room.id);
-                } else {
-                    throw new Error('채팅방 생성 실패');
-                }
-            } catch (error) {
-                console.error('채팅방 생성 실패:', error);
-                alert('채팅방 생성에 실패했습니다.');
-            }
+            showModal();
         }
 
         async function joinRoom(roomId) {
             try {
                 // 먼저 채팅방 멤버인지 확인
-                const checkResponse = await fetch(`http://localhost:3000/chatmember/check/${roomId}`, {
+                const checkResponse = await fetch(`/chatmember/check/${roomId}`, {
                     headers: {
                         'Authorization': localStorage.getItem('accessToken')
                     }
@@ -162,7 +215,7 @@
                 // 멤버가 아닌 경우에도 바로 채팅방으로 이동하지 말고, 먼저 멤버로 추가
                 if (!checkResponse.ok) {
                     // 멤버가 아니라면 새로 생성
-                    const response = await fetch(`http://localhost:3000/chatmember`, {
+                    const response = await fetch(`/chatmember`, {
                         method: 'POST',
                         headers: {
                             'Authorization': localStorage.getItem('accessToken'),
@@ -217,7 +270,7 @@
                 }
 
                 // 채팅방 존재 여부 확인
-                const checkResponse = await fetch(`http://localhost:3000/chattingroom/${roomId}`, {
+                const checkResponse = await fetch(`/chattingroom/${roomId}`, {
                     headers: {
                         'Authorization': localStorage.getItem('accessToken')
                     }
@@ -228,7 +281,7 @@
                 }
 
                 // 채팅방 멤버 확인
-                const memberCheckResponse = await fetch(`http://localhost:3000/chatmember/check/${roomId}`, {
+                const memberCheckResponse = await fetch(`/chatmember/check/${roomId}`, {
                     headers: {
                         'Authorization': localStorage.getItem('accessToken')
                     }
@@ -241,7 +294,7 @@
                 }
 
                 // 멤버가 아니라면 새로 가입
-                const joinResponse = await fetch(`http://localhost:3000/chatmember`, {
+                const joinResponse = await fetch(`/chatmember`, {
                     method: 'POST',
                     headers: {
                         'Authorization': localStorage.getItem('accessToken'),
@@ -292,7 +345,7 @@
                 // 또는 특정 사용자에게 이메일로 보내기
                 const userId = prompt('초대할 사용자 ID를 입력하세요:');
                 if (userId) {
-                    const response = await fetch(`http://localhost:3000/chattingroom/${roomId}/send-url`, {
+                    const response = await fetch(`/chattingroom/${roomId}/send-url`, {
                         method: 'POST',
                         headers: {
                             'Authorization': localStorage.getItem('accessToken'),
@@ -320,6 +373,71 @@
         function redirectToLogin() {
             window.location.href = '/public/login.html';
         }
+
+        // 모달 관련 함수 추가
+        function showModal() {
+            document.getElementById('createRoomModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('createRoomModal').style.display = 'none';
+        }
+
+        // 실제 채팅방 생성 함수
+        async function createRoomWithTitle() {
+            const title = document.getElementById('roomTitle').value.trim();
+            
+            if (!title) {
+                alert('채팅방 제목을 입력해주세요.');
+                return;
+            }
+
+            try {
+                // 채팅방 생성
+                const response = await fetch('/chattingroom', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': localStorage.getItem('accessToken'),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('채팅방 생성 실패');
+                }
+
+                // 응답에서 채팅방 ID 추출
+                const result = await response.json();
+                console.log('채팅방 생성 응답:', result);
+                
+                if (!result.id) {
+                    throw new Error('채팅방 ID를 찾을 수 없습니다.');
+                }
+
+                // 모달 닫고 생성된 채팅방으로 바로 입장
+                closeModal();
+                window.location.href = `/public/chatting.html?roomId=${result.id}`;
+                
+            } catch (error) {
+                console.error('채팅방 생성/입장 실패:', error);
+                alert(error.message || '채팅방 생성에 실패했습니다.');
+            }
+        }
+
+        // ESC 키로 모달 닫기
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // 모달 외부 클릭 시 닫기
+        window.addEventListener('click', (e) => {
+            if (e.target === document.getElementById('createRoomModal')) {
+                closeModal();
+            }
+        });
     </script>
 </body>
 </html> 

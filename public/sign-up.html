@@ -185,7 +185,7 @@
         </form>
         <div class="login-link">
           <span>이미 계정이 있으신가요? </span>
-          <a href="/log-in.html">로그인</a>
+          <a href="/public/log-in.html">로그인</a>
         </div>
       </div>
     </div>
@@ -338,7 +338,7 @@
 
           try {
             const response = await fetch(
-              'http://localhost:3000/user/auth/sign-up',
+              '/user/auth/sign-up',
               {
                 method: 'POST',
                 headers: {
@@ -359,7 +359,7 @@
             if (response.ok) {
               // 회원가입 성공 시 이메일 인증 코드 전송
               const verificationResponse = await fetch(
-                'http://localhost:3000/user/auth/send-code',
+                '/user/auth/send-code',
                 {
                   method: 'POST',
                   headers: {
@@ -400,7 +400,7 @@
 
           try {
             const response = await fetch(
-              'http://localhost:3000/user/auth/send-code',
+              '/user/auth/send-code',
               {
                 method: 'POST',
                 headers: {
@@ -434,7 +434,7 @@
 
           try {
             const response = await fetch(
-              'http://localhost:3000/user/auth/verify-code',
+              '/user/auth/verify-code',
               {
                 method: 'POST',
                 headers: {
@@ -450,7 +450,7 @@
               alert(
                 '이메일 인증이 완료되었습니다. 로그인 페이지로 이동합니다.',
               );
-              window.location.href = '/log-in.html';
+              window.location.href = '/public/log-in.html';
             } else {
               alert(data.message || '이메일 인증에 실패했습니다.');
             }

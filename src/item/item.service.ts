@@ -7,6 +7,7 @@ import { InventoryRepository } from '../inventory/inventory.repository';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { UserRepository } from 'src/user/user.repository';
 import { CreateItemWithInventoryDto } from './dto/create-item-with-inventory.dto';
+import { ValkeyService } from 'src/valkey/valkey.service';
 
 @Injectable()
 export class ItemService {
@@ -15,6 +16,7 @@ export class ItemService {
     private readonly storeItemRepository: StoreItemRepository,
     private readonly inventoryRepository: InventoryRepository,
     private readonly userRepository: UserRepository,
+    private readonly valkeyService: ValkeyService,
   ) {}
 
   async purchaseItem(
@@ -78,6 +80,7 @@ export class ItemService {
       }
       item.count += count;
       await this.itemRepository.updateItem(item.id, { count: item.count });
+      await this.valkeyService.del(`invenItems:`);
       return {
         item: item,
         message: `${storeItem.name} ${count}개를 구매하였습니다. 남아있는 젬 ${user.pink_gem}개, 남아있는 다이아몬드 ${user.pink_dia}개`,
@@ -92,6 +95,7 @@ export class ItemService {
         ...createItemDto,
         inventoryId: Number(inventory.id),
       } as CreateItemWithInventoryDto);
+      await this.valkeyService.del(`invenItems:`);
       return {
         item: newItem,
         message: `${storeItem.name} ${count}개를 구매하였습니다. 남아있는 젬 ${user.pink_gem}개, 남아있는 다이아몬드 ${user.pink_dia}개`,
