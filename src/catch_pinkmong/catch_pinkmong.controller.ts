@@ -16,11 +16,11 @@ export class CatchPinkmongController {
   constructor(private readonly catchPinkmongService: CatchPinkmongService) {}
 
   @Post('catchpinkmong')
-  catchPinkmong(@Request() req) {
-    return this.catchPinkmongService.appearPinkmong(req.user.id);
+  catchPinkmong(@Request() req, @Body('region_theme') region_theme: string) {
+    return this.catchPinkmongService.appearPinkmong(req.user.id, region_theme);
   }
 
-  @Get('feeding')
+  @Post('feeding')
   feeding(@Request() req, @Body('itemId', ParseIntPipe) itemId: number) {
     return this.catchPinkmongService.feeding(req.user.id, itemId);
   }

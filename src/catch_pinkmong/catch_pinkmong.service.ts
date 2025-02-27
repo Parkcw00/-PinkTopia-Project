@@ -20,6 +20,7 @@ export class CatchPinkmongService {
   // 🔹 핑크몽 등장 (전투 시작 시 Valkey에 저장)
   async appearPinkmong(
     userId: number,
+    region_theme: string,
   ): Promise<{ pinkmongImage?: string; message: string }> {
     // 1. 유저 조회
     const user = await this.catchRepo.getUser(userId);
@@ -34,7 +35,7 @@ export class CatchPinkmongService {
     }
 
     // 4. 등급을 고정 확률로 랜덤 선택
-    // 확률: legendary (전설) 5%, epic(초희귀) 10%, rare (희귀) 35%, common (보통) 50%
+    // 확률: legendary (전설) 5%, epic(에픽) 10%, rare (희귀) 35%, common (보통) 50%
     const r = Math.random(); // 0 ~ 1 사이의 난수 생성
     let selectedGrade: string;
     if (r < 0.05) {
@@ -48,13 +49,16 @@ export class CatchPinkmongService {
     }
 
     // ✅ 5. 선택된 등급과 지역에 따른 핑크몽 선택
-    const randomRegion =
-      await this.catchRepo.getRandomRegionByGrade(selectedGrade);
     const selectedPinkmong =
       await this.catchRepo.getRandomPinkmongByGradeAndRegion(
         selectedGrade,
-        randomRegion,
+        region_theme /* MODIFIED: regionTheme 파라미터 사용 */,
       );
+    if (!selectedPinkmong) {
+      throw new NotFoundException(
+        `해당 테마(${region_theme})와 등급(${selectedGrade})에 해당하는 핑크몽이 없습니다.`,
+      );
+    }
 
     // 6. 동일한 핑크몽이 있는지 중복 체크
     const duplicateCatch = await this.catchRepo.getExistingCatch(
@@ -86,7 +90,7 @@ export class CatchPinkmongService {
 
     return {
       pinkmongImage: selectedPinkmong.pinkmong_image,
-      message: `${selectedPinkmong.name}이(가) 등장했다! (등급: ${selectedGrade})`,
+      message: `${selectedPinkmong.name}이(가) 등장했다! (등급: ${selectedGrade} 지역 : ${region_theme})`,
     };
   }
 

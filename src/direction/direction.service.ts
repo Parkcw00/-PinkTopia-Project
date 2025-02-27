@@ -168,47 +168,6 @@ export class DirectionService {
       });
       console.log('nearBybookmarksS1', nearBybookmarksS);
 
-      // nearBybookmarksS2 = nearBybookmarksS1.filter((bookmark: any) => {
-      //   if (!bookmark.latitude || !bookmark.longitude) return false;
-
-      //   const result = isPointWithinRadius(
-      //     {
-      //       latitude: user_direction.latitude,
-      //       longitude: user_direction.longitude,
-      //     },
-      //     {
-      //       latitude: Number(bookmark.latitude),
-      //       longitude: Number(bookmark.longitude),
-      //     },
-      //     5, // 반경 5m 내에 있는지 체크
-      //   );
-      //   console.log('결과', result);
-      //   return result;
-      // });
-      // console.log('가까운 북마크', nearBybookmarksS);
-
-      // 도착위치 배열: nearBybookmarksS;
-
-      // 이벤트 실행
-
-      // 반복문으로 업적P 추가 하기 어떤 방법으로 하는 것이 좋을 까?
-      // 방법 - 유저id : user_id, 서브업적id : nearBybookmarksS배열 안에 -.subId
-      // 1. api 호출 : localhost:3000/achievement-p/subAchievementId/:subAchievementId
-      // 2. 업적P의 서비스에서 직접 실행
-      // if (nearBybookmarksS.length >= 1) {
-
-      //   try {
-      //     // [변경됨]: axios.post 호출 시, payload에 nearBybookmarksS 정보 포함
-      //     nearBybookmarksS.forEach({sub} , {
-      //       console.log(`이벤트 실행: 유저 ${user_id}가 북마크 [${sub.title}] 주변에 진입했습니다.`);
-
-      //     await this.APService.post(user_id, sub.subId);
-      // });
-
-      //   }catch (error) {
-      //     console.error('❌ 업적P 완료료 처리 실패:', error);
-      //   }
-
       // 이벤트 실행: 각 서브 업적에 대해 AchievementPService 호출
       if (nearBybookmarksS.length >= 1) {
         // [변경됨]: forEach 내부를 async 함수로 변경하여 APService 호출
@@ -292,21 +251,24 @@ export class DirectionService {
 
       // 이벤트 실행
       // 5m 이내 북마크가 있으면 해당 테마에 맞는 캐치핑크몽 API 호출
-      // 여기다가 웹소캣 해야될거같아~~~~~~
+      // 이벤트 실행: 북마크 주변 5m 내에 있을 경우
+      // nearBybookmarksP에서 가장 가까운 북마크를 선택한 후
       if (nearestBookmarkP) {
         console.log(
           `이벤트 실행: 유저 ${user_id}가 북마크 [${nearestBookmarkP.title}] 주변에 진입했습니다.`,
         );
         if (nearestBookmarkP.region_theme) {
           try {
-            // [변경됨]: axios.post 호출 시, payload에 nearestBookmarkP 정보 포함
+            // 여기서 웹소켓 메시지에서 받은 데이터를 payload에 담아 POST 요청 수행
+            const payload = {
+              user_id, // 예: user_id가 이미 존재하는 변수
+              region_theme: nearestBookmarkP.region_theme, // 웹소켓으로 받은 데이터 내 테마 값
+              bookmark: nearestBookmarkP, // 전체 북마크 데이터 전달
+            };
+
             const response = await axios.post(
               'http://localhost:3000/catch-pinkmong/catchpinkmong',
-              {
-                user_id,
-                region_theme: nearestBookmarkP.region_theme, // 'forest', 'desert', 'ocean', 'mountain', 'city'
-                bookmark: nearestBookmarkP,
-              },
+              payload,
             );
             console.log(
               `핑크몽 API 호출 성공 (테마: ${nearestBookmarkP.region_theme}):`,
@@ -323,12 +285,11 @@ export class DirectionService {
             `북마크 [${nearestBookmarkP.title}]에 테마 정보가 없습니다.`,
           );
         }
-        return { triggered: true, bookmark: nearestBookmarkP }; // [변경됨]: 단일 북마크 반환
+        return { triggered: true, bookmark: nearestBookmarkP };
       } else {
         console.log(
           `유저 ${user_id}는 핑크몽 북마크 주변 5m 범위에 진입하지 않았습니다.`,
         );
-
         return { triggered: false };
       }
     } catch (error) {
