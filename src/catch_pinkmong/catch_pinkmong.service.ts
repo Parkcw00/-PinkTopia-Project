@@ -115,6 +115,22 @@ export class CatchPinkmongService {
     if (item.count > 0) {
       item.count -= 1;
       await this.catchRepo.updateItem(item);
+
+      // Valkey에 인벤토리 아이템 목록 업데이트
+      const invenItemsKey = `invenItems:${userId}`;
+      const existingItems: any = await this.valkeyService.get(
+        `invenItems:${userId}`,
+      );
+
+      const updatedItems = existingItems.map((existingItem) =>
+        existingItem.id === item.id
+          ? {
+              ...existingItem,
+              count: item.count,
+            }
+          : existingItem,
+      );
+      await this.valkeyService.set(invenItemsKey, updatedItems, 3600); // 1시간 TTL
     } else {
       throw new BadRequestException('해당 아이템의 수량이 부족합니다.');
     }
