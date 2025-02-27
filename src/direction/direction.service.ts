@@ -4,6 +4,7 @@ import { AchievementPService } from '../achievement-p/achievement-p.service';
 import { CompareDirection } from './dto/compare-direction.dto';
 import { getDistance, isPointWithinRadius } from 'geolib';
 import axios, { all } from 'axios'; // HTTP 요청을 보내기 위한 클라이언트 라이브러리
+import { DirectionGateway } from './/direction.gateway';
 
 import { number } from 'joi';
 
@@ -12,6 +13,7 @@ export class DirectionService {
   constructor(
     private readonly valkeyService: ValkeyService,
     private readonly APService: AchievementPService,
+    private readonly directionGateway: DirectionGateway,
   ) {}
 
   async createBookmarks() {
@@ -296,6 +298,10 @@ export class DirectionService {
       if (nearestBookmarkP) {
         console.log(
           `이벤트 실행: 유저 ${user_id}가 북마크 [${nearestBookmarkP.title}] 주변에 진입했습니다.`,
+        );
+        this.directionGateway.sendPopup(
+          user_id,
+          `핑크몽 [${nearestBookmarkP.title}]에 접근했습니다!`,
         );
         if (nearestBookmarkP.region_theme) {
           try {
