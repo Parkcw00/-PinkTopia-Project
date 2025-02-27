@@ -146,7 +146,21 @@
             object-fit: cover;
         }
 
+        .profile-buttons {
+            display: flex;
+            justify-content: center;
+            /* 가운데 정렬 */
+            gap: 10px;
+            /* 버튼 간격 */
+            width: 100%;
+            /* 부모 요소 가득 차게 */
+            margin-top: 10px;
+        }
+
+
         .upload-btn {
+            flex: 1;
+            /* 동일한 크기 */
             margin-top: 10px;
             background-color: #f575b5;
             color: white;
@@ -155,6 +169,7 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
+            text-align: center;
         }
 
         .upload-btn:hover {
@@ -211,6 +226,32 @@
         .logout-btn:hover {
             background-color: #d9324a;
         }
+
+        .user-assets {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 20px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
+            z-index: 100;
+        }
+
+        .asset-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #9c195f;
+            font-weight: bold;
+        }
+
+        .asset-item img {
+            width: 24px;
+            height: 24px;
+        }
     </style>
 </head>
 
@@ -229,6 +270,18 @@
         <div class="logo-text">
             <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
         </div>
+
+        <div class="user-assets">
+            <div class="asset-item">
+                <img src="/public/images/gem.png" alt="젬">
+                <span id="userGem">로딩 중...</span> 젬
+            </div>
+            <div class="asset-item">
+                <img src="/public/images/dia.png" alt="다이아">
+                <span id="userDia">로딩 중...</span> 다이아
+            </div>
+        </div>
+
     </div>
 
     <!-- 사이드바 -->
@@ -264,7 +317,7 @@
         <h1>마이페이지</h1>
 
         <div class="profile-section">
-            <img id="profileImage" src="/public/images/default-profile.png" alt="프로필 이미지" class="profile-image">
+            <img id="profileImage" src="/public/images/1.png" alt="프로필 이미지" class="profile-image">
             <input type="file" id="fileInput" style="display: none;" accept="image/*">
             <button class="upload-btn" onclick="document.getElementById('fileInput').click();">프로필 변경</button>
             <button class="upload-btn" id="deleteProfileBtn">프로필 삭제</button>
@@ -330,7 +383,7 @@
                 const userData = await response.json();
                 document.getElementById("nickname").value = userData.nickname || "";
                 document.getElementById("profileImage").src = userData.profile_image || "/public/images/default-profile.png";
-                
+
                 // 자산 정보도 함께 업데이트
                 document.getElementById('userGem').textContent = userData.pink_gem.toLocaleString();
                 document.getElementById('userDia').textContent = userData.pink_dia.toLocaleString();
@@ -414,6 +467,31 @@
                 console.error("정보 수정 실패:", error);
             }
         }
+
+        async function loadUserAssets() {
+            try {
+                const accessToken = localStorage.getItem('accessToken');
+                if (!accessToken) return;
+
+                const response = await fetch('http://localhost:3000/user/me', {
+                    headers: { 'Authorization': accessToken }
+                });
+
+                if (!response.ok) throw new Error('자산 로드 실패');
+                const userData = await response.json();
+
+                document.getElementById('userGem').textContent = userData.pink_gem.toLocaleString();
+                document.getElementById('userDia').textContent = userData.pink_dia.toLocaleString();
+            } catch (error) {
+                console.error('자산 불러오기 실패:', error);
+            }
+        }
+
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', function () {
+            loadUserAssets();
+        });
+
 
         // 로그아웃
         async function logout() {
