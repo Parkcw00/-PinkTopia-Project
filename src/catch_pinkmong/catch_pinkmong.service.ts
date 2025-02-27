@@ -124,7 +124,7 @@ export class CatchPinkmongService {
 
     // 4. 포획 확률 계산
     const baseCatchRate = 0.1;
-    const getChanceIncrease = { 2: 0.15, 3: 0.27, 4: 0.35 };
+    const getChanceIncrease = { 2: 0.15, 3: 0.25 };
     const bonus = getChanceIncrease[item.id] || 0;
     const finalCatchRate = baseCatchRate + bonus;
 
