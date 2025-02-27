@@ -104,7 +104,6 @@ export class AchievementPService {
 
     // Redis에 저장
     await this.valkeyService.set(key, dataP);
-
     const createP = await this.repository.createP(dataP);
     if (!createP) {
       console.log('생성실패');
