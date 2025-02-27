@@ -35,11 +35,13 @@ export class InventoryService {
       potion: item.store_item.potion,
       potionTime: item.store_item.potion_time,
     }));
-    const cachedinvenItems: any = await this.valkeyService.get(`invenItems:`);
+    const cachedinvenItems: any = await this.valkeyService.get(
+      `invenItems:${userId}`,
+    );
     if (cachedinvenItems) {
       return cachedinvenItems; // 캐시된 데이터 반환
     }
-    await this.valkeyService.set(`invenItems:`, invenItems, 600);
+    await this.valkeyService.set(`invenItems:${userId}`, invenItems, 600);
 
     return invenItems;
   }
