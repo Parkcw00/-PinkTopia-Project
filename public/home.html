@@ -255,7 +255,7 @@
                     if (!response.ok) throw new Error("유저 정보를 불러오지 못했습니다.");
                     const userData = await response.json();
 
-                    document.getElementById("profileImage").src = userData.profile_image || "/public/images/default-profile.png";
+                    document.getElementById("profileImage").src = userData.profile_image || "/public/images/1.png";
                     document.getElementById("welcomeMessage").textContent = `환영합니다! ${userData.nickname}님!`;
 
                 } catch (error) {
@@ -404,7 +404,7 @@
             localStorage.removeItem("accessToken");
 
             console.log("✅ 로그아웃 성공! 페이지 이동");
-            window.location.href = "/public/log-in.html"; // 로그인 페이지로 이동
+            window.location.href = "/"; // 로그인 페이지로 이동
         } catch (error) {
             console.error("❌ 로그아웃 실패:", error);
             alert("로그아웃 중 오류가 발생했습니다.");
