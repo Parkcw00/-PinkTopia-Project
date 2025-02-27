@@ -292,7 +292,7 @@ export class DirectionService {
 
       // 이벤트 실행
       // 5m 이내 북마크가 있으면 해당 테마에 맞는 캐치핑크몽 API 호출
-      //여기다가 웹소캣 해야될거같아~~~~~~
+      // 여기다가 웹소캣 해야될거같아~~~~~~
       if (nearestBookmarkP) {
         console.log(
           `이벤트 실행: 유저 ${user_id}가 북마크 [${nearestBookmarkP.title}] 주변에 진입했습니다.`,
