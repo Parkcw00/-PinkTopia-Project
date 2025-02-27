@@ -225,11 +225,10 @@ export class DirectionService {
         .filter((bookmark) => bookmark.distance <= 5) // 5m 이내만 필터링
         .sort((a, b) => a.distance - b.distance) // 가장 가까운 순으로 정렬
         .at(0); // 가장 가까운 하나만 가져오기
-      console.log('nearestBookmarkP', nearestBookmarkP);
+
       // 이벤트 실행
       // 5m 이내 북마크가 있으면 해당 테마에 맞는 캐치핑크몽 API 호출
-      // 이벤트 실행: 북마크 주변 5m 내에 있을 경우
-      // nearBybookmarksP에서 가장 가까운 북마크를 선택한 후
+      //여기다가 웹소캣 해야될거같아~~~~~~
       if (nearestBookmarkP) {
         console.log(
           `이벤트 실행: 유저 ${user_id}가 북마크 [${nearestBookmarkP.title}] 주변에 진입했습니다.`,
@@ -241,17 +240,14 @@ export class DirectionService {
         );
         if (nearestBookmarkP.region_theme) {
           try {
-            // 여기서 웹소켓 메시지에서 받은 데이터를 payload에 담아 POST 요청 수행
-
-            const payload = {
-              user_id, // 예: user_id가 이미 존재하는 변수
-              region_theme: nearestBookmarkP.region_theme, // 웹소켓으로 받은 데이터 내 테마 값
-              bookmark: nearestBookmarkP, // 전체 북마크 데이터 전달
-            };
-
+            // [변경됨]: axios.post 호출 시, payload에 nearestBookmarkP 정보 포함
             const response = await axios.post(
               'http://localhost:3000/catch-pinkmong/catchpinkmong',
-              payload,
+              {
+                user_id,
+                region_theme: nearestBookmarkP.region_theme, // 'forest', 'desert', 'ocean', 'mountain', 'city'
+                bookmark: nearestBookmarkP,
+              },
             );
             console.log(
               `핑크몽 API 호출 성공 (테마: ${nearestBookmarkP.region_theme}):`,
@@ -266,11 +262,12 @@ export class DirectionService {
             `북마크 [${nearestBookmarkP.title}]에 테마 정보가 없습니다.`,
           );
         }
-        return { triggered: true, bookmark: nearestBookmarkP };
+        return { triggered: true, bookmark: nearestBookmarkP }; // [변경됨]: 단일 북마크 반환
       } else {
         console.log(
           `유저 ${user_id}는 핑크몽 북마크 주변 5m 범위에 진입하지 않았습니다.`,
         );
+
         return { triggered: false };
       }
     } catch (error) {
