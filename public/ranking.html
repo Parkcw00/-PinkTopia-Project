@@ -296,6 +296,9 @@
                 document.getElementById('loggedInMenu').style.display = 'none';
                 document.getElementById('loggedOutMenu').style.display = 'block';
             }
+
+            console.log("✅ DOMContentLoaded 이벤트 실행됨");
+            fetchRankings();
         });
 
         async function logout() {
@@ -356,28 +359,29 @@
             }
         }
 
+        const baseURL = "http://localhost:3000"; // NestJS 서버 주소
         async function fetchRankings() {
             try {
-                // 포인트 랭킹 가져오기
-                const pointResponse = await fetch('/user/ranking/point');
+                const pointResponse = await fetch(`${baseURL}/user/ranking/point`);
+                console.log("포인트 랭킹 응답 상태:", pointResponse.status);
+                if (!pointResponse.ok) throw new Error("포인트 랭킹 데이터를 불러오지 못했습니다.");
                 const pointData = await pointResponse.json();
+                console.log("포인트 랭킹 데이터:", pointData);
                 displayRanking('pointRanking', pointData, 'collection_point');
 
-                // 업적 랭킹 가져오기
-                const achievementResponse = await fetch('/user/ranking/achievement');
+                const achievementResponse = await fetch(`${baseURL}/user/ranking/achievement`);
+                console.log("업적 랭킹 응답 상태:", achievementResponse.status);
+                if (!achievementResponse.ok) throw new Error("업적 랭킹 데이터를 불러오지 못했습니다.");
                 const achievementData = await achievementResponse.json();
-                displayRanking(
-                    'achievementRanking',
-                    achievementData,
-                    'achievementCount',
-                );
+                console.log("업적 랭킹 데이터:", achievementData);
+                displayRanking('achievementRanking', achievementData, 'achievementCount');
             } catch (error) {
-                console.error(
-                    '랭킹 데이터를 가져오는 중 오류가 발생했습니다:',
-                    error,
-                );
+                console.error('❌ 랭킹 데이터를 가져오는 중 오류:', error);
+                alert("랭킹 데이터를 불러오는 데 문제가 발생했습니다.");
             }
         }
+
+
 
         function displayRanking(tableId, data, scoreField) {
             const tbody = document.querySelector(`#${tableId} tbody`);
