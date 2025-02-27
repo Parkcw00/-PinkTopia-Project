@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지 | PinkTopia</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffe4f7;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
+        }
+
+        h1 {
+            color: #ff62b6;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .profile-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid #f38fc5;
+            object-fit: cover;
+        }
+
+        .upload-btn {
+            margin-top: 10px;
+            background-color: #f575b5;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .upload-btn:hover {
+            background-color: #ff1493;
+        }
+
+        .info-section {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f38fc5;
+        }
+
+        .info-item input {
+            width: 60%;
+            padding: 8px;
+            border: 2px solid #f38fc5;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .save-btn {
+            background-color: #f575b5;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .save-btn:hover {
+            background-color: #ff1493;
+        }
+
+        .logout-btn {
+            background-color: #ff4d6a;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        .logout-btn:hover {
+            background-color: #d9324a;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>마이페이지</h1>
+
+        <div class="profile-section">
+            <img id="profileImage" src="/public/images/default-profile.png" alt="프로필 이미지" class="profile-image">
+            <input type="file" id="fileInput" style="display: none;" accept="image/*">
+            <button class="upload-btn" onclick="document.getElementById('fileInput').click();">프로필 변경</button>
+            <button class="upload-btn" id="deleteProfileBtn">프로필 삭제</button>
+        </div>
+
+        <div class="info-section">
+            <div class="info-item">
+                <span>닉네임:</span>
+                <input type="text" id="nickname">
+            </div>
+            <div class="info-item">
+                <span>비밀번호 변경:</span>
+                <input type="password" id="password" placeholder="새 비밀번호 입력">
+            </div>
+            <button class="save-btn" onclick="updateProfile()">정보 수정</button>
+        </div>
+
+        <button class="logout-btn" onclick="logout()">로그아웃</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            const accessToken = localStorage.getItem("accessToken");
+            if (!accessToken) {
+                window.location.href = "/public/log-in.html";
+                return;
+            }
+
+            try {
+                const response = await fetch("http://localhost:3000/user/me", {
+                    headers: { "Authorization": accessToken }
+                });
+
+                if (!response.ok) throw new Error("유저 정보를 불러오지 못했습니다.");
+
+                const userData = await response.json();
+                document.getElementById("nickname").value = userData.nickname || "";
+                document.getElementById("profileImage").src = userData.profile_image || "/public/images/default-profile.png";
+            } catch (error) {
+                console.error("유저 정보 로드 실패:", error);
+            }
+        });
+
+        // 프로필 이미지 업로드
+        document.getElementById("fileInput").addEventListener("change", async function (event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const response = await fetch("http://localhost:3000/user/upload-profile", {
+                    method: "POST",
+                    headers: { "Authorization": localStorage.getItem("accessToken") },
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error("프로필 업로드 실패");
+
+                const result = await response.json();
+                document.getElementById("profileImage").src = result.imageUrl;
+                alert("프로필 이미지가 변경되었습니다.");
+            } catch (error) {
+                console.error("프로필 업로드 실패:", error);
+            }
+        });
+
+        // 프로필 이미지 삭제
+        document.getElementById("deleteProfileBtn").addEventListener("click", async function () {
+            if (!confirm("정말 프로필 이미지를 삭제하시겠습니까?")) return;
+
+            try {
+                const response = await fetch("http://localhost:3000/user/delete-profile", {
+                    method: "DELETE",
+                    headers: { "Authorization": localStorage.getItem("accessToken") }
+                });
+
+                if (!response.ok) throw new Error("프로필 삭제 실패");
+
+                document.getElementById("profileImage").src = "/public/images/default-profile.png";
+                alert("프로필 이미지가 삭제되었습니다.");
+            } catch (error) {
+                console.error("프로필 삭제 실패:", error);
+            }
+        });
+
+        // 유저 정보 업데이트
+        async function updateProfile() {
+            const nickname = document.getElementById("nickname").value;
+            const password = document.getElementById("password").value;
+            const updateData = {};
+
+            if (nickname) updateData.nickname = nickname;
+            if (password) updateData.password = password;
+
+            if (!nickname && !password) {
+                alert("변경할 정보를 입력해주세요.");
+                return;
+            }
+
+            try {
+                const response = await fetch("http://localhost:3000/user/me", {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": localStorage.getItem("accessToken")
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                if (!response.ok) throw new Error("정보 수정 실패");
+
+                alert("회원 정보가 수정되었습니다.");
+            } catch (error) {
+                console.error("정보 수정 실패:", error);
+            }
+        }
+
+        // 로그아웃
+        async function logout() {
+            try {
+                const accessToken = localStorage.getItem("accessToken");
+                if (!accessToken) {
+                    console.warn("🚨 로그아웃 시도: 이미 로그아웃된 상태");
+                    window.location.href = "/public/log-in.html";
+                    return;
+                }
+
+                // 🔹 서버에 로그아웃 요청 보내기
+                const response = await fetch("http://localhost:3000/user/auth/logout", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": accessToken
+                    },
+                    credentials: "include" // 쿠키도 함께 보내기
+                });
+
+                if (!response.ok) {
+                    throw new Error("서버에서 로그아웃 처리 실패");
+                }
+
+                // ✅ 로그아웃 성공 후, 토큰 삭제
+                localStorage.removeItem("accessToken");
+
+                console.log("✅ 로그아웃 성공! 페이지 이동");
+                window.location.href = "/public/log-in.html"; // 로그인 페이지로 이동
+            } catch (error) {
+                console.error("❌ 로그아웃 실패:", error);
+                alert("로그아웃 중 오류가 발생했습니다.");
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>

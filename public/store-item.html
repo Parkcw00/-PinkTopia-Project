@@ -46,10 +46,9 @@
         }
 
         h1 {
+            margin: 0;
             color: #ff62b6;
-            padding: 20px;
             font-size: 32px;
-            font-weight: bold;
         }
 
         .store-container {
@@ -59,6 +58,7 @@
             padding: 20px;
             max-width: 900px;
             margin: 0 auto;
+            margin-top: 20px;
         }
 
         .store-item {
@@ -211,6 +211,93 @@
             cursor: pointer;
             color: white;
         }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .user-assets {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 20px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
+            z-index: 100;
+        }
+
+        .asset-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #9c195f;
+            font-weight: bold;
+        }
+
+        .asset-item img {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* 구매 버튼 스타일 수정 */
+        .buy-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .gem-button,
+        .dia-button {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            color: white;
+        }
+
+        .gem-button {
+            background-color: #ff69b4;
+        }
+
+        .dia-button {
+            background-color: #4a90e2;
+        }
+
+        .gem-button:hover {
+            background-color: #ff1493;
+        }
+
+        .dia-button:hover {
+            background-color: #357abd;
+        }
+
+        .page-title {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .page-title h1 {
+            color: #ff62b6;
+            font-size: 32px;
+            margin: 0;
+        }
+
+        .store-container {
+            margin-top: 40px;
+            /* 상단 여백 추가 */
+        }
     </style>
 </head>
 
@@ -259,7 +346,21 @@
         </div>
     </div>
 
-    <h1>아이템 상점</h1>
+    <div class="user-assets">
+        <div class="asset-item">
+            <img src="/public/images/gem.png" alt="젬">
+            <span id="userGem">로딩 중...</span> 젬
+        </div>
+        <div class="asset-item">
+            <img src="/public/images/dia.png" alt="다이아">
+            <span id="userDia">로딩 중...</span> 다이아
+        </div>
+    </div>
+
+    <div class="page-title">
+        <h1>아이템 상점</h1>
+    </div>
+
     <div class="store-container" id="store-items">
         <!-- 아이템이 여기에 추가될 예정 -->
     </div>
@@ -272,22 +373,86 @@
                 const storeContainer = document.getElementById('store-items');
 
                 storeContainer.innerHTML = items.map(item => `
-            <div class="store-item">
-                <img src="${item.item_image}" alt="${item.name}">
-                <h3>${item.name}</h3>
-                <p>젬 : ${item.gem_price} 핑크젬</p>
-                <p>다이아 : ${item.dia_price} 다이아</p>
-                ${item.potion ? `<p>포션 시간: ${item.potion_time}초</p>` : ''}
-                <button onclick="buyItem('${item.name}')">구매</button>
-            </div>
-        `).join('');
+                    <div class="store-item">
+                        <img src="${item.item_image}" alt="${item.name}">
+                        <h3>${item.name}</h3>
+                        <p>젬 : ${item.gem_price} 핑크젬</p>
+                        <p>다이아 : ${item.dia_price} 다이아</p>
+                        ${item.potion ? `<p>포션 시간: ${item.potion_time}분</p>` : ''}
+                        <div class="buy-buttons">
+                            <button class="gem-button" onclick='buyItem(${JSON.stringify(item)}, "gem")'>젬으로 구매</button>
+                            <button class="dia-button" onclick='buyItem(${JSON.stringify(item)}, "dia")'>다이아로 구매</button>
+                        </div>
+                    </div>
+                `).join('');
             } catch (error) {
                 console.error('상점 아이템을 불러오는 중 오류 발생:', error);
             }
         }
 
-        function buyItem(itemname) {
-            alert(`⭐ 아이템 ${itemname} 구매 요청 ⭐`);
+        async function buyItem(item, paymentMethod) {
+            try {
+                const accessToken = localStorage.getItem('accessToken');
+                if (!accessToken) {
+                    alert('로그인이 필요합니다.');
+                    return;
+                }
+
+                // 구매 수량 입력 받기
+                const quantity = prompt('구매할 수량을 입력하세요:', '1');
+                if (quantity === null) {
+                    alert('구매가 취소되었습니다.');
+                    return;
+                }
+
+                const quantityNum = parseInt(quantity);
+                if (isNaN(quantityNum) || quantityNum < 1) {
+                    alert('올바른 수량을 입력해주세요.');
+                    return;
+                }
+
+                // 구매 확인
+                const totalPrice = paymentMethod === 'gem' ?
+                    item.gem_price * quantityNum :
+                    item.dia_price * quantityNum;
+
+                const confirmMessage = `${item.name}을(를) ${quantityNum}개 구매하시겠습니까?\n총 가격: ${totalPrice.toLocaleString()} ${paymentMethod === 'gem' ? '젬' : '다이아'}`;
+
+                if (!confirm(confirmMessage)) {
+                    alert('구매가 취소되었습니다.');
+                    return;
+                }
+
+                const response = await fetch('http://localhost:3000/item', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': accessToken
+                    },
+                    body: JSON.stringify({
+                        storeItemId: item.id,
+                        count: quantityNum,
+                        paymentMethod: paymentMethod
+                    })
+                });
+
+                const result = await response.json();
+
+                // 구매 성공 시에만 자산 새로고침
+                if (response.ok) {
+                    alert(result.message);
+                    // 잠시 대기 후 자산 새로고침
+                    setTimeout(async () => {
+                        await loadUserAssets();
+                    }, 500);
+                } else {
+                    throw new Error(result.message || '구매에 실패했습니다.');
+                }
+
+            } catch (error) {
+                console.error('구매 실패:', error);
+                alert(error.message || '구매에 실패했습니다.');
+            }
         }
 
         function openSidebar() {
@@ -298,24 +463,98 @@
             document.getElementById('sidebar').style.width = "0";
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
+        // loadUserAssets 함수 수정
+        async function loadUserAssets() {
+            try {
+                const accessToken = localStorage.getItem('accessToken');
+                if (!accessToken) {
+                    console.log('로그인이 필요합니다.');
+                    return;
+                }
+
+                // 엔드포인트를 /user/me로 수정
+                const response = await fetch('http://localhost:3000/user/me', {
+                    headers: {
+                        'Authorization': accessToken
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.text();
+                    console.log('에러 응답:', errorData);
+                    throw new Error(`API 요청 실패: ${response.status}`);
+                }
+
+                const userData = await response.json();
+                console.log('받은 유저 데이터:', userData);
+
+                // 서버에서 반환하는 데이터 구조에 맞게 접근
+                if (userData && typeof userData.pink_gem === 'number' && typeof userData.pink_dia === 'number') {
+                    document.getElementById('userGem').textContent = userData.pink_gem.toLocaleString();
+                    document.getElementById('userDia').textContent = userData.pink_dia.toLocaleString();
+                } else {
+                    console.error('잘못된 유저 데이터 형식:', userData);
+                    throw new Error('유저 데이터 형식이 올바르지 않습니다.');
+                }
+
+            } catch (error) {
+                console.error('유저 자산 로드 실패:', error.message);
+                console.log('에러 객체:', error);
+                document.getElementById('userGem').textContent = '0';
+                document.getElementById('userDia').textContent = '0';
+            }
+        }
+
+        // DOMContentLoaded 이벤트에 loadUserAssets 추가
+        document.addEventListener("DOMContentLoaded", function () {
             const accessToken = localStorage.getItem("accessToken");
-            
+
             if (accessToken) {
                 document.getElementById('loggedInMenu').style.display = 'block';
                 document.getElementById('loggedOutMenu').style.display = 'none';
+                loadUserAssets(); // 자산 로드 추가
             } else {
                 document.getElementById('loggedInMenu').style.display = 'none';
                 document.getElementById('loggedOutMenu').style.display = 'block';
             }
+
+            fetchStoreItems();
         });
 
-        function logout() {
-            localStorage.removeItem("accessToken");
-            window.location.reload();
+        async function logout() {
+            try {
+                const accessToken = localStorage.getItem("accessToken");
+                if (!accessToken) {
+                    console.warn("🚨 로그아웃 시도: 이미 로그아웃된 상태");
+                    window.location.href = "/public/log-in.html";
+                    return;
+                }
+
+                // 🔹 서버에 로그아웃 요청 보내기
+                const response = await fetch("http://localhost:3000/user/auth/logout", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": accessToken
+                    },
+                    credentials: "include" // 쿠키도 함께 보내기
+                });
+
+                if (!response.ok) {
+                    throw new Error("서버에서 로그아웃 처리 실패");
+                }
+
+                // ✅ 로그아웃 성공 후, 토큰 삭제
+                localStorage.removeItem("accessToken");
+
+                console.log("✅ 로그아웃 성공! 페이지 이동");
+                window.location.href = "/public/log-in.html"; // 로그인 페이지로 이동
+            } catch (error) {
+                console.error("❌ 로그아웃 실패:", error);
+                alert("로그아웃 중 오류가 발생했습니다.");
+            }
         }
 
-        fetchStoreItems();
     </script>
 </body>
 

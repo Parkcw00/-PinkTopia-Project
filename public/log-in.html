@@ -186,7 +186,7 @@
             <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
         </div>
     </div>
-    
+
     <div id="sidebar" class="sidebar">
         <div class="sidebar-header">
             <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
@@ -244,9 +244,9 @@
             document.getElementById('sidebar').style.width = "0";
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const accessToken = localStorage.getItem("accessToken");
-            
+
             if (accessToken) {
                 document.getElementById('loggedInMenu').style.display = 'block';
                 document.getElementById('loggedOutMenu').style.display = 'none';
@@ -256,10 +256,40 @@
             }
         });
 
-        function logout() {
-            localStorage.removeItem("accessToken");
-            window.location.reload();
+        async function logout() {
+            try {
+                const accessToken = localStorage.getItem("accessToken");
+                if (!accessToken) {
+                    console.warn("🚨 로그아웃 시도: 이미 로그아웃된 상태");
+                    window.location.href = "/public/log-in.html";
+                    return;
+                }
+
+                // 🔹 서버에 로그아웃 요청 보내기
+                const response = await fetch("http://localhost:3000/user/auth/logout", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": accessToken
+                    },
+                    credentials: "include" // 쿠키도 함께 보내기
+                });
+
+                if (!response.ok) {
+                    throw new Error("서버에서 로그아웃 처리 실패");
+                }
+
+                // ✅ 로그아웃 성공 후, 토큰 삭제
+                localStorage.removeItem("accessToken");
+
+                console.log("✅ 로그아웃 성공! 페이지 이동");
+                window.location.href = "/public/log-in.html"; // 로그인 페이지로 이동
+            } catch (error) {
+                console.error("❌ 로그아웃 실패:", error);
+                alert("로그아웃 중 오류가 발생했습니다.");
+            }
         }
+
 
         document
             .getElementById('loginForm')

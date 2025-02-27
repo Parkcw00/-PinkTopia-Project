@@ -39,12 +39,10 @@ function displayMarker(locPosition, message) {
   map.setCenter(locPosition);
 }
 
-
 // 여기서 북마커 호출
 let markerData = [];
 
-// ✅ 서버에서 북마커 데이터 가져오기
-console.log('📡 북마커 데이터를 요청합니다!'); // ✅ fetch 실행 전 확인 로그
+/** */
 
 // fetch('/direction/bookmarke') //
 fetch('http://localhost:3000/direction/bookmarke')
@@ -57,7 +55,7 @@ fetch('http://localhost:3000/direction/bookmarke')
   })
   .then((data) => {
     console.log('북마커 데이터:', data); // ✅ 데이터 확인용 콘솔 출력
- 
+
     if (data.bookmarksS && Array.isArray(data.bookmarksS)) {
       data.bookmarksS.forEach((bookmarkeS) => {
         markerData.push({

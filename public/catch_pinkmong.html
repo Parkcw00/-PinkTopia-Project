@@ -1,36 +1,37 @@
 <!doctype html>
 <html lang="ko">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>핑크몽 포획 | PinkTopia</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        height: 100vh;
-        overflow: hidden;
-      }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-      .nav {
-        display: flex;
-        justify-content: space-between;
-        background-color: #ff69b4;
-        padding: 15px;
-        color: white;
-        font-weight: bold;
-        position: fixed;
-        width: 100%;
-        top: 0;
-        z-index: 1000;
-      }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            background-color: #ff69b4;
+            padding: 15px;
+            color: white;
+            font-weight: bold;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
 
-      .nav a {
-        color: white;
-        text-decoration: none;
-        margin: 0 10px;
-      }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
 
       .catch-container {
         height: 100vh;
@@ -46,17 +47,17 @@
         z-index: 1;
       }
 
-      @media (orientation: landscape) {
-        .catch-container {
-          background-image: url('assets/landscape-background.jpg');
+        @media (orientation: landscape) {
+            .catch-container {
+                background-image: url('assets/landscape-background.jpg');
+            }
         }
-      }
 
-      @media (orientation: portrait) {
-        .catch-container {
-          background-image: url('assets/portrait-background.jpg');
+        @media (orientation: portrait) {
+            .catch-container {
+                background-image: url('assets/portrait-background.jpg');
+            }
         }
-      }
 
       .pinkmong {
         width: 200px;
@@ -71,15 +72,17 @@
         z-index: 2;
       }
 
-      @keyframes float {
-        0%,
-        100% {
-          transform: translate(-50%, -50%);
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%);
+            }
+
+            50% {
+                transform: translate(-50%, -60%);
+            }
         }
-        50% {
-          transform: translate(-50%, -60%);
-        }
-      }
 
       .controls {
         background: rgba(255, 255, 255, 0.9);
@@ -211,22 +214,23 @@
         transform: scale(0.95);
       }
 
-      .status {
-        text-align: center;
-        color: white;
-        font-size: 1.2em;
-        margin-bottom: 10px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-      }
+        .status {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
     </style>
-  </head>
-  <body>
+</head>
+
+<body>
     <div class="nav">
-      <div>PinkTophia</div>
-      <div id="authMenu">
-        <a href="/public/log-in.html">로그인</a>
-        <a href="/public/sign-up.html">회원가입</a>
-      </div>
+        <div>PinkTophia</div>
+        <div id="authMenu">
+            <a href="/public/log-in.html">로그인</a>
+            <a href="/public/sign-up.html">회원가입</a>
+        </div>
     </div>
 
     <div class="catch-container">
@@ -256,8 +260,8 @@
         const accessToken = localStorage.getItem('accessToken');
         const authMenu = document.getElementById('authMenu');
 
-        if (accessToken) {
-          authMenu.innerHTML = `
+            if (accessToken) {
+                authMenu.innerHTML = `
             <a href="mypage.html">마이페이지</a>
             <a href="#" onclick="logout()">로그아웃</a>
           `;
@@ -268,27 +272,27 @@
         }
       });
 
-      async function appearPinkmong() {
-        const accessToken = localStorage.getItem('accessToken');
-        if (!accessToken) {
-          alert('로그인이 필요합니다.');
-          window.location.href = '/public/log-in.html';
-          return;
-        }
+        async function appearPinkmong() {
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/public/log-in.html';
+                return;
+            }
 
-        try {
-          const response = await fetch('/catch-pinkmong/catchpinkmong', {
-            method: 'POST',
-            headers: {
-              Authorization: `${accessToken}`,
-              'Content-Type': 'application/json',
-            },
-          });
+            try {
+                const response = await fetch('/catch-pinkmong/catchpinkmong', {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `${accessToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
 
-          if (response.ok) {
-            const result = await response.json();
-            document.querySelector('.status').textContent = result.message;
-            console.log(result);
+                if (response.ok) {
+                    const result = await response.json();
+                    document.querySelector('.status').textContent = result.message;
+                    console.log(result);
 
             // 핑크몽 이미지 업데이트
             if (result.pinkmongImage) {
@@ -392,13 +396,13 @@
         }
       }
 
-      async function catchPinkmong() {
-        const accessToken = localStorage.getItem('accessToken');
-        if (!accessToken) {
-          alert('로그인이 필요합니다.');
-          window.location.href = '/public/log-in.html';
-          return;
-        }
+        async function catchPinkmong() {
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/public/log-in.html';
+                return;
+            }
 
         const selectedItem = document.querySelector('.inventory-item.selected');
         if (!selectedItem) {
@@ -446,25 +450,25 @@
         }
       }
 
-      async function giveUp() {
-        const accessToken = localStorage.getItem('accessToken');
-        if (!accessToken) {
-          alert('로그인이 필요합니다.');
-          window.location.href = '/public/log-in.html';
-          return;
-        }
+        async function giveUp() {
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                alert('로그인이 필요합니다.');
+                window.location.href = '/public/log-in.html';
+                return;
+            }
 
-        try {
-          const response = await fetch('/catch-pinkmong/giveup', {
-            method: 'POST',
-            headers: {
-              Authorization: `${accessToken}`,
-              'Content-Type': 'application/json',
-            },
-          });
+            try {
+                const response = await fetch('/catch-pinkmong/giveup', {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `${accessToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
 
-          const result = await response.json();
-          document.querySelector('.status').textContent = result.message;
+                const result = await response.json();
+                document.querySelector('.status').textContent = result.message;
 
           // 도망 성공 시 2초 후 홈페이지로 이동
           if (result.success === false) {
@@ -479,10 +483,46 @@
         }
       }
 
-      function logout() {
-        localStorage.removeItem('accessToken');
-        window.location.reload();
-      }
+        function logout() {
+            localStorage.removeItem('accessToken');
+            window.location.reload();
+        }
+
+        async function logout() {
+            try {
+                const accessToken = localStorage.getItem("accessToken");
+                if (!accessToken) {
+                    console.warn("🚨 로그아웃 시도: 이미 로그아웃된 상태");
+                    window.location.href = "/public/log-in.html";
+                    return;
+                }
+
+                // 🔹 서버에 로그아웃 요청 보내기
+                const response = await fetch("http://localhost:3000/user/auth/logout", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": accessToken
+                    },
+                    credentials: "include" // 쿠키도 함께 보내기
+                });
+
+                if (!response.ok) {
+                    throw new Error("서버에서 로그아웃 처리 실패");
+                }
+
+                // ✅ 로그아웃 성공 후, 토큰 삭제
+                localStorage.removeItem("accessToken");
+
+                console.log("✅ 로그아웃 성공! 페이지 이동");
+                window.location.href = "/public/log-in.html"; // 로그인 페이지로 이동
+            } catch (error) {
+                console.error("❌ 로그아웃 실패:", error);
+                alert("로그아웃 중 오류가 발생했습니다.");
+            }
+        }
+
     </script>
-  </body>
+</body>
+
 </html>
