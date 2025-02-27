@@ -15,6 +15,8 @@ import {
 import { DirectionService } from './direction.service';
 import { CompareDirection } from './dto/compare-direction.dto';
 import { UserGuard } from 'src/user/guards/user-guard';
+import { Socket } from 'socket.io';
+import { ConnectedSocket } from '@nestjs/websockets';
 
 @Controller('direction')
 export class DirectionController {
@@ -31,8 +33,13 @@ export class DirectionController {
   async compareBookmark(
     @Request() req,
     @Body() compareDirection: CompareDirection,
+    @ConnectedSocket() client: Socket,
   ) {
-    return this.directionService.compareBookmark(req.user.id, compareDirection);
+    return this.directionService.compareBookmark(
+      req.user.id,
+      compareDirection,
+      client,
+    );
   }
   //user_direction, bookmark_direction[]
 

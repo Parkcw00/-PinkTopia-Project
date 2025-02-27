@@ -29,7 +29,7 @@ export class LocationHistoryGateway {
 
   constructor(
     private readonly locationHistoryService: LocationHistoryService,
-    private readonly directionService: DirectionService
+    private readonly directionService: DirectionService,
   ) {}
 
   /**
@@ -48,15 +48,19 @@ export class LocationHistoryGateway {
       latitude: data.latitude,
       longitude: data.longitude,
     };
-// [추가됨]: CompareDirection 객체 생성 (CoordinatesDto 포함)
-const compareDirection: CompareDirection = {
-  user_direction: {
-    latitude: data.latitude,
-    longitude: data.longitude,
-  },
-};
-await this.locationHistoryService.updateValkey(data.userId, updateDto);
-await this.directionService.compareBookmark(data.userId, compareDirection)
+    // [추가됨]: CompareDirection 객체 생성 (CoordinatesDto 포함)
+    const compareDirection: CompareDirection = {
+      user_direction: {
+        latitude: data.latitude,
+        longitude: data.longitude,
+      },
+    };
+    await this.locationHistoryService.updateValkey(data.userId, updateDto);
+    await this.directionService.compareBookmark(
+      data.userId,
+      compareDirection,
+      client,
+    );
 
     client.emit('locationUpdated', { message: '위치 업데이트 완료' });
   }

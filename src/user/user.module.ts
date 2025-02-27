@@ -40,6 +40,12 @@ import { ValkeyModule } from 'src/valkey/valkey.module';
   ],
   controllers: [UserController, UsersController],
   providers: [UserService, UserRepository, UserGuard, ValkeyService],
-  exports: [UserGuard, JwtModule, UserRepository, UserService],
+  exports: [
+    UserGuard,
+    JwtModule,
+    UserRepository,
+    UserService,
+    TypeOrmModule.forFeature([UserRepository]),
+  ],
 })
 export class UserModule {}
