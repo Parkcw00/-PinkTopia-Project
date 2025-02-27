@@ -386,31 +386,37 @@
         // 인벤토리 로드
         async function loadInventory() {
             try {
-                const response = await fetch('http://localhost:3000/inventory', {
-                    headers: {
-                        'Authorization': localStorage.getItem('accessToken')
-                    }
+                const response = await fetch(`http://localhost:3000/inventory?timestamp=${new Date().getTime()}`, {
+                    headers: { 'Authorization': localStorage.getItem('accessToken') }
                 });
+
+                if (!response.ok) {
+                    throw new Error('인벤토리를 불러오지 못했습니다.');
+                }
+
                 const items = await response.json();
+                console.log('📦 [인벤토리 데이터] 가져온 아이템 리스트:', items);
 
                 const inventoryGrid = document.getElementById('inventoryGrid');
-                inventoryGrid.innerHTML = '';
+                inventoryGrid.innerHTML = ''; // 기존 아이템 목록 제거
 
                 items.forEach(item => {
                     const itemElement = document.createElement('div');
                     itemElement.className = 'inventory-item';
                     itemElement.innerHTML = `
-                        <img src="${item.storeItemImage}" alt="${item.storeItemName}" class="item-image">
-                        <div class="item-name">${item.storeItemName}</div>
-                        <div class="item-count">수량: ${item.count}개</div>
-                        <button class="sell-button" onclick="showSellModal(${item.id}, '${item.storeItemName}', ${item.count})">판매</button>
-                    `;
+                <img src="${item.storeItemImage}" alt="${item.storeItemName}" class="item-image">
+                <div class="item-name">${item.storeItemName}</div>
+                <div class="item-count">수량: ${item.count}개</div>
+                <button class="sell-button" onclick="showSellModal(${item.id}, '${item.storeItemName}', ${item.count})">판매</button>
+            `;
                     inventoryGrid.appendChild(itemElement);
                 });
+
             } catch (error) {
-                console.error('인벤토리 로드 실패:', error);
+                console.error('❌ [인벤토리 로드 오류]:', error);
             }
         }
+
 
         // 판매 모달 표시
         function showSellModal(itemId, itemName, itemCount) {
@@ -420,9 +426,7 @@
 
             document.getElementById('sellItemName').textContent = itemName;
             sellCount.max = itemCount;  // 최대 판매 가능 수량 설정
-            sellCount.value = '1';  // 기본값 1로 설정
-
-            // 현재 보유 수량 표시 추가
+            sellCount.value = '1';      // 기본값 1로 설정
             document.getElementById('currentCount').textContent = `현재 보유: ${itemCount}개`;
 
             sellModal.style.display = 'block';
@@ -438,15 +442,8 @@
         // 판매 확인
         async function confirmSell() {
             const count = parseInt(document.getElementById('sellCount').value);
-            const maxCount = parseInt(document.getElementById('sellCount').max);
-
             if (!count || count < 1) {
                 alert('올바른 수량을 입력해주세요.');
-                return;
-            }
-
-            if (count > maxCount) {
-                alert(`최대 ${maxCount}개까지만 판매할 수 있습니다.`);
                 return;
             }
 
@@ -461,25 +458,24 @@
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || '판매에 실패했습니다.');
+                    throw new Error('판매 실패');
                 }
 
                 const result = await response.json();
                 alert(result.message);
                 closeSellModal();
 
-                // 판매 후 자산과 인벤토리 모두 새로고침
-                await Promise.all([
-                    loadUserAssets(),
-                    loadInventory()
-                ]);
+                console.log('🛒 [판매 후 인벤토리 업데이트 시작]');
+                await loadUserAssets(); // 유저 자산 (젬) 업데이트
+                await loadInventory(); // 인벤토리 업데이트
 
             } catch (error) {
-                console.error('아이템 판매 실패:', error);
+                console.error('❌ [아이템 판매 실패]:', error);
                 alert(error.message);
             }
         }
+
+
 
         // 사이드바 제어
         function openSidebar() {
