@@ -75,10 +75,157 @@
         .back-button:hover {
             background-color: #ff4da6;
         }
+
+        /* 네비게이션 바 스타일 */
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ff69b4;
+            padding: 15px;
+            color: white;
+            font-weight: bold;
+            position: relative;
+            height: 50px;
+        }
+
+        /* 햄버거 메뉴 아이콘 스타일 */
+        .menu-icon {
+            position: absolute;
+            left: 15px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .menu-icon .hamburger {
+            width: 25px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-icon .hamburger span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: white;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        /* 로고 컨테이너 스타일 */
+        .nav .logo-container {
+            position: absolute;
+            left: 50px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav img {
+            width: 45px;
+            height: 45px;
+            border-radius: 0;
+            object-fit: cover;
+        }
+
+        /* 로고 텍스트 */
+        .nav .logo-text {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+        }
+
+        /* 사이드바 스타일 */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            background-color: #ff69b4;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar a {
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar a:hover {
+            background-color: #ff4da6;
+        }
+
+        .close-sidebar {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 36px;
+            cursor: pointer;
+            color: white;
+        }
     </style>
 </head>
 
 <body>
+    <div class="nav">
+        <div class="menu-icon" onclick="openSidebar()">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        <div class="logo-container">
+            <img src="/public/images/123.jpg" alt="PinkTopia Logo">
+        </div>
+        <div class="logo-text">
+            <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
+        </div>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+        </div>
+        <div class="sidebar-content">
+            <a href="/public/home.html">홈</a>
+            <a href="/public/event.html">이벤트</a>
+            <a href="/public/store-item.html">아이템샵</a>
+            <a href="/public/board.html">게시글 (커뮤니티)</a>
+            <a href="/public/ranking.html">랭킹</a>
+            <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
+            <!-- 로그인 시 표시될 메뉴들 -->
+            <div id="loggedInMenu" style="display: none;">
+                <a href="/public/chattingrooms.html">채팅</a>
+                <a href="/public/collection.html">핑크몽 개인 도감</a>
+                <a href="/public/inventory.html">인벤토리 아이템</a>
+                <a href="/public/achievements.html">업적</a>
+                <a href="/public/mypage.html">마이페이지</a>
+                <a href="#" onclick="logout()">로그아웃</a>
+            </div>
+            <!-- 로그인 안 된 경우 표시될 메뉴들 -->
+            <div id="loggedOutMenu">
+                <a href="/public/log-in.html">로그인</a>
+                <a href="/public/sign-up.html">회원가입</a>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <h2>이벤트 상세 정보</h2>
         <img id="eventImage" class="event-image" src="" alt="이벤트 이미지">
@@ -131,6 +278,61 @@
         function goBack() {
             window.history.back();
         }
+
+        function openSidebar() {
+            document.getElementById('sidebar').style.width = "250px";
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').style.width = "0";
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const accessToken = localStorage.getItem("accessToken");
+
+            if (accessToken) {
+                document.getElementById('loggedInMenu').style.display = 'block';
+                document.getElementById('loggedOutMenu').style.display = 'none';
+            } else {
+                document.getElementById('loggedInMenu').style.display = 'none';
+                document.getElementById('loggedOutMenu').style.display = 'block';
+            }
+        });
+
+        async function logout() {
+            try {
+                const accessToken = localStorage.getItem("accessToken");
+                if (!accessToken) {
+                    console.warn("🚨 로그아웃 시도: 이미 로그아웃된 상태");
+                    window.location.href = "/public/log-in.html";
+                    return;
+                }
+
+                // 🔹 서버에 로그아웃 요청 보내기
+                const response = await fetch("http://localhost:3000/user/auth/logout", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": accessToken
+                    },
+                    credentials: "include" // 쿠키도 함께 보내기
+                });
+
+                if (!response.ok) {
+                    throw new Error("서버에서 로그아웃 처리 실패");
+                }
+
+                // ✅ 로그아웃 성공 후, 토큰 삭제
+                localStorage.removeItem("accessToken");
+
+                console.log("✅ 로그아웃 성공! 페이지 이동");
+                window.location.href = "/public/log-in.html"; // 로그인 페이지로 이동
+            } catch (error) {
+                console.error("❌ 로그아웃 실패:", error);
+                alert("로그아웃 중 오류가 발생했습니다.");
+            }
+        }
+
     </script>
 </body>
 
