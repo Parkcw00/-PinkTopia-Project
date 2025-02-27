@@ -1,646 +1,663 @@
 <!doctype html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>회원가입 | PinkTophia</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f8f9fa;
-        min-height: 100vh;
-      }
-      .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-        min-height: calc(100vh - 80px); /* 네비게이션 바 높이 고려 */
-      }
-      .signup-container {
-        background-color: white;
-        padding: 2rem;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 400px;
-      }
-      .signup-title {
-        text-align: center;
-        color: #ff69b4;
-        margin-bottom: 1.5rem;
-      }
-      .form-control:focus {
-        border-color: #ff69b4;
-        box-shadow: 0 0 0 0.2rem rgba(255, 105, 180, 0.25);
-      }
-      .btn-pink {
-        background-color: #ff69b4;
-        border-color: #ff69b4;
-        color: white;
-      }
-      .btn-pink:hover {
-        background-color: #ff4da6;
-        border-color: #ff4da6;
-        color: white;
-      }
-      .login-link {
-        text-align: center;
-        margin-top: 1rem;
-      }
-      .login-link a {
-        color: #ff69b4;
-        text-decoration: none;
-      }
-      .login-link a:hover {
-        text-decoration: underline;
-      }
-      .modal-content {
-        border-radius: 10px;
-        border: none;
-      }
-      .modal-header {
-        border-bottom: none;
-        padding: 1.5rem 1.5rem 0.5rem;
-      }
-      .modal-title {
-        color: #ff69b4;
-        font-weight: 600;
-      }
-      .modal-body {
-        padding: 1.5rem;
-      }
-      .modal-footer {
-        border-top: none;
-        padding: 0.5rem 1.5rem 1.5rem;
-      }
-      .verification-message {
-        text-align: center;
-        color: #666;
-        margin-bottom: 1.5rem;
-      }
-      .verification-code-container {
-        display: flex;
-        gap: 0.5rem;
-        justify-content: center;
-        margin-bottom: 1rem;
-      }
-      .verification-code-input {
-        width: 3rem;
-        height: 3.5rem;
-        text-align: center;
-        font-size: 1.5rem;
-        border: 2px solid #ddd;
-        border-radius: 8px;
-        margin: 0 0.25rem;
-        transition: all 0.3s ease;
-      }
-      .verification-code-input:focus {
-        border-color: #ff69b4;
-        box-shadow: 0 0 0 0.2rem rgba(255, 105, 180, 0.25);
-        outline: none;
-      }
-      .timer {
-        text-align: center;
-        color: #666;
-        margin-bottom: 1rem;
-      }
-      .resend-button {
-        background: none;
-        border: none;
-        color: #ff69b4;
-        text-decoration: underline;
-        cursor: pointer;
-        padding: 0;
-        font-size: 0.9rem;
-        display: block;
-        margin: 0 auto;
-      }
-      .resend-button:disabled {
-        color: #999;
-        cursor: not-allowed;
-      }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(-20px);
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            min-height: 100vh;
         }
-        to {
-          opacity: 1;
-          transform: translateY(0);
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            min-height: calc(100vh - 80px);
+            /* 네비게이션 바 높이 고려 */
         }
-      }
-      .modal.show .modal-content {
-        animation: fadeIn 0.3s ease-out;
-      }
-      /* 네비게이션 바 스타일 */
-      .nav {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #ff69b4;
-        padding: 15px;
-        color: white;
-        font-weight: bold;
-        position: relative;
-        height: 50px;
-        z-index: 100;
-      }
-      /* 햄버거 메뉴 아이콘 스타일 */
-      .menu-icon {
-        position: absolute;
-        left: 15px;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        z-index: 102;
-      }
-      .menu-icon .hamburger {
-        width: 25px;
-        height: 20px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-      }
-      .menu-icon .hamburger span {
-        display: block;
-        height: 3px;
-        width: 100%;
-        background-color: white;
-        border-radius: 3px;
-        transition: all 0.3s ease;
-      }
-      /* 로고 컨테이너 스타일 */
-      .nav .logo-container {
-        position: absolute;
-        left: 50px;
-        height: 100%;
-        display: flex;
-        align-items: center;
-      }
-      .nav img {
-        width: 45px;
-        height: 45px;
-        border-radius: 0;
-        object-fit: cover;
-      }
-      /* 로고 텍스트 */
-      .nav .logo-text {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 24px;
-      }
-      /* 사이드바 스타일 */
-      .sidebar {
-        height: 100%;
-        width: 0;
-        position: fixed;
-        z-index: 1000;
-        top: 0;
-        left: 0;
-        background-color: #ff69b4;
-        overflow-x: hidden;
-        transition: 0.5s;
-        padding-top: 60px;
-        box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
-      }
-      .sidebar a {
-        padding: 15px 25px;
-        text-decoration: none;
-        font-size: 18px;
-        color: white;
-        display: block;
-        transition: 0.3s;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      }
-      .sidebar a:hover {
-        background-color: #ff4da6;
-      }
-      .close-sidebar {
-        position: absolute;
-        top: 15px;
-        right: 25px;
-        font-size: 36px;
-        cursor: pointer;
-        color: white;
-      }
-      /* 모달 스타일 수정 */
-      .modal {
-        display: none;
-        position: fixed;
-        z-index: 1001;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-      }
-      .modal-content {
-        background-color: white;
-        margin: 15% auto;
-        padding: 20px;
-        border-radius: 5px;
-        width: 80%;
-        max-width: 500px;
-        position: relative;
-        animation: fadeIn 0.3s ease-out;
-      }
+
+        .signup-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .signup-title {
+            text-align: center;
+            color: #ff69b4;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-control:focus {
+            border-color: #ff69b4;
+            box-shadow: 0 0 0 0.2rem rgba(255, 105, 180, 0.25);
+        }
+
+        .btn-pink {
+            background-color: #ff69b4;
+            border-color: #ff69b4;
+            color: white;
+        }
+
+        .btn-pink:hover {
+            background-color: #ff4da6;
+            border-color: #ff4da6;
+            color: white;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .login-link a {
+            color: #ff69b4;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        .modal-content {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .modal-header {
+            border-bottom: none;
+            padding: 1.5rem 1.5rem 0.5rem;
+        }
+
+        .modal-title {
+            color: #ff69b4;
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            border-top: none;
+            padding: 0.5rem 1.5rem 1.5rem;
+        }
+
+        .verification-message {
+            text-align: center;
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .verification-code-container {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .verification-code-input {
+            width: 3rem;
+            height: 3.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 0 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .verification-code-input:focus {
+            border-color: #ff69b4;
+            box-shadow: 0 0 0 0.2rem rgba(255, 105, 180, 0.25);
+            outline: none;
+        }
+
+        .timer {
+            text-align: center;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .resend-button {
+            background: none;
+            border: none;
+            color: #ff69b4;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 0;
+            font-size: 0.9rem;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .resend-button:disabled {
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal.show .modal-content {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* 네비게이션 바 스타일 */
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ff69b4;
+            padding: 15px;
+            color: white;
+            font-weight: bold;
+            position: relative;
+            height: 50px;
+            z-index: 100;
+        }
+
+        /* 햄버거 메뉴 아이콘 스타일 */
+        .menu-icon {
+            position: absolute;
+            left: 15px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            z-index: 102;
+        }
+
+        .menu-icon .hamburger {
+            width: 25px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-icon .hamburger span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: white;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        /* 로고 컨테이너 스타일 */
+        .nav .logo-container {
+            position: absolute;
+            left: 50px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav img {
+            width: 45px;
+            height: 45px;
+            border-radius: 0;
+            object-fit: cover;
+        }
+
+        /* 로고 텍스트 */
+        .nav .logo-text {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+        }
+
+        /* 사이드바 스타일 */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            background-color: #ff69b4;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar a {
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar a:hover {
+            background-color: #ff4da6;
+        }
+
+        .close-sidebar {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 36px;
+            cursor: pointer;
+            color: white;
+        }
+
+        /* 모달 스타일 수정 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
     </style>
-  </head>
-  <body>
+</head>
+
+<body>
     <!-- 기존 네비게이션 바를 아래 코드로 교체 -->
     <div class="nav">
-      <div class="menu-icon" onclick="openSidebar()">
-        <div class="hamburger">
-          <span></span>
-          <span></span>
-          <span></span>
+        <div class="menu-icon" onclick="openSidebar()">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
-      </div>
-      <div class="logo-container">
-        <img src="/public/images/123.jpg" alt="PinkTopia Logo">
-      </div>
-      <div class="logo-text">
-        <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
-      </div>
+        <div class="logo-container">
+            <img src="/public/images/123.jpg" alt="PinkTopia Logo">
+        </div>
+        <div class="logo-text">
+            <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
+        </div>
     </div>
 
     <!-- 사이드바 추가 -->
     <div id="sidebar" class="sidebar">
-      <div class="sidebar-header">
-        <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
-      </div>
-      <div class="sidebar-content">
-        <a href="/public/home.html">홈</a>
-        <a href="/public/event.html">이벤트</a>
-        <a href="/public/store-item.html">아이템샵</a>
-        <a href="/public/board.html">게시글 (커뮤니티)</a>
-        <a href="/public/ranking.html">랭킹</a>
-        <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
-        <!-- 로그인 시 표시될 메뉴들 -->
-        <div id="loggedInMenu" style="display: none;">
-          <a href="/public/chattingrooms.html">채팅</a>
-          <a href="/public/collection.html">핑크몽 개인 도감</a>
-          <a href="/public/inventory.html">인벤토리 아이템</a>
-          <a href="/public/achievements.html">업적</a>
-          <a href="/public/mypage.html">마이페이지</a>
-          <a href="#" onclick="logout()">로그아웃</a>
+        <div class="sidebar-header">
+            <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
         </div>
-        <!-- 로그인 안 된 경우 표시될 메뉴들 -->
-        <div id="loggedOutMenu">
-          <a href="/public/log-in.html">로그인</a>
-          <a href="/public/sign-up.html">회원가입</a>
+        <div class="sidebar-content">
+            <a href="/public/home.html">홈</a>
+            <a href="/public/event.html">이벤트</a>
+            <a href="/public/store-item.html">아이템샵</a>
+            <a href="/public/board.html">게시글 (커뮤니티)</a>
+            <a href="/public/ranking.html">랭킹</a>
+            <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
+            <!-- 로그인 시 표시될 메뉴들 -->
+            <div id="loggedInMenu" style="display: none;">
+                <a href="/public/chattingrooms.html">채팅</a>
+                <a href="/public/collection.html">핑크몽 개인 도감</a>
+                <a href="/public/inventory.html">인벤토리 아이템</a>
+                <a href="/public/achievements.html">업적</a>
+                <a href="/public/mypage.html">마이페이지</a>
+                <a href="#" onclick="logout()">로그아웃</a>
+            </div>
+            <!-- 로그인 안 된 경우 표시될 메뉴들 -->
+            <div id="loggedOutMenu">
+                <a href="/public/log-in.html">로그인</a>
+                <a href="/public/sign-up.html">회원가입</a>
+            </div>
         </div>
-      </div>
     </div>
 
     <div class="container">
-      <div class="signup-container">
-        <h2 class="signup-title">회원가입</h2>
-        <form id="signupForm">
-          <div class="mb-3">
-            <label for="nickname" class="form-label">닉네임</label>
-            <input type="text" class="form-control" id="nickname" required />
-          </div>
-          <div class="mb-3">
-            <label for="email" class="form-label">이메일</label>
-            <input type="email" class="form-control" id="email" required />
-          </div>
-          <div class="mb-3">
-            <label for="password" class="form-label">비밀번호</label>
-            <input
-              type="password"
-              class="form-control"
-              id="password"
-              required
-            />
-          </div>
-          <div class="mb-3">
-            <label for="confirmedPassword" class="form-label"
-              >비밀번호 확인</label
-            >
-            <input
-              type="password"
-              class="form-control"
-              id="confirmedPassword"
-              required
-            />
-          </div>
-          <div class="mb-3">
-            <label for="birthday" class="form-label">생년월일 (선택)</label>
-            <input type="date" class="form-control" id="birthday" />
-          </div>
-          <button type="submit" class="btn btn-pink w-100">회원가입</button>
-        </form>
-        <div class="login-link">
-          <span>이미 계정이 있으신가요? </span>
-          <a href="/public/log-in.html">로그인</a>
+        <div class="signup-container">
+            <h2 class="signup-title">회원가입</h2>
+            <form id="signupForm">
+                <div class="mb-3">
+                    <label for="nickname" class="form-label">닉네임</label>
+                    <input type="text" class="form-control" id="nickname" required />
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">이메일</label>
+                    <input type="email" class="form-control" id="email" required />
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">비밀번호</label>
+                    <input type="password" class="form-control" id="password" required />
+                </div>
+                <div class="mb-3">
+                    <label for="confirmedPassword" class="form-label">비밀번호 확인</label>
+                    <input type="password" class="form-control" id="confirmedPassword" required />
+                </div>
+                <div class="mb-3">
+                    <label for="birthday" class="form-label">생년월일 (선택)</label>
+                    <input type="date" class="form-control" id="birthday" />
+                </div>
+                <button type="submit" class="btn btn-pink w-100">회원가입</button>
+            </form>
+            <div class="login-link">
+                <span>이미 계정이 있으신가요? </span>
+                <a href="/public/log-in.html">로그인</a>
+            </div>
         </div>
-      </div>
     </div>
 
     <!-- 이메일 인증 모달 -->
     <div class="modal fade" id="verificationModal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">이메일 인증</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <p class="verification-message">
-              입력하신 이메일로 인증 코드가 전송되었습니다.
-            </p>
-            <div class="verification-code-container">
-              <input
-                type="text"
-                class="verification-code-input"
-                maxlength="1"
-                pattern="[0-9]"
-                inputmode="numeric"
-              />
-              <input
-                type="text"
-                class="verification-code-input"
-                maxlength="1"
-                pattern="[0-9]"
-                inputmode="numeric"
-              />
-              <input
-                type="text"
-                class="verification-code-input"
-                maxlength="1"
-                pattern="[0-9]"
-                inputmode="numeric"
-              />
-              <input
-                type="text"
-                class="verification-code-input"
-                maxlength="1"
-                pattern="[0-9]"
-                inputmode="numeric"
-              />
-              <input
-                type="text"
-                class="verification-code-input"
-                maxlength="1"
-                pattern="[0-9]"
-                inputmode="numeric"
-              />
-              <input
-                type="text"
-                class="verification-code-input"
-                maxlength="1"
-                pattern="[0-9]"
-                inputmode="numeric"
-              />
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">이메일 인증</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="verification-message">
+                        입력하신 이메일로 인증 코드가 전송되었습니다.
+                    </p>
+                    <div class="verification-code-container">
+                        <input type="text" class="verification-code-input" maxlength="1" pattern="[0-9]"
+                            inputmode="numeric" />
+                        <input type="text" class="verification-code-input" maxlength="1" pattern="[0-9]"
+                            inputmode="numeric" />
+                        <input type="text" class="verification-code-input" maxlength="1" pattern="[0-9]"
+                            inputmode="numeric" />
+                        <input type="text" class="verification-code-input" maxlength="1" pattern="[0-9]"
+                            inputmode="numeric" />
+                        <input type="text" class="verification-code-input" maxlength="1" pattern="[0-9]"
+                            inputmode="numeric" />
+                        <input type="text" class="verification-code-input" maxlength="1" pattern="[0-9]"
+                            inputmode="numeric" />
+                    </div>
+                    <div class="timer">남은 시간: <span id="timeLeft">3:00</span></div>
+                    <button type="button" class="resend-button" id="resendButton" disabled>
+                        인증 코드 재전송
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-pink w-100" id="verifyButton">
+                        인증하기
+                    </button>
+                </div>
             </div>
-            <div class="timer">남은 시간: <span id="timeLeft">3:00</span></div>
-            <button
-              type="button"
-              class="resend-button"
-              id="resendButton"
-              disabled
-            >
-              인증 코드 재전송
-            </button>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-pink w-100" id="verifyButton">
-              인증하기
-            </button>
-          </div>
         </div>
-      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      // 인증 코드 입력 필드 자동 포커스 이동
-      const codeInputs = document.querySelectorAll('.verification-code-input');
-      codeInputs.forEach((input, index) => {
-        input.addEventListener('input', (e) => {
-          if (e.target.value.length === 1) {
-            if (index < codeInputs.length - 1) {
-              codeInputs[index + 1].focus();
-            }
-          }
+        // 인증 코드 입력 필드 자동 포커스 이동
+        const codeInputs = document.querySelectorAll('.verification-code-input');
+        codeInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1) {
+                    if (index < codeInputs.length - 1) {
+                        codeInputs[index + 1].focus();
+                    }
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    codeInputs[index - 1].focus();
+                }
+            });
         });
 
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Backspace' && !e.target.value && index > 0) {
-            codeInputs[index - 1].focus();
-          }
-        });
-      });
+        // 타이머 기능
+        let timeLeft = 180; // 3분
+        let timerId = null;
 
-      // 타이머 기능
-      let timeLeft = 180; // 3분
-      let timerId = null;
+        function startTimer() {
+            const timerDisplay = document.getElementById('timeLeft');
+            const resendButton = document.getElementById('resendButton');
+            const verifyButton = document.getElementById('verifyButton');
 
-      function startTimer() {
-        const timerDisplay = document.getElementById('timeLeft');
-        const resendButton = document.getElementById('resendButton');
-        const verifyButton = document.getElementById('verifyButton');
-
-        clearInterval(timerId);
-        timeLeft = 180;
-        resendButton.disabled = true;
-        verifyButton.disabled = false;
-
-        timerId = setInterval(() => {
-          timeLeft--;
-          const minutes = Math.floor(timeLeft / 60);
-          const seconds = timeLeft % 60;
-          timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-
-          if (timeLeft <= 0) {
             clearInterval(timerId);
-            resendButton.disabled = false;
-            verifyButton.disabled = true;
-          }
-        }, 1000);
-      }
+            timeLeft = 180;
+            resendButton.disabled = true;
+            verifyButton.disabled = false;
 
-      // 인증 모달이 표시될 때 타이머 시작
-      document
-        .getElementById('verificationModal')
-        .addEventListener('show.bs.modal', () => {
-          startTimer();
-        });
+            timerId = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-      document
-        .getElementById('signupForm')
-        .addEventListener('submit', async (e) => {
-          e.preventDefault();
-
-          const nickname = document.getElementById('nickname').value;
-          const email = document.getElementById('email').value;
-          const password = document.getElementById('password').value;
-          const confirmedPassword =
-            document.getElementById('confirmedPassword').value;
-          const birthday = document.getElementById('birthday').value || null;
-
-          try {
-            const response = await fetch(
-              '/user/auth/sign-up',
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  nickname,
-                  email,
-                  password,
-                  confirmedPassword,
-                  birthday: birthday ? new Date(birthday) : undefined,
-                }),
-              },
-            );
-
-            const data = await response.json();
-
-            if (response.ok) {
-              // 회원가입 성공 시 이메일 인증 코드 전송
-              const verificationResponse = await fetch(
-                '/user/auth/send-code',
-                {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({ email, password }),
-                },
-              );
-
-              if (verificationResponse.ok) {
-                // 이메일 인증 모달 표시
-                const verificationModal = new bootstrap.Modal(
-                  document.getElementById('verificationModal'),
-                );
-                verificationModal.show();
-              } else {
-                const verificationData = await verificationResponse.json();
-                alert(
-                  verificationData.message ||
-                    '이메일 인증 코드 전송에 실패했습니다.',
-                );
-              }
-            } else {
-              alert(data.message || '회원가입에 실패했습니다.');
-            }
-          } catch (error) {
-            console.error('Error:', error);
-            alert('회원가입 중 오류가 발생했습니다.');
-          }
-        });
-
-      // 재전송 버튼 클릭 시
-      document
-        .getElementById('resendButton')
-        .addEventListener('click', async () => {
-          const email = document.getElementById('email').value;
-          const password = document.getElementById('password').value;
-
-          try {
-            const response = await fetch(
-              '/user/auth/send-code',
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-              },
-            );
-
-            if (response.ok) {
-              startTimer();
-              alert('인증 코드가 재전송되었습니다.');
-            } else {
-              const data = await response.json();
-              alert(data.message || '인증 코드 재전송에 실패했습니다.');
-            }
-          } catch (error) {
-            console.error('Error:', error);
-            alert('인증 코드 재전송 중 오류가 발생했습니다.');
-          }
-        });
-
-      // 인증하기 버튼 클릭 시
-      document
-        .getElementById('verifyButton')
-        .addEventListener('click', async () => {
-          const email = document.getElementById('email').value;
-          const verificationCode = Array.from(codeInputs)
-            .map((input) => input.value)
-            .join('');
-
-          try {
-            const response = await fetch(
-              '/user/auth/verify-code',
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, verificationCode }),
-              },
-            );
-
-            const data = await response.json();
-
-            if (response.ok) {
-              alert(
-                '이메일 인증이 완료되었습니다. 로그인 페이지로 이동합니다.',
-              );
-              window.location.href = '/public/log-in.html';
-            } else {
-              alert(data.message || '이메일 인증에 실패했습니다.');
-            }
-          } catch (error) {
-            console.error('Error:', error);
-            alert('이메일 인증 중 오류가 발생했습니다.');
-          }
-        });
-
-      function openSidebar() {
-        document.getElementById('sidebar').style.width = "250px";
-      }
-
-      function closeSidebar() {
-        document.getElementById('sidebar').style.width = "0";
-      }
-
-      document.addEventListener("DOMContentLoaded", function() {
-        const accessToken = localStorage.getItem("accessToken");
-        
-        if (accessToken) {
-          document.getElementById('loggedInMenu').style.display = 'block';
-          document.getElementById('loggedOutMenu').style.display = 'none';
-        } else {
-          document.getElementById('loggedInMenu').style.display = 'none';
-          document.getElementById('loggedOutMenu').style.display = 'block';
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    resendButton.disabled = false;
+                    verifyButton.disabled = true;
+                }
+            }, 1000);
         }
-      });
 
-      function logout() {
-        localStorage.removeItem("accessToken");
-        window.location.reload();
-      }
+        // 인증 모달이 표시될 때 타이머 시작
+        document
+            .getElementById('verificationModal')
+            .addEventListener('show.bs.modal', () => {
+                startTimer();
+            });
+
+        document
+            .getElementById('signupForm')
+            .addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const nickname = document.getElementById('nickname').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const confirmedPassword =
+                    document.getElementById('confirmedPassword').value;
+                const birthday = document.getElementById('birthday').value || null;
+
+                try {
+                    const response = await fetch(
+                        '/user/auth/sign-up',
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                nickname,
+                                email,
+                                password,
+                                confirmedPassword,
+                                birthday: birthday ? new Date(birthday) : undefined,
+                            }),
+                        },
+                    );
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // 회원가입 성공 시 이메일 인증 코드 전송
+                        const verificationResponse = await fetch(
+                            '/user/auth/send-code',
+                            {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ email, password }),
+                            },
+                        );
+
+                        if (verificationResponse.ok) {
+                            // 이메일 인증 모달 표시
+                            const verificationModal = new bootstrap.Modal(
+                                document.getElementById('verificationModal'),
+                            );
+                            verificationModal.show();
+                        } else {
+                            const verificationData = await verificationResponse.json();
+                            alert(
+                                verificationData.message ||
+                                '이메일 인증 코드 전송에 실패했습니다.',
+                            );
+                        }
+                    } else {
+                        alert(data.message || '회원가입에 실패했습니다.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('회원가입 중 오류가 발생했습니다.');
+                }
+            });
+
+        // 재전송 버튼 클릭 시
+        document
+            .getElementById('resendButton')
+            .addEventListener('click', async () => {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+
+                try {
+                    const response = await fetch(
+                        '/user/auth/send-code',
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ email, password }),
+                        },
+                    );
+
+                    if (response.ok) {
+                        startTimer();
+                        alert('인증 코드가 재전송되었습니다.');
+                    } else {
+                        const data = await response.json();
+                        alert(data.message || '인증 코드 재전송에 실패했습니다.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('인증 코드 재전송 중 오류가 발생했습니다.');
+                }
+            });
+
+        // 인증하기 버튼 클릭 시
+        document
+            .getElementById('verifyButton')
+            .addEventListener('click', async () => {
+                const email = document.getElementById('email').value;
+                const verificationCode = Array.from(codeInputs)
+                    .map((input) => input.value)
+                    .join('');
+
+                try {
+                    const response = await fetch(
+                        '/user/auth/verify-code',
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ email, verificationCode }),
+                        },
+                    );
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        alert(
+                            '이메일 인증이 완료되었습니다. 로그인 페이지로 이동합니다.',
+                        );
+                        window.location.href = '/public/log-in.html';
+                    } else {
+                        alert(data.message || '이메일 인증에 실패했습니다.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('이메일 인증 중 오류가 발생했습니다.');
+                }
+            });
+
+        function openSidebar() {
+            document.getElementById('sidebar').style.width = "250px";
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').style.width = "0";
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const accessToken = localStorage.getItem("accessToken");
+
+            if (accessToken) {
+                document.getElementById('loggedInMenu').style.display = 'block';
+                document.getElementById('loggedOutMenu').style.display = 'none';
+            } else {
+                document.getElementById('loggedInMenu').style.display = 'none';
+                document.getElementById('loggedOutMenu').style.display = 'block';
+            }
+        });
+
+        async function logout() {
+            try {
+                const accessToken = localStorage.getItem("accessToken");
+                if (!accessToken) {
+                    console.warn("🚨 로그아웃 시도: 이미 로그아웃된 상태");
+                    window.location.href = "/public/log-in.html";
+                    return;
+                }
+
+                // 🔹 서버에 로그아웃 요청 보내기
+                const response = await fetch("http://localhost:3000/user/auth/logout", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": accessToken
+                    },
+                    credentials: "include" // 쿠키도 함께 보내기
+                });
+
+                if (!response.ok) {
+                    throw new Error("서버에서 로그아웃 처리 실패");
+                }
+
+                // ✅ 로그아웃 성공 후, 토큰 삭제
+                localStorage.removeItem("accessToken");
+
+                console.log("✅ 로그아웃 성공! 페이지 이동");
+                window.location.href = "/public/log-in.html"; // 로그인 페이지로 이동
+            } catch (error) {
+                console.error("❌ 로그아웃 실패:", error);
+                alert("로그아웃 중 오류가 발생했습니다.");
+            }
+        }
+
     </script>
-  </body>
+</body>
+
 </html>

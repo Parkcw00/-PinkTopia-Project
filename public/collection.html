@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,7 +32,7 @@
             background: white;
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -39,7 +40,7 @@
 
         .pinkmong-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
 
         .pinkmong-image {
@@ -263,6 +264,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="nav">
         <div class="menu-icon" onclick="openSidebar()">
@@ -333,9 +335,9 @@
             document.getElementById('sidebar').style.width = "0";
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const accessToken = localStorage.getItem("accessToken");
-            
+
             if (accessToken) {
                 document.getElementById('loggedInMenu').style.display = 'block';
                 document.getElementById('loggedOutMenu').style.display = 'none';
@@ -363,7 +365,7 @@
 
         async function loadCollection() {
             if (!checkLogin()) return;
-            
+
             try {
                 const pinkmongResponse = await fetch('http://localhost:3000/pinkmong/pinkmongs', {
                     credentials: 'include',
@@ -371,11 +373,11 @@
                         'Authorization': localStorage.getItem('accessToken')
                     }
                 });
-                
+
                 if (!pinkmongResponse.ok) {
                     throw new Error('핑크몽 데이터 요청 실패: ' + pinkmongResponse.status);
                 }
-                
+
                 const pinkmongResult = await pinkmongResponse.json();
                 console.log('Collection API 응답:', pinkmongResult);
 
@@ -386,17 +388,17 @@
                     'rare': 2,
                     'common': 3
                 };
-                
+
                 // 등급순으로 정렬
                 allPinkmongs = pinkmongResult.pinkmongs.sort((a, b) => {
                     // 등급 비교
                     const gradeComparison = gradeOrder[a.grade.toLowerCase()] - gradeOrder[b.grade.toLowerCase()];
-                    
+
                     // 등급이 같으면 ID순으로 정렬
                     if (gradeComparison === 0) {
                         return a.id - b.id;
                     }
-                    
+
                     return gradeComparison;
                 });
 
@@ -415,7 +417,7 @@
                 console.log('Collection API 응답:', collectionResult);
                 userCollections = new Set(collectionResult.map(col => col.id));
                 console.log('유저가 보유한 핑크몽 ID:', Array.from(userCollections));
-                
+
                 displayPinkmongs();
                 updatePaginationButtons();
             } catch (error) {
@@ -426,16 +428,16 @@
         function displayPinkmongs() {
             const grid = document.getElementById('collectionGrid');
             grid.innerHTML = '';
-            
+
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
             const currentPinkmongs = allPinkmongs.slice(startIndex, endIndex);
-            
+
             currentPinkmongs.forEach(pinkmong => {
                 const isCollected = userCollections.has(pinkmong.id);
                 const card = document.createElement('div');
                 card.className = `pinkmong-card ${!isCollected ? 'not-collected' : ''} grade-${pinkmong.grade?.toLowerCase() || 'unknown'}`;
-                
+
                 card.innerHTML = `
                     <img class="pinkmong-image ${!isCollected ? 'uncollected' : ''}" 
                          src="${pinkmong.pinkmong_image}" 
@@ -447,17 +449,17 @@
                         <div class="pinkmong-description">${isCollected ? pinkmong.explain : '아직 발견하지 못한 핑크몽입니다.'}</div>
                     </div>
                 `;
-                
+
                 grid.appendChild(card);
             });
-            
+
             document.getElementById('page-info').textContent = currentPage;
         }
 
         function updatePaginationButtons() {
             const prevBtn = document.getElementById('prev-btn');
             const nextBtn = document.getElementById('next-btn');
-            
+
             prevBtn.disabled = currentPage === 1;
             nextBtn.disabled = currentPage >= Math.ceil(allPinkmongs.length / itemsPerPage);
         }
@@ -469,6 +471,43 @@
         }
 
         window.onload = loadCollection;
+
+
+        async function logout() {
+            try {
+                const accessToken = localStorage.getItem("accessToken");
+                if (!accessToken) {
+                    console.warn("🚨 로그아웃 시도: 이미 로그아웃된 상태");
+                    window.location.href = "/public/log-in.html";
+                    return;
+                }
+
+                // 🔹 서버에 로그아웃 요청 보내기
+                const response = await fetch("http://localhost:3000/user/auth/logout", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": accessToken
+                    },
+                    credentials: "include" // 쿠키도 함께 보내기
+                });
+
+                if (!response.ok) {
+                    throw new Error("서버에서 로그아웃 처리 실패");
+                }
+
+                // ✅ 로그아웃 성공 후, 토큰 삭제
+                localStorage.removeItem("accessToken");
+
+                console.log("✅ 로그아웃 성공! 페이지 이동");
+                window.location.href = "/public/log-in.html"; // 로그인 페이지로 이동
+            } catch (error) {
+                console.error("❌ 로그아웃 실패:", error);
+                alert("로그아웃 중 오류가 발생했습니다.");
+            }
+        }
+
     </script>
 </body>
-</html> 
+
+</html>
