@@ -28,7 +28,7 @@ export class UserService {
     private readonly jwtService: JwtService,
     private configService: ConfigService,
     private readonly inventoryService: InventoryService,
-    private readonly valkeyService: ValkeyService, // ✅ Valkey 서비스 추가
+    private readonly valkeyService: ValkeyService,
   ) {}
 
   // 🔹 컬렉션 포인트 랭킹 조회 (Valkey 적용)
@@ -204,7 +204,6 @@ export class UserService {
     let refreshTokenExpiresIn = this.configService.get<string>(
       'REFRESH_TOKEN_EXPIRES_IN',
     );
-
     if (!accessTokenExpiresIn || !refreshTokenExpiresIn) {
       throw new InternalServerErrorException('관리자에게 문의해 주세요');
     }

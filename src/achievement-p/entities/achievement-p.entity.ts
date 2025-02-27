@@ -36,7 +36,7 @@ export class AchievementP {
   @Column({ type: 'int', nullable: false })
   sub_achievement_id: number; // camelCase 스타일로 변경
 
-// 업적id
+// 업적 id
   @ManyToOne(() => Achievement, (achievement) => achievement.achievement_c, {
     onDelete: 'CASCADE',
   })

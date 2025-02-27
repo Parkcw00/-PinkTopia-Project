@@ -11,6 +11,7 @@ import { UserGuard } from './guards/user-guard';
 import { InventoryModule } from 'src/inventory/inventory.module';
 import { ValkeyService } from 'src/valkey/valkey.service';
 import { AchievementCRepository } from 'src/achievement-c/achievement-c.repository';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 
 @Global()
 @Module({
@@ -35,6 +36,7 @@ import { AchievementCRepository } from 'src/achievement-c/achievement-c.reposito
       inject: [ConfigService],
     }),
     InventoryModule,
+    ValkeyModule,
   ],
   controllers: [UserController, UsersController],
   providers: [UserService, UserRepository, UserGuard, ValkeyService],

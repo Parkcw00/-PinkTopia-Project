@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChattingService } from './chatting.service';
 import { ChattingGateway } from './chatting.gateway';
@@ -11,11 +11,12 @@ import { S3Module } from '../s3/s3.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ChattingController } from './chatting.controller';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Chatting, Chatmember]),
-    ChatmemberModule,
+    forwardRef(() => ChatmemberModule),
     ChatblacklistModule,
     S3Module,
     JwtModule.registerAsync({
@@ -25,9 +26,10 @@ import { ChattingController } from './chatting.controller';
       }),
       inject: [ConfigService],
     }),
+    ValkeyModule,
   ],
   controllers: [ChattingController],
   providers: [ChattingGateway, ChattingService, ChattingRepository],
-  exports: [ChattingService, ChattingRepository],
+  exports: [ChattingService, ChattingRepository, ChattingGateway],
 })
 export class ChattingModule {}

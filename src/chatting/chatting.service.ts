@@ -8,13 +8,16 @@ import { ChattingRepository } from './chatting.repository';
 import { S3Service } from '../s3/s3.service';
 import { UploadChattingDto } from './dto/create-upload-chatting.dto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Chatting } from './entities/chatting.entity';
+import { ValkeyService } from 'src/valkey/valkey.service';
 
 @Injectable()
 export class ChattingService {
   constructor(
+    private readonly chattingRepository: ChattingRepository,
     private readonly s3Service: S3Service,
-    private readonly chattingCustomRepository: ChattingRepository,
+    private readonly valkeyService: ValkeyService,
   ) {}
 
   async create(
@@ -22,8 +25,9 @@ export class ChattingService {
     chatting_room_id: string,
     createChattingDto: CreateChattingDto,
   ) {
+    console.log(user, chatting_room_id, createChattingDto);
     try {
-      const isMember = await this.chattingCustomRepository.isMember(
+      const isMember = await this.chattingRepository.isMember(
         user.id,
         chatting_room_id,
       );
@@ -32,12 +36,28 @@ export class ChattingService {
         throw new ForbiddenException('메시지 작성 권한이 없습니다.');
       }
 
-      console.log(isMember);
-      return this.chattingCustomRepository.create(
-        user,
-        chatting_room_id,
-        createChattingDto,
-      );
+      // Redis에서 메시지 수 확인
+      const messageCount = await this.valkeyService.llen(chatting_room_id);
+
+      if (messageCount >= 5) {
+        // 5개 이상일 경우 오래된 메시지를 DB에 저장
+        for (let i = 0; i < messageCount - 5; i++) {
+          const msg = await this.valkeyService.lpop(chatting_room_id); // Redis에서 오래된 메시지 가져오기
+          if (msg) {
+            // DB에 저장
+            await this.chattingRepository.create(user, chatting_room_id, msg);
+          }
+        }
+      }
+      const message = {
+        ...createChattingDto,
+        user_id: user.id,
+      };
+
+      // 새로운 메시지를 Redis에 저장
+      await this.valkeyService.rpush(chatting_room_id, JSON.stringify(message));
+
+      return createChattingDto; // 또는 원하는 응답 형태로 변경
     } catch (error) {
       if (
         error instanceof BadRequestException ||
@@ -56,7 +76,7 @@ export class ChattingService {
     file: Express.Multer.File,
   ) {
     try {
-      const isMember = await this.chattingCustomRepository.isMember(
+      const isMember = await this.chattingRepository.isMember(
         user.id,
         chatting_room_id,
       );
@@ -65,20 +85,20 @@ export class ChattingService {
         throw new ForbiddenException('메시지 업로드 권한이 없습니다.');
       }
 
+      // 파일 형식 검증 추가
+      if (!file.mimetype.startsWith('image/')) {
+        throw new BadRequestException('이미지 파일만 업로드할 수 있습니다.');
+      }
+
       const imageUrl = await this.s3Service.uploadFile(file);
 
       // 채팅 메시지 생성 DTO
-      const createChattingDto: UploadChattingDto = {
+      const uploadChattingDto: UploadChattingDto = {
         type: 'image',
         message: imageUrl,
       };
 
-      // 채팅 테이블에 저장
-      return this.chattingCustomRepository.create(
-        user,
-        chatting_room_id,
-        createChattingDto,
-      );
+      return uploadChattingDto;
     } catch (error) {
       if (
         error instanceof BadRequestException ||
@@ -92,7 +112,7 @@ export class ChattingService {
   }
 
   async findAll(user: any, chatting_room_id: string) {
-    const isMember = await this.chattingCustomRepository.isMember(
+    const isMember = await this.chattingRepository.isMember(
       user.id,
       chatting_room_id,
     );
@@ -101,6 +121,32 @@ export class ChattingService {
       throw new ForbiddenException('채팅방에 접근 권한이 없습니다.');
     }
 
-    return this.chattingCustomRepository.findAll(chatting_room_id);
+    // Redis에서 메시지 가져오기
+    const redisMessages = await this.valkeyService.lrange(
+      chatting_room_id,
+      0,
+      -1,
+    );
+
+    // DB에서 메시지 가져오기
+    const dbMessages = await this.chattingRepository.findAll(chatting_room_id);
+
+    // Redis 메시지를 객체로 변환
+    const parsedRedisMessages = redisMessages.map((msg) => JSON.parse(msg));
+
+    // 배열의 각 메시지에 대해 유저 닉네임을 가져오기
+    const messagesWithNicknames = await Promise.all(
+      parsedRedisMessages.map(async (msg) => {
+        const nickname = await this.chattingRepository.getUserNickname(
+          msg.user_id,
+        );
+        return { message: msg.message, nickname: nickname?.user.nickname }; // 메시지에 닉네임 추가
+      }),
+    );
+
+    // Redis 메시지와 DB 메시지를 통합
+    const allMessages = [...dbMessages, ...messagesWithNicknames];
+
+    return allMessages; // 통합된 메시지를 반환
   }
 }

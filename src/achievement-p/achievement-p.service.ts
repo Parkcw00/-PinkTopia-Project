@@ -5,16 +5,55 @@ import {
 } from '@nestjs/common';
 import { CreateAchievementPDto } from './dto/create-achievement-p.dto';
 import { UpdateAchievementPDto } from './dto/update-achievement-p.dto';
-
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { AchievementP } from './entities/achievement-p.entity';
 import { AchievementPRepository } from './achievement-p.repository';
 import { number } from 'joi';
 import { Achievement } from '../achievement/entities/achievement.entity';
 import { IsDate } from 'class-validator';
 
+import { ValkeyService } from '../valkey/valkey.service';
+import { Repository } from 'typeorm'; // TypeORM Repository
 @Injectable()
 export class AchievementPService {
+  valkeyService: any;
   constructor(private readonly repository: AchievementPRepository) {}
+
+  async fillValkey(user_id: number) {
+    if (isNaN(+user_id)) {
+      throw new BadRequestException('user_id는 숫자여야 합니다.');
+    }
+    const APDB = await this.repository.findPByUser(user_id);
+    if (!APDB || APDB.length === 0) {
+      throw new NotFoundException('DB에 유저의 서브업적 데이터가 없습니다.');
+    }
+    // 2. Redis에 일괄 저장 (Pipeline 사용)
+    const pipeline = this.valkeyService.getClient().pipeline();
+    if (!pipeline) {
+      throw new NotFoundException('Valkey(Pipeline)를 가져올 수 없습니다.');
+    }
+
+    for (const aP of APDB) {
+      const key = `achievementP:${aP.id}`; // 고유 ID 사용
+      const aPData = {
+        id: aP.id,
+        user_id: aP.user_id,
+        sub_achievement_id: aP.sub_achievement_id,
+        achievement_id: aP.achievement_id,
+        complete: aP.complete,
+      };
+      console.log(aPData);
+
+      pipeline.set(key, JSON.stringify(aPData)); // Redis에 저장
+    }
+
+    await pipeline.exec(); // 🚀 일괄 실행 (반드시 await 사용)
+
+    console.log(`✅ ${APDB.length}개의 서브업적이 Valkey에 저장되었습니다.`);
+    return {
+      message: `✅ ${APDB.length}개의 서브업적이 Valkey에 저장되었습니다.`,
+    };
+  }
 
   async post(user: any, subId: string): Promise<AchievementP> {
     const user_id = user.id;
@@ -39,13 +78,33 @@ export class AchievementPService {
       throw new BadRequestException('이미 달성한 서브업적 입니다.');
     }
 
-    // 있으면 등록
+    //     // 있으면 등록
+    //     const dataP = {
+    //       user_id: user_id,
+    //       sub_achievement_id: idS,
+    //       achievement_id: isSubId?.achievement_id,
+    //       complete: true,
+    //     };
+    //     // Redis 저장할 키 생성 (고유 ID 자동 생성되므로 따로 안 넣음)
+    // const key = `achievementP:${id}:${Date.now()}`;
+
+    // // Redis에 저장
+    // await this.valkeyService.set(key, dataP);
+
+    // 업적 데이터 생성
     const dataP = {
-      user_id: user_id,
+      user_id,
       sub_achievement_id: idS,
-      achievement_id: isSubId?.achievement_id,
+      achievement_id: isSubId?.achievement_id ?? null, // 만약 null이면 명확하게 설정
       complete: true,
     };
+
+    // Redis 저장할 키 생성 (고유 ID 자동 생성되므로 따로 안 넣음)
+    const key = `achievementP:${idS}:${Date.now()}`;
+
+    // Redis에 저장
+    await this.valkeyService.set(key, dataP);
+
     const createP = await this.repository.createP(dataP);
     if (!createP) {
       console.log('생성실패');

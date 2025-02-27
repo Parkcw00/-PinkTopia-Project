@@ -39,16 +39,16 @@ const typeOrmModuleOptions = {
     host: configService.get('DB_HOST'),
     port: configService.get('DB_PORT'),
     database: configService.get('DB_NAME'),
-    entities: [__dirname + '/**/entities/*.{ts,js}'], // 이곳에서 자신의 작업물의 엔티티 등록  -  경로 잘못??
+    entities: [__dirname + '/**/entities/*.{ts,js}'], // 이곳에서 자신의 작업물의 엔티티 등록  -  자동으로 entities폴더 에서 엔티티파일 등록
     // entities: [
-    //   process.env.NODE_ENV === 'production'
-    //     ? 'dist/**/*.entity.js' // 배포 환경에서는 dist 폴더 사용
-    //     : 'src/**/*.entity.ts',  // 개발 환경에서는 src 사용
+    //   process.env.NODE_ENV === 'production' // 환경에 따라 엔티티 경로를 다르게 설정하기
+    //     ? 'dist/**/*.entity.js' // 배포 환경에서는 컴파일된 파일 사용 - dist 폴더 사용
+    //     : 'src/**/*.entity.ts',  // 개발 환경에서는 TypeScript 파일 사용 - src 폴더 안에 있음음 사용
     // ],
-    /// 개발, dev 인
     synchronize: configService.get('DB_SYNC'), //true, // 기존 테이블이 있다면 자동으로 수정됨
+    // migrations: [__dirname + '/**/migrations/*.{ts,js}'], // 모든 폴더 내의 migrations 폴더에서 마이그레이션 파일을 자동으로 등록
     migrationsRun: !configService.get('DB_SYNC'), // 앱 실행 시 마이그레이션 적용
-
+    dropSchema: configService.get('DB_SYNC'),
     logging: true,
   }),
   inject: [ConfigService],

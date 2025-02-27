@@ -10,6 +10,7 @@ import { Item } from 'src/item/entities/item.entity';
 import { Collection } from 'src/collection/entities/collection.entity';
 import { ValkeyService } from 'src/valkey/valkey.service';
 import { CatchPinkmongRepository } from './catch_pinkmong.repository';
+import { ValkeyModule } from 'src/valkey/valkey.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { CatchPinkmongRepository } from './catch_pinkmong.repository';
       Item,
       Collection,
     ]),
+    ValkeyModule,
   ],
   controllers: [CatchPinkmongController],
   providers: [CatchPinkmongService, CatchPinkmongRepository, ValkeyService],

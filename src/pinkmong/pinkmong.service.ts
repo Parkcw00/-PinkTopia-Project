@@ -80,17 +80,17 @@ export class PinkmongService {
       throw new NotFoundException({ message: '핑크몽이 존재하지 않습니다.' });
 
     // 🔹 파일이 존재하면 S3에 업로드 후 URL 업데이트
-    let item_image = pinkmong.pinkmong_image; // 기존 이미지 유지
+    let pinkmong_image = pinkmong.pinkmong_image; // 기존 이미지 유지
     if (file) {
-      item_image = await this.s3Service.uploadFile(file);
+      pinkmong_image = await this.s3Service.uploadFile(file);
     }
 
     const updatedData = {
       ...updatePinkmongDto,
-      item_image, // 🔹 새 이미지가 있으면 업데이트
+      pinkmong_image, // 🔹 새 이미지가 있으면 업데이트
     };
 
-    Object.assign(pinkmong, updatePinkmongDto);
+    Object.assign(pinkmong, updatedData);
     await this.pinkmongRepository.updatePinkmong(pinkmong);
     return { message: '핑크몽 수정이 완료 되었습니다.' };
   }
