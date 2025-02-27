@@ -122,4 +122,33 @@ export class CollectionService {
     await this.collectionRepository.remove(collection);
     return { message: '도감 기록이 삭제되었습니다.' };
   }
+
+  async getCollectionStatus(userId: number) {
+    // 1. 모든 핑크몽 데이터 조회
+    const allPinkmongs = await this.pinkmongRepository.find({
+      order: { id: 'ASC' }
+    });
+    
+    // 2. 유저가 수집한 핑크몽 조회
+    const userCollections = await this.collectionRepository.find({
+      where: { user_id: userId },
+      relations: ['pinkmong']
+    });
+    
+    // 3. 도감 상태 매핑
+    const collectionStatus = allPinkmongs.map(pinkmong => {
+      const collected = userCollections.some(col => col.pinkmong_id === pinkmong.id);
+      return {
+        id: pinkmong.id,
+        name: collected ? pinkmong.name : '???',
+        pinkmong_image: collected ? pinkmong.pinkmong_image : '/images/unknown.png',
+        grade: collected ? pinkmong.grade : '???',
+        region_theme: collected ? pinkmong.region_theme : '???',
+        explain: collected ? pinkmong.explain : '아직 발견하지 못한 핑크몽입니다.',
+        isCollected: collected
+      };
+    });
+
+    return { data: collectionStatus }; // 데이터를 객체로 감싸서 반환
+  }
 }

@@ -1,242 +1,399 @@
 <!doctype html>
 <html lang="ko">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>랭킹 | PinkTopia</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f9f9f9;
-      }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
 
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-      }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-      .nav {
-        display: flex;
-        justify-content: space-between;
-        background-color: #ff69b4;
-        padding: 15px;
-        color: white;
-        font-weight: bold;
-      }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ff69b4;
+            padding: 15px;
+            color: white;
+            font-weight: bold;
+            position: relative;
+            height: 50px;
+        }
 
-      .nav a {
-        color: white;
-        text-decoration: none;
-        margin: 0 10px;
-      }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
 
-      .ranking-section {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        margin: 20px 0;
-        padding: 20px;
-      }
+        .ranking-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            padding: 20px;
+        }
 
-      .ranking-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-      }
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
 
-      .ranking-table th,
-      .ranking-table td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-      }
+        .ranking-table th,
+        .ranking-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
 
-      .ranking-table th {
-        background-color: #ff69b4;
-        color: white;
-      }
+        .ranking-table th {
+            background-color: #ff69b4;
+            color: white;
+        }
 
-      .ranking-table tr:nth-child(even) {
-        background-color: #f9f9f9;
-      }
+        .ranking-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
 
-      .ranking-table tr:hover {
-        background-color: #f5f5f5;
-      }
+        .ranking-table tr:hover {
+            background-color: #f5f5f5;
+        }
 
-      .rank {
-        font-weight: bold;
-        color: #ff69b4;
-      }
+        .rank {
+            font-weight: bold;
+            color: #ff69b4;
+        }
 
-      .tabs {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-      }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
 
-      .tab {
-        padding: 10px 20px;
-        background-color: #f0f0f0;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: bold;
-      }
+        .tab {
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
 
-      .tab.active {
-        background-color: #ff69b4;
-        color: white;
-      }
+        .tab.active {
+            background-color: #ff69b4;
+            color: white;
+        }
 
-      .ranking-section {
-        display: none;
-      }
+        .ranking-section {
+            display: none;
+        }
 
-      .ranking-section.active {
-        display: block;
-      }
+        .ranking-section.active {
+            display: block;
+        }
+
+        /* 햄버거 메뉴 아이콘 스타일 */
+        .menu-icon {
+            position: absolute;
+            left: 15px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .menu-icon .hamburger {
+            width: 25px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-icon .hamburger span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: white;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        /* 로고 컨테이너 스타일 */
+        .nav .logo-container {
+            position: absolute;
+            left: 50px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav img {
+            width: 45px;
+            height: 45px;
+            border-radius: 0;
+            object-fit: cover;
+        }
+
+        /* 로고 텍스트 */
+        .nav .logo-text {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+        }
+
+        /* 사이드바 스타일 */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            background-color: #ff69b4;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar a {
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar a:hover {
+            background-color: #ff4da6;
+        }
+
+        .close-sidebar {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 36px;
+            cursor: pointer;
+            color: white;
+        }
     </style>
-  </head>
+</head>
 
-  <body>
+<body>
     <div class="nav">
-      <div>
-        <a href="home.html" style="text-decoration: none; color: white"
-          >PinkTophia</a
-        >
-      </div>
-      <div id="authMenu">
-        <a href="log-in.html">로그인</a>
-        <a href="sign-up.html">회원가입</a>
-      </div>
-    </div>
-    <div class="container">
-      <h1>랭킹</h1>
-
-      <div class="tabs">
-        <div class="tab active" onclick="showRanking('point')">포인트 랭킹</div>
-        <div class="tab" onclick="showRanking('achievement')">
-          업적 달성 랭킹
+        <div class="menu-icon" onclick="openSidebar()">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
-      </div>
+        <div class="logo-container">
+            <img src="/public/images/123.jpg" alt="PinkTopia Logo">
+        </div>
+        <div class="logo-text">
+            <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
+        </div>
+    </div>
 
-      <div class="ranking-section active" id="pointRankingSection">
-        <h2>포인트 랭킹</h2>
-        <table class="ranking-table" id="pointRanking">
-          <thead>
-            <tr>
-              <th>순위</th>
-              <th>닉네임</th>
-              <th>포인트</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+        </div>
+        <div class="sidebar-content">
+            <a href="/public/home.html">홈</a>
+            <a href="/public/event.html">이벤트</a>
+            <a href="/public/store-item.html">아이템샵</a>
+            <a href="/public/board.html">게시글 (커뮤니티)</a>
+            <a href="/public/ranking.html">랭킹</a>
+            <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
+            <div id="loggedInMenu" style="display: none;">
+                <a href="/public/chattingrooms.html">채팅</a>
+                <a href="/public/collection.html">핑크몽 개인 도감</a>
+                <a href="/public/inventory.html">인벤토리 아이템</a>
+                <a href="/public/achievements.html">업적</a>
+                <a href="/public/mypage.html">마이페이지</a>
+                <a href="#" onclick="logout()">로그아웃</a>
+            </div>
+            <div id="loggedOutMenu">
+                <a href="/public/log-in.html">로그인</a>
+                <a href="/public/sign-up.html">회원가입</a>
+            </div>
+        </div>
+    </div>
 
-      <div class="ranking-section" id="achievementRankingSection">
-        <h2>업적 달성 랭킹</h2>
-        <table class="ranking-table" id="achievementRanking">
-          <thead>
-            <tr>
-              <th>순위</th>
-              <th>닉네임</th>
-              <th>달성 업적 수</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+    <div class="container">
+        <h1>랭킹</h1>
+
+        <div class="tabs">
+            <div class="tab active" onclick="showRanking('point')">포인트 랭킹</div>
+            <div class="tab" onclick="showRanking('achievement')">
+                업적 달성 랭킹
+            </div>
+        </div>
+
+        <div class="ranking-section active" id="pointRankingSection">
+            <h2>포인트 랭킹</h2>
+            <table class="ranking-table" id="pointRanking">
+                <thead>
+                    <tr>
+                        <th>순위</th>
+                        <th>닉네임</th>
+                        <th>포인트</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="ranking-section" id="achievementRankingSection">
+            <h2>업적 달성 랭킹</h2>
+            <table class="ranking-table" id="achievementRanking">
+                <thead>
+                    <tr>
+                        <th>순위</th>
+                        <th>닉네임</th>
+                        <th>달성 업적 수</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        const accessToken = localStorage.getItem('accessToken');
-        const authMenu = document.getElementById('authMenu');
-
-        if (accessToken) {
-          authMenu.innerHTML =
-            '<a href="mypage.html">마이페이지</a> <a href="#" onclick="logout()">로그아웃</a>';
+        function openSidebar() {
+            document.getElementById('sidebar').style.width = "250px";
         }
 
-        fetchRankings();
-      });
-
-      function showRanking(type) {
-        // 모든 탭과 섹션의 active 클래스 제거
-        document
-          .querySelectorAll('.tab')
-          .forEach((tab) => tab.classList.remove('active'));
-        document
-          .querySelectorAll('.ranking-section')
-          .forEach((section) => section.classList.remove('active'));
-
-        // 선택된 탭과 섹션에 active 클래스 추가
-        if (type === 'point') {
-          document.querySelector('.tab:first-child').classList.add('active');
-          document
-            .getElementById('pointRankingSection')
-            .classList.add('active');
-        } else {
-          document.querySelector('.tab:last-child').classList.add('active');
-          document
-            .getElementById('achievementRankingSection')
-            .classList.add('active');
+        function closeSidebar() {
+            document.getElementById('sidebar').style.width = "0";
         }
-      }
 
-      async function logout() {
-        localStorage.removeItem('accessToken');
-        await fetch(`http://localhost:3000/user/auth/logout`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `${localStorage.getItem('accessToken')}`,
-          },
+        document.addEventListener("DOMContentLoaded", function () {
+            const accessToken = localStorage.getItem("accessToken");
+
+            if (accessToken) {
+                document.getElementById('loggedInMenu').style.display = 'block';
+                document.getElementById('loggedOutMenu').style.display = 'none';
+            } else {
+                document.getElementById('loggedInMenu').style.display = 'none';
+                document.getElementById('loggedOutMenu').style.display = 'block';
+            }
         });
-        window.location.reload();
-      }
 
-      async function fetchRankings() {
-        try {
-          // 포인트 랭킹 가져오기
-          const pointResponse = await fetch('/user/ranking/point');
-          const pointData = await pointResponse.json();
-          displayRanking('pointRanking', pointData, 'collection_point');
+        async function logout() {
+            try {
+                const accessToken = localStorage.getItem("accessToken");
+                if (!accessToken) {
+                    console.warn("🚨 로그아웃 시도: 이미 로그아웃된 상태");
+                    window.location.href = "/public/log-in.html";
+                    return;
+                }
 
-          // 업적 랭킹 가져오기
-          const achievementResponse = await fetch('/user/ranking/achievement');
-          const achievementData = await achievementResponse.json();
-          displayRanking(
-            'achievementRanking',
-            achievementData,
-            'achievementCount',
-          );
-        } catch (error) {
-          console.error(
-            '랭킹 데이터를 가져오는 중 오류가 발생했습니다:',
-            error,
-          );
+                // 🔹 서버에 로그아웃 요청 보내기
+                const response = await fetch("http://localhost:3000/user/auth/logout", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": accessToken
+                    },
+                    credentials: "include" // 쿠키도 함께 보내기
+                });
+
+                if (!response.ok) {
+                    throw new Error("서버에서 로그아웃 처리 실패");
+                }
+
+                // ✅ 로그아웃 성공 후, 토큰 삭제
+                localStorage.removeItem("accessToken");
+
+                console.log("✅ 로그아웃 성공! 페이지 이동");
+                window.location.href = "/public/log-in.html"; // 로그인 페이지로 이동
+            } catch (error) {
+                console.error("❌ 로그아웃 실패:", error);
+                alert("로그아웃 중 오류가 발생했습니다.");
+            }
         }
-      }
 
-      function displayRanking(tableId, data, scoreField) {
-        const tbody = document.querySelector(`#${tableId} tbody`);
-        tbody.innerHTML = '';
 
-        data.forEach((user, index) => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
+        function showRanking(type) {
+            // 모든 탭과 섹션의 active 클래스 제거
+            document
+                .querySelectorAll('.tab')
+                .forEach((tab) => tab.classList.remove('active'));
+            document
+                .querySelectorAll('.ranking-section')
+                .forEach((section) => section.classList.remove('active'));
+
+            // 선택된 탭과 섹션에 active 클래스 추가
+            if (type === 'point') {
+                document.querySelector('.tab:first-child').classList.add('active');
+                document
+                    .getElementById('pointRankingSection')
+                    .classList.add('active');
+            } else {
+                document.querySelector('.tab:last-child').classList.add('active');
+                document
+                    .getElementById('achievementRankingSection')
+                    .classList.add('active');
+            }
+        }
+
+        async function fetchRankings() {
+            try {
+                // 포인트 랭킹 가져오기
+                const pointResponse = await fetch('/user/ranking/point');
+                const pointData = await pointResponse.json();
+                displayRanking('pointRanking', pointData, 'collection_point');
+
+                // 업적 랭킹 가져오기
+                const achievementResponse = await fetch('/user/ranking/achievement');
+                const achievementData = await achievementResponse.json();
+                displayRanking(
+                    'achievementRanking',
+                    achievementData,
+                    'achievementCount',
+                );
+            } catch (error) {
+                console.error(
+                    '랭킹 데이터를 가져오는 중 오류가 발생했습니다:',
+                    error,
+                );
+            }
+        }
+
+        function displayRanking(tableId, data, scoreField) {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            tbody.innerHTML = '';
+
+            data.forEach((user, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
                     <td class="rank">${index + 1}</td>
                     <td>${user.nickname}</td>
                     <td>${user[scoreField]}</td>
                 `;
-          tbody.appendChild(row);
-        });
-      }
+                tbody.appendChild(row);
+            });
+        }
     </script>
-  </body>
+</body>
+
 </html>

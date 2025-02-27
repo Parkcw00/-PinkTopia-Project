@@ -38,6 +38,14 @@
     </style>
   </head>
   <body>
+    <div class="nav" style="display: flex; justify-content: space-between; background-color: #ff69b4; padding: 15px; color: white; font-weight: bold;">
+        <div>
+            <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTophia</a>
+        </div>
+        <div>
+            <a href="/public/home.html" style="color: white; text-decoration: none; margin: 0 10px;">홈으로</a>
+        </div>
+    </div>
     <div class="container">
       <h1>채팅방 블랙리스트 관리</h1>
 
@@ -203,7 +211,7 @@
 
       // 채팅멤버 목록 수신 및 처리
       chatmemberSocket.on('allChatMembers', (chatmembers) => {
-        console.log('�� 채팅멤버 목록 수신:', chatmembers);
+        console.log('📥 채팅멤버 목록 수신:', chatmembers);
         const blacklistedUserId = document.getElementById('userId').value;
         const blacklistedRoomId = document.getElementById('chatRoomId').value;
 
