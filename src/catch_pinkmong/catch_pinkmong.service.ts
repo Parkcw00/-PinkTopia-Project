@@ -18,7 +18,9 @@ export class CatchPinkmongService {
   ) {}
 
   // 🔹 핑크몽 등장 (전투 시작 시 Valkey에 저장)
-  async appearPinkmong(userId: number): Promise<{ message: string }> {
+  async appearPinkmong(
+    userId: number,
+  ): Promise<{ pinkmongImage?: string; message: string }> {
     // 1. 유저 조회
     const user = await this.catchRepo.getUser(userId);
     // 2. 인벤토리 조회
@@ -80,6 +82,7 @@ export class CatchPinkmongService {
     );
 
     return {
+      pinkmongImage: selectedPinkmong.pinkmong_image,
       message: `${selectedPinkmong.name}이(가) 등장했다! (등급: ${selectedGrade})`,
     };
   }
