@@ -2,336 +2,265 @@
 <html lang="ko">
 
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>핑크몽 포획 | PinkTopia</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>핑크몽 포획 | PinkTopia</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 0;
-                height: 100vh;
-                overflow: hidden;
-            }
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            background-color: #ff69b4;
+            padding: 15px;
+            color: white;
+            font-weight: bold;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
 
-            body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 0;
-                height: 100vh;
-                overflow: hidden;
-            }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
 
-            .nav {
-                display: flex;
-                justify-content: space-between;
-                background-color: #ff69b4;
-                padding: 15px;
-                color: white;
-                font-weight: bold;
-                position: fixed;
-                width: 100%;
-                top: 0;
-                z-index: 1000;
-            }
+        .catch-container {
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 1;
+        }
 
-            .nav {
-                display: flex;
-                justify-content: space-between;
-                background-color: #ff69b4;
-                padding: 15px;
-                color: white;
-                font-weight: bold;
-                position: fixed;
-                width: 100%;
-                top: 0;
-                z-index: 1000;
-            }
-
-            .nav a {
-                color: white;
-                text-decoration: none;
-                margin: 0 10px;
-            }
-
-            .nav a {
-                color: white;
-                text-decoration: none;
-                margin: 0 10px;
-            }
-
+        @media (orientation: landscape) {
             .catch-container {
-                height: 100vh;
-                background-size: cover;
-                background-position: center;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-end;
-                align-items: center;
-                padding: 20px;
-                box-sizing: border-box;
-                position: relative;
-                z-index: 1;
+                background-image: url('assets/landscape-background.jpg');
             }
+        }
 
-            @media (orientation: landscape) {
-                .catch-container {
-                    background-image: url('assets/landscape-background.jpg');
-                }
+        @media (orientation: portrait) {
+            .catch-container {
+                background-image: url('assets/portrait-background.jpg');
             }
+        }
 
-            @media (orientation: landscape) {
-                .catch-container {
-                    background-image: url('assets/landscape-background.jpg');
-                }
-            }
+        .pinkmong {
+            width: 200px;
+            height: 200px;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: float 3s ease-in-out infinite;
+            z-index: 2;
+        }
 
-            @media (orientation: portrait) {
-                .catch-container {
-                    background-image: url('assets/portrait-background.jpg');
-                }
-            }
+        @keyframes float {
 
-            @media (orientation: portrait) {
-                .catch-container {
-                    background-image: url('assets/portrait-background.jpg');
-                }
-            }
-
-            .pinkmong {
-                width: 200px;
-                height: 200px;
-                background-repeat: no-repeat;
-                background-position: center;
-                position: absolute;
-                top: 50%;
-                left: 50%;
+            0%,
+            100% {
                 transform: translate(-50%, -50%);
-                animation: float 3s ease-in-out infinite;
-                z-index: 2;
             }
 
-            @keyframes float {
-
-                0%,
-                100% {
-                    transform: translate(-50%, -50%);
-                }
-
-                50% {
-                    transform: translate(-50%, -60%);
-                }
+            50% {
+                transform: translate(-50%, -60%);
             }
+        }
 
-            @keyframes float {
+        .controls {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 3;
+        }
 
-                0%,
-                100% {
-                    transform: translate(-50%, -50%);
-                }
+        .inventory-select {
+            display: none;
+        }
 
-                50% {
-                    transform: translate(-50%, -60%);
-                }
-            }
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
 
-            .controls {
-                background: rgba(255, 255, 255, 0.9);
-                padding: 20px;
-                border-radius: 15px;
-                width: 90%;
-                max-width: 500px;
-                margin-bottom: 20px;
-                position: relative;
-                z-index: 3;
-            }
+        .inventory-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border: 2px solid #ff69b4;
+            border-radius: 10px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-            .inventory-select {
-                display: none;
-            }
+        .inventory-item.selected {
+            background-color: #ffe6f2;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
 
-            .inventory-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-                gap: 10px;
-                margin-bottom: 15px;
-            }
+        .inventory-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
 
-            .inventory-item {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                padding: 10px;
-                border: 2px solid #ff69b4;
-                border-radius: 10px;
-                background-color: white;
-                cursor: pointer;
-                transition: all 0.3s ease;
-            }
+        .inventory-item-info {
+            text-align: center;
+            width: 100%;
+        }
 
-            .inventory-item.selected {
-                background-color: #ffe6f2;
-                transform: scale(1.05);
-                box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
-            }
+        .inventory-item-name {
+            font-size: 0.9em;
+            margin-bottom: 4px;
+            color: #333;
+        }
 
-            .inventory-item img {
-                width: 50px;
-                height: 50px;
-                border-radius: 8px;
-                margin-bottom: 8px;
-            }
+        .inventory-item-count {
+            color: #666;
+            font-size: 0.8em;
+        }
 
-            .inventory-item-info {
-                text-align: center;
-                width: 100%;
-            }
+        .inventory-item {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+        }
 
-            .inventory-item-name {
-                font-size: 0.9em;
-                margin-bottom: 4px;
-                color: #333;
-            }
+        .inventory-item img {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
 
-            .inventory-item-count {
-                color: #666;
-                font-size: 0.8em;
-            }
+        .inventory-item-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
 
-            .inventory-item {
-                display: flex;
-                align-items: center;
-                padding: 5px;
-            }
+        .inventory-item-count {
+            color: #666;
+            font-size: 0.9em;
+        }
 
-            .inventory-item img {
-                width: 30px;
-                height: 30px;
-                margin-right: 10px;
-                border-radius: 5px;
-            }
+        .catch-button {
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 48%;
+        }
 
-            .inventory-item-info {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                width: 100%;
-            }
+        .escape-button {
+            background-color: #808080;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 48%;
+        }
 
-            .inventory-item-count {
-                color: #666;
-                font-size: 0.9em;
-            }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
 
-            .catch-button {
-                background-color: #ff69b4;
-                color: white;
-                border: none;
-                padding: 15px 30px;
-                border-radius: 25px;
-                font-size: 1.2em;
-                font-weight: bold;
-                cursor: pointer;
-                transition: transform 0.2s;
-                width: 48%;
-            }
+        .catch-button:hover,
+        .escape-button:hover {
+            transform: scale(1.05);
+        }
 
-            .escape-button {
-                background-color: #808080;
-                color: white;
-                border: none;
-                padding: 15px 30px;
-                border-radius: 25px;
-                font-size: 1.2em;
-                font-weight: bold;
-                cursor: pointer;
-                transition: transform 0.2s;
-                width: 48%;
-            }
+        .catch-button:active,
+        .escape-button:active {
+            transform: scale(0.95);
+        }
 
-            .button-container {
-                display: flex;
-                justify-content: space-between;
-                width: 100%;
-            }
-
-            .catch-button:hover,
-            .escape-button:hover {
-                transform: scale(1.05);
-            }
-
-            .catch-button:active,
-            .escape-button:active {
-                transform: scale(0.95);
-            }
-
-            .status {
-                text-align: center;
-                color: white;
-                font-size: 1.2em;
-                margin-bottom: 10px;
-                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            }
-
-            .status {
-                text-align: center;
-                color: white;
-                font-size: 1.2em;
-                margin-bottom: 10px;
-                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            }
-        </style>
-    </head>
+        .status {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
 
 <body>
-    </head>
+    <div class="nav">
+        <div>PinkTophia</div>
+        <div id="authMenu">
+            <a href="/public/log-in.html">로그인</a>
+            <a href="/public/sign-up.html">회원가입</a>
+        </div>
+    </div>
 
-    <body>
-        <div class="nav">
-            <div>PinkTophia</div>
-            <div id="authMenu">
-                <a href="/public/log-in.html">로그인</a>
-                <a href="/public/sign-up.html">회원가입</a>
-            </div>
-            <div>PinkTophia</div>
-            <div id="authMenu">
-                <a href="/public/log-in.html">로그인</a>
-                <a href="/public/sign-up.html">회원가입</a>
+    <div class="catch-container">
+        <div class="pinkmong"></div>
+        <div class="controls">
+            <div class="status">야생의 핑크몽이 나타났다!</div>
+            <select class="inventory-select" id="itemSelect" onchange="updateCatchButton()">
+                <option value="">아이템을 선택하세요</option>
+            </select>
+            <div class="button-container">
+                <button class="catch-button" onclick="catchPinkmong()" disabled>
+                    포획하기
+                </button>
+                <button class="escape-button" onclick="giveUp()">도망가기</button>
             </div>
         </div>
+    </div>
 
-        <div class="catch-container">
-            <div class="pinkmong"></div>
-            <div class="controls">
-                <div class="status">야생의 핑크몽이 나타났다!</div>
-                <select class="inventory-select" id="itemSelect" onchange="updateCatchButton()">
-                    <option value="">아이템을 선택하세요</option>
-                </select>
-                <div class="button-container">
-                    <button class="catch-button" onclick="catchPinkmong()" disabled>
-                        포획하기
-                    </button>
-                    <button class="escape-button" onclick="giveUp()">도망가기</button>
-                </div>
-            </div>
-        </div>
+    <script>
+        let inventoryItems = [];
 
-        <script>
-            let inventoryItems = [];
+        document.addEventListener('DOMContentLoaded', async function () {
+            const accessToken = localStorage.getItem('accessToken');
+            const authMenu = document.getElementById('authMenu');
 
-            document.addEventListener('DOMContentLoaded', async function () {
-                const accessToken = localStorage.getItem('accessToken');
-                const authMenu = document.getElementById('authMenu');
-
-                if (accessToken) {
-                    authMenu.innerHTML = `
             if (accessToken) {
                 authMenu.innerHTML = `
-                        < a href = "mypage.html" > 마이페이지</a >
-                            <a href="#" onclick="logout()">로그아웃</a>
-                    `;
+            <a href="mypage.html">마이페이지</a>
+            <a href="#" onclick="logout()">로그아웃</a>
+          `;
                 // 핑크몽 등장 API 호출
                 appearPinkmong();
                 // 인벤토리 아이템 로드
@@ -346,35 +275,16 @@
                 window.location.href = '/public/log-in.html';
                 return;
             }
-        async function appearPinkmong() {
-            const accessToken = localStorage.getItem('accessToken');
-            if (!accessToken) {
-                alert('로그인이 필요합니다.');
-                window.location.href = '/public/log-in.html';
-                return;
-            }
 
             try {
                 const response = await fetch('/catch-pinkmong/catchpinkmong', {
                     method: 'POST',
                     headers: {
-                        Authorization: `${ accessToken } `,
-                        'Content-Type': 'application/json',
-                    },
-                });
-            try {
-                const response = await fetch('/catch-pinkmong/catchpinkmong', {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `${ accessToken } `,
+                        Authorization: `${accessToken}`,
                         'Content-Type': 'application/json',
                     },
                 });
 
-                if (response.ok) {
-                    const result = await response.json();
-                    document.querySelector('.status').textContent = result.message;
-                    console.log(result);
                 if (response.ok) {
                     const result = await response.json();
                     document.querySelector('.status').textContent = result.message;
@@ -404,7 +314,7 @@
                 const response = await fetch('/inventory', {
                     method: 'GET',
                     headers: {
-                        Authorization: `${ accessToken } `,
+                        Authorization: `${accessToken}`,
                         'Content-Type': 'application/json',
                     },
                 });
@@ -441,12 +351,12 @@
                 itemElement.className = 'inventory-item';
                 itemElement.dataset.itemId = item.id; // storeItemId 대신 id 사용
                 itemElement.innerHTML = `
-                        < img src = "${item.storeItemImage}" alt = "${item.storeItemName}" >
-                            <div class="inventory-item-info">
-                                <div class="inventory-item-name">${item.storeItemName}</div>
-                                <div class="inventory-item-count">보유: ${item.count}개</div>
-                            </div>
-                    `;
+            <img src="${item.storeItemImage}" alt="${item.storeItemName}">
+            <div class="inventory-item-info">
+              <div class="inventory-item-name">${item.storeItemName}</div>
+              <div class="inventory-item-count">보유: ${item.count}개</div>
+            </div>
+          `;
 
                 itemElement.addEventListener('click', () => {
                     // 모든 아이템에서 selected 클래스 제거
@@ -489,13 +399,6 @@
                 window.location.href = '/public/log-in.html';
                 return;
             }
-        async function catchPinkmong() {
-            const accessToken = localStorage.getItem('accessToken');
-            if (!accessToken) {
-                alert('로그인이 필요합니다.');
-                window.location.href = '/public/log-in.html';
-                return;
-            }
 
             const selectedItem = document.querySelector('.inventory-item.selected');
             if (!selectedItem) {
@@ -509,7 +412,7 @@
                 const response = await fetch('/catch-pinkmong/feeding', {
                     method: 'POST',
                     headers: {
-                        Authorization: `${ accessToken } `,
+                        Authorization: `${accessToken}`,
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({ itemId: parseInt(itemId) }),
@@ -550,33 +453,16 @@
                 window.location.href = '/public/log-in.html';
                 return;
             }
-        async function giveUp() {
-            const accessToken = localStorage.getItem('accessToken');
-            if (!accessToken) {
-                alert('로그인이 필요합니다.');
-                window.location.href = '/public/log-in.html';
-                return;
-            }
 
             try {
                 const response = await fetch('/catch-pinkmong/giveup', {
                     method: 'POST',
                     headers: {
-                        Authorization: `${ accessToken } `,
-                        'Content-Type': 'application/json',
-                    },
-                });
-            try {
-                const response = await fetch('/catch-pinkmong/giveup', {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `${ accessToken }`,
+                        Authorization: `${accessToken}`,
                         'Content-Type': 'application/json',
                     },
                 });
 
-                const result = await response.json();
-                document.querySelector('.status').textContent = result.message;
                 const result = await response.json();
                 document.querySelector('.status').textContent = result.message;
 
@@ -597,9 +483,7 @@
             localStorage.removeItem('accessToken');
             window.location.reload();
         }
-        </script>
-    </body>
-
+    </script>
 </body>
 
 </html>
