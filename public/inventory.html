@@ -347,6 +347,7 @@
         <div class="modal-content">
             <h3>아이템 판매</h3>
             <p id="sellItemName"></p>
+            <p id="currentCount" style="color: #666;"></p>
             <input type="number" id="sellCount" min="1" placeholder="판매할 수량을 입력하세요">
             <div class="modal-buttons">
                 <button class="sell-button" onclick="confirmSell()">판매</button>
@@ -360,8 +361,15 @@
 
         // 페이지 로드 시 실행
         document.addEventListener('DOMContentLoaded', function () {
-            checkLoginStatus();
-            loadInventory();
+            const accessToken = localStorage.getItem('accessToken');
+            if (accessToken) {
+                document.getElementById('loggedInMenu').style.display = 'block';
+                document.getElementById('loggedOutMenu').style.display = 'none';
+                loadUserAssets();  // 초기 자산 로드
+                loadInventory();   // 초기 인벤토리 로드
+            } else {
+                window.location.href = '/public/log-in.html';
+            }
         });
 
         // 로그인 상태 체크
@@ -395,7 +403,7 @@
                         <img src="${item.storeItemImage}" alt="${item.storeItemName}" class="item-image">
                         <div class="item-name">${item.storeItemName}</div>
                         <div class="item-count">수량: ${item.count}개</div>
-                        <button class="sell-button" onclick="showSellModal(${item.id}, '${item.storeItemName}')">판매</button>
+                        <button class="sell-button" onclick="showSellModal(${item.id}, '${item.storeItemName}', ${item.count})">판매</button>
                     `;
                     inventoryGrid.appendChild(itemElement);
                 });
@@ -405,10 +413,19 @@
         }
 
         // 판매 모달 표시
-        function showSellModal(itemId, itemName) {
+        function showSellModal(itemId, itemName, itemCount) {
             currentItemId = itemId;
+            const sellModal = document.getElementById('sellModal');
+            const sellCount = document.getElementById('sellCount');
+
             document.getElementById('sellItemName').textContent = itemName;
-            document.getElementById('sellModal').style.display = 'block';
+            sellCount.max = itemCount;  // 최대 판매 가능 수량 설정
+            sellCount.value = '1';  // 기본값 1로 설정
+
+            // 현재 보유 수량 표시 추가
+            document.getElementById('currentCount').textContent = `현재 보유: ${itemCount}개`;
+
+            sellModal.style.display = 'block';
         }
 
         // 판매 모달 닫기
@@ -421,8 +438,15 @@
         // 판매 확인
         async function confirmSell() {
             const count = parseInt(document.getElementById('sellCount').value);
+            const maxCount = parseInt(document.getElementById('sellCount').max);
+
             if (!count || count < 1) {
                 alert('올바른 수량을 입력해주세요.');
+                return;
+            }
+
+            if (count > maxCount) {
+                alert(`최대 ${maxCount}개까지만 판매할 수 있습니다.`);
                 return;
             }
 
@@ -436,13 +460,24 @@
                     body: JSON.stringify({ count: count })
                 });
 
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || '판매에 실패했습니다.');
+                }
+
                 const result = await response.json();
                 alert(result.message);
                 closeSellModal();
-                loadInventory();
+
+                // 판매 후 자산과 인벤토리 모두 새로고침
+                await Promise.all([
+                    loadUserAssets(),
+                    loadInventory()
+                ]);
+
             } catch (error) {
                 console.error('아이템 판매 실패:', error);
-                alert('아이템 판매에 실패했습니다.');
+                alert(error.message);
             }
         }
 
@@ -490,15 +525,6 @@
                 document.getElementById('userDia').textContent = '0';
             }
         }
-
-        // DOMContentLoaded 이벤트에 loadUserAssets 추가
-        document.addEventListener("DOMContentLoaded", function () {
-            const accessToken = localStorage.getItem("accessToken");
-            if (accessToken) {
-                loadUserAssets();  // 자산 로드 추가
-                loadInventory();   // 기존 인벤토리 로드
-            }
-        });
     </script>
 </body>
 
