@@ -61,8 +61,12 @@
             border-color: #ffd700;
         }
 
+        .grade-epic .pinkmong-image {
+            border-color: #f013cb;
+        }
+
         .grade-rare .pinkmong-image {
-            border-color: #9370db;
+            border-color: #17c4f0;
         }
 
         .grade-common .pinkmong-image {
@@ -93,9 +97,14 @@
             color: #ffa500;
         }
 
+        .grade-epic .pinkmong-grade {
+            background-color: #fff7e6;
+            color: #f013cb;
+        }
+
         .grade-rare .pinkmong-grade {
             background-color: #f0e6ff;
-            color: #9370db;
+            color: #17c4f0;
         }
 
         .grade-common .pinkmong-grade {
@@ -368,7 +377,28 @@
                 }
                 
                 const pinkmongResult = await pinkmongResponse.json();
-                allPinkmongs = pinkmongResult.pinkmongs;
+                console.log('Collection API 응답:', pinkmongResult);
+
+                // 등급 우선순위 설정
+                const gradeOrder = {
+                    'legendary': 0,
+                    'epic': 1,
+                    'rare': 2,
+                    'common': 3
+                };
+                
+                // 등급순으로 정렬
+                allPinkmongs = pinkmongResult.pinkmongs.sort((a, b) => {
+                    // 등급 비교
+                    const gradeComparison = gradeOrder[a.grade.toLowerCase()] - gradeOrder[b.grade.toLowerCase()];
+                    
+                    // 등급이 같으면 ID순으로 정렬
+                    if (gradeComparison === 0) {
+                        return a.id - b.id;
+                    }
+                    
+                    return gradeComparison;
+                });
 
                 const collectionResponse = await fetch('http://localhost:3000/collection/collections', {
                     credentials: 'include',
