@@ -44,6 +44,7 @@
             padding: 20px;
             box-sizing: border-box;
             position: relative;
+            z-index: 1;
         }
 
         @media (orientation: landscape) {
@@ -68,6 +69,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             animation: float 3s ease-in-out infinite;
+            z-index: 2;
         }
 
         @keyframes float {
@@ -89,6 +91,85 @@
             width: 90%;
             max-width: 500px;
             margin-bottom: 20px;
+            position: relative;
+            z-index: 3;
+        }
+
+        .inventory-select {
+            display: none;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .inventory-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border: 2px solid #ff69b4;
+            border-radius: 10px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .inventory-item.selected {
+            background-color: #ffe6f2;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+
+        .inventory-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .inventory-item-info {
+            text-align: center;
+            width: 100%;
+        }
+
+        .inventory-item-name {
+            font-size: 0.9em;
+            margin-bottom: 4px;
+            color: #333;
+        }
+
+        .inventory-item-count {
+            color: #666;
+            font-size: 0.8em;
+        }
+
+        .inventory-item {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+        }
+
+        .inventory-item img {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+
+        .inventory-item-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .inventory-item-count {
+            color: #666;
+            font-size: 0.9em;
         }
 
         .catch-button {
@@ -101,14 +182,35 @@
             font-weight: bold;
             cursor: pointer;
             transition: transform 0.2s;
+            width: 48%;
+        }
+
+        .escape-button {
+            background-color: #808080;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 48%;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
             width: 100%;
         }
 
-        .catch-button:hover {
+        .catch-button:hover,
+        .escape-button:hover {
             transform: scale(1.05);
         }
 
-        .catch-button:active {
+        .catch-button:active,
+        .escape-button:active {
             transform: scale(0.95);
         }
 
@@ -135,12 +237,22 @@
         <div class="pinkmong"></div>
         <div class="controls">
             <div class="status">야생의 핑크몽이 나타났다!</div>
-            <button class="catch-button" onclick="catchPinkmong()">포획하기</button>
+            <select class="inventory-select" id="itemSelect" onchange="updateCatchButton()">
+                <option value="">아이템을 선택하세요</option>
+            </select>
+            <div class="button-container">
+                <button class="catch-button" onclick="catchPinkmong()" disabled>
+                    포획하기
+                </button>
+                <button class="escape-button" onclick="giveUp()">도망가기</button>
+            </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        let inventoryItems = [];
+
+        document.addEventListener('DOMContentLoaded', async function () {
             const accessToken = localStorage.getItem('accessToken');
             const authMenu = document.getElementById('authMenu');
 
@@ -151,6 +263,8 @@
           `;
                 // 핑크몽 등장 API 호출
                 appearPinkmong();
+                // 인벤토리 아이템 로드
+                loadInventoryItems();
             }
         });
 
@@ -184,13 +298,6 @@
                     } else {
                         console.error('핑크몽 이미지 URL이 없습니다.');
                     }
-
-                    // 2분 후 자동 포기 처리
-                    setTimeout(() => {
-                        console.log('2분이 지나 포기 요청을 보냅니다.');
-                        giveUp();
-                    }, 120000); // 120초 (2분)
-
                 } else {
                     document.querySelector('.status').textContent =
                         '핑크몽 등장에 실패했습니다.';
@@ -199,6 +306,89 @@
                 console.error('Error:', error);
                 document.querySelector('.status').textContent =
                     '오류가 발생했습니다.';
+            }
+        }
+        async function loadInventoryItems() {
+            const accessToken = localStorage.getItem('accessToken');
+            try {
+                const response = await fetch('/inventory', {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `${accessToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.ok) {
+                    const items = await response.json();
+                    inventoryItems = items;
+                    updateInventorySelect(items);
+                } else {
+                    console.error('인벤토리 로드 실패');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function updateInventorySelect(items) {
+            const select = document.getElementById('itemSelect');
+            const controls = document.querySelector('.controls');
+
+            // 기존 그리드가 있다면 제거
+            const existingGrid = document.querySelector('.inventory-grid');
+            if (existingGrid) {
+                existingGrid.remove();
+            }
+
+            // 새로운 그리드 생성
+            const grid = document.createElement('div');
+            grid.className = 'inventory-grid';
+
+            items.forEach((item) => {
+                console.log(item);
+                const itemElement = document.createElement('div');
+                itemElement.className = 'inventory-item';
+                itemElement.dataset.itemId = item.id; // storeItemId 대신 id 사용
+                itemElement.innerHTML = `
+            <img src="${item.storeItemImage}" alt="${item.storeItemName}">
+            <div class="inventory-item-info">
+              <div class="inventory-item-name">${item.storeItemName}</div>
+              <div class="inventory-item-count">보유: ${item.count}개</div>
+            </div>
+          `;
+
+                itemElement.addEventListener('click', () => {
+                    // 모든 아이템에서 selected 클래스 제거
+                    document.querySelectorAll('.inventory-item').forEach((el) => {
+                        el.classList.remove('selected');
+                    });
+                    // 선택된 아이템에 selected 클래스 추가
+                    itemElement.classList.add('selected');
+                    // select 값 업데이트
+                    select.value = item.id; // storeItemId 대신 id 사용
+                    // 포획 버튼 활성화
+                    updateCatchButton();
+                });
+
+                grid.appendChild(itemElement);
+            });
+
+            // select 요소 앞에 그리드 삽입
+            select.parentNode.insertBefore(grid, select);
+        }
+
+        function updateCatchButton() {
+            const select = document.getElementById('itemSelect');
+            const catchButton = document.querySelector('.catch-button');
+            const selectedItem = document.querySelector('.inventory-item.selected');
+
+            if (selectedItem) {
+                select.value = selectedItem.dataset.itemId;
+                catchButton.disabled = false;
+            } else {
+                select.value = '';
+                catchButton.disabled = true;
             }
         }
 
@@ -210,26 +400,44 @@
                 return;
             }
 
+            const selectedItem = document.querySelector('.inventory-item.selected');
+            if (!selectedItem) {
+                alert('아이템을 선택해주세요.');
+                return;
+            }
+
+            const itemId = selectedItem.dataset.itemId;
+
             try {
-                // 임시로 itemId를 2로 설정 (실제로는 사용자가 선택한 아이템 ID를 사용해야 함)
-                const itemId = 2;
                 const response = await fetch('/catch-pinkmong/feeding', {
-                    method: 'GET',
+                    method: 'POST',
                     headers: {
                         Authorization: `${accessToken}`,
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ itemId }),
+                    body: JSON.stringify({ itemId: parseInt(itemId) }),
                 });
 
                 const result = await response.json();
                 document.querySelector('.status').textContent = result.message;
 
+                // 포획 시도 후 인벤토리 새로고침
+                await loadInventoryItems();
+
                 if (result.success) {
                     // 포획 성공 시 2초 후 핑크몽 목록 페이지로 이동
+                    alert(result.message);
                     setTimeout(() => {
-                        window.location.href = '/public/pinkmonglist.html';
-                    }, 2000);
+                        window.location.href = '/public/home.html';
+                    }, 1000);
+                }
+
+                if (result.message === '핑크몽이 도망갔습니다!') {
+                    // 포획 실패 시 2초 후 홈페이지로 이동
+                    alert(result.message);
+                    setTimeout(() => {
+                        window.location.href = '/public/home.html';
+                    }, 1000);
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -262,7 +470,7 @@
                 if (result.success === false) {
                     setTimeout(() => {
                         window.location.href = '/public/home.html';
-                    }, 2000);
+                    }, 1000);
                 }
             } catch (error) {
                 console.error('Error:', error);
