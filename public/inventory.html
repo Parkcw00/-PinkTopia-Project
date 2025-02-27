@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인벤토리 | PinkTopia</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffe4f7;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        h1 {
+            color: #ff62b6;
+            padding: 20px;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        /* 인벤토리 그리드 스타일 수정 */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .inventory-item {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .inventory-item:hover {
+            transform: scale(1.05);
+        }
+
+        .item-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 15px;
+            border: 3px solid #f38fc5;
+        }
+
+        .item-name {
+            margin: 10px 0;
+            font-size: 20px;
+            color: #9c195f;
+            font-weight: bold;
+        }
+
+        .item-count {
+            margin: 5px 0;
+            color: #2c121f;
+            font-size: 16px;
+        }
+
+        .sell-button {
+            background-color: #f575b5;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+            width: 100%;
+            max-width: 200px;
+            margin-top: 10px;
+        }
+
+        .sell-button:hover {
+            background-color: #ff1493;
+        }
+
+        /* 모달 스타일 수정 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 350px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
+        }
+
+        .modal-content h3 {
+            color: #9c195f;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #f38fc5;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+        }
+
+        /* 기존의 nav, sidebar 등의 스타일은 유지 */
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ff69b4;
+            padding: 15px;
+            color: white;
+            font-weight: bold;
+            height: 50px;
+        }
+
+        /* 햄버거 메뉴 아이콘 스타일 */
+        .menu-icon {
+            position: absolute;
+            left: 15px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .menu-icon .hamburger {
+            width: 25px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-icon .hamburger span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: white;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .nav .logo-container {
+            position: absolute;
+            left: 50px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav img {
+            width: 45px;
+            height: 45px;
+            border-radius: 0;
+            object-fit: cover;
+        }
+
+        .nav .logo-text {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+        }
+
+        /* 사이드바 스타일 */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            background-color: #ff69b4;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar a {
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar a:hover {
+            background-color: #ff4da6;
+        }
+
+        .close-sidebar {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 36px;
+            cursor: pointer;
+            color: white;
+        }
+
+        /* user-assets 스타일 수정 */
+        .user-assets {
+            position: absolute;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: white;
+            padding: 8px 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
+        }
+
+        .asset-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #9c195f;
+            font-weight: bold;
+        }
+
+        .asset-item img {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* nav 스타일 수정 */
+        .nav {
+            position: relative;
+            /* 상대 위치 설정 */
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 네비게이션 바 -->
+    <div class="nav">
+        <div class="menu-icon" onclick="openSidebar()">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        <div class="logo-container">
+            <img src="/public/images/123.jpg" alt="PinkTopia Logo">
+        </div>
+        <div class="logo-text">
+            <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
+        </div>
+        <!-- user-assets를 nav 안으로 이동 -->
+        <div class="user-assets">
+            <div class="asset-item">
+                <img src="/public/images/gem.png" alt="젬">
+                <span id="userGem">로딩 중...</span> 젬
+            </div>
+            <div class="asset-item">
+                <img src="/public/images/dia.png" alt="다이아">
+                <span id="userDia">로딩 중...</span> 다이아
+            </div>
+        </div>
+    </div>
+
+    <!-- 사이드바 -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+        </div>
+        <div class="sidebar-content">
+            <a href="/public/home.html">홈</a>
+            <a href="/public/event.html">이벤트</a>
+            <a href="/public/store-item.html">아이템샵</a>
+            <a href="/public/board.html">게시글 (커뮤니티)</a>
+            <a href="/public/ranking.html">랭킹</a>
+            <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
+            <!-- 로그인 시 표시될 메뉴들 -->
+            <div id="loggedInMenu" style="display: none;">
+                <a href="/public/chattingrooms.html">채팅</a>
+                <a href="/public/pinkmong-dex.html">핑크몽 개인 도감</a>
+                <a href="/public/inventory.html">인벤토리 아이템</a>
+                <a href="/public/achievements.html">업적</a>
+                <a href="/public/mypage.html">마이페이지</a>
+                <a href="#" onclick="logout()">로그아웃</a>
+            </div>
+            <!-- 로그인 안 된 경우 표시될 메뉴들 -->
+            <div id="loggedOutMenu">
+                <a href="/public/log-in.html">로그인</a>
+                <a href="/public/sign-up.html">회원가입</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 메인 컨텐츠 -->
+    <div class="container">
+        <h1>인벤토리</h1>
+        <div class="inventory-grid" id="inventoryGrid">
+            <!-- 아이템들이 여기에 동적으로 추가됩니다 -->
+        </div>
+    </div>
+
+    <!-- 판매 모달 -->
+    <div id="sellModal" class="modal">
+        <div class="modal-content">
+            <h3>아이템 판매</h3>
+            <p id="sellItemName"></p>
+            <input type="number" id="sellCount" min="1" placeholder="판매할 수량을 입력하세요">
+            <div class="modal-buttons">
+                <button class="sell-button" onclick="confirmSell()">판매</button>
+                <button class="sell-button" onclick="closeSellModal()">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentItemId = null;
+
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', function () {
+            checkLoginStatus();
+            loadInventory();
+        });
+
+        // 로그인 상태 체크
+        function checkLoginStatus() {
+            const accessToken = localStorage.getItem('accessToken');
+            if (accessToken) {
+                document.getElementById('loggedInMenu').style.display = 'block';
+                document.getElementById('loggedOutMenu').style.display = 'none';
+            } else {
+                window.location.href = '/public/log-in.html';
+            }
+        }
+
+        // 인벤토리 로드
+        async function loadInventory() {
+            try {
+                const response = await fetch('http://localhost:3000/inventory', {
+                    headers: {
+                        'Authorization': localStorage.getItem('accessToken')
+                    }
+                });
+                const items = await response.json();
+
+                const inventoryGrid = document.getElementById('inventoryGrid');
+                inventoryGrid.innerHTML = '';
+
+                items.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'inventory-item';
+                    itemElement.innerHTML = `
+                        <img src="${item.storeItemImage}" alt="${item.storeItemName}" class="item-image">
+                        <div class="item-name">${item.storeItemName}</div>
+                        <div class="item-count">수량: ${item.count}개</div>
+                        <button class="sell-button" onclick="showSellModal(${item.id}, '${item.storeItemName}')">판매</button>
+                    `;
+                    inventoryGrid.appendChild(itemElement);
+                });
+            } catch (error) {
+                console.error('인벤토리 로드 실패:', error);
+            }
+        }
+
+        // 판매 모달 표시
+        function showSellModal(itemId, itemName) {
+            currentItemId = itemId;
+            document.getElementById('sellItemName').textContent = itemName;
+            document.getElementById('sellModal').style.display = 'block';
+        }
+
+        // 판매 모달 닫기
+        function closeSellModal() {
+            document.getElementById('sellModal').style.display = 'none';
+            document.getElementById('sellCount').value = '';
+            currentItemId = null;
+        }
+
+        // 판매 확인
+        async function confirmSell() {
+            const count = parseInt(document.getElementById('sellCount').value);
+            if (!count || count < 1) {
+                alert('올바른 수량을 입력해주세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:3000/item/${currentItemId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': localStorage.getItem('accessToken')
+                    },
+                    body: JSON.stringify({ count: count })
+                });
+
+                const result = await response.json();
+                alert(result.message);
+                closeSellModal();
+                loadInventory();
+            } catch (error) {
+                console.error('아이템 판매 실패:', error);
+                alert('아이템 판매에 실패했습니다.');
+            }
+        }
+
+        // 사이드바 제어
+        function openSidebar() {
+            document.getElementById('sidebar').style.width = "250px";
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').style.width = "0";
+        }
+
+        // 로그아웃
+        async function logout() {
+            localStorage.removeItem('accessToken');
+            window.location.href = '/public/log-in.html';
+        }
+
+        // loadUserAssets 함수 추가
+        async function loadUserAssets() {
+            try {
+                const accessToken = localStorage.getItem('accessToken');
+                if (!accessToken) {
+                    console.log('로그인이 필요합니다.');
+                    return;
+                }
+
+                const response = await fetch('http://localhost:3000/user/me', {
+                    headers: {
+                        'Authorization': accessToken
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch user data');
+                }
+
+                const userData = await response.json();
+                document.getElementById('userGem').textContent = userData.pink_gem.toLocaleString();
+                document.getElementById('userDia').textContent = userData.pink_dia.toLocaleString();
+
+            } catch (error) {
+                console.error('유저 자산 로드 실패:', error);
+                document.getElementById('userGem').textContent = '0';
+                document.getElementById('userDia').textContent = '0';
+            }
+        }
+
+        // DOMContentLoaded 이벤트에 loadUserAssets 추가
+        document.addEventListener("DOMContentLoaded", function () {
+            const accessToken = localStorage.getItem("accessToken");
+            if (accessToken) {
+                loadUserAssets();  // 자산 로드 추가
+                loadInventory();   // 기존 인벤토리 로드
+            }
+        });
+    </script>
+</body>
+
+</html>
