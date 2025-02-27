@@ -25,13 +25,20 @@ interface ChatMessage {
 @WebSocketGateway({
   namespace: 'chatting',
   cors: {
-    origin: ['http://localhost:3000', 'http://127.0.0.1:5500', 'http://localhost:5500'],
+    origin: [
+      'http://localhost:3000',
+      'http://127.0.0.1:5500',
+      'http://localhost:5500',
+      'http://127.0.0.1:3000',
+    ],
     credentials: true,
     methods: ['GET', 'POST'],
-    allowedHeaders: ['Authorization', 'Content-Type']
+    allowedHeaders: ['Authorization', 'Content-Type'],
   },
 })
-export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class ChattingGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
 
@@ -45,9 +52,9 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
 
   async handleConnection(client: Socket) {
     try {
-      console.log('소켓 연결 시도:', client.id);  // 연결 시도 로그
+      console.log('소켓 연결 시도:', client.id); // 연결 시도 로그
       const token = client.handshake.auth.token;
-      console.log('받은 토큰:', token);  // 토큰 확인
+      console.log('받은 토큰:', token); // 토큰 확인
 
       if (!token) {
         console.log('토큰 없음');
@@ -60,17 +67,16 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
 
       try {
         const decoded = this.jwtService.verify(tokenWithoutBearer, {
-          secret: this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY')
+          secret: this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
         });
-        console.log('토큰 검증 성공:', decoded);  // 디코딩된 정보 확인
+        console.log('토큰 검증 성공:', decoded); // 디코딩된 정보 확인
 
         client.data.user = decoded;
-        console.log('클라이언트 데이터 설정:', client.data);  // 클라이언트 데이터 확인
+        console.log('클라이언트 데이터 설정:', client.data); // 클라이언트 데이터 확인
       } catch (error) {
         console.log('토큰 검증 실패:', error);
         throw new WsException('유효하지 않은 토큰입니다.');
       }
-
     } catch (error) {
       console.error('연결 처리 중 에러:', error);
       client.disconnect();
@@ -82,7 +88,7 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
   async handleJoinRoom(client: Socket, data: { roomId: number }) {
     try {
       console.log('방 입장 요청:', data);
-      
+
       const user = client.data.user;
       if (!user) {
         throw new WsException('인증되지 않은 사용자입니다.');
@@ -110,13 +116,13 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
 
         // 채팅방 입장
         await client.join(`room_${data.roomId}`);
-        
+
         // 입장 메시지 전송
         this.server.to(`room_${data.roomId}`).emit('message', {
           type: 'system',
           roomId: data.roomId,
           message: `${chatMember.user.nickname}님이 입장하셨습니다.`,
-          timestamp: new Date()
+          timestamp: new Date(),
         });
 
         return { success: true };
@@ -135,10 +141,13 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
 
   // 채팅 메시지 전송
   @SubscribeMessage('sendMessage')
-  async handleMessage(client: Socket, data: { roomId: number; message: string; type?: string }) {
+  async handleMessage(
+    client: Socket,
+    data: { roomId: number; message: string; type?: string },
+  ) {
     try {
       console.log('메시지 수신:', data, client.data);
-      
+
       const user = client.data.user;
       if (!user) {
         console.log('인증되지 않은 사용자');
@@ -148,7 +157,7 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
       // 사용자 닉네임 조회
       const chatMember = await this.chatmemberService.findByRoomAndUser(
         data.roomId,
-        user.id
+        user.id,
       );
       console.log('채팅 멤버 정보:', chatMember);
 
@@ -158,11 +167,13 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
         nickname: chatMember.user.nickname || user.email,
         message: data.message,
         type: data.type || 'text',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       // DB에 메시지 저장
-      await this.chattingService.create(user, data.roomId.toString(), {message: data.message});
+      await this.chattingService.create(user, data.roomId.toString(), {
+        message: data.message,
+      });
 
       // 메시지 전송
       this.server.to(`room_${data.roomId}`).emit('message', messageData);
@@ -190,17 +201,17 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
       // 채팅멤버 정보 조회
       const chatMember = await this.chatmemberService.findByRoomAndUser(
         data.roomId,
-        user.id
+        user.id,
       );
 
       // 먼저 퇴장 메시지를 브로드캐스트
       await this.server.to(`room_${data.roomId}`).emit('userLeft', {
         userId: user.id,
-        nickname: chatMember.user.nickname
+        nickname: chatMember.user.nickname,
       });
 
       // 잠시 대기하여 메시지가 전송될 시간을 확보
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // 채팅방에서 소켓 연결 해제
       await client.leave(`room_${data.roomId}`);
@@ -222,14 +233,17 @@ export class ChattingGateway implements OnGatewayConnection, OnGatewayDisconnect
   }
 
   @SubscribeMessage('fileUploaded')
-  async handleFileUploaded(client: Socket, data: { roomId: number; fileUrl: string }) {
+  async handleFileUploaded(
+    client: Socket,
+    data: { roomId: number; fileUrl: string },
+  ) {
     try {
       console.log('파일 업로드 알림:', data);
 
       // 업로드된 파일 정보를 같은 방의 모든 사용자에게 전송
       this.server.to(`room_${data.roomId}`).emit('newFile', {
         fileUrl: data.fileUrl,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       return { success: true };

@@ -14,6 +14,7 @@ import {
 } from '@nestjs/common';
 import { DirectionService } from './direction.service';
 import { CompareDirection } from './dto/compare-direction.dto';
+import { UserGuard } from 'src/user/guards/user-guard';
 
 @Controller('direction')
 export class DirectionController {
@@ -24,12 +25,12 @@ export class DirectionController {
   async getAllSubAchievements() {
     return this.directionService.createBookmarks();
   }
-
+  @UseGuards(UserGuard)
   // 사용자와 거리비교
   @Patch('compare-bookmark')
   async compareBookmark(
     @Request() req,
-    @Body('CompareDirection') compareDirection: CompareDirection,
+    @Body() compareDirection: CompareDirection,
   ) {
     return this.directionService.compareBookmark(req.user.id, compareDirection);
   }
