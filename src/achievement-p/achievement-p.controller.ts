@@ -26,7 +26,7 @@ export class AchievementPController {
   @UseGuards(UserGuard)
   @Post('fill-valkey')
   async fillValkey(@Request() req) {
-    return await await this.APService.fillValkey(req.user.id);
+    return await this.APService.fillValkey(req.user.id);
   }
 
   // 수행으로 등록

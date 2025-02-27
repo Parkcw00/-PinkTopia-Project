@@ -2,6 +2,9 @@ import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 @Injectable()
 export class ValkeyService implements OnModuleDestroy {
+  createQueryBuilder(arg0: string) {
+    throw new Error('Method not implemented.');
+  }
   async hgetall(key: string): Promise<any | null> {
     const data = await this.client.hgetall(key);
     return data && Object.keys(data).length > 0 ? data : null; // 데이터가 있으면 반환, 없으면 null
@@ -32,7 +35,8 @@ export class ValkeyService implements OnModuleDestroy {
 
   async get<T>(key: string): Promise<T | null> {
     const data = await this.client.get(key);
-    return data ? JSON.parse(data) : null; // JSON 변환 후 반환
+    if (data === null) return null; // null 반환 시 JSON.parse() 호출 안 함
+    return JSON.parse(data);
   }
   async del(key: string) {
     await this.client.del(key);

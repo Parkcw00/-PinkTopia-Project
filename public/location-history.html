@@ -106,47 +106,63 @@
 
             socket.emit('updateLocationDB', data);
 
-            // 10분마다 회사 DB에 사용자 위치 저장
-            fetch('/location-history/db', {
-              method: 'PATCH',
-              credentials: 'include',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: accessToken,
-              },
-              body: JSON.stringify(data),
+        socket.on('locationUpdated', (data) => {
+            console.log('✅ 서버 응답:', data);
+        });
+
+        socket.on('error', (error) => {
+            console.error('❌ 서버 오류:', error);
+        });
+
+        // ✅ 로그인 후 위치 데이터를 요청
+        function requestLocationHistory() {
+            // 위치 기록 서버에 PATCH 요청
+            fetch('/location-history/valkey', {
+                method: 'PATCH',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: accessToken,
+                },
+                body: JSON.stringify({ user_id: decodedToken.id }),
             })
-              .then((response) => response.json())
-              .then((resData) => console.log('✅ 위치 저장 성공:', resData))
-              .catch((error) => console.error('❌ 위치 저장 실패:', error));
-          });
-        } else {
-          alert('Geolocation을 지원하지 않는 브라우저입니다.');
+                .then((response) => response.json())
+                .then((data) => console.log('✅ 위치 데이터 로드:', data))
+                .catch((error) => console.error('❌ 위치 데이터 로드 실패:', error));
+
+            // Geolocation API를 사용하여 현재 위치 정보 가져오기
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const data = {
+                        userId: decodedToken.id,
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        timestamp: new Date().toISOString(),
+                    };
+
+                    // 위치 정보를 포함하여 POST 요청 보내기
+                    fetch('/direction/compare-bookmark', {
+                        method: 'PATCH',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `${accessToken}`,
+                        },
+                        body: JSON.stringify({
+                            user_direction: {
+                                latitude: data.latitude,
+                                longitude: data.longitude,
+                            },
+                        }),
+                    })
+                        .then((response) => response.json())
+                        .then((result) => console.log('✅ 북마크 비교 결과:', result))
+                        .catch((error) => console.error('❌ 북마크 비교 요청 실패:', error));
+                });
+            } else {
+                alert('Geolocation을 지원하지 않는 브라우저입니다.');
+            }
         }
-      }
-
-      socket.on('locationUpdated', (data) => {
-        console.log('✅ 서버 응답:', data);
-      });
-
-      socket.on('error', (error) => {
-        console.error('❌ 서버 오류:', error);
-      });
-
-      // ✅ 로그인 후 위치 데이터를 요청
-      function requestLocationHistory() {
-        fetch('/location-history/valkey', {
-          method: 'PATCH',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: accessToken,
-          },
-          body: JSON.stringify({ user_id: decodedToken.id }),
-        })
-          .then((response) => response.json())
-          .then((data) => console.log('✅ 위치 데이터 로드:', data))
-          .catch((error) => console.error('❌ 위치 데이터 로드 실패:', error));
       }
     </script>
   </body>

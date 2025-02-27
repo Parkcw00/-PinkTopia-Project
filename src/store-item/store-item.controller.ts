@@ -40,19 +40,33 @@ export class StoreItemController {
     );
   }
 
-  @ApiOperation({ summary: '상점 아이템 조회' })
+  @ApiOperation({ summary: '모든 상점 아이템 조회' })
+  @Get()
+  findAll() {
+    return this.storeItemService.findAll();
+  }
+
+  @ApiOperation({ summary: '특정 상점 아이템 조회' })
+  @Get(':id')
+  findOne(@Param('id') id: number) {
+    return this.storeItemService.storeItemFindOne(id);
+  }
+
   @ApiOperation({ summary: '상점 아이템 수정' })
   @UseGuards(UserGuard, AdminGuard)
+  @UseInterceptors(FileInterceptor('file')) // 🔹 파일 업로드 지원
   @Patch(':id')
   update(
     @Request() req,
     @Param('id') id: number,
     @Body() updateStoreItemDto: UpdateStoreItemDto,
+    @UploadedFile() file?: Express.Multer.File, // 🔹 파일 추가
   ) {
     return this.storeItemService.updateStoreItem(
       req.user,
       id,
       updateStoreItemDto,
+      file,
     );
   }
 

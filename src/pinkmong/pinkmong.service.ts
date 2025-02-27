@@ -73,12 +73,24 @@ export class PinkmongService {
   async updatePinkmong(
     pinkmongId: number,
     updatePinkmongDto: UpdatePinkmongDto,
+    file?: Express.Multer.File, // 🔹 파일을 받을 수 있도록 추가
   ) {
     const pinkmong = await this.pinkmongRepository.findById(pinkmongId);
     if (!pinkmong)
       throw new NotFoundException({ message: '핑크몽이 존재하지 않습니다.' });
 
-    Object.assign(pinkmong, updatePinkmongDto);
+    // 🔹 파일이 존재하면 S3에 업로드 후 URL 업데이트
+    let pinkmong_image = pinkmong.pinkmong_image; // 기존 이미지 유지
+    if (file) {
+      pinkmong_image = await this.s3Service.uploadFile(file);
+    }
+
+    const updatedData = {
+      ...updatePinkmongDto,
+      pinkmong_image, // 🔹 새 이미지가 있으면 업데이트
+    };
+
+    Object.assign(pinkmong, updatedData);
     await this.pinkmongRepository.updatePinkmong(pinkmong);
     return { message: '핑크몽 수정이 완료 되었습니다.' };
   }
