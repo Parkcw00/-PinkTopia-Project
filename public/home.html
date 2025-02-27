@@ -233,10 +233,18 @@
         </div>
 
         <!-- 🔹 유저 프로필 표시 영역 -->
-        <div class="user-profile">
+        <div id="userProfileContainer" class="user-profile">
+            <!-- 로그인 시 유저 정보 표시 -->
             <img id="profileImage" src="/public/images/default-profile.png" alt="프로필 이미지">
             <span id="welcomeMessage">환영합니다!</span>
         </div>
+
+        <!-- 🔹 로그인 안 한 경우 보이는 메뉴 -->
+        <div id="authMenu" class="user-auth" style="display: none;">
+            <a href="/public/log-in.html">로그인</a>
+            <a href="/public/sign-up.html">회원가입</a>
+        </div>
+
 
         <script>
             document.addEventListener("DOMContentLoaded", function () {
@@ -246,8 +254,19 @@
             async function loadUserProfile() {
                 try {
                     const accessToken = localStorage.getItem("accessToken");
-                    if (!accessToken) return;
 
+                    // 요소 가져오기
+                    const userProfileContainer = document.getElementById("userProfileContainer");
+                    const authMenu = document.getElementById("authMenu");
+
+                    if (!accessToken) {
+                        // 🔹 로그인되지 않은 경우 → 로그인 / 회원가입 버튼 보이기
+                        userProfileContainer.style.display = "none";
+                        authMenu.style.display = "flex";
+                        return;
+                    }
+
+                    // 🔹 로그인한 경우 → 유저 정보 가져오기
                     const response = await fetch("http://localhost:3000/user/me", {
                         headers: { "Authorization": accessToken }
                     });
@@ -255,24 +274,33 @@
                     if (!response.ok) throw new Error("유저 정보를 불러오지 못했습니다.");
                     const userData = await response.json();
 
-                    document.getElementById("profileImage").src = userData.profile_image || "/public/images/1.png";
+                    // 🔹 유저 정보 업데이트
+                    document.getElementById("profileImage").src = userData.profile_image || "/public/images/default-profile.png";
                     document.getElementById("welcomeMessage").textContent = `환영합니다! ${userData.nickname}님!`;
+
+                    // 🔹 로그인 UI 보이기
+                    userProfileContainer.style.display = "flex";
+                    authMenu.style.display = "none";
 
                 } catch (error) {
                     console.error("유저 정보 불러오기 실패:", error);
+                    // 로그인 실패 시, 로그인 / 회원가입 버튼 보이기
+                    document.getElementById("userProfileContainer").style.display = "none";
+                    document.getElementById("authMenu").style.display = "flex";
                 }
             }
+
         </script>
 
         <style>
             /* 🔹 유저 프로필 스타일 */
-            .user-profile {
+            .user-profile,
+            .user-auth {
                 display: flex;
                 align-items: center;
                 gap: 10px;
                 position: absolute;
                 right: 20px;
-                /* 오른쪽 정렬 */
                 top: 50%;
                 transform: translateY(-50%);
                 background: rgb(255, 255, 255);
@@ -280,6 +308,7 @@
                 border-radius: 10px;
             }
 
+            /* 🔹 프로필 이미지 스타일 */
             .user-profile img {
                 width: 40px;
                 height: 40px;
@@ -288,10 +317,19 @@
                 border: 2px solid white;
             }
 
+            /* 🔹 텍스트 스타일 */
             .user-profile span {
                 font-size: 16px;
                 font-weight: bold;
                 color: #ff69b4;
+            }
+
+            .user-auth a {
+                text-decoration: none;
+                color: #ff69b4;
+                font-size: 16px;
+                font-weight: bold;
+                margin-left: 10px;
             }
         </style>
 </body>

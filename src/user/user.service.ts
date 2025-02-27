@@ -46,7 +46,7 @@ export class UserService {
 
     // Valkey에 데이터가 없으면 DB에서 조회 후 캐싱
     const rankingData = await this.userRepository.findUsersByCollectionPoint();
-    await this.valkeyService.set(cacheKey, rankingData, 300); // 5분 캐싱
+    await this.valkeyService.set(cacheKey, rankingData, 90); // 1분 30초 캐싱
 
     return rankingData;
   }
@@ -63,7 +63,7 @@ export class UserService {
 
     // Valkey에 데이터가 없으면 DB에서 조회 후 캐싱
     const rankingData = await this.userRepository.findUsersByAchievement();
-    await this.valkeyService.set(cacheKey, rankingData, 300); // 5분 캐싱
+    await this.valkeyService.set(cacheKey, rankingData, 90); // 1분30초 캐싱
 
     return rankingData;
   }

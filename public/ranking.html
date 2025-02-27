@@ -192,6 +192,44 @@
             cursor: pointer;
             color: white;
         }
+
+        .ranking-info {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #993969;
+            margin-bottom: 10px;
+        }
+
+        #myRankContainer {
+            font-size: 16px;
+            /* 🔹 폰트 크기 조정 */
+            font-weight: bold;
+            color: #993969;
+            background: #ffe4f0;
+            padding: 8px 12px;
+            /* 🔹 박스 크기 조절 */
+            border-radius: 7px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+
+            /* 🔹 박스 크기 유지 */
+            display: inline-block;
+            /* ✅ 자동 크기 조정 */
+
+            /* 🔹 오른쪽 정렬 */
+            position: absolute;
+            right: 22px;
+            /* 원하는 만큼 조정 */
+            top: 200px;
+            /* 원하는 위치로 조정 */
+        }
+
+
+        #myRankContainer:hover {
+            transform: scale(1.05);
+            /* 🔹 마우스 올리면 살짝 커지게 */
+        }
     </style>
 </head>
 
@@ -240,6 +278,9 @@
 
     <div class="container">
         <h1>랭킹</h1>
+
+        <!-- 🔹 랭킹 초기화 안내 문구 추가 -->
+        <p class="ranking-info"> ⭐ 랭킹은 1분 30초마다 초기화됩니다. ⭐</p>
 
         <div id="myRankContainer" style="text-align:right; font-weight:bold; margin-bottom: 10px;"></div>
 
