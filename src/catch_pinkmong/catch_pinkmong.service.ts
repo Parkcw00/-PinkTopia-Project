@@ -195,6 +195,7 @@ export class CatchPinkmongService {
     // 2. 전투 종료 및 데이터 삭제
     await this.catchRepo.removeCatchPinkmong(catchRecord);
     this.catchAttempts.delete(catchRecord.id);
+    console.log('userId', userId);
     await this.valkeyService.del(`pinkmong_battle:${userId}`); // ✅ Valkey에서 삭제
 
     return { message: `성공적으로 도망쳤습니다!`, success: false };

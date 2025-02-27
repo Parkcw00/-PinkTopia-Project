@@ -95,8 +95,6 @@ export class DirectionService {
         });
       }
     }
-
-    // console.log(`왔음`);
     //console.log({ bookmarksS, bookmarksP });
     return { bookmarksS, bookmarksP };
   }
@@ -117,11 +115,7 @@ export class DirectionService {
     /** Sub업적 */
     try {
       // 서브업적 키만 가져옴
-
       // 반복문 돌면서 키값으로 데이터 읽어오기  -   5m 이내인 경우만
-
-      /** 서브 업적 키 조회 */
-
       /** 서브 업적 키 조회 */
       const keysS: string[] =
         await this.valkeyService.getKeysByPattern(`sub-achievement:*`);
@@ -139,16 +133,7 @@ export class DirectionService {
       let nearBybookmarksS = allData.flat();
       nearBybookmarksS = nearBybookmarksS.filter((bookmark: any) => {
         if (!bookmark.latitude || !bookmark.longitude) return false;
-        const result1 = getDistance(
-          {
-            latitude: user_direction.latitude,
-            longitude: user_direction.longitude,
-          },
-          {
-            latitude: Number(bookmark.latitude),
-            longitude: Number(bookmark.longitude),
-          }, // 반경 5m 내에 있는지 체크
-        );
+
         const result = isPointWithinRadius(
           {
             latitude: user_direction.latitude,
@@ -235,11 +220,17 @@ export class DirectionService {
         console.log(
           `이벤트 실행: 유저 ${user_id}가 북마크 [${nearestBookmarkP.title}] 주변에 진입했습니다.`,
         );
-        this.directionGateway.sendPopup(
-          client,
-          user_id,
-          `핑크몽 [${nearestBookmarkP.title}]에 접근했습니다!`,
-        );
+        // 변경됨: 팝업을 즉시 전송하고, 2분 후에 재전송하는 재귀 함수 사용
+        const sendPopupRecursively = () => {
+          this.directionGateway.sendPopup(
+            client,
+            user_id,
+            `핑크몽 [${nearestBookmarkP.title}]에 접근했습니다!`,
+          );
+          setTimeout(sendPopupRecursively, 120000); // 2분 후에 재호출
+        };
+        sendPopupRecursively();
+
         if (nearestBookmarkP.region_theme) {
           try {
             // [변경됨]: axios.post 호출 시, payload에 nearestBookmarkP 정보 포함
