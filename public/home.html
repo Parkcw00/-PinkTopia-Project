@@ -5,13 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>홈 | PinkTopia</title>
-    <link rel="stylesheet" href="/public/H,J,C/styles.css">
     <style>
         body {
+            width: 100%;
+            height: 100%;
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f9f9f9;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
         }
 
         .container {
@@ -217,7 +223,8 @@
 
 <body>
 
-    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=5dc1bc6ffb574e60204390643bad8557"></script>
+    <script
+        src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=5dc1bc6ffb574e60204390643bad8557&libraries=services,clusterer,drawing"></script>
     <div class="nav">
         <!-- 햄버거 메뉴 아이콘 추가 -->
         <div class="menu-icon" onclick="openSidebar()">
@@ -252,9 +259,9 @@
                     <div class="mb-3">
                         <label for="end" class="form-label">도착지</label>
                         <input type="text" class="form-control" id="end" placeholder="도착지를 입력하세요">
-                    </div>
-                    <button class="route-button" onclick="findRoute()"
-                        style="width: 100%; padding: 10px; background: #ff69b4; color: white; border: none; border-radius: 5px; cursor: pointer;">길찾기</button>
+                    </div><!-- onclick="findRoute()" -->
+                    <button class="route-button" onclick="openDirection()" style="width: 100%; padding: 10px; background: #ff69b4; color: white; border: none;
+                        border-radius: 5px; cursor: pointer;">길찾기</button>
                 </div>
                 <div id="route-result" style="margin-top: 20px;">
                     <!-- 길찾기 결과가 여기에 표시됩니다 -->
@@ -306,6 +313,87 @@
                         infowindow.open(map, marker);
                         map.setCenter(locPosition);
                     }
+
+
+                    // 로컬 스토리지에서 저장된 출발지와 도착지 정보를 가져옴
+                    let savedStart = JSON.parse(localStorage.getItem('startLocation'));
+                    let savedEnd = JSON.parse(localStorage.getItem('endLocation'));
+
+                    // 확대/축소 컨트롤 추가
+                    let zoomControl = new kakao.maps.ZoomControl();
+                    map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+                    // 마커 정보 배열
+                    let markers = [
+                        {
+                            key: 'start',
+                            info: '출발지',
+                            position: savedStart
+                                ? new kakao.maps.LatLng(savedStart.lat, savedStart.lng)
+                                : new kakao.maps.LatLng(36.3275, 127.4268),
+                            imageUrl:
+                                'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/red_b.png',
+                            storageKey: 'startLocation',
+                        },
+                        {
+                            key: 'end',
+                            info: '도착지',
+                            position: savedEnd
+                                ? new kakao.maps.LatLng(savedEnd.lat, savedEnd.lng)
+                                : new kakao.maps.LatLng(36.340309, 127.389999),
+                            imageUrl:
+                                'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/blue_b.png',
+                            storageKey: 'endLocation',
+                        },
+                    ];
+
+                    // 마커를 지도에 추가하고 이벤트 등록
+                    markers.forEach(function (data) {
+                        let markerImage = new kakao.maps.MarkerImage(
+                            data.imageUrl,
+                            new kakao.maps.Size(50, 50),
+                        );
+                        let marker = new kakao.maps.Marker({
+                            position: data.position,
+                            image: markerImage,
+                            map: map,
+                            draggable: true,
+                        });
+
+                        // 마커 위에 정보창 추가
+                        let infowindow = new kakao.maps.InfoWindow({
+                            content: `<div style="padding:5px;">${data.info}</div>`,
+                        });
+                        infowindow.open(map, marker);
+
+                        // 마커 드래그 후 위치 변경 시 로컬 스토리지에 저장
+                        kakao.maps.event.addListener(marker, 'dragend', function () {
+                            let position = marker.getPosition();
+                            localStorage.setItem(
+                                data.storageKey,
+                                JSON.stringify({ lat: position.getLat(), lng: position.getLng() }),
+                            );
+                            console.log(
+                                `${data.info} 위치 저장됨:`,
+                                position.getLat(),
+                                position.getLng(),
+                            );
+                        });
+
+                        // 마커 객체 저장
+                        data.marker = marker;
+                    });
+
+                    // 길찾기 버튼 클릭 시 카카오맵 길찾기 URL을 새 창에서 엶
+                    function openDirection() {
+                        let start = markers.find((m) => m.key === 'start').marker.getPosition();
+                        let end = markers.find((m) => m.key === 'end').marker.getPosition();
+
+                        // 카카오맵 길찾기 링크 생성 및 새 창에서 열기
+                        let url = `https://map.kakao.com/link/to/도착지,${end.getLat()},${end.getLng()}/from/출발지,${start.getLat()},${start.getLng()}`;
+                        window.open(url, '_blank');
+                    }
+
 
                     // 여기서 북마커 호출
                     let markerData = [];
