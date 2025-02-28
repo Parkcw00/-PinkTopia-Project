@@ -18,7 +18,9 @@ export class CatchPinkmongService {
   ) {}
 
   // 🔹 핑크몽 등장 (전투 시작 시 Valkey에 저장)
-  async appearPinkmong(userId: number): Promise<{ message: string }> {
+  async appearPinkmong(
+    userId: number,
+  ): Promise<{ pinkmongImage?: string; message: string }> {
     // 1. 유저 조회
     const user = await this.catchRepo.getUser(userId);
     // 2. 인벤토리 조회
@@ -31,15 +33,18 @@ export class CatchPinkmongService {
       return { message: `이미 다른 핑크몽이 등장 중입니다!` };
     }
 
-    // ✅ 4. 등급 결정 (전설: 5%, 희귀: 35%, 보통: 60%)
-    const r = Math.random();
+    // 4. 등급을 고정 확률로 랜덤 선택
+    // 확률: legendary (전설) 5%, ultra_rare (초희귀) 10%, rare (희귀) 35%, common (보통) 50%
+    const r = Math.random(); // 0 ~ 1 사이의 난수 생성
     let selectedGrade: string;
     if (r < 0.05) {
-      selectedGrade = 'legendary';
-    } else if (r < 0.05 + 0.35) {
-      selectedGrade = 'rare';
+      selectedGrade = 'legendary'; // 난수가 0 ~ 0.05이면 전설
+    } else if (r < 0.05 + 0.1) {
+      selectedGrade = 'epic'; // 난수가 0.05 이상 0.15 미만이면 초희귀
+    } else if (r < 0.05 + 0.1 + 0.35) {
+      selectedGrade = 'rare'; // 난수가 0.15 이상 0.50 미만이면 희귀
     } else {
-      selectedGrade = 'common';
+      selectedGrade = 'common'; // 그 외에는 보통
     }
 
     // ✅ 5. 선택된 등급과 지역에 따른 핑크몽 선택
@@ -80,6 +85,7 @@ export class CatchPinkmongService {
     );
 
     return {
+      pinkmongImage: selectedPinkmong.pinkmong_image,
       message: `${selectedPinkmong.name}이(가) 등장했다! (등급: ${selectedGrade})`,
     };
   }
@@ -112,13 +118,29 @@ export class CatchPinkmongService {
     if (item.count > 0) {
       item.count -= 1;
       await this.catchRepo.updateItem(item);
+
+      // Valkey에 인벤토리 아이템 목록 업데이트
+      const invenItemsKey = `invenItems:${userId}`;
+      const existingItems: any = await this.valkeyService.get(
+        `invenItems:${userId}`,
+      );
+
+      const updatedItems = existingItems.map((existingItem) =>
+        existingItem.id === item.id
+          ? {
+              ...existingItem,
+              count: item.count,
+            }
+          : existingItem,
+      );
+      await this.valkeyService.set(invenItemsKey, updatedItems, 3600); // 1시간 TTL
     } else {
       throw new BadRequestException('해당 아이템의 수량이 부족합니다.');
     }
 
     // 4. 포획 확률 계산
     const baseCatchRate = 0.1;
-    const getChanceIncrease = { 2: 0.15, 3: 0.27, 4: 0.35 };
+    const getChanceIncrease = { 2: 0.15, 3: 0.3 };
     const bonus = getChanceIncrease[item.id] || 0;
     const finalCatchRate = baseCatchRate + bonus;
 
@@ -173,6 +195,7 @@ export class CatchPinkmongService {
     // 2. 전투 종료 및 데이터 삭제
     await this.catchRepo.removeCatchPinkmong(catchRecord);
     this.catchAttempts.delete(catchRecord.id);
+    console.log('userId', userId);
     await this.valkeyService.del(`pinkmong_battle:${userId}`); // ✅ Valkey에서 삭제
 
     return { message: `성공적으로 도망쳤습니다!`, success: false };

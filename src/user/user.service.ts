@@ -15,12 +15,14 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { ValkeyService } from 'src/valkey/valkey.service';
+import { S3Service } from 'src/s3/s3.service'; // S3 서비스 추가
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
+  // logOutUsers: any;
   logOutUsers: { [key: number]: boolean } = {};
 
   constructor(
@@ -29,6 +31,7 @@ export class UserService {
     private configService: ConfigService,
     private readonly inventoryService: InventoryService,
     private readonly valkeyService: ValkeyService,
+    private readonly s3Service: S3Service, // S3 서비스 추가
   ) {}
 
   // 🔹 컬렉션 포인트 랭킹 조회 (Valkey 적용)
@@ -63,6 +66,52 @@ export class UserService {
     await this.valkeyService.set(cacheKey, rankingData, 300); // 5분 캐싱
 
     return rankingData;
+  }
+
+  // 🔹 프로필 이미지 업로드
+  async uploadProfileImage(user: any, file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('파일을 업로드해 주세요.');
+    }
+
+    // S3 업로드 후 이미지 URL 저장
+    const imageUrl = await this.s3Service.uploadFile(file);
+    await this.userRepository.updateMyInfo(
+      user.email,
+      undefined,
+      undefined,
+      imageUrl,
+    );
+
+    return { message: '프로필 이미지가 업로드되었습니다.', imageUrl };
+  }
+
+  // 🔹 프로필 이미지 삭제
+  async deleteProfileImage(user: any) {
+    const existingUser = await this.userRepository.findEmail(user.email);
+    if (!existingUser) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    }
+
+    if (!existingUser.profile_image) {
+      throw new BadRequestException('삭제할 프로필 이미지가 없습니다.');
+    }
+
+    // S3에서 삭제
+    const imageKey = existingUser.profile_image.split('/').pop();
+    if (imageKey) {
+      await this.s3Service.deleteFile(imageKey);
+    }
+
+    // 기본 이미지로 변경
+    await this.userRepository.updateMyInfo(
+      user.email,
+      undefined,
+      undefined,
+      '',
+    );
+
+    return { message: '프로필 이미지가 삭제되었습니다.' };
   }
 
   // 회원가입
@@ -183,7 +232,7 @@ export class UserService {
     if (!existEmail) {
       throw new BadRequestException('존재하는지 않는 이메일입니다.');
     }
-
+    console.log(`------>`, existEmail);
     if (existEmail.email_verify === false) {
       throw new BadRequestException('이메일 인증을 진행해 주세요');
     }

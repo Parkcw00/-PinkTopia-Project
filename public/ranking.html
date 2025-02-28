@@ -1,86 +1,24 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>핑크몽 상세보기</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>랭킹 | PinkTopia</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #fff0f5;
             margin: 0;
             padding: 0;
+            background-color: #f9f9f9;
         }
 
         .container {
-            width: 50%;
-            margin: 50px auto;
-            background: white;
-            border-radius: 10px;
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
-            box-shadow: 0px 0px 10px rgba(255, 105, 180, 0.5);
-            text-align: center;
         }
 
-        .details {
-            text-align: left;
-            margin: 20px auto;
-            width: 80%;
-        }
-
-        img {
-            max-width: 300px;
-            margin-top: 10px;
-            border-radius: 10px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .back-button {
-            display: block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #ff69b4;
-            border: none;
-            color: white;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 1em;
-        }
-
-        .back-button:hover {
-            background-color: #ff1493;
-        }
-
-        .grade {
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 5px;
-            display: inline-block;
-        }
-
-        .common {
-            color: green;
-        }
-
-        .rare {
-            color: blue;
-        }
-
-        .epic {
-            color: purple;
-        }
-
-        .legendary {
-            color: rgb(209, 178, 0);
-            font-size: 1.2em;
-            text-shadow: 1px 1px 5px gold;
-        }
-
-        /* 네비게이션 바 스타일 */
         .nav {
             display: flex;
             justify-content: space-between;
@@ -91,6 +29,78 @@
             font-weight: bold;
             position: relative;
             height: 50px;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .ranking-section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            padding: 20px;
+        }
+
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .ranking-table th,
+        .ranking-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .ranking-table th {
+            background-color: #ff69b4;
+            color: white;
+        }
+
+        .ranking-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .ranking-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .rank {
+            font-weight: bold;
+            color: #ff69b4;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .tab.active {
+            background-color: #ff69b4;
+            color: white;
+        }
+
+        .ranking-section {
+            display: none;
+        }
+
+        .ranking-section.active {
+            display: block;
         }
 
         /* 햄버거 메뉴 아이콘 스타일 */
@@ -213,7 +223,6 @@
             <a href="/public/board.html">게시글 (커뮤니티)</a>
             <a href="/public/ranking.html">랭킹</a>
             <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
-            <!-- 로그인 시 표시될 메뉴들 -->
             <div id="loggedInMenu" style="display: none;">
                 <a href="/public/chattingrooms.html">채팅</a>
                 <a href="/public/collection.html">핑크몽 개인 도감</a>
@@ -222,7 +231,6 @@
                 <a href="/public/mypage.html">마이페이지</a>
                 <a href="#" onclick="logout()">로그아웃</a>
             </div>
-            <!-- 로그인 안 된 경우 표시될 메뉴들 -->
             <div id="loggedOutMenu">
                 <a href="/public/log-in.html">로그인</a>
                 <a href="/public/sign-up.html">회원가입</a>
@@ -231,54 +239,45 @@
     </div>
 
     <div class="container">
-        <h1 id="pinkmong-name">핑크몽 이름</h1>
-        <img id="pinkmong-image" src="" alt="핑크몽 이미지">
-        <div class="details">
-            <p><strong>설명:</strong> <span id="pinkmong-explain">정보 없음</span></p>
-            <p><strong>테마:</strong> <span id="pinkmong-theme">정보 없음</span></p>
-            <p><strong>등급:</strong> <span id="pinkmong-grade" class="grade">정보 없음</span></p>
+        <h1>랭킹</h1>
+
+        <div class="tabs">
+            <div class="tab active" onclick="showRanking('point')">포인트 랭킹</div>
+            <div class="tab" onclick="showRanking('achievement')">
+                업적 달성 랭킹
+            </div>
         </div>
-        <button class="back-button" onclick="goBack()">뒤로 가기</button>
+
+        <div class="ranking-section active" id="pointRankingSection">
+            <h2>포인트 랭킹</h2>
+            <table class="ranking-table" id="pointRanking">
+                <thead>
+                    <tr>
+                        <th>순위</th>
+                        <th>닉네임</th>
+                        <th>포인트</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="ranking-section" id="achievementRankingSection">
+            <h2>업적 달성 랭킹</h2>
+            <table class="ranking-table" id="achievementRanking">
+                <thead>
+                    <tr>
+                        <th>순위</th>
+                        <th>닉네임</th>
+                        <th>달성 업적 수</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        async function fetchPinkmongDetail() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const pinkmongId = urlParams.get('id');
-            if (!pinkmongId) {
-                alert('잘못된 접근입니다.');
-                window.location.href = 'pinkmonglist.html';
-                return;
-            }
-
-            try {
-                const response = await fetch(`http://localhost:3000/pinkmong/${pinkmongId}`);
-                if (!response.ok) throw new Error('네트워크 응답이 올바르지 않습니다.');
-                const pinkmong = await response.json();
-
-                document.getElementById('pinkmong-name').textContent = pinkmong.name;
-                document.getElementById('pinkmong-explain').textContent = pinkmong.explain || '정보 없음';
-                document.getElementById('pinkmong-theme').textContent = pinkmong.region_theme || '정보 없음';
-
-                const gradeElement = document.getElementById('pinkmong-grade');
-                gradeElement.textContent = pinkmong.grade || '정보 없음';
-                gradeElement.className = `grade ${pinkmong.grade}`;
-
-                if (pinkmong.pinkmong_image) {
-                    document.getElementById('pinkmong-image').src = pinkmong.pinkmong_image;
-                    document.getElementById('pinkmong-image').alt = pinkmong.name;
-                } else {
-                    document.getElementById('pinkmong-image').style.display = 'none';
-                }
-            } catch (error) {
-                console.error('핑크몽 상세 정보를 불러오는 중 오류 발생:', error);
-            }
-        }
-
-        function goBack() {
-            window.history.back();
-        }
-
         function openSidebar() {
             document.getElementById('sidebar').style.width = "250px";
         }
@@ -334,7 +333,66 @@
         }
 
 
-        document.addEventListener('DOMContentLoaded', fetchPinkmongDetail);
+        function showRanking(type) {
+            // 모든 탭과 섹션의 active 클래스 제거
+            document
+                .querySelectorAll('.tab')
+                .forEach((tab) => tab.classList.remove('active'));
+            document
+                .querySelectorAll('.ranking-section')
+                .forEach((section) => section.classList.remove('active'));
+
+            // 선택된 탭과 섹션에 active 클래스 추가
+            if (type === 'point') {
+                document.querySelector('.tab:first-child').classList.add('active');
+                document
+                    .getElementById('pointRankingSection')
+                    .classList.add('active');
+            } else {
+                document.querySelector('.tab:last-child').classList.add('active');
+                document
+                    .getElementById('achievementRankingSection')
+                    .classList.add('active');
+            }
+        }
+
+        async function fetchRankings() {
+            try {
+                // 포인트 랭킹 가져오기
+                const pointResponse = await fetch('/user/ranking/point');
+                const pointData = await pointResponse.json();
+                displayRanking('pointRanking', pointData, 'collection_point');
+
+                // 업적 랭킹 가져오기
+                const achievementResponse = await fetch('/user/ranking/achievement');
+                const achievementData = await achievementResponse.json();
+                displayRanking(
+                    'achievementRanking',
+                    achievementData,
+                    'achievementCount',
+                );
+            } catch (error) {
+                console.error(
+                    '랭킹 데이터를 가져오는 중 오류가 발생했습니다:',
+                    error,
+                );
+            }
+        }
+
+        function displayRanking(tableId, data, scoreField) {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            tbody.innerHTML = '';
+
+            data.forEach((user, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="rank">${index + 1}</td>
+                    <td>${user.nickname}</td>
+                    <td>${user[scoreField]}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
     </script>
 </body>
 

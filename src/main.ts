@@ -50,7 +50,6 @@ async function bootstrap() {
     });
     next();
   });
-
   const options = new DocumentBuilder()
     .setTitle('Your API Title')
     .addBearerAuth()
