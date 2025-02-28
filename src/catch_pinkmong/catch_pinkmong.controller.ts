@@ -26,7 +26,7 @@ export class CatchPinkmongController {
   }
 
   @Post('giveup')
-  async giveUp(@Body('userId') userId: number) {
-    return this.catchPinkmongService.giveup(userId);
+  async giveUp(@Request() req) {
+    return this.catchPinkmongService.giveup(req.user.id);
   }
 }

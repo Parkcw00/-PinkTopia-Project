@@ -3,14 +3,19 @@ import {
   WebSocketGateway,
   WebSocketServer,
   SubscribeMessage,
+  ConnectedSocket,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway()
 export class DirectionGateway {
   @WebSocketServer() server: Server;
 
-  sendPopup(userId: number, message: string) {
-    this.server.emit('showPopup', { userId, message });
+  sendPopup(
+    @ConnectedSocket() client: Socket,
+    userId: number,
+    message: string,
+  ) {
+    client.emit('showPopup', { userId, message });
   }
 }
