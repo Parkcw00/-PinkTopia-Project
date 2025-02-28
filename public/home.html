@@ -224,10 +224,41 @@
             left: 50%;
             transform: translate(-50%, -50%);
             padding: 20px;
-            background-color: white;
-            border: 1px solid #ccc;
+            background-color: #ff84c1;
+            border: 1px solid #ff84c1;
             z-index: 1000;
             text-align: center;
+        }
+
+        #userProfileBox {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            /* 배경을 흰색으로 설정 */
+            padding: 10px 15px;
+            border-radius: 20px;
+            /* 둥근 네모 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #ff5faf;
+            /* 기본 글자색 */
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        #userProfileBox img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+            border: 2px solid #ff7fbf;
+            /* 핑크 테두리 */
+        }
+
+        #userProfileBox .welcome-text {
+            color: #ff78bc;
+            /* 핑크색 */
+            font-weight: bold;
         }
     </style>
 </head>
@@ -249,6 +280,8 @@
         <div class="logo-text">
             <a href="/public/home.html" style="text-decoration: none; color: white">PinkTopia</a>
         </div>
+        <!-- 로그인 상태에 따라 변경될 영역 -->
+        <div id="authMenu" style="margin-left: auto; display: flex; align-items: center;"></div>
     </div>
     <div class="container">
         <h1>홈</h1>
@@ -545,6 +578,45 @@
                 `;
             }
         });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            checkLoginStatus();
+        });
+
+        function checkLoginStatus() {
+            const accessToken = localStorage.getItem("accessToken");
+            const authMenu = document.getElementById("authMenu");
+
+            if (accessToken) {
+                fetch("http://localhost:3000/user/me", {
+                    headers: { "Authorization": accessToken }
+                })
+                    .then(response => response.json())
+                    .then(userData => {
+                        const profileImage = userData.profile_image || "/public/images/default-profile.png"; // 기본 이미지
+
+                        authMenu.innerHTML = `
+                    <div id="userProfileBox" onclick="goToProfile()" style="cursor: pointer;">
+                    <img src="${profileImage}" alt="프로필 사진">
+                    <span><span class="welcome-text">환영합니다!</span> <strong>${userData.nickname}</strong>님!</span>
+                    </div>
+                    <a href="#" onclick="logout()" style="margin-left: 15px; color: white; text-decoration: none;">로그아웃</a>
+                `;
+                    })
+                    .catch(error => {
+                        console.error("유저 정보 불러오기 실패:", error);
+                        authMenu.innerHTML = `<a href="/public/log-in.html" style="color: white;">로그인</a> / <a href="/public/sign-up.html" style="color: white;">회원가입</a>`;
+                    });
+            } else {
+                authMenu.innerHTML = `<a href="/public/log-in.html" style="color: white;">로그인</a> / <a href="/public/sign-up.html" style="color: white;">회원가입</a>`;
+            }
+        }
+
+        function goToProfile() {
+            window.location.href = "/public/mypage.html";
+        }
+
+
         async function logout() {
             try {
                 const accessToken = localStorage.getItem("accessToken");
@@ -566,23 +638,13 @@
                 }
                 localStorage.removeItem("accessToken");
                 console.log("✅ 로그아웃 성공! 페이지 이동");
-                window.location.href = "/public/log-in.html";
+                window.location.href = "/";
             } catch (error) {
                 console.error("❌ 로그아웃 실패:", error);
                 alert("로그아웃 중 오류가 발생했습니다.");
             }
         }
-        /*  function findRoute() {
-              const start = document.getElementById('start').value;
-              const end = document.getElementById('end').value;
-              alert('길찾기 기능은 현재 개발 중입니다.\n출발지: ' + start + '\n도착지: ' + end);
-              const routeResult = document.getElementById('route-result');
-              routeResult.innerHTML = `
-                  <div style="padding: 10px; background: #f8f9fa; border-radius: 5px;">
-                      <p>검색 결과가 여기에 표시됩니다.<-임시</p>
-                  </div>
-              `;
-          }*/
+
     </script>
     <div id="sidebar" class="sidebar">
         <div class="sidebar-header">
