@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateChattingDto } from './dto/create-chatting.dto';
 import { Chatmember } from '../chatmember/entities/chatmember.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class ChattingRepository {
@@ -12,6 +13,8 @@ export class ChattingRepository {
     private readonly chattingRepository: Repository<Chatting>,
     @InjectRepository(Chatmember)
     private readonly chatmemberRepository: Repository<Chatmember>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async create(
@@ -45,13 +48,10 @@ export class ChattingRepository {
     }));
   }
   async getUserNickname(user_id: any) {
-    const user = await this.chattingRepository.findOne({
-      where: { user_id: user_id },
-      relations: ['user'], // User 엔티티와의 관계를 가져옵니다.
+    const user = await this.userRepository.findOne({
+      where: { id: user_id },
       select: {
-        user: {
-          nickname: true,
-        },
+        nickname: true,
       },
     });
     return user; // 유저의 닉네임 반환

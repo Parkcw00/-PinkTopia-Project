@@ -20,13 +20,13 @@ export class CatchPinkmongController {
     return this.catchPinkmongService.appearPinkmong(req.user.id);
   }
 
-  @Get('feeding')
+  @Post('feeding')
   feeding(@Request() req, @Body('itemId', ParseIntPipe) itemId: number) {
     return this.catchPinkmongService.feeding(req.user.id, itemId);
   }
 
   @Post('giveup')
-  async giveUp(@Body('userId') userId: number) {
-    return this.catchPinkmongService.giveup(userId);
+  async giveUp(@Request() req) {
+    return this.catchPinkmongService.giveup(req.user.id);
   }
 }

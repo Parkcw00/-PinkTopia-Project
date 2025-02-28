@@ -15,13 +15,15 @@ import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { InventoryService } from 'src/inventory/inventory.service';
 import { ValkeyService } from 'src/valkey/valkey.service';
+import { S3Service } from 'src/s3/s3.service'; // S3 서비스 추가
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  // logOutUsers: { [key: number]: boolean } = {};
+  // logOutUsers: any;
+  logOutUsers: { [key: number]: boolean } = {};
 
   constructor(
     private readonly userRepository: UserRepository,
@@ -29,14 +31,87 @@ export class UserService {
     private configService: ConfigService,
     private readonly inventoryService: InventoryService,
     private readonly valkeyService: ValkeyService,
+    private readonly s3Service: S3Service, // S3 서비스 추가
   ) {}
 
+  // 🔹 컬렉션 포인트 랭킹 조회 (Valkey 적용)
   async getRanking() {
-    return await this.userRepository.findUsersByCollectionPoint();
+    const cacheKey = 'ranking:collection_point';
+
+    // Valkey에서 먼저 조회
+    const cachedData = await this.valkeyService.get(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
+
+    // Valkey에 데이터가 없으면 DB에서 조회 후 캐싱
+    const rankingData = await this.userRepository.findUsersByCollectionPoint();
+    await this.valkeyService.set(cacheKey, rankingData, 300); // 5분 캐싱
+
+    return rankingData;
   }
 
+  // 🔹 업적 랭킹 조회 (Valkey 적용)
   async getRankingAchievement() {
-    return await this.userRepository.findUsersByAchievement();
+    const cacheKey = 'ranking:achievement';
+
+    // Valkey에서 먼저 조회
+    const cachedData = await this.valkeyService.get(cacheKey);
+    if (cachedData) {
+      return cachedData;
+    }
+
+    // Valkey에 데이터가 없으면 DB에서 조회 후 캐싱
+    const rankingData = await this.userRepository.findUsersByAchievement();
+    await this.valkeyService.set(cacheKey, rankingData, 300); // 5분 캐싱
+
+    return rankingData;
+  }
+
+  // 🔹 프로필 이미지 업로드
+  async uploadProfileImage(user: any, file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('파일을 업로드해 주세요.');
+    }
+
+    // S3 업로드 후 이미지 URL 저장
+    const imageUrl = await this.s3Service.uploadFile(file);
+    await this.userRepository.updateMyInfo(
+      user.email,
+      undefined,
+      undefined,
+      imageUrl,
+    );
+
+    return { message: '프로필 이미지가 업로드되었습니다.', imageUrl };
+  }
+
+  // 🔹 프로필 이미지 삭제
+  async deleteProfileImage(user: any) {
+    const existingUser = await this.userRepository.findEmail(user.email);
+    if (!existingUser) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    }
+
+    if (!existingUser.profile_image) {
+      throw new BadRequestException('삭제할 프로필 이미지가 없습니다.');
+    }
+
+    // S3에서 삭제
+    const imageKey = existingUser.profile_image.split('/').pop();
+    if (imageKey) {
+      await this.s3Service.deleteFile(imageKey);
+    }
+
+    // 기본 이미지로 변경
+    await this.userRepository.updateMyInfo(
+      user.email,
+      undefined,
+      undefined,
+      '',
+    );
+
+    return { message: '프로필 이미지가 삭제되었습니다.' };
   }
 
   // 회원가입
@@ -152,11 +227,12 @@ export class UserService {
       throw new BadRequestException('비밀번호를 입력해 주세요');
     }
 
+    // 1️⃣ 🔹 DB에서 유저 정보 조회
     const existEmail = await this.userRepository.findEmail(email);
     if (!existEmail) {
       throw new BadRequestException('존재하는지 않는 이메일입니다.');
     }
-
+    console.log(`------>`, existEmail);
     if (existEmail.email_verify === false) {
       throw new BadRequestException('이메일 인증을 진행해 주세요');
     }
@@ -181,6 +257,7 @@ export class UserService {
       throw new InternalServerErrorException('관리자에게 문의해 주세요');
     }
 
+    // 3️⃣ 🔹 Access Token & Refresh Token 생성
     const accessToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
       expiresIn: accessTokenExpiresIn,
@@ -203,10 +280,25 @@ export class UserService {
       path: '/',
       domain: 'localhost',
     });
-    // if (this.logOutUsers[existEmail.id]) {
-    //   delete this.logOutUsers[existEmail.id];
-    // }
-    await this.valkeyService.del(`logoutUser:${existEmail.id}`);
+    if (this.logOutUsers[existEmail.id]) {
+      delete this.logOutUsers[existEmail.id];
+    }
+
+    // 5️⃣ 🔹 Valkey(발키)에 유저 정보 저장 (12시간 후 자동 삭제)
+    const cacheKey = `user:${existEmail.email}`;
+    const userData = {
+      id: existEmail.id,
+      email: existEmail.email,
+      nickname: existEmail.nickname,
+      profile_image: existEmail.profile_image,
+      collection_point: existEmail.collection_point,
+      pink_gem: existEmail.pink_gem,
+      pink_dia: existEmail.pink_dia,
+      role: existEmail.role,
+    };
+
+    await this.valkeyService.set(cacheKey, userData, 60 * 60 * 12); // 12시간 (초 단위)
+
     return res.status(200).json({ message: '로그인이 되었습니다.' });
   }
 
@@ -218,8 +310,12 @@ export class UserService {
     });
     res.setHeader('Authorization', `Bearer ${accessToken}`);
     res.clearCookie('refreshToken');
-    // this.logOutUsers[user.id] = true;
-    await this.valkeyService.set(`logoutUser:${user.id}`, 'true');
+
+    // 🔹 Valkey에서 해당 유저 정보 삭제 (DB는 건드리지 않음)
+    const cacheKey = `user:${user.email}`;
+    await this.valkeyService.del(cacheKey);
+
+    this.logOutUsers[user.id] = true;
     return res.status(200).json({ message: '로그아웃이 되었습니다.' });
   }
 

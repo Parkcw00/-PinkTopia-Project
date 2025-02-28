@@ -34,28 +34,6 @@ export class LocationHistoryController {
       await this.locationHistoryService.createDefault(user_id);
     return { message: '기본 위치 데이터 생성 완료', locationHistory };
   }
-  // /**
-  //  * ✅
-  //  * 엔드포인트: **POST /location-history/valkey**
-  //  */
-  // @UseGuards(UserGuard)
-  // @Post('valkey')
-  // async createValkey(@Request() req) {
-  //   console.log(
-  //     `✅ [Controller] 로그인 후 createValkey() 실행 - user_id: ${req.user.id}`,
-  //   );
-
-  //   // ✅ 로그인 시 DB에서 최신 위치 데이터를 가져와 Valkey에 저장
-  //   const updatedValkey = await this.locationHistoryService.createDBValkey(
-  //     req.user.id,
-  //   );
-  //   console.log(
-  //     `✅ [Controller] createValkey() 완료 - 저장된 데이터:`,
-  //     updatedValkey,
-  //   );
-
-  //   return { message: 'Valkey 저장 완료', data: updatedValkey };
-  // }
 
   /**
    * ✅ 10초마다 실행되어, 최신 위치 데이터를 valkey에 업데이트합니다.

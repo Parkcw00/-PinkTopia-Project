@@ -7,6 +7,9 @@ import { CreateChattingDto } from './dto/create-chatting.dto';
 import { ChattingRepository } from './chatting.repository';
 import { S3Service } from '../s3/s3.service';
 import { UploadChattingDto } from './dto/create-upload-chatting.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Chatting } from './entities/chatting.entity';
 import { ValkeyService } from 'src/valkey/valkey.service';
 
 @Injectable()
@@ -22,6 +25,7 @@ export class ChattingService {
     chatting_room_id: string,
     createChattingDto: CreateChattingDto,
   ) {
+    console.log(user, chatting_room_id, createChattingDto);
     try {
       const isMember = await this.chattingRepository.isMember(
         user.id,
@@ -81,6 +85,11 @@ export class ChattingService {
         throw new ForbiddenException('메시지 업로드 권한이 없습니다.');
       }
 
+      // 파일 형식 검증 추가
+      if (!file.mimetype.startsWith('image/')) {
+        throw new BadRequestException('이미지 파일만 업로드할 수 있습니다.');
+      }
+
       const imageUrl = await this.s3Service.uploadFile(file);
 
       // 채팅 메시지 생성 DTO
@@ -131,7 +140,7 @@ export class ChattingService {
         const nickname = await this.chattingRepository.getUserNickname(
           msg.user_id,
         );
-        return { message: msg.message, nickname: nickname?.user.nickname }; // 메시지에 닉네임 추가
+        return { message: msg.message, nickname: nickname?.nickname }; // 메시지에 닉네임 추가
       }),
     );
 

@@ -90,7 +90,7 @@ export class ChattingRoomController {
     return this.chattingRoomService.sendInviteUrl(
       req.user,
       chattingRoomId,
-      inviteUser.userId,
+      inviteUser.nickname,
     );
   }
 

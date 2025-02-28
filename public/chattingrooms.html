@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>채팅방 목록</title>
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
     <style>
         .container {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
         }
+
         .room-list {
             margin-top: 20px;
         }
+
         .room-item {
             padding: 15px;
             border: 1px solid #ddd;
@@ -21,12 +25,15 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
+
         .room-item:hover {
             background-color: #f5f5f5;
         }
+
         .create-room {
             margin-bottom: 20px;
         }
+
         .button {
             padding: 10px 20px;
             background-color: #4CAF50;
@@ -35,14 +42,17 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
         .button:hover {
             background-color: #45a049;
         }
+
         .join-room-form {
             margin-bottom: 20px;
             display: flex;
             gap: 10px;
         }
+
         .join-room-form input {
             flex: 1;
             padding: 8px;
@@ -50,23 +60,29 @@
             border-radius: 4px;
             font-size: 16px;
         }
+
         .join-room-form button {
             background-color: #2196F3;
         }
+
         .join-room-form button:hover {
             background-color: #1976D2;
         }
+
         .room-actions {
             margin-top: 10px;
             display: flex;
             gap: 10px;
         }
+
         .share-btn {
             background-color: #2196F3;
         }
+
         .share-btn:hover {
             background-color: #1976D2;
         }
+
         .modal {
             display: none;
             position: fixed;
@@ -74,9 +90,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
+            background-color: rgba(0, 0, 0, 0.5);
             z-index: 1000;
         }
+
         .modal-content {
             position: relative;
             background-color: #fff;
@@ -85,18 +102,22 @@
             width: 80%;
             max-width: 500px;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
+
         .modal-header {
             margin-bottom: 20px;
         }
+
         .modal-header h2 {
             margin: 0;
             color: #333;
         }
+
         .modal-body {
             margin-bottom: 20px;
         }
+
         .modal-body input {
             width: 100%;
             padding: 8px;
@@ -105,11 +126,13 @@
             font-size: 16px;
             box-sizing: border-box;
         }
+
         .modal-footer {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
         }
+
         .close {
             position: absolute;
             right: 10px;
@@ -118,25 +141,186 @@
             cursor: pointer;
             color: #666;
         }
+
         .close:hover {
             color: #000;
         }
+
+        .leave-btn {
+            background-color: #dc3545;
+        }
+
+        .leave-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* 네비게이션 바 스타일 */
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ff69b4;
+            padding: 15px;
+            color: white;
+            font-weight: bold;
+            position: relative;
+            height: 50px;
+        }
+
+        /* 햄버거 메뉴 아이콘 스타일 */
+        .menu-icon {
+            position: absolute;
+            left: 15px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .menu-icon .hamburger {
+            width: 25px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-icon .hamburger span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: white;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        /* 로고 컨테이너 스타일 */
+        .nav .logo-container {
+            position: absolute;
+            left: 50px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav img {
+            width: 45px;
+            height: 45px;
+            border-radius: 0;
+            object-fit: cover;
+        }
+
+        /* 로고 텍스트 */
+        .nav .logo-text {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+        }
+
+        /* 사이드바 스타일 */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            background-color: #ff69b4;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar a {
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar a:hover {
+            background-color: #ff4da6;
+        }
+
+        .close-sidebar {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 36px;
+            cursor: pointer;
+            color: white;
+        }
     </style>
 </head>
+
 <body>
+    <div class="nav">
+        <div class="menu-icon" onclick="openSidebar()">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        <div class="logo-container">
+            <img src="/public/images/123.jpg" alt="PinkTopia Logo">
+        </div>
+        <div class="logo-text">
+            <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
+        </div>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+        </div>
+        <div class="sidebar-content">
+            <a href="/public/home.html">홈</a>
+            <a href="/public/event.html">이벤트</a>
+            <a href="/public/store-item.html">아이템샵</a>
+            <a href="/public/board.html">게시글 (커뮤니티)</a>
+            <a href="/public/ranking.html">랭킹</a>
+            <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
+            <!-- 로그인 시 표시될 메뉴들 -->
+            <div id="loggedInMenu" style="display: none;">
+                <a href="/public/chattingrooms.html">채팅</a>
+                <a href="/public/collection.html">핑크몽 개인 도감</a>
+                <a href="/public/inventory.html">인벤토리 아이템</a>
+                <a href="/public/achievements.html">업적</a>
+                <a href="/public/mypage.html">마이페이지</a>
+                <a href="#" onclick="logout()">로그아웃</a>
+            </div>
+            <!-- 로그인 안 된 경우 표시될 메뉴들 -->
+            <div id="loggedOutMenu">
+                <a href="/public/log-in.html">로그인</a>
+                <a href="/public/sign-up.html">회원가입</a>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <h1>채팅방 목록</h1>
-        
+
+        <script>
+            let socket;  // 전역 socket 변수 선언
+        </script>
+
         <!-- 채팅방 직접 입장 폼 추가 -->
         <div class="join-room-form">
-            <input type="text" id="roomInput" placeholder="채팅방 ID 또는 초대 링크 입력">
+            <input type="text" id="roomInput" placeholder="초대 링크 입력">
             <button class="button" onclick="joinDirectRoom()">채팅방 입장</button>
         </div>
 
         <div class="create-room">
             <button class="button" onclick="createRoom()">새 채팅방 만들기</button>
         </div>
-        
+
         <div class="room-list" id="roomList">
             <!-- 채팅방 목록이 여기에 동적으로 추가됨 -->
         </div>
@@ -163,46 +347,44 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const accessToken = localStorage.getItem('accessToken');
             if (!accessToken) {
-                redirectToLogin();
+                window.location.href = '/';
                 return;
             }
 
-            // 채팅방 목록 불러오기
-            loadRooms();
-        });
-
-        async function loadRooms() {
             try {
+                // 채팅방 목록 가져오기
                 const response = await fetch('/chattingroom', {
                     headers: {
                         'Authorization': localStorage.getItem('accessToken')
                     }
                 });
-                const result = await response.json();
-                
-                // chattingRooms 배열 추출
-                const data = result.chattingRooms;
-                if (!Array.isArray(data)) {
-                    console.error('잘못된 데이터 형식:', result);
-                    throw new Error('채팅방 데이터 형식이 올바르지 않습니다.');
+
+                if (!response.ok) {
+                    throw new Error('채팅방 목록을 불러오는데 실패했습니다.');
                 }
-                
-                const roomList = document.getElementById('roomList');
-                roomList.innerHTML = '';
-                
-                data.forEach(room => {
-                    addRoomToList(room);
-                });
+
+                const data = await response.json();
+                console.log('채팅방 목록:', data);
+
+                // 채팅방 목록 표시
+                if (data.chattingRooms && Array.isArray(data.chattingRooms)) {
+                    const roomList = document.getElementById('roomList');
+                    roomList.innerHTML = ''; // 기존 목록 초기화
+                    data.chattingRooms.forEach(room => {
+                        addRoomToList(room);
+                    });
+                }
             } catch (error) {
-                console.error('채팅방 목록 로딩 실패:', error);
-                alert('채팅방 목록을 불러오는데 실패했습니다.');
+                console.error('채팅방 목록 로드 실패:', error);
+                alert(error.message || '채팅방 목록을 불러오는데 실패했습니다.');
             }
-        }
+        });
 
         async function createRoom() {
             showModal();
         }
 
+        // 채팅방 입장 함수 수정
         async function joinRoom(roomId) {
             try {
                 // 먼저 채팅방 멤버인지 확인
@@ -212,27 +394,11 @@
                     }
                 });
 
-                // 멤버가 아닌 경우에도 바로 채팅방으로 이동하지 말고, 먼저 멤버로 추가
                 if (!checkResponse.ok) {
-                    // 멤버가 아니라면 새로 생성
-                    const response = await fetch(`/chatmember`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': localStorage.getItem('accessToken'),
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            chatting_room_id: roomId
-                        })
-                    });
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || '채팅방 입장 실패');
-                    }
+                    throw new Error('채팅방 멤버가 아닙니다. 초대 링크를 통해서만 입장할 수 있습니다.');
                 }
 
-                // 멤버 확인 또는 생성이 성공하면 채팅방으로 이동
+                // 멤버인 경우에만 채팅방으로 이동
                 window.location.href = `/public/chatting.html?roomId=${roomId}`;
 
             } catch (error) {
@@ -241,32 +407,32 @@
             }
         }
 
-        // 채팅방 ID로 직접 입장하는 함수 추가
+        // 채팅방 입장 함수 수정
         async function joinDirectRoom() {
             const input = document.getElementById('roomInput').value.trim();
             if (!input) {
-                alert('채팅방 ID 또는 초대 링크를 입력해주세요.');
+                alert('초대 링크를 입력해주세요.');
                 return;
             }
 
             try {
                 let roomId;
-                
-                // URL인지 확인
+
+                // URL에서 roomId 추출 (두 가지 형식 모두 지원)
                 if (input.includes('/chattingroom/')) {
-                    // URL에서 채팅방 ID 추출
+                    // /chattingroom/{id}/join 형식
                     const urlParts = input.split('/');
                     roomId = urlParts[urlParts.indexOf('chattingroom') + 1];
-                    if (roomId.includes('join')) {
-                        roomId = roomId.split('/')[0];
-                    }
+                } else if (input.includes('/invite.html?roomId=')) {
+                    // /invite.html?roomId={id} 형식
+                    const urlParams = new URLSearchParams(input.split('?')[1]);
+                    roomId = urlParams.get('roomId');
                 } else {
-                    // 숫자만 입력한 경우
-                    roomId = input;
+                    throw new Error('올바른 초대 링크를 입력해주세요.');
                 }
 
                 if (!roomId || isNaN(roomId)) {
-                    throw new Error('올바른 채팅방 ID 또는 초대 링크를 입력해주세요.');
+                    throw new Error('올바른 초대 링크를 입력해주세요.');
                 }
 
                 // 채팅방 존재 여부 확인
@@ -280,37 +446,35 @@
                     throw new Error('존재하지 않는 채팅방입니다.');
                 }
 
-                // 채팅방 멤버 확인
+                // 채팅방 멤버 확인 및 가입 처리
                 const memberCheckResponse = await fetch(`/chatmember/check/${roomId}`, {
                     headers: {
                         'Authorization': localStorage.getItem('accessToken')
                     }
                 });
 
-                if (memberCheckResponse.ok) {
-                    // 이미 멤버라면 바로 입장
-                    window.location.href = `/public/chatting.html?roomId=${roomId}`;
-                    return;
+                if (!memberCheckResponse.ok) {
+                    // 멤버가 아니라면 새로 가입
+                    const joinResponse = await fetch(`/chatmember`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': localStorage.getItem('accessToken'),
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            chatting_room_id: parseInt(roomId)
+                        })
+                    });
+
+                    if (!joinResponse.ok) {
+                        const errorData = await joinResponse.json();
+                        throw new Error(errorData.message || '채팅방 입장에 실패했습니다.');
+                    }
                 }
 
-                // 멤버가 아니라면 새로 가입
-                const joinResponse = await fetch(`/chatmember`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': localStorage.getItem('accessToken'),
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        chatting_room_id: parseInt(roomId)
-                    })
-                });
+                // 멤버 확인 또는 생성이 성공하면 채팅방으로 이동
+                window.location.href = `/public/chatting.html?roomId=${roomId}`;
 
-                if (joinResponse.ok) {
-                    window.location.href = `/public/chatting.html?roomId=${roomId}`;
-                } else {
-                    const errorData = await joinResponse.json();
-                    throw new Error(errorData.message || '채팅방 입장에 실패했습니다.');
-                }
             } catch (error) {
                 console.error('채팅방 입장 실패:', error);
                 alert(error.message || '채팅방 입장에 실패했습니다.');
@@ -327,24 +491,24 @@
                 <div class="room-actions">
                     <button onclick="joinRoom(${room.id})" class="button">입장</button>
                     <button onclick="shareInviteLink(${room.id})" class="button share-btn">초대 링크 공유</button>
+                    <button onclick="leaveRoom(${room.id})" class="button leave-btn">채팅방 나가기</button>
                 </div>
             `;
             document.getElementById('roomList').appendChild(roomElement);
         }
 
-        // 초대 링크 공유 함수 수정
+        // 초대 링크 공유 함수
         async function shareInviteLink(roomId) {
             try {
-                // 경로 수정: /public/invite.html로 변경
-                const inviteLink = `/public/invite.html?roomId=${roomId}`;
+                const inviteLink = `/public/chattingroom/${roomId}/join`;
                 const fullLink = window.location.origin + inviteLink;
-                
+
                 await navigator.clipboard.writeText(fullLink);
                 alert('초대 링크가 클립보드에 복사되었습니다!\n' + fullLink);
-                
-                // 또는 특정 사용자에게 이메일로 보내기
-                const userId = prompt('초대할 사용자 ID를 입력하세요:');
-                if (userId) {
+
+                // 닉네임으로 초대하기
+                const nickname = prompt('초대할 사용자의 닉네임을 입력하세요:');
+                if (nickname) {
                     const response = await fetch(`/chattingroom/${roomId}/send-url`, {
                         method: 'POST',
                         headers: {
@@ -352,7 +516,7 @@
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            userId: parseInt(userId)
+                            nickname: nickname
                         })
                     });
 
@@ -371,7 +535,7 @@
 
         // 다른 페이지 이동 URL들도 수정
         function redirectToLogin() {
-            window.location.href = '/public/login.html';
+            window.location.href = '/';
         }
 
         // 모달 관련 함수 추가
@@ -386,7 +550,7 @@
         // 실제 채팅방 생성 함수
         async function createRoomWithTitle() {
             const title = document.getElementById('roomTitle').value.trim();
-            
+
             if (!title) {
                 alert('채팅방 제목을 입력해주세요.');
                 return;
@@ -402,7 +566,7 @@
                     },
                     body: JSON.stringify({ title })
                 });
-                
+
                 if (!response.ok) {
                     throw new Error('채팅방 생성 실패');
                 }
@@ -410,7 +574,7 @@
                 // 응답에서 채팅방 ID 추출
                 const result = await response.json();
                 console.log('채팅방 생성 응답:', result);
-                
+
                 if (!result.id) {
                     throw new Error('채팅방 ID를 찾을 수 없습니다.');
                 }
@@ -418,7 +582,7 @@
                 // 모달 닫고 생성된 채팅방으로 바로 입장
                 closeModal();
                 window.location.href = `/public/chatting.html?roomId=${result.id}`;
-                
+
             } catch (error) {
                 console.error('채팅방 생성/입장 실패:', error);
                 alert(error.message || '채팅방 생성에 실패했습니다.');
@@ -438,6 +602,122 @@
                 closeModal();
             }
         });
+
+        // 채팅방 완전히 나가기 함수 (멤버 삭제)
+        async function leaveRoom(roomId) {
+            if (!confirm('정말로 이 채팅방에서 완전히 나가시겠습니까?\n나가기를 하면 다시 초대를 받아야 입장할 수 있습니다.')) {
+                return;
+            }
+
+            try {
+                // 먼저 사용자 정보 가져오기
+                const memberResponse = await fetch(`/chatmember/check/${roomId}`, {
+                    headers: {
+                        'Authorization': localStorage.getItem('accessToken')
+                    }
+                });
+
+                if (!memberResponse.ok) {
+                    throw new Error('채팅방 멤버 정보를 가져오는데 실패했습니다.');
+                }
+
+                const memberData = await memberResponse.json();
+                const userId = memberData.user_id;
+                const nickname = memberData.user.nickname;
+
+                // 소켓 연결
+                const socket = io('http://localhost:3000/chatmember', {
+                    withCredentials: true,
+                    auth: {
+                        token: localStorage.getItem('accessToken')
+                    }
+                });
+
+                // 퇴장 이벤트 발생
+                socket.emit('permanentLeaveChatRoom', {
+                    userId: userId,
+                    roomId: roomId,
+                    nickname: nickname
+                });
+
+                const response = await fetch(`/chatmember/permanent-leave/${roomId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': localStorage.getItem('accessToken')
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('채팅방 나가기에 실패했습니다.');
+                }
+
+                // 소켓 연결 해제
+                socket.disconnect();
+
+                // 페이지 새로고침하여 채팅방 목록 업데이트
+                window.location.reload();
+            } catch (error) {
+                console.error('채팅방 나가기 실패:', error);
+                alert(error.message || '채팅방 나가기에 실패했습니다.');
+            }
+        }
+
+        function openSidebar() {
+            document.getElementById('sidebar').style.width = "250px";
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').style.width = "0";
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const accessToken = localStorage.getItem("accessToken");
+
+            if (accessToken) {
+                document.getElementById('loggedInMenu').style.display = 'block';
+                document.getElementById('loggedOutMenu').style.display = 'none';
+            } else {
+                document.getElementById('loggedInMenu').style.display = 'none';
+                document.getElementById('loggedOutMenu').style.display = 'block';
+            }
+        });
+
+        async function logout() {
+            try {
+                const accessToken = localStorage.getItem("accessToken");
+                if (!accessToken) {
+                    console.warn("🚨 로그아웃 시도: 이미 로그아웃된 상태");
+                    window.location.href = "/public/log-in.html";
+                    return;
+                }
+
+                // 🔹 서버에 로그아웃 요청 보내기
+                const response = await fetch("http://localhost:3000/user/auth/logout", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": accessToken
+                    },
+                    credentials: "include" // 쿠키도 함께 보내기
+                });
+
+                if (!response.ok) {
+                    throw new Error("서버에서 로그아웃 처리 실패");
+                }
+
+                // ✅ 로그아웃 성공 후, 토큰 삭제
+                localStorage.removeItem("accessToken");
+
+                console.log("✅ 로그아웃 성공! 페이지 이동");
+                window.location.href = "/public/log-in.html"; // 로그인 페이지로 이동
+            } catch (error) {
+                console.error("❌ 로그아웃 실패:", error);
+                alert("로그아웃 중 오류가 발생했습니다.");
+            }
+        }
+
+
     </script>
 </body>
-</html> 
+
+</html>

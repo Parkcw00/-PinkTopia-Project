@@ -55,8 +55,7 @@ export class AchievementPService {
     };
   }
 
-  async post(user: any, subId: string): Promise<AchievementP> {
-    const user_id = user.id;
+  async post(user_id: number, subId: string): Promise<AchievementP> {
     const idS = Number(subId);
     if (!idS) {
       console.log('idS불량');
@@ -101,11 +100,12 @@ export class AchievementPService {
 
     // Redis 저장할 키 생성 (고유 ID 자동 생성되므로 따로 안 넣음)
     const key = `achievementP:${idS}:${Date.now()}`;
-
+    console.log('dataP', dataP);
+    console.log('key', key);
     // Redis에 저장
     await this.valkeyService.set(key, dataP);
-
     const createP = await this.repository.createP(dataP);
+    console.log('createP', createP);
     if (!createP) {
       console.log('생성실패');
       throw new BadRequestException('생성 실패했습니다.');
@@ -190,39 +190,9 @@ export class AchievementPService {
       }
     }
 
-    //
-    //
-    //
-    //
-    //
-    //
     // 반환값은 추가한 P
     return save;
   }
-
-  /*
-  async update(id: string) : Promise<{message:string}>{
-    const idA = Number(id);
-    if (!idA) {
-      throw new BadRequestException('achievementId 값이 없거나 형식이 맞지 않습니다');
-    }
-    const isExists = await this.repository.findOne(idA)
-    if(!isExists){
-      throw new NotFoundException(`ID ${id}에 해당하는 업적이 존재하지 않습니다.`);
-    }
-    if(isExists.complete){
-      throw new NotFoundException(`이미 달성한 업적입니다.`);
-    }
-    await this.repository.updateP(idA)
-
-     // 업데이트 후 다시 조회하여 확인
-  const isUpdated = await this.repository.findOne(idA);
-  if (!isUpdated?.complete) {
-    throw new NotFoundException(`업데이트 실패`);
-  }
-    return {message : '서브업적 달성!'}
-  }
-*/
 
   // 삭제
   async deleteByUserNSub(
