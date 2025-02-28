@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>홈 | PinkTopia</title>
     <style>
         body {
@@ -205,6 +205,30 @@
                 width: 100%;
             }
         }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        #popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: white;
+            border: 1px solid #ccc;
+            z-index: 1000;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -220,10 +244,10 @@
             </div>
         </div>
         <div class="logo-container">
-            <img src="/public/images/123.jpg" alt="PinkTopia Logo">
+            <img src="/public/images/123.jpg" alt="PinkTopia Logo" />
         </div>
         <div class="logo-text">
-            <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
+            <a href="/public/home.html" style="text-decoration: none; color: white">PinkTopia</a>
         </div>
     </div>
     <div class="container">

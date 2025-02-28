@@ -118,13 +118,29 @@ export class CatchPinkmongService {
     if (item.count > 0) {
       item.count -= 1;
       await this.catchRepo.updateItem(item);
+
+      // Valkey에 인벤토리 아이템 목록 업데이트
+      const invenItemsKey = `invenItems:${userId}`;
+      const existingItems: any = await this.valkeyService.get(
+        `invenItems:${userId}`,
+      );
+
+      const updatedItems = existingItems.map((existingItem) =>
+        existingItem.id === item.id
+          ? {
+              ...existingItem,
+              count: item.count,
+            }
+          : existingItem,
+      );
+      await this.valkeyService.set(invenItemsKey, updatedItems, 3600); // 1시간 TTL
     } else {
       throw new BadRequestException('해당 아이템의 수량이 부족합니다.');
     }
 
     // 4. 포획 확률 계산
     const baseCatchRate = 0.1;
-    const getChanceIncrease = { 2: 0.15, 3: 0.25 };
+    const getChanceIncrease = { 2: 0.15, 3: 0.3 };
     const bonus = getChanceIncrease[item.id] || 0;
     const finalCatchRate = baseCatchRate + bonus;
 
@@ -179,6 +195,7 @@ export class CatchPinkmongService {
     // 2. 전투 종료 및 데이터 삭제
     await this.catchRepo.removeCatchPinkmong(catchRecord);
     this.catchAttempts.delete(catchRecord.id);
+    console.log('userId', userId);
     await this.valkeyService.del(`pinkmong_battle:${userId}`); // ✅ Valkey에서 삭제
 
     return { message: `성공적으로 도망쳤습니다!`, success: false };
