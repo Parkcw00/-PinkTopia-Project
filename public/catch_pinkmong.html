@@ -399,7 +399,7 @@
                 window.location.href = '/public/log-in.html';
                 return;
             }
-
+            localStorage.setItem('lastCatchAttempt', new Date().getTime());
             const selectedItem = document.querySelector('.inventory-item.selected');
             if (!selectedItem) {
                 alert('아이템을 선택해주세요.');
@@ -453,7 +453,7 @@
                 window.location.href = '/';
                 return;
             }
-
+            localStorage.setItem('lastCatchAttempt', new Date().getTime());
             try {
                 const response = await fetch('/catch-pinkmong/giveup', {
                     method: 'POST',
