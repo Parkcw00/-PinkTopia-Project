@@ -140,7 +140,7 @@ export class ChattingService {
         const nickname = await this.chattingRepository.getUserNickname(
           msg.user_id,
         );
-        return { message: msg.message, nickname: nickname?.user.nickname }; // 메시지에 닉네임 추가
+        return { message: msg.message, nickname: nickname?.nickname }; // 메시지에 닉네임 추가
       }),
     );
 

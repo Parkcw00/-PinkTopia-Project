@@ -6,10 +6,17 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Request,
+  UseInterceptors,
+  UploadedFiles,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { DirectionService } from './direction.service';
-import { CreateDirectionDto } from './dto/create-direction.dto';
-import { UpdateDirectionDto } from './dto/update-direction.dto';
+import { CompareDirection } from './dto/compare-direction.dto';
+import { UserGuard } from 'src/user/guards/user-guard';
+import { Socket } from 'socket.io';
+import { ConnectedSocket } from '@nestjs/websockets';
 
 @Controller('direction')
 export class DirectionController {
@@ -20,4 +27,21 @@ export class DirectionController {
   async getAllSubAchievements() {
     return this.directionService.createBookmarks();
   }
+  @UseGuards(UserGuard)
+  // 사용자와 거리비교
+  @Patch('compare-bookmark')
+  async compareBookmark(
+    @Request() req,
+    @Body() compareDirection: CompareDirection,
+    @ConnectedSocket() client: Socket,
+  ) {
+    return this.directionService.compareBookmark(
+      req.user.id,
+      compareDirection,
+      client,
+    );
+  }
+  //user_direction, bookmark_direction[]
+
+  // 지도에 북마커 표시
 }

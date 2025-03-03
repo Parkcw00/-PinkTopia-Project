@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,9 +12,11 @@
             margin: 0 auto;
             padding: 20px;
         }
+
         .room-list {
             margin-top: 20px;
         }
+
         .room-item {
             padding: 15px;
             border: 1px solid #ddd;
@@ -22,12 +25,15 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
+
         .room-item:hover {
             background-color: #f5f5f5;
         }
+
         .create-room {
             margin-bottom: 20px;
         }
+
         .button {
             padding: 10px 20px;
             background-color: #4CAF50;
@@ -36,14 +42,17 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
         .button:hover {
             background-color: #45a049;
         }
+
         .join-room-form {
             margin-bottom: 20px;
             display: flex;
             gap: 10px;
         }
+
         .join-room-form input {
             flex: 1;
             padding: 8px;
@@ -51,23 +60,29 @@
             border-radius: 4px;
             font-size: 16px;
         }
+
         .join-room-form button {
             background-color: #2196F3;
         }
+
         .join-room-form button:hover {
             background-color: #1976D2;
         }
+
         .room-actions {
             margin-top: 10px;
             display: flex;
             gap: 10px;
         }
+
         .share-btn {
             background-color: #2196F3;
         }
+
         .share-btn:hover {
             background-color: #1976D2;
         }
+
         .modal {
             display: none;
             position: fixed;
@@ -75,9 +90,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
+            background-color: rgba(0, 0, 0, 0.5);
             z-index: 1000;
         }
+
         .modal-content {
             position: relative;
             background-color: #fff;
@@ -86,18 +102,22 @@
             width: 80%;
             max-width: 500px;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
+
         .modal-header {
             margin-bottom: 20px;
         }
+
         .modal-header h2 {
             margin: 0;
             color: #333;
         }
+
         .modal-body {
             margin-bottom: 20px;
         }
+
         .modal-body input {
             width: 100%;
             padding: 8px;
@@ -106,11 +126,13 @@
             font-size: 16px;
             box-sizing: border-box;
         }
+
         .modal-footer {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
         }
+
         .close {
             position: absolute;
             right: 10px;
@@ -119,21 +141,172 @@
             cursor: pointer;
             color: #666;
         }
+
         .close:hover {
             color: #000;
         }
+
         .leave-btn {
             background-color: #dc3545;
         }
+
         .leave-btn:hover {
             background-color: #c82333;
         }
+
+        /* 네비게이션 바 스타일 */
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ff69b4;
+            padding: 15px;
+            color: white;
+            font-weight: bold;
+            position: relative;
+            height: 50px;
+        }
+
+        /* 햄버거 메뉴 아이콘 스타일 */
+        .menu-icon {
+            position: absolute;
+            left: 15px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .menu-icon .hamburger {
+            width: 25px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-icon .hamburger span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: white;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        /* 로고 컨테이너 스타일 */
+        .nav .logo-container {
+            position: absolute;
+            left: 50px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav img {
+            width: 45px;
+            height: 45px;
+            border-radius: 0;
+            object-fit: cover;
+        }
+
+        /* 로고 텍스트 */
+        .nav .logo-text {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+        }
+
+        /* 사이드바 스타일 */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            background-color: #ff69b4;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar a {
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar a:hover {
+            background-color: #ff4da6;
+        }
+
+        .close-sidebar {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 36px;
+            cursor: pointer;
+            color: white;
+        }
     </style>
 </head>
+
 <body>
+    <div class="nav">
+        <div class="menu-icon" onclick="openSidebar()">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        <div class="logo-container">
+            <img src="/public/images/123.jpg" alt="PinkTopia Logo">
+        </div>
+        <div class="logo-text">
+            <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
+        </div>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+        </div>
+        <div class="sidebar-content">
+            <a href="/public/home.html">홈</a>
+            <a href="/public/event.html">이벤트</a>
+            <a href="/public/store-item.html">아이템샵</a>
+            <a href="/public/board.html">게시글 (커뮤니티)</a>
+            <a href="/public/ranking.html">랭킹</a>
+            <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
+            <!-- 로그인 시 표시될 메뉴들 -->
+            <div id="loggedInMenu" style="display: none;">
+                <a href="/public/chattingrooms.html">채팅</a>
+                <a href="/public/collection.html">핑크몽 개인 도감</a>
+                <a href="/public/inventory.html">인벤토리 아이템</a>
+                <a href="/public/achievements.html">업적</a>
+                <a href="/public/mypage.html">마이페이지</a>
+                <a href="#" onclick="logout()">로그아웃</a>
+            </div>
+            <!-- 로그인 안 된 경우 표시될 메뉴들 -->
+            <div id="loggedOutMenu">
+                <a href="/public/log-in.html">로그인</a>
+                <a href="/public/sign-up.html">회원가입</a>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <h1>채팅방 목록</h1>
-        
+
         <script>
             let socket;  // 전역 socket 변수 선언
         </script>
@@ -147,7 +320,7 @@
         <div class="create-room">
             <button class="button" onclick="createRoom()">새 채팅방 만들기</button>
         </div>
-        
+
         <div class="room-list" id="roomList">
             <!-- 채팅방 목록이 여기에 동적으로 추가됨 -->
         </div>
@@ -174,7 +347,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const accessToken = localStorage.getItem('accessToken');
             if (!accessToken) {
-                window.location.href = '/public/login.html';
+                window.location.href = '/';
                 return;
             }
 
@@ -244,7 +417,7 @@
 
             try {
                 let roomId;
-                
+
                 // URL에서 roomId 추출 (두 가지 형식 모두 지원)
                 if (input.includes('/chattingroom/')) {
                     // /chattingroom/{id}/join 형식
@@ -329,10 +502,10 @@
             try {
                 const inviteLink = `/public/chattingroom/${roomId}/join`;
                 const fullLink = window.location.origin + inviteLink;
-                
+
                 await navigator.clipboard.writeText(fullLink);
                 alert('초대 링크가 클립보드에 복사되었습니다!\n' + fullLink);
-                
+
                 // 닉네임으로 초대하기
                 const nickname = prompt('초대할 사용자의 닉네임을 입력하세요:');
                 if (nickname) {
@@ -362,7 +535,7 @@
 
         // 다른 페이지 이동 URL들도 수정
         function redirectToLogin() {
-            window.location.href = '/public/login.html';
+            window.location.href = '/';
         }
 
         // 모달 관련 함수 추가
@@ -377,7 +550,7 @@
         // 실제 채팅방 생성 함수
         async function createRoomWithTitle() {
             const title = document.getElementById('roomTitle').value.trim();
-            
+
             if (!title) {
                 alert('채팅방 제목을 입력해주세요.');
                 return;
@@ -393,7 +566,7 @@
                     },
                     body: JSON.stringify({ title })
                 });
-                
+
                 if (!response.ok) {
                     throw new Error('채팅방 생성 실패');
                 }
@@ -401,7 +574,7 @@
                 // 응답에서 채팅방 ID 추출
                 const result = await response.json();
                 console.log('채팅방 생성 응답:', result);
-                
+
                 if (!result.id) {
                     throw new Error('채팅방 ID를 찾을 수 없습니다.');
                 }
@@ -409,7 +582,7 @@
                 // 모달 닫고 생성된 채팅방으로 바로 입장
                 closeModal();
                 window.location.href = `/public/chatting.html?roomId=${result.id}`;
-                
+
             } catch (error) {
                 console.error('채팅방 생성/입장 실패:', error);
                 alert(error.message || '채팅방 생성에 실패했습니다.');
@@ -488,6 +661,63 @@
                 alert(error.message || '채팅방 나가기에 실패했습니다.');
             }
         }
+
+        function openSidebar() {
+            document.getElementById('sidebar').style.width = "250px";
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').style.width = "0";
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const accessToken = localStorage.getItem("accessToken");
+
+            if (accessToken) {
+                document.getElementById('loggedInMenu').style.display = 'block';
+                document.getElementById('loggedOutMenu').style.display = 'none';
+            } else {
+                document.getElementById('loggedInMenu').style.display = 'none';
+                document.getElementById('loggedOutMenu').style.display = 'block';
+            }
+        });
+
+        async function logout() {
+            try {
+                const accessToken = localStorage.getItem("accessToken");
+                if (!accessToken) {
+                    console.warn("🚨 로그아웃 시도: 이미 로그아웃된 상태");
+                    window.location.href = "/public/log-in.html";
+                    return;
+                }
+
+                // 🔹 서버에 로그아웃 요청 보내기
+                const response = await fetch("http://localhost:3000/user/auth/logout", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": accessToken
+                    },
+                    credentials: "include" // 쿠키도 함께 보내기
+                });
+
+                if (!response.ok) {
+                    throw new Error("서버에서 로그아웃 처리 실패");
+                }
+
+                // ✅ 로그아웃 성공 후, 토큰 삭제
+                localStorage.removeItem("accessToken");
+
+                console.log("✅ 로그아웃 성공! 페이지 이동");
+                window.location.href = "/"; //
+            } catch (error) {
+                console.error("❌ 로그아웃 실패:", error);
+                alert("로그아웃 중 오류가 발생했습니다.");
+            }
+        }
+
+
     </script>
 </body>
-</html> 
+
+</html>

@@ -9,6 +9,8 @@ import {
   Res,
   UseGuards,
   Request,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -18,11 +20,28 @@ import { UserGuard } from './guards/user-guard';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LogInDto } from './dto/log-in.dto';
 import { VerifyDto } from './dto/verify-dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('User 기능')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Post('upload-profile')
+  @UseGuards(UserGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadProfileImage(
+    @Request() req,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return await this.userService.uploadProfileImage(req.user, file);
+  }
+
+  @Delete('delete-profile')
+  @UseGuards(UserGuard)
+  async deleteProfileImage(@Request() req) {
+    return await this.userService.deleteProfileImage(req.user);
+  }
 
   // 포인트랭킹api
   @ApiOperation({ summary: '포인트 랭킹 조회' })
@@ -70,6 +89,7 @@ export class UserController {
   @ApiOperation({ summary: '로그인' })
   @Post('/auth/login')
   async logIn(@Body() logInDto: LogInDto, @Res() res: Response) {
+    console.log(`------>`, logInDto);
     return await this.userService.logIn(logInDto.email, logInDto.password, res);
   }
 

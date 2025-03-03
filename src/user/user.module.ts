@@ -12,6 +12,7 @@ import { InventoryModule } from 'src/inventory/inventory.module';
 import { ValkeyService } from 'src/valkey/valkey.service';
 import { AchievementCRepository } from 'src/achievement-c/achievement-c.repository';
 import { ValkeyModule } from 'src/valkey/valkey.module';
+import { S3Module } from 'src/s3/s3.module';
 
 @Global()
 @Module({
@@ -37,9 +38,16 @@ import { ValkeyModule } from 'src/valkey/valkey.module';
     }),
     InventoryModule,
     ValkeyModule,
+    S3Module,
   ],
   controllers: [UserController, UsersController],
   providers: [UserService, UserRepository, UserGuard, ValkeyService],
-  exports: [UserGuard, JwtModule, UserRepository, UserService],
+  exports: [
+    UserGuard,
+    JwtModule,
+    UserRepository,
+    UserService,
+    TypeOrmModule.forFeature([UserRepository]),
+  ],
 })
 export class UserModule {}
