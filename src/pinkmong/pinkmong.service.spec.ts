@@ -55,8 +55,8 @@ describe('PinkmongService', () => {
   });
 
   // 1️⃣ **핑크몽 전체 조회**
-  describe('getAllPinkmongs', () => {
-    it('should return cached pinkmongs if found in Valkey', async () => {
+  describe('getAllPinkmongs(전체 핑크몽 조회)', () => {
+    it('Valkey 캐시에 데이터가 있는 경우, 캐시된 데이터를 반환해야 한다.', async () => {
       const cachedPinkmongs: Pinkmong[] = [
         {
           id: 1,
@@ -84,7 +84,7 @@ describe('PinkmongService', () => {
       expect(pinkmongRepository.findAll).not.toHaveBeenCalled();
     });
 
-    it('should return pinkmongs from DB if not found in Valkey', async () => {
+    it('Valkey 캐시에 데이터가 없는 경우, DB에서 조회 후 캐시에 저장해야 한다.', async () => {
       const dbPinkmongs: Pinkmong[] = [
         {
           id: 1,
@@ -120,7 +120,7 @@ describe('PinkmongService', () => {
 
   // 2️⃣ **특정 핑크몽 조회**
   describe('getPinkmong', () => {
-    it('should return cached pinkmong if found in Valkey', async () => {
+    it('Valkey 캐시에 핑크몽이 있는 경우, 캐시된 데이터를 반환해야 한다.', async () => {
       const pinkmong: Pinkmong = {
         id: 1,
         name: '핑크몽',
@@ -143,7 +143,7 @@ describe('PinkmongService', () => {
       expect(pinkmongRepository.findById).not.toHaveBeenCalled();
     });
 
-    it('should throw NotFoundException if pinkmong does not exist', async () => {
+    it('존재하지 않는 핑크몽을 조회하면 NotFoundException을 발생시켜야 한다.', async () => {
       valkeyService.get.mockResolvedValue(null);
       pinkmongRepository.findById.mockResolvedValue(null);
 
@@ -154,7 +154,7 @@ describe('PinkmongService', () => {
   });
 
   // 3️⃣ **핑크몽 생성**
-  describe('createPinkmong', () => {
+  describe('createPinkmong(핑크몽 생성)', () => {
     it('should create a pinkmong', async () => {
       const createPinkmongDto: CreatePinkmongDto = {
         name: '새 핑크몽',
@@ -206,7 +206,7 @@ describe('PinkmongService', () => {
   });
 
   // 4️⃣ **핑크몽 삭제**
-  describe('deletePinkmong', () => {
+  describe('deletePinkmong(핑크몽 삭제제)', () => {
     it('should delete a pinkmong', async () => {
       const pinkmong: Pinkmong = {
         id: 1,
@@ -229,7 +229,7 @@ describe('PinkmongService', () => {
       expect(result).toEqual({ message: '핑크몽 삭제가 완료 되었습니다.' });
     });
 
-    it('should throw NotFoundException if pinkmong does not exist', async () => {
+    it('존재하지 않는 핑크몽을 삭제하면 NotFoundException을 발생시켜야 한다.', async () => {
       pinkmongRepository.findById.mockResolvedValue(null);
 
       await expect(pinkmongService.deletePinkmong(1)).rejects.toThrow(

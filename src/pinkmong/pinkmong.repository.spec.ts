@@ -29,13 +29,13 @@ describe('PinkmongRepository', () => {
     repository = module.get(getRepositoryToken(Pinkmong));
   });
 
-  it('should be defined', () => {
+  it('정상적으로 정의되어야 함', () => {
     expect(pinkmongRepository).toBeDefined();
   });
 
   // 1️⃣ **특정 핑크몽 조회**
-  describe('findById', () => {
-    it('should return a pinkmong when found', async () => {
+  describe('findById(ID로 핑크몽 조회)', () => {
+    it('핑크몽이 존재할 경우 반환해야 한다.', async () => {
       const pinkmong: Pinkmong = {
         id: 1,
         name: '핑크몽A',
@@ -59,7 +59,7 @@ describe('PinkmongRepository', () => {
       expect(repository.findOne).toHaveBeenCalledWith({ where: { id: 1 } });
     });
 
-    it('should return null if pinkmong not found', async () => {
+    it('핑크몽이 존재하지 않을 경우 null로 반환환', async () => {
       repository.findOne.mockResolvedValue(null);
 
       const result = await pinkmongRepository.findById(1);
@@ -70,7 +70,7 @@ describe('PinkmongRepository', () => {
 
   // 2️⃣ **모든 핑크몽 조회**
   describe('findAll', () => {
-    it('should return all pinkmongs', async () => {
+    it('데이터베이스에 저장된 모든 핑크몽을 반환해야 한다.', async () => {
       const pinkmongs: Pinkmong[] = [
         {
           id: 1,
@@ -113,7 +113,7 @@ describe('PinkmongRepository', () => {
 
   // 3️⃣ **핑크몽 생성**
   describe('createPinkmong', () => {
-    it('should create and return a pinkmong', async () => {
+    it('핑크몽을 생성하고 반환해야 한다.', async () => {
       const pinkmongData = {
         name: '새 핑크몽',
         pinkmong_image: 'https://s3.example.com/new.png',
@@ -146,7 +146,7 @@ describe('PinkmongRepository', () => {
 
   // 4️⃣ **핑크몽 업데이트**
   describe('updatePinkmong', () => {
-    it('should update and return the pinkmong', async () => {
+    it('핑크몽을 수정하고 수정된 핑크몽을 반환해야 한다.', async () => {
       const pinkmong: Pinkmong = {
         id: 1,
         name: '수정된 핑크몽',
@@ -173,7 +173,7 @@ describe('PinkmongRepository', () => {
 
   // 5️⃣ **핑크몽 삭제**
   describe('deletePinkmong', () => {
-    it('should delete a pinkmong', async () => {
+    it('핑크몽을 삭제해야 한다.', async () => {
       const pinkmong: Pinkmong = {
         id: 1,
         name: '핑크몽',

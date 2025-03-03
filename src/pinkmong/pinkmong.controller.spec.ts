@@ -41,13 +41,13 @@ describe('PinkmongController', () => {
     pinkmongService = module.get(PinkmongService);
   });
 
-  it('should be defined', () => {
+  it('정상적으로 정의되어야 한다.', () => {
     expect(pinkmongController).toBeDefined();
   });
 
   // 1️⃣ **핑크몽 생성 테스트**
   describe('createPinkmong', () => {
-    it('should create a pinkmong and return it', async () => {
+    it('핑크몽을 생성하고 반환해야 한다.', async () => {
       const createPinkmongDto: CreatePinkmongDto = {
         name: '핑크몽A',
         location_url: 'https://example.com/location',
@@ -85,7 +85,7 @@ describe('PinkmongController', () => {
 
   // 2️⃣ **모든 핑크몽 조회**
   describe('getAllPinkmongs', () => {
-    it('should return all pinkmongs', async () => {
+    it('모든 핑크몽을 조회하고 반환해야 한다.', async () => {
       const pinkmongs = [
         {
           id: 1,
@@ -117,7 +117,7 @@ describe('PinkmongController', () => {
 
   // 3️⃣ **특정 핑크몽 조회**
   describe('getPinkmong', () => {
-    it('should return a pinkmong', async () => {
+    it('특정 핑크몽을 조회하고 반환해야 한다.', async () => {
       const pinkmong = {
         id: 1,
         name: '핑크몽A',
@@ -145,7 +145,7 @@ describe('PinkmongController', () => {
 
   // 4️⃣ **핑크몽 수정**
   describe('updatePinkmong', () => {
-    it('should update a pinkmong and return success message', async () => {
+    it('핑크몽을 수정하고 성공 메시지를 반환해야 한다.', async () => {
       const updatePinkmongDto: UpdatePinkmongDto = {
         name: '수정된 핑크몽',
         explain: '수정된 설명',
@@ -176,7 +176,7 @@ describe('PinkmongController', () => {
 
   // 5️⃣ **핑크몽 삭제**
   describe('deletePinkmong', () => {
-    it('should delete a pinkmong and return success message', async () => {
+    it('핑크몽을 삭제하고 성공 메시지를 반환해야 한다.', async () => {
       const expectedResult = { message: '핑크몽 삭제가 완료 되었습니다.' };
 
       pinkmongService.deletePinkmong.mockResolvedValue(expectedResult);
