@@ -1,11 +1,11 @@
-import { AchievementC } from 'src/achievement-c/entities/achievement-c.entity';
-import { AchievementP } from 'src/achievement-p/entities/achievement-p.entity';
-import { CatchPinkmong } from 'src/catch_pinkmong/entities/catch_pinkmong.entity';
-import { Chatting } from 'src/chatting/entities/chatting.entity';
-import { Collection } from 'src/collection/entities/collection.entity';
-import { Inventory } from 'src/inventory/entities/inventory.entity';
-import { Post } from 'src/post/entities/post.entity';
-import { Comment } from 'src/comment/entities/comment.entity';
+import { AchievementC } from '../../achievement-c/entities/achievement-c.entity';
+import { AchievementP } from '../../achievement-p/entities/achievement-p.entity';
+import { CatchPinkmong } from '../../catch_pinkmong/entities/catch_pinkmong.entity';
+import { Chatting } from '../../chatting/entities/chatting.entity';
+import { Collection } from '../../collection/entities/collection.entity';
+import { Inventory } from '../../inventory/entities/inventory.entity';
+import { Post } from '../../post/entities/post.entity';
+import { Comment } from '../../comment/entities/comment.entity';
 import {
   Column,
   CreateDateColumn,
@@ -16,9 +16,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Chatblacklist } from 'src/chatblacklist/entities/chatblacklist.entity';
-import { Chatmember } from 'src/chatmember/entities/chatmember.entity';
-import { LocationHistory } from 'src/location-history/entities/location-history.entity';
+import { Chatblacklist } from '../../chatblacklist/entities/chatblacklist.entity';
+import { Chatmember } from '../../chatmember/entities/chatmember.entity';
+import { LocationHistory } from '../../location-history/entities/location-history.entity';
 
 @Entity({
   name: 'user',

@@ -1,5 +1,5 @@
-import { Inventory } from 'src/inventory/entities/inventory.entity';
-import { StoreItem } from 'src/store-item/entities/store-item.entity';
+import { Inventory } from '../../inventory/entities/inventory.entity';
+import { StoreItem } from '../../store-item/entities/store-item.entity';
 import {
   Column,
   Entity,
@@ -15,10 +15,10 @@ export class Item {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ 
-    type: 'int', 
-    nullable: false, 
-    default: 1
+  @Column({
+    type: 'int',
+    nullable: false,
+    default: 1,
   })
   count: number;
 

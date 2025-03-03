@@ -1,7 +1,7 @@
-import { Inventory } from 'src/inventory/entities/inventory.entity';
-import { PinkmongAppearLocation } from 'src/pinkmong-appear-location/entities/pinkmong-appear-location.entity';
-import { Pinkmong } from 'src/pinkmong/entities/pinkmong.entity';
-import { User } from 'src/user/entities/user.entity';
+import { Inventory } from '../../inventory/entities/inventory.entity';
+import { PinkmongAppearLocation } from '../../pinkmong-appear-location/entities/pinkmong-appear-location.entity';
+import { Pinkmong } from '../../pinkmong/entities/pinkmong.entity';
+import { User } from '../../user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
