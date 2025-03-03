@@ -3,6 +3,9 @@ import { PinkmongController } from './pinkmong.controller';
 import { PinkmongService } from './pinkmong.service';
 import { CreatePinkmongDto } from './dto/create-pinkmong.dto';
 import { UpdatePinkmongDto } from './dto/update-pinkmong.dto';
+import { UserGuard } from '../user/guards/user-guard';
+import { AdminGuard } from '../user/guards/admin.guard';
+import { InventoryService } from 'src/inventory/inventory.service';
 
 describe('PinkmongController', () => {
   let pinkmongController: PinkmongController;
@@ -22,8 +25,17 @@ describe('PinkmongController', () => {
             deletePinkmong: jest.fn(),
           },
         },
+        {
+          provide: InventoryService, // ✅ InventoryService Mock 추가
+          useValue: {}, // ✅ Mock 객체 제공
+        },
       ],
-    }).compile();
+    })
+      .overrideGuard(UserGuard) // ✅ UserGuard를 Mock 처리
+      .useValue({})
+      .overrideGuard(AdminGuard) // ✅ AdminGuard를 Mock 처리
+      .useValue({})
+      .compile();
 
     pinkmongController = module.get<PinkmongController>(PinkmongController);
     pinkmongService = module.get(PinkmongService);

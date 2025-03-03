@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 // import { Chatting } from 'src/chatting/entities/chatting.entity';
-import { AchievementC } from 'src/achievement-c/entities/achievement-c.entity';
+import { AchievementC } from '../achievement-c/entities/achievement-c.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
