@@ -189,8 +189,17 @@ describe('PinkmongService', () => {
 
       expect(result).toEqual({
         id: 1,
-        ...createPinkmongDto,
+        name: createPinkmongDto.name,
         pinkmong_image: uploadedUrl,
+        explain: createPinkmongDto.explain,
+        region_theme: createPinkmongDto.region_theme,
+        grade: createPinkmongDto.grade,
+        point: createPinkmongDto.point,
+        created_at: expect.any(Date), // ✅ Date 타입이면 통과
+        updated_at: expect.any(Date), // ✅ Date 타입이면 통과
+        deleted_at: undefined,
+        catch_pinkmong: expect.any(Array), // ✅ 배열 검증
+        collection: expect.any(Array),
       });
       expect(s3Service.uploadFile).toHaveBeenCalledWith(file);
     });
