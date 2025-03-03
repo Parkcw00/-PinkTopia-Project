@@ -1,4 +1,4 @@
-import { CatchPinkmong } from 'src/catch_pinkmong/entities/catch_pinkmong.entity';
+import { CatchPinkmong } from '../../catch_pinkmong/entities/catch_pinkmong.entity';
 import {
   Column,
   CreateDateColumn,

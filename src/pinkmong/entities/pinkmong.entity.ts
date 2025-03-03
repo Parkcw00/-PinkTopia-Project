@@ -1,5 +1,5 @@
-import { CatchPinkmong } from 'src/catch_pinkmong/entities/catch_pinkmong.entity';
-import { Collection } from 'src/collection/entities/collection.entity';
+import { CatchPinkmong } from '../../catch_pinkmong/entities/catch_pinkmong.entity';
+import { Collection } from '../../collection/entities/collection.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,

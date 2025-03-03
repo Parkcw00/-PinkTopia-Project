@@ -1,6 +1,6 @@
-import { CatchPinkmong } from 'src/catch_pinkmong/entities/catch_pinkmong.entity';
-import { Item } from 'src/item/entities/item.entity';
-import { User } from 'src/user/entities/user.entity';
+import { CatchPinkmong } from '../../catch_pinkmong/entities/catch_pinkmong.entity';
+import { Item } from '../../item/entities/item.entity';
+import { User } from '../../user/entities/user.entity';
 import {
   Column,
   Entity,

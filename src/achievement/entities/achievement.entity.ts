@@ -8,8 +8,8 @@ import {
   Unique,
 } from 'typeorm';
 import { AchievementCategory } from '../enums/achievement-category.enum'; // Enum 파일 import
-import { SubAchievement } from 'src/sub-achievement/entities/sub-achievement.entity';
-import { AchievementC } from 'src/achievement-c/entities/achievement-c.entity';
+import { SubAchievement } from '../../sub-achievement/entities/sub-achievement.entity';
+import { AchievementC } from '../../achievement-c/entities/achievement-c.entity';
 @Entity({ name: 'achievement' })
 @Unique(['title'])
 export class Achievement {
