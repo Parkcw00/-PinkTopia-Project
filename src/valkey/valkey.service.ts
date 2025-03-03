@@ -2,6 +2,8 @@ import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 @Injectable()
 export class ValkeyService implements OnModuleDestroy {
+  private readonly client: Redis;
+  
   createQueryBuilder(arg0: string) {
     throw new Error('Method not implemented.');
   }
@@ -16,7 +18,6 @@ export class ValkeyService implements OnModuleDestroy {
   pipeline() {
     throw new Error('Method not implemented.');
   }
-  private readonly client: Redis;
   constructor() {
     this.client = new Redis({
       host: 'localhost', // Docker 컨테이너와 같은 네트워크일 경우 'valkey' 사용 가능
