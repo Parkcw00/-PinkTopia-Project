@@ -11,7 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from '../user.repository';
 import { Response } from 'express';
 import { UserService } from '../user.service';
-import { ValkeyService } from 'src/valkey/valkey.service';
+import { ValkeyService } from '../../valkey/valkey.service';
 
 @Injectable()
 export class UserGuard implements CanActivate {

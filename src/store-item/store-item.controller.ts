@@ -15,9 +15,9 @@ import { StoreItemService } from './store-item.service';
 import { CreateStoreItemDto } from './dto/create-store-item.dto';
 import { UpdateStoreItemDto } from './dto/update-store-item.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UserGuard } from 'src/user/guards/user-guard';
+import { UserGuard } from '../user/guards/user-guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AdminGuard } from 'src/user/guards/admin.guard';
+import { AdminGuard } from '../user/guards/admin.guard';
 
 @ApiTags('상점 아이템 CRUD')
 @Controller('store-item')

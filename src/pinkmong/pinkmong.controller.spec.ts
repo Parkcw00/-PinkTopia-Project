@@ -5,7 +5,7 @@ import { CreatePinkmongDto } from './dto/create-pinkmong.dto';
 import { UpdatePinkmongDto } from './dto/update-pinkmong.dto';
 import { UserGuard } from '../user/guards/user-guard';
 import { AdminGuard } from '../user/guards/admin.guard';
-import { InventoryService } from 'src/inventory/inventory.service';
+import { InventoryService } from '../inventory/inventory.service';
 
 describe('PinkmongController', () => {
   let pinkmongController: PinkmongController;
