@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ItemRepository } from 'src/item/item.repository';
-import { CreateItemDto } from 'src/item/dto/create-item.dto';
+import { ItemRepository } from '../item/item.repository';
+import { CreateItemDto } from '../item/dto/create-item.dto';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { InventoryRepository } from './inventory.repository';
-import { UserRepository } from 'src/user/user.repository';
-import { ValkeyService } from 'src/valkey/valkey.service';
+import { UserRepository } from '../user/user.repository';
+import { ValkeyService } from '../valkey/valkey.service';
 
 @Injectable()
 export class InventoryService {
