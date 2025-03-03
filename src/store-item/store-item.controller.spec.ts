@@ -1,10 +1,40 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StoreItemController } from './store-item.controller';
 import { StoreItemService } from './store-item.service';
+import { UserGuard } from '../user/guards/user-guard';
+import { AdminGuard } from '../user/guards/admin.guard';
 
-// 엔티티 모킹 추가
-jest.mock('../../src/item/entities/item.entity', () => ({
-  Item: class MockItem {}
+// 엔티티 모킹
+jest.mock('./entities/store-item.entity', () => ({
+  StoreItem: class MockStoreItem {}
+}));
+
+// S3Service 모킹
+jest.mock('../s3/s3.service', () => ({
+  S3Service: jest.fn().mockImplementation(() => ({
+    uploadFile: jest.fn().mockResolvedValue('mocked-image-url.jpg'),
+  }))
+}));
+
+// ValkeyService 모킹
+jest.mock('../valkey/valkey.service', () => ({
+  ValkeyService: jest.fn().mockImplementation(() => ({
+    get: jest.fn(),
+    set: jest.fn(),
+  }))
+}));
+
+// 가드 모킹
+jest.mock('../user/guards/user-guard', () => ({
+  UserGuard: jest.fn().mockImplementation(() => ({
+    canActivate: jest.fn().mockReturnValue(true)
+  }))
+}));
+
+jest.mock('../user/guards/admin.guard', () => ({
+  AdminGuard: jest.fn().mockImplementation(() => ({
+    canActivate: jest.fn().mockReturnValue(true)
+  }))
 }));
 
 describe('StoreItemController', () => {
@@ -19,6 +49,19 @@ describe('StoreItemController', () => {
     deleteStoreItem: jest.fn(),
   };
 
+  const mockStoreItem = {
+    id: 1,
+    name: '테스트 아이템',
+    item_image: 'test.jpg',
+    potion: false,
+    potion_time: 0,
+    gem_price: 100,
+    dia_price: 50,
+    created_at: new Date(),
+    updated_at: new Date(),
+    deleted_at: null,
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [StoreItemController],
@@ -26,9 +69,14 @@ describe('StoreItemController', () => {
         {
           provide: StoreItemService,
           useValue: mockStoreItemService,
-        },
+        }
       ],
-    }).compile();
+    })
+    .overrideGuard(UserGuard)
+    .useValue({ canActivate: () => true })
+    .overrideGuard(AdminGuard)
+    .useValue({ canActivate: () => true })
+    .compile();
 
     controller = module.get<StoreItemController>(StoreItemController);
     service = module.get<StoreItemService>(StoreItemService);
@@ -41,16 +89,16 @@ describe('StoreItemController', () => {
   describe('create', () => {
     it('상점 아이템을 생성해야 합니다', async () => {
       const mockReq = { user: { id: 1 } };
-      const mockCreateDto = { 
-        name: '테스트 아이템', 
-        price: 100,
+      const mockCreateDto = {
+        name: '테스트 아이템',
+        potion: false,
+        potion_time: 0,
         gem_price: 100,
-        dia_price: 50
+        dia_price: 50,
       };
       const mockFile = { filename: 'test.jpg' } as Express.Multer.File;
-      const expectedResult = { id: 1, ...mockCreateDto };
 
-      mockStoreItemService.addShopItem.mockResolvedValue(expectedResult);
+      mockStoreItemService.addShopItem.mockResolvedValue(mockStoreItem);
 
       const result = await controller.create(mockReq, mockCreateDto, mockFile);
 
@@ -59,17 +107,13 @@ describe('StoreItemController', () => {
         mockCreateDto,
         mockFile,
       );
-      expect(result).toEqual(expectedResult);
+      expect(result).toEqual(mockStoreItem);
     });
   });
 
   describe('findAll', () => {
     it('모든 상점 아이템을 조회해야 합니다', async () => {
-      const expectedItems = [
-        { id: 1, name: '아이템1' },
-        { id: 2, name: '아이템2' },
-      ];
-
+      const expectedItems = [mockStoreItem];
       mockStoreItemService.findAll.mockResolvedValue(expectedItems);
 
       const result = await controller.findAll();
@@ -82,14 +126,12 @@ describe('StoreItemController', () => {
   describe('findOne', () => {
     it('특정 상점 아이템을 조회해야 합니다', async () => {
       const itemId = 1;
-      const expectedItem = { id: itemId, name: '테스트 아이템' };
-
-      mockStoreItemService.storeItemFindOne.mockResolvedValue(expectedItem);
+      mockStoreItemService.storeItemFindOne.mockResolvedValue(mockStoreItem);
 
       const result = await controller.findOne(itemId);
 
       expect(service.storeItemFindOne).toHaveBeenCalledWith(itemId);
-      expect(result).toEqual(expectedItem);
+      expect(result).toEqual(mockStoreItem);
     });
   });
 
@@ -97,18 +139,19 @@ describe('StoreItemController', () => {
     it('상점 아이템을 수정해야 합니다', async () => {
       const mockReq = { user: { id: 1 } };
       const itemId = 1;
-      const mockUpdateDto = { name: '수정된 아이템' };
+      const mockUpdateDto = {
+        name: '수정된 아이템',
+        potion: true,
+        potion_time: 30,
+        gem_price: 150,
+        dia_price: 75,
+      };
       const mockFile = { filename: 'updated.jpg' } as Express.Multer.File;
-      const expectedResult = { id: itemId, ...mockUpdateDto };
 
-      mockStoreItemService.updateStoreItem.mockResolvedValue(expectedResult);
+      const updatedItem = { ...mockStoreItem, ...mockUpdateDto };
+      mockStoreItemService.updateStoreItem.mockResolvedValue(updatedItem);
 
-      const result = await controller.update(
-        mockReq,
-        itemId,
-        mockUpdateDto,
-        mockFile,
-      );
+      const result = await controller.update(mockReq, itemId, mockUpdateDto, mockFile);
 
       expect(service.updateStoreItem).toHaveBeenCalledWith(
         mockReq.user,
@@ -116,7 +159,7 @@ describe('StoreItemController', () => {
         mockUpdateDto,
         mockFile,
       );
-      expect(result).toEqual(expectedResult);
+      expect(result).toEqual(updatedItem);
     });
   });
 
@@ -130,7 +173,10 @@ describe('StoreItemController', () => {
 
       const result = await controller.delete(mockReq, itemId);
 
-      expect(service.deleteStoreItem).toHaveBeenCalledWith(mockReq.user, itemId);
+      expect(service.deleteStoreItem).toHaveBeenCalledWith(
+        mockReq.user,
+        itemId
+      );
       expect(result).toEqual(expectedResult);
     });
   });
