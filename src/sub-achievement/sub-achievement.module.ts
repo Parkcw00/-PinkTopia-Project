@@ -15,14 +15,16 @@ import { GeoService } from 'src/geo/geo.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([SubAchievement, AchievementC, User]),
-    ValkeyModule,GeoModule
+    ValkeyModule,
+    GeoModule,
   ], // ✅ TypeOrmModule에 엔터티 추가
   controllers: [SubAchievementController],
   providers: [
     SubAchievementService,
     SubAchievementRepository,
     S3Service,
-    ValkeyService,GeoService
+    ValkeyService,
+    GeoService,
   ], // ✅ Repository 등록
   exports: [SubAchievementService, SubAchievementRepository], // ✅ 다른 모듈에서 사용 가능하도록 export
 })

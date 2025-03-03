@@ -3,8 +3,8 @@ import Redis from 'ioredis';
 
 @Injectable()
 export class GeoService implements OnModuleInit, OnModuleDestroy {
-  private readonly S_GEO_KEY = 'bookmarksS'; 
-  private readonly P_GEO_KEY = 'bookmarkP'; // Valkey 내 Geo 데이터 키
+  private readonly S_GEO_KEY = 'bookmarksS';
+  private readonly P_GEO_KEY = 'bookmarksP'; // Valkey 내 Geo 데이터 키
   private readonly client: Redis;
 
   constructor() {
@@ -32,7 +32,6 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
     return this.client.multi(); // multi()는 Redis의 파이프라인 메서드
   }
 
-
   /**
    * Redis Geo 데이터에 위치 정보를 추가하고, 추가 속성은 Hash에 저장
    * @param key Redis 키
@@ -49,10 +48,10 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
       latitude: number;
       sub_achievement_images: string[];
       mission_type: string;
-      expiration_at: string | "";
-      created_at: string | "";
-      updated_at: string | "";
-    }
+      expiration_at: string | '';
+      created_at: string | '';
+      updated_at: string | '';
+    },
   ) {
     const member = data.id.toString(); // 멤버는 고유 식별자로 사용 (문자열 필요)
     // GEO에 위치 데이터 저장
@@ -79,54 +78,87 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
    * @param member 멤버
    */
   // 핑크몽 위치 수정하기
-  async geoAddBookmarkP(key: string, longitude: number, latitude: number, member: string) {
-    await this.client.geoadd(key, longitude, latitude, member);
+  async geoAddBookmarkP(
+    key: string,
+    data: {
+      id: number;
+      title: string; // 제목
+      latitude: number; // 위도
+      longitude: number; // 경도
+      region_theme: string; // 지역 테마 (forest, desert 등)
+      created_at: string | '';
+      updated_at: string | '';
+      deleted_at: string | '';
+    },
+  ) {
+    const member = data.id.toString(); // 멤버는 고유 식별자로 사용 (문자열 필요)
+    // GEO에 위치 데이터 저장
+    await this.client.geoadd(key, data.longitude, data.latitude, member);
+    const hashKey = `bookmarksP:${data.id}`;
+    await this.client.hset(hashKey, {
+      title: data.title,
+      region_theme: data.region_theme,
+    });
   }
 
-
-
-
-
-/**
+  /**
    * 반경 5m 이내 북마크 검색 및 상세 정보 반환
    * @param latitude 사용자 위도
    * @param longitude 사용자 경도
    * @returns 반경 내 북마크 상세 정보 목록
    */
-async getNearbyBookmarksS(latitude: number, longitude: number): Promise<any[]> {
-  // 1. GEO에서 반경 5m 내의 북마크 ID 목록 가져오기
-  const nearbyIds = await this.client.georadius(this.S_GEO_KEY, longitude, latitude, 5, 'm') as string[];
-  // 2. ID 목록을 기반으로 Hash에서 상세 정보 가져오기
-  const bookmarkDetails = await Promise.all(
-    nearbyIds.map(async (id) => {
-      const hashKey = `bookmarkS:${id}`;
-      const details = await this.client.hgetall(hashKey);
-      return { id, ...details }; // ID와 상세 정보를 함께 반환
-    })
-  );
+  async getNearbyBookmarksS(
+    latitude: number,
+    longitude: number,
+  ): Promise<any[]> {
+    // 1. GEO에서 반경 5m 내의 북마크 ID 목록 가져오기
+    const nearbyIds = (await this.client.georadius(
+      this.S_GEO_KEY,
+      longitude,
+      latitude,
+      5,
+      'm',
+    )) as string[];
+    // 2. ID 목록을 기반으로 Hash에서 상세 정보 가져오기
+    const bookmarkDetails = await Promise.all(
+      nearbyIds.map(async (id) => {
+        const hashKey = `bookmarkS:${id}`;
+        const details = await this.client.hgetall(hashKey);
+        return { id, ...details }; // ID와 상세 정보를 함께 반환
+      }),
+    );
 
-  return bookmarkDetails;
-}
+    return bookmarkDetails;
+  }
 
-/**
+  /**
    * 반경 5m 이내 북마크 검색 및 상세 정보 반환
    * @param latitude 사용자 위도
    * @param longitude 사용자 경도
    * @returns 반경 내 북마크 상세 정보 목록
    */
-async getNearbyBookmarkP(latitude: number, longitude: number): Promise<any[]> {
-  // 1. GEO에서 반경 5m 내의 북마크 ID 목록 가져오기
-  const nearbyIds = await this.client.georadius(this.P_GEO_KEY, longitude, latitude, 5, 'm') as string[];
+  async getNearbyBookmarkP(
+    latitude: number,
+    longitude: number,
+  ): Promise<any[]> {
+    // 1. GEO에서 반경 5m 내의 북마크 ID 목록 가져오기
+    const nearbyIds = (await this.client.georadius(
+      this.P_GEO_KEY,
+      longitude,
+      latitude,
+      5,
+      'm',
+    )) as string[];
 
-  // 2. ID 목록을 기반으로 Hash에서 상세 정보 가져오기
-  const bookmarkDetails = await Promise.all(
-    nearbyIds.map(async (id) => {
-      const hashKey = `bookmarkP:${id}`;
-      const details = await this.client.hgetall(hashKey);
-      return { id, ...details }; // ID와 상세 정보를 함께 반환
-    })
-  );
+    // 2. ID 목록을 기반으로 Hash에서 상세 정보 가져오기
+    const bookmarkDetails = await Promise.all(
+      nearbyIds.map(async (id) => {
+        const hashKey = `bookmarkP:${id}`;
+        const details = await this.client.hgetall(hashKey);
+        return { id, ...details }; // ID와 상세 정보를 함께 반환
+      }),
+    );
 
-  return bookmarkDetails;
-}
+    return bookmarkDetails;
+  }
 }

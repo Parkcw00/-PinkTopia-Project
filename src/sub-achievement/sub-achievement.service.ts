@@ -28,7 +28,7 @@ export class SubAchievementService {
     private readonly geoService: GeoService,
     private readonly valkeyService: ValkeyService,
   ) {}
-/*
+
   async fillGeo() {
     // 1. DB에서 모든 서브업적 가져오기
     const dbSub: SubAchievement[] = await this.repository.getAll();
@@ -37,17 +37,15 @@ export class SubAchievementService {
       throw new NotFoundException('DB에 서브업적 데이터가 없습니다.');
     }
 
-    // 2. Redis에 일괄 저장 (Pipeline 사용)
-   const pipeline = this.valkeyService.getClient().pipeline();
-    if (!pipeline) {
-      throw new NotFoundException('Valkey(Pipeline)를 가져올 수 없습니다.');
-    }
-
-
+    // 2. GeoService를 활용하여 파이프라인 생성
+    //const pipeline = this.geoService.multi();
 
     for (const sub of dbSub) {
-      const key = `sub-achievement:${sub.id}`; // 고유 ID 사용
-
+      const key = `sub-achievement:${sub.id}`;
+      const image =
+        typeof sub.sub_achievement_images === 'string'
+          ? [sub.sub_achievement_images] // 문자열이면 배열로 변환
+          : sub.sub_achievement_images;
       const subData = {
         id: sub.id,
         achievement_id: sub.achievement_id,
@@ -55,85 +53,19 @@ export class SubAchievementService {
         content: sub.content,
         longitude: sub.longitude,
         latitude: sub.latitude,
-        sub_achievement_images: sub.sub_achievement_images,
-        mission_type: sub.mission_type,
-        expiration_at: sub.expiration_at,
-        created_at: sub.created_at?.toISOString() || null,
-        updated_at: sub.updated_at?.toISOString() || null,
+        sub_achievement_images: image,
+        mission_type: sub.mission_type as SubAchievementMissionType,
+        expiration_at: new Date(sub.expiration_at).toISOString(),
+        created_at: sub.created_at?.toISOString() || '',
+        updated_at: sub.updated_at?.toISOString() || '',
       };
-      console.log(subData);
 
-      pipeline.set(key, JSON.stringify(subData)); // Redis에 저장
+      await this.geoService.geoAddBookmarkS(key, subData);
     }
-
-    await pipeline.exec(); // 🚀 일괄 실행 (반드시 await 사용)
-
-    console.log(`✅ ${dbSub.length}개의 서브업적이 Valkey에 저장되었습니다.`);
-
     return {
-      message: `✅ ${dbSub.length}개의 서브업적이 Valkey에 저장되었습니다.`,
+      message: `✅ ${dbSub.length}개의 서브업적이 GeoService에 저장되었습니다.`,
     };
   }
-*/
-
-async fillGeo() {
-  // 1. DB에서 모든 서브업적 가져오기
-  const dbSub: SubAchievement[] = await this.repository.getAll();
-
-  if (!dbSub || dbSub.length === 0) {
-    throw new NotFoundException('DB에 서브업적 데이터가 없습니다.');
-  }
-
-  // 2. GeoService를 활용하여 파이프라인 생성
-  //const pipeline = this.geoService.multi();
-
-
-  for (const sub of dbSub) {
-    const key = `sub-achievement:${sub.id}`;
-   const image =  typeof sub.sub_achievement_images === "string"
-  ? [sub.sub_achievement_images] // 문자열이면 배열로 변환
-  : sub.sub_achievement_images;
-     const subData = {
-      id: sub.id,
-      achievement_id: sub.achievement_id,
-      title: sub.title,
-      content: sub.content,
-      longitude: sub.longitude,
-      latitude: sub.latitude,
-      sub_achievement_images: image,      
-      mission_type: sub.mission_type as SubAchievementMissionType,
-     expiration_at: new Date(sub.expiration_at).toISOString(),      
-      created_at: sub.created_at?.toISOString() ||"",
-      updated_at: sub.updated_at?.toISOString() ||"",
-    }
-    
-    await this.geoService.geoAddBookmarkS(key,subData)
-    /*// 3. GEO에 위치 데이터 추가
-    pipeline.geoadd(this.geoService['S_GEO_KEY'], sub.longitude, sub.latitude, member);
-
-    // 4. Hash에 상세 정보 추가
-    pipeline.hset(hashKey, {
-      achievement_id: sub.achievement_id,
-      title: sub.title,
-      content: sub.content,
-      sub_achievement_images: sub.sub_achievement_images,
-      mission_type: sub.mission_type,
-      expiration_at: sub.expiration_at?.toISOString() || "",
-      created_at: sub.created_at?.toISOString() || "",
-      updated_at: sub.updated_at?.toISOString() || "",
-    });
-  }
-
-  // 5. 파이프라인 실행
-  await pipeline.exec();
-  console.log(`✅ ${dbSub.length}개의 서브업적이 GeoService에 저장되었습니다.`);
-*/}
-  return {
-    message: `✅ ${dbSub.length}개의 서브업적이 GeoService에 저장되었습니다.`,
-  };
-
-  
-}
 
   async create(
     createSubAchievementDto: CreateSubAchievementDto,

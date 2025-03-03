@@ -6,10 +6,13 @@ import { PinkmongAppearLocationRepository } from './pinkmong-appear-location.rep
 import { PinkmongAppearLocation } from './entities/pinkmong-appear-location.entity';
 import { ValkeyService } from '../valkey/valkey.service';
 import { DirectionModule } from '../direction/direction.module';
+import { GeoModule } from '../geo/geo.module';
+import { GeoService } from 'src/geo/geo.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([PinkmongAppearLocation]),
+    GeoModule,
     forwardRef(() => DirectionModule), //forwardRef()는 NestJS에서 순환 의존성(circular dependency) 문제를 해결하기 위해 제공하는 함수
   ],
   controllers: [PinkmongAppearLocationController],
@@ -17,6 +20,7 @@ import { DirectionModule } from '../direction/direction.module';
     PinkmongAppearLocationService,
     PinkmongAppearLocationRepository,
     ValkeyService,
+    GeoService,
   ],
   exports: [PinkmongAppearLocationService, PinkmongAppearLocationRepository],
 })
