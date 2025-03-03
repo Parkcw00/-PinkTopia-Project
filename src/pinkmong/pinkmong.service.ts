@@ -4,7 +4,7 @@ import { Pinkmong } from './entities/pinkmong.entity';
 import { CreatePinkmongDto } from './dto/create-pinkmong.dto';
 import { UpdatePinkmongDto } from './dto/update-pinkmong.dto';
 import { S3Service } from '../s3/s3.service';
-import { ValkeyService } from 'src/valkey/valkey.service';
+import { ValkeyService } from '../valkey/valkey.service';
 
 /**
  * PinkmongService
