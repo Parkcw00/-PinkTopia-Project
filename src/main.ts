@@ -7,12 +7,7 @@ import * as express from 'express';
 import { join } from 'path';
 
 async function bootstrap() {
-  //위치추적 허용
-  // const httpsOptions = {
-  // key: readFileSync('server.key'),
-  // cert: readFileSync('server.cert'),
-  // };
-  const app = await NestFactory.create(AppModule); //, { httpsOptions });
+  const app = await NestFactory.create(AppModule);
 
   app.use(cookieParser());
   // 정적 파일 제공 설정
