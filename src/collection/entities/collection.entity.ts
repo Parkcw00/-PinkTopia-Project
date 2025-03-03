@@ -1,5 +1,5 @@
-import { Pinkmong } from 'src/pinkmong/entities/pinkmong.entity';
-import { User } from 'src/user/entities/user.entity';
+import { Pinkmong } from '../../pinkmong/entities/pinkmong.entity';
+import { User } from '../../user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,

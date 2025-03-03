@@ -11,8 +11,8 @@ import {
   Unique,
 } from 'typeorm';
 import { SubAchievementMissionType } from '../enums/sub-achievement-mission-type.enum';
-import { Achievement } from 'src/achievement/entities/achievement.entity';
-import { AchievementP } from 'src/achievement-p/entities/achievement-p.entity';
+import { Achievement } from '../../achievement/entities/achievement.entity';
+import { AchievementP } from '../../achievement-p/entities/achievement-p.entity';
 
 @Entity({ name: 'sub-achievement' })
 @Unique(['title']) // 유니크 추가

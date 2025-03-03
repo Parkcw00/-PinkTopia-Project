@@ -1,6 +1,6 @@
-import { Chatblacklist } from 'src/chatblacklist/entities/chatblacklist.entity';
-import { Chatmember } from 'src/chatmember/entities/chatmember.entity';
-import { Chatting } from 'src/chatting/entities/chatting.entity';
+import { Chatblacklist } from '../../chatblacklist/entities/chatblacklist.entity';
+import { Chatmember } from '../../chatmember/entities/chatmember.entity';
+import { Chatting } from '../../chatting/entities/chatting.entity';
 import {
   Column,
   CreateDateColumn,
