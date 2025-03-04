@@ -124,6 +124,16 @@ export class UserController {
   async deleteMe(@Request() req) {
     return await this.userService.deleteMe(req.user);
   }
+
+  @Post('charge-diamond')
+  @UseGuards(UserGuard)
+  @ApiOperation({ summary: '다이아 충전' })
+  async chargeDiamond(
+    @Request() req,
+    @Body() body: { amount: number, paymentKey: string, orderId: string }
+  ) {
+    return await this.userService.chargeDiamond(req.user.id, body.amount);
+  }
 }
 
 @ApiTags('Users 기능')
