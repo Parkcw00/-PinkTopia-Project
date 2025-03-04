@@ -2,9 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateStoreItemDto } from './dto/update-store-item.dto';
 import { StoreItem } from './entities/store-item.entity';
 import { StoreItemRepository } from './store-item.repository';
-import { S3Service } from 'src/s3/s3.service';
+import { S3Service } from '../s3/s3.service';
 import { CreateStoreItemDto } from './dto/create-store-item.dto';
-import { ValkeyService } from 'src/valkey/valkey.service';
+import { ValkeyService } from '../valkey/valkey.service';
 
 @Injectable()
 export class StoreItemService {

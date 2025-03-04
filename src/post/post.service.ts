@@ -34,26 +34,25 @@ export class PostService {
   }
 
   async findPosts(): Promise<Post[]> {
-    const posts = await this.postRepository.findPosts();
-
     const cachedPosts: any = await this.valkeyService.get(`posts:`);
     if (cachedPosts) {
       console.log(cachedPosts);
       return cachedPosts; // 캐시된 데이터 반환
     }
+    const posts = await this.postRepository.findPosts();
     await this.valkeyService.set(`posts:`, posts, 60);
     return posts;
   }
 
   async findPost(id: number): Promise<Post> {
-    const post = await this.postRepository.findPost(id);
-    if (!post) {
-      throw new NotFoundException(`게시글을 찾을 수 없습니다.`);
-    }
     const cachedPost: any = await this.valkeyService.get(`post:${id}`);
     if (cachedPost) {
       console.log(cachedPost);
       return cachedPost; // 캐시된 데이터 반환
+    }
+    const post = await this.postRepository.findPost(id);
+    if (!post) {
+      throw new NotFoundException(`게시글을 찾을 수 없습니다.`);
     }
     await this.valkeyService.set(`post:${id}`, post, 60);
     return post;

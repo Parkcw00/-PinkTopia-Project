@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateChattingDto } from './dto/create-chatting.dto';
 import { Chatmember } from '../chatmember/entities/chatmember.entity';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class ChattingRepository {
