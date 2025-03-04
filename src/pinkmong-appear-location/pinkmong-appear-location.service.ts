@@ -31,7 +31,7 @@ export class PinkmongAppearLocationService {
     }*/
 
     for (const location of locations) {
-      const key = `pinkmong-appear-location:${location.id}`; // 고유 ID 사용
+      const key = `pinkmong-appear-location`; //:${location.id}`; // 고유 ID 사용
 
       const locationData = {
         id: location.id,
