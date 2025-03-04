@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { SentryModule } from '@sentry/nestjs/setup';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PostModule } from './post/post.module';
@@ -29,6 +30,8 @@ import { S3Module } from './s3/s3.module';
 import { LocationHistoryModule } from './location-history/location-history.module';
 import { ValkeyModule } from './valkey/valkey.module';
 import { PinkmongAppearLocationModule } from './pinkmong-appear-location/pinkmong-appear-location.module';
+import { SentryGlobalFilter } from '@sentry/nestjs/setup';
+import { APP_FILTER } from '@nestjs/core';
 
 const typeOrmModuleOptions = {
   useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
@@ -56,6 +59,7 @@ const typeOrmModuleOptions = {
 
 @Module({
   imports: [
+    SentryModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
@@ -68,7 +72,6 @@ const typeOrmModuleOptions = {
         DB_SYNC: Joi.boolean().required(),
       }),
     }),
-
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
     PostModule,
     CommentModule,
@@ -96,6 +99,12 @@ const typeOrmModuleOptions = {
     PinkmongAppearLocationModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: SentryGlobalFilter,
+    },
+    AppService,
+  ],
 })
 export class AppModule {}

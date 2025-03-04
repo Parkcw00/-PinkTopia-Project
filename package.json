@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "nest build && npm run sentry:sourcemaps",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -17,7 +17,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org parkchanwoo --project pink-topia dist && sentry-cli sourcemaps upload --org parkchanwoo --project pink-topia dist"
   },
   "dependencies": {
     "@nestjs-modules/ioredis": "^2.0.2",
@@ -31,6 +32,9 @@
     "@nestjs/swagger": "^8.1.1",
     "@nestjs/typeorm": "^11.0.0",
     "@nestjs/websockets": "^10.4.15",
+    "@sentry/cli": "^2.42.2",
+    "@sentry/nestjs": "^9.3.0",
+    "@sentry/profiling-node": "^9.3.0",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.8.1",
     "bcrypt": "^5.1.1",
@@ -105,7 +109,10 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
-    "moduleDirectories": ["node_modules", "<rootDir>"],
+    "moduleDirectories": [
+      "node_modules",
+      "<rootDir>"
+    ],
     "moduleNameMapper": {
       "^src/(.*)$": "<rootDir>/$1"
     }
