@@ -10,7 +10,7 @@ import {
   Request,
   NotFoundException,
 } from '@nestjs/common';
-import { UserGuard } from 'src/user/guards/user-guard';
+import { UserGuard } from '../user/guards/user-guard';
 import { ChattingRoomService } from './chattingroom.service';
 import { ChangeAdmin } from './dto/change-admin.dto';
 import { InviteUser } from './dto/invite-user.dto';
