@@ -253,6 +253,40 @@
             padding: 10px;
             border-bottom: 1px solid #eee;
         }
+
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .pagination button {
+            margin: 5px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: 1px solid #ff69b4;
+            background-color: #ff69b4;
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .pagination button:hover {
+            background-color: #f846a5;
+        }
+
+        .pagination button:disabled {
+            background-color: #ddd;
+            border-color: #ddd;
+            cursor: not-allowed;
+        }
+
+        #page-info {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 0 10px;
+            color: #000000;
+        }
     </style>
 </head>
 
@@ -313,6 +347,13 @@
         <div class="post-list" id="postList">
             <!-- 게시글 목록이 여기에 동적으로 추가됩니다 -->
         </div>
+
+        <div class="pagination">
+            <button id="prev-btn" onclick="changePage(-1)" disabled>이전</button>
+            <span id="page-info">1</span>
+            <button id="next-btn" onclick="changePage(1)">다음</button>
+        </div>
+
     </div>
 
     <!-- 게시글 상세 모달 -->
@@ -383,43 +424,66 @@
             loadPosts();
         });
 
+        let currentPage = 1;
+        const itemsPerPage = 10; // 한 페이지당 게시글 수
+        let totalPosts = 1;
+        let allPosts = []; // 전체 게시글 저장
 
         async function loadPosts() {
             try {
                 const response = await fetch('http://localhost:3000/post', {
-                    headers: {
-                        Authorization: `${localStorage.getItem('accessToken')}`,
-                    },
+                    headers: { Authorization: `${localStorage.getItem('accessToken')}` },
                 });
-                const posts = await response.json();
-                console.log(posts);
-                const postList = document.getElementById('postList');
-                postList.innerHTML = '';
 
-                for (const post of posts) {
-                    const userResponse = await fetch(
-                        `http://localhost:3000/users/${post.user_id}`,
-                        {
-                            headers: {
-                                Authorization: `${localStorage.getItem('accessToken')}`,
-                            },
-                        },
-                    );
-                    const user = await userResponse.json();
-                    const postElement = document.createElement('div');
-                    postElement.className = 'post-item';
-                    postElement.onclick = () => showPostDetail(post.id);
-                    postElement.innerHTML = `
-                        <div class="post-title">${post.title}</div>
-                        <div class="post-info">
-                            작성자: ${user.nickname} |
-                            작성일: ${new Date(post.created_at).toLocaleString()}
-                        </div>
-                    `;
-                    postList.appendChild(postElement);
-                }
+                allPosts = await response.json();
+                // 🔹 게시글을 최신순(내림차순)으로 정렬 (created_at 기준)
+                allPosts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                totalPages = Math.ceil(allPosts.length / itemsPerPage); // 총 페이지 수 계산
+
+                displayPosts();
             } catch (error) {
                 console.error('게시글 로딩 실패:', error);
+            }
+        }
+
+        function displayPosts() {
+            const postList = document.getElementById('postList');
+            postList.innerHTML = '';
+
+            // 현재 페이지에서 보여줄 게시글 가져오기
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedPosts = allPosts.slice(start, end);
+
+            paginatedPosts.forEach(async (post) => {
+                const userResponse = await fetch(`http://localhost:3000/users/${post.user_id}`, {
+                    headers: { Authorization: `${localStorage.getItem('accessToken')}` },
+                });
+                const user = await userResponse.json();
+
+                const postElement = document.createElement('div');
+                postElement.className = 'post-item';
+                postElement.onclick = () => showPostDetail(post.id);
+                postElement.innerHTML = `
+            <div class="post-title">${post.title}</div>
+            <div class="post-info">
+                작성자: ${user.nickname} |
+                작성일: ${new Date(post.created_at).toLocaleString()}
+            </div>
+        `;
+                postList.appendChild(postElement);
+            });
+
+            // 페이지네이션 정보 업데이트
+            document.getElementById("page-info").textContent = `${currentPage} / ${totalPages}`;
+            document.getElementById("prev-btn").disabled = currentPage === 1;
+            document.getElementById("next-btn").disabled = currentPage >= totalPages;
+        }
+
+        function changePage(offset) {
+            if ((currentPage + offset) > 0 && (currentPage + offset) <= totalPages) {
+                currentPage += offset;
+                displayPosts();
             }
         }
 
