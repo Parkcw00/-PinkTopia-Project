@@ -337,6 +337,10 @@
             filteredEvents.forEach(event => {
                 const eventDiv = document.createElement('div');
                 eventDiv.className = 'event-item';
+                // 🔹 날짜 형식을 YYYY-MM-DD 로 변환
+                const createdAt = new Date(event.created_at).toISOString().split('T')[0];
+                const expirationAt = event.expiration_at ? new Date(event.expiration_at).toISOString().split('T')[0] : "종료일 없음";
+
                 eventDiv.innerHTML = `
                     ${event.image ? `<img src="${event.image}" alt="이벤트 이미지" class="event-image">` : ''}
                     <div class="event-title">${event.title}</div>
@@ -344,6 +348,10 @@
                         ${event.status === 'active' ? '진행 중' : '종료됨'}
                     </div>
                     <div class="event-description">${event.content}</div>
+                    <div class="event-dates">
+                    <p><strong>시작일:</strong> ${createdAt}</p>
+                    <p><strong>종료일:</strong> ${expirationAt}</p>
+                    </div>
                     <button class="details-button" onclick="goToEventDetail(${event.id})">자세히 보기</button>
                 `;
                 eventList.appendChild(eventDiv);
