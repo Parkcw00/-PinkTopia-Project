@@ -3,12 +3,12 @@ import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreatePostDto {
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: '제목을 입력해주세요' })
   @ApiProperty({ example: '게시글 제목' })
   title: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: '내용을 입력해주세요' })
   @ApiProperty({ example: '게시글 내용' })
   content: string;
 
