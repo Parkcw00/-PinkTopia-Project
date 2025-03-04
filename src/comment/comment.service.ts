@@ -3,7 +3,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CommentRepository } from './comment.repository';
 import { PostRepository } from '../post/post.repository';
-import { ValkeyService } from 'src/valkey/valkey.service';
+import { ValkeyService } from '../valkey/valkey.service';
 
 @Injectable()
 export class CommentService {
@@ -37,13 +37,13 @@ export class CommentService {
     if (!post) {
       throw new NotFoundException(`게시물이 존재하지 않습니다.`);
     }
-    const comments = await this.commentRepository.findComments(post_id);
     const cachedComments: any = await this.valkeyService.get(
       `comments:${post_id}`,
     );
     if (cachedComments) {
       return cachedComments; // 캐시된 데이터 반환
     }
+    const comments = await this.commentRepository.findComments(post_id);
     await this.valkeyService.set(`comments:${post_id}`, comments, 60);
     return comments;
   }
