@@ -4,9 +4,9 @@ import { Pinkmong } from './entities/pinkmong.entity';
 import { PinkmongService } from './pinkmong.service';
 import { PinkmongController } from './pinkmong.controller';
 import { PinkmongRepository } from './pinkmong.repository';
-import { S3Service } from 'src/s3/s3.service';
-import { ValkeyModule } from 'src/valkey/valkey.module';
-import { ValkeyService } from 'src/valkey/valkey.service';
+import { S3Service } from '../s3/s3.service';
+import { ValkeyModule } from '../valkey/valkey.module';
+import { ValkeyService } from '../valkey/valkey.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Pinkmong]), ValkeyModule],

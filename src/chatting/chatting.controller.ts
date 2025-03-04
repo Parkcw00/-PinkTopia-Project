@@ -12,7 +12,7 @@ import {
 import { ChattingService } from './chatting.service';
 import { CreateChattingDto } from './dto/create-chatting.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UserGuard } from 'src/user/guards/user-guard';
+import { UserGuard } from '../user/guards/user-guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('채팅 조회 및 생성')

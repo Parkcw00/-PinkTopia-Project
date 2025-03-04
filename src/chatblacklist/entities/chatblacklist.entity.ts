@@ -1,5 +1,5 @@
-import { ChattingRoom } from 'src/chattingroom/entities/chattingroom.entity';
-import { User } from 'src/user/entities/user.entity';
+import { ChattingRoom } from '../../chattingroom/entities/chattingroom.entity';
+import { User } from '../../user/entities/user.entity';
 import {
   Column,
   Entity,
