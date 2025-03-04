@@ -4,7 +4,7 @@ import { PostController } from './post.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { PostRepository } from './post.repository';
-import { S3Service } from 'src/s3/s3.service';
+import { S3Service } from '../s3/s3.service';
 import { ValkeyModule } from '../valkey/valkey.module';
 
 @Module({
