@@ -12,30 +12,46 @@
   <body>
     <div id="info" class="box_section" style="width: 600px">
       <img width="100px" src="https://static.toss.im/lotties/error-spot-no-loop-space-apng.png" />
-      <h2>결제를 실패했어요</h2>
+      <h2 id="failTitle">결제를 실패했어요</h2>
 
       <div class="p-grid typography--p" style="margin-top: 50px">
-        <div class="p-grid-col text--left"><b>에러메시지</b></div>
+        <div class="p-grid-col text--left"><b>실패 사유</b></div>
         <div class="p-grid-col text--right" id="message"></div>
       </div>
       <div class="p-grid typography--p" style="margin-top: 10px">
         <div class="p-grid-col text--left"><b>에러코드</b></div>
         <div class="p-grid-col text--right" id="code"></div>
       </div>
+
+      <!-- 버튼 영역 수정 -->
       <div class="p-grid">
-        <button class="button p-grid-col5" onclick="location.href='https://docs.tosspayments.com/guides/v2/payment-widget/integration';">연동 문서</button>
-        <button class="button p-grid-col5" onclick="location.href='https://discord.gg/A4fRFXQhRu';" style="background-color: #e8f3ff; color: #1b64da">실시간 문의</button>
+        <button class="button p-grid-col5" onclick="redirectToShop()">
+          상점으로 돌아가기
+        </button>
       </div>
     </div>
 
     <script>
       const urlParams = new URLSearchParams(window.location.search);
+      const type = urlParams.get('type');
 
-      const codeElement = document.getElementById("code");
-      const messageElement = document.getElementById("message");
+      // 실패 메시지 표시
+      document.getElementById('message').textContent = urlParams.get('message');
+      document.getElementById('code').textContent = urlParams.get('code');
 
-      codeElement.textContent = urlParams.get("code");
-      messageElement.textContent = urlParams.get("message");
+      // 타입에 따른 메시지 설정
+      if (type === 'diamond') {
+        document.getElementById('failTitle').textContent = 
+          '다이아 충전에 실패했어요';
+      } else {
+        document.getElementById('failTitle').textContent = 
+          '상품 구매에 실패했어요';
+      }
+
+      // 상점으로 돌아가기
+      function redirectToShop() {
+        window.location.href = '/public/store-item.html';
+      }
     </script>
   </body>
 </html>
