@@ -16,9 +16,6 @@ import { Response } from 'express';
 import { InventoryService } from '../inventory/inventory.service';
 import { ValkeyService } from '../valkey/valkey.service';
 import { S3Service } from '../s3/s3.service'; // S3 서비스 추가
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
