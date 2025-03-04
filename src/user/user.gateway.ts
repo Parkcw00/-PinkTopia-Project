@@ -8,7 +8,7 @@ import { Server, Socket } from 'socket.io';
 import { UserService } from './user.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { ValkeyService } from 'src/valkey/valkey.service';
+import { ValkeyService } from '../valkey/valkey.service';
 
 @WebSocketGateway({
   cors: {

@@ -8,11 +8,11 @@ import { AchievementC } from 'src/achievement-c/entities/achievement-c.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserGuard } from './guards/user-guard';
-import { InventoryModule } from 'src/inventory/inventory.module';
-import { ValkeyService } from 'src/valkey/valkey.service';
+import { InventoryModule } from '../inventory/inventory.module';
+import { ValkeyService } from '../valkey/valkey.service';
 import { AchievementCRepository } from 'src/achievement-c/achievement-c.repository';
-import { ValkeyModule } from 'src/valkey/valkey.module';
-import { S3Module } from 'src/s3/s3.module';
+import { ValkeyModule } from '../valkey/valkey.module';
+import { S3Module } from '../s3/s3.module';
 
 @Global()
 @Module({
