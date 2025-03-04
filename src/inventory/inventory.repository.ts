@@ -2,9 +2,9 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Inventory } from "./entities/inventory.entity";
-import { Item } from "src/item/entities/item.entity";
+import { Item } from "../item/entities/item.entity";
 import { plainToInstance } from "class-transformer";
-import { CreateItemDto } from "src/item/dto/create-item.dto";
+import { CreateItemDto } from "../item/dto/create-item.dto";
 import { CreateInventoryDto } from "./dto/create-inventory.dto";
 
 @Injectable()

@@ -5,7 +5,7 @@ import { Item } from "./entities/item.entity";
 import { CreateItemDto } from "./dto/create-item.dto";
 import { UpdateItemDto } from "./dto/update-item.dto";
 import { plainToInstance } from "class-transformer";
-import { Inventory } from "src/inventory/entities/inventory.entity";
+import { Inventory } from "../inventory/entities/inventory.entity";
 import { CreateItemWithInventoryDto } from "./dto/create-item-with-inventory.dto";
 
 @Injectable()
