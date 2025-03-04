@@ -39,6 +39,7 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "geolib": "^3.3.4",
@@ -105,7 +106,10 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
-    "moduleDirectories": ["node_modules", "<rootDir>"],
+    "moduleDirectories": [
+      "node_modules",
+      "<rootDir>"
+    ],
     "moduleNameMapper": {
       "^src/(.*)$": "<rootDir>/$1"
     }

@@ -4,6 +4,7 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CommentRepository } from './comment.repository';
 import { PostRepository } from '../post/post.repository';
 import { ValkeyService } from '../valkey/valkey.service';
+import { format, toZonedTime } from 'date-fns-tz'; // ✅ 한국 시간 변환 라이브러리 추가
 
 @Injectable()
 export class CommentService {
@@ -44,8 +45,21 @@ export class CommentService {
       return cachedComments; // 캐시된 데이터 반환
     }
     const comments = await this.commentRepository.findComments(post_id);
+    // ✅ 조회된 댓글들의 시간 변환 (UTC → KST)
+    comments.forEach((comment) => {
+      comment.created_at = this.convertToKoreanTime(comment.created_at);
+      comment.updated_at = this.convertToKoreanTime(comment.updated_at);
+    });
+
     await this.valkeyService.set(`comments:${post_id}`, comments, 60);
     return comments;
+  }
+
+  // ✅ 한국 시간 변환 함수 (Date → Date)
+  private convertToKoreanTime(date: Date | null): Date {
+    if (!date) return new Date(); // ✅ null이 아니라 현재 시간을 반환하도록 변경
+    const timeZone = 'Asia/Seoul';
+    return toZonedTime(date, timeZone);
   }
 
   async updateComment(
