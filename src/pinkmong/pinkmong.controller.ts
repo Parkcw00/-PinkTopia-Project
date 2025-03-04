@@ -11,8 +11,8 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { PinkmongService } from './pinkmong.service';
-import { UserGuard } from 'src/user/guards/user-guard';
-import { AdminGuard } from 'src/user/guards/admin.guard';
+import { UserGuard } from '../user/guards/user-guard';
+import { AdminGuard } from '../user/guards/admin.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreatePinkmongDto } from './dto/create-pinkmong.dto';
 import { UpdatePinkmongDto } from './dto/update-pinkmong.dto';
