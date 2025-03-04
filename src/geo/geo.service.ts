@@ -3,8 +3,8 @@ import Redis from 'ioredis';
 
 @Injectable()
 export class GeoService implements OnModuleInit, OnModuleDestroy {
-  private readonly S_GEO_KEY = 'bookmarksS';
-  private readonly P_GEO_KEY = 'bookmarksP'; // Valkey 내 Geo 데이터 키
+  private readonly S_GEO_KEY = 'sub-achievement';
+  private readonly P_GEO_KEY = 'pinkmong-appear-location'; // Valkey 내 Geo 데이터 키
   private readonly client: Redis;
 
   constructor() {
@@ -94,7 +94,7 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
     const member = data.id.toString(); // 멤버는 고유 식별자로 사용 (문자열 필요)
     // GEO에 위치 데이터 저장
     await this.client.geoadd(key, data.longitude, data.latitude, member);
-    const hashKey = `bookmarksP:${data.id}`;
+    const hashKey = `bookmarkP:${data.id}`;
     await this.client.hset(hashKey, {
       title: data.title,
       region_theme: data.region_theme,
@@ -125,6 +125,7 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
         const hashKey = `bookmarkS:${id}`;
         const details = await this.client.hgetall(hashKey);
         return { id, ...details }; // ID와 상세 정보를 함께 반환
+        // Hash로 저장된 데이터는  ...details 로 객체의 모든 속성을 전개할 수 있다.
       }),
     );
 
@@ -140,25 +141,30 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
   async getNearbyBookmarkP(
     latitude: number,
     longitude: number,
-  ): Promise<any[]> {
-    // 1. GEO에서 반경 5m 내의 북마크 ID 목록 가져오기
-    const nearbyIds = (await this.client.georadius(
+  ): Promise<any | null> {
+    // 1. GEO에서 반경 5m 내의 가장 가까운 북마크 ID 가져오기
+    const nearestIds = (await this.client.geosearch(
       this.P_GEO_KEY,
+      'FROMLONLAT',
       longitude,
       latitude,
+      'BYRADIUS',
       5,
       'm',
+      'ASC', // 가장 가까운 순으로 정렬
+      'COUNT',
+      1, // 1개만 가져옴
     )) as string[];
 
-    // 2. ID 목록을 기반으로 Hash에서 상세 정보 가져오기
-    const bookmarkDetails = await Promise.all(
-      nearbyIds.map(async (id) => {
-        const hashKey = `bookmarkP:${id}`;
-        const details = await this.client.hgetall(hashKey);
-        return { id, ...details }; // ID와 상세 정보를 함께 반환
-      }),
-    );
+    if (!nearestIds || nearestIds.length === 0) return null; // 반경 내 북마크가 없으면 null 반환
 
-    return bookmarkDetails;
+    // 2. 해당 ID의 Hash에서 상세 정보 가져오기
+    const nearestId = nearestIds[0];
+    const hashKey = `bookmarkP:${nearestId}`;
+    const details = await this.client.hgetall(hashKey);
+
+    return details && Object.keys(details).length > 0
+      ? { id: nearestId, ...details }
+      : null;
   }
 }

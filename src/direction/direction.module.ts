@@ -11,11 +11,13 @@ import { SubAchievement } from '../sub-achievement/entities/sub-achievement.enti
 import { PinkmongAppearLocationModule } from '../pinkmong-appear-location/pinkmong-appear-location.module';
 import { AchievementPModule } from '../achievement-p/achievement-p.module';
 import { DirectionGateway } from './direction.gateway';
+import { GeoService } from '../geo/geo.service';
+import { GeoModule } from 'src/geo/geo.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([SubAchievement]),
-    ValkeyModule,
+    ValkeyModule, GeoModule,
     AchievementPModule,
     PinkmongAppearLocationModule,
   ], // ✅ TypeOrmModule에 엔터티 추가
@@ -26,7 +28,7 @@ import { DirectionGateway } from './direction.gateway';
     S3Service,
     ValkeyService,
     SubAchievement,
-    DirectionGateway,
+    DirectionGateway,GeoService,
   ],
   exports: [DirectionService, DirectionRepository, DirectionGateway],
 })
