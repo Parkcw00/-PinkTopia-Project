@@ -7,8 +7,7 @@ const socket = io('/location', {
 function checkAccessToken() {
   const accessToken = localStorage.getItem('accessToken');
   if (!accessToken) {
-    console.error(':x: Access Token이 없습니다. 로그인 페이지로 이동합니다.');
-    window.location.href = '/';
+    console.error(':x: 로그인이 필요합니다.');
   }
   return accessToken; // accessToken을 반환
 }
@@ -22,8 +21,7 @@ const decodedToken = parseJwt(accessToken);
 async function checkAndRefreshToken() {
   const accessToken = localStorage.getItem('accessToken');
   if (!accessToken) {
-    console.error(':x: Access Token이 없습니다. 로그인 페이지로 이동합니다.');
-    window.location.href = '/';
+    console.error(':x: 로그인이 필요합니다.');
     return;
   }
 
@@ -48,7 +46,6 @@ async function refreshAccessToken() {
   const refreshToken = getCookie('refreshToken'); // 리프레시 토큰을 쿠키에서 가져오는 함수
   if (!refreshToken) {
     console.error(':x: 리프레시 토큰이 없습니다. 다시 로그인 해주세요.');
-    window.location.href = '/';
     return;
   }
   try {
