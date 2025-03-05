@@ -58,6 +58,47 @@ body {
     width: 100%;
     min-height: 300px !important; /* 📌 모바일에서도 높이 유지 */
   }
+  #userProfileBox {
+    max-width: 140px !important; /* ✅ 강제 적용 */
+    font-size: 12px !important; /* ✅ 글자 크기 더 줄이기 */
+    padding: 4px 6px !important;
+    display: flex;
+    align-items: center;
+  }
+
+  #userProfileBox img {
+    width: 25px !important; /* ✅ 더 작은 크기 */
+    height: 25px !important;
+    margin-right: 5px;
+  }
+
+  .nav .logo-text {
+    font-size: 16px !important; /* ✅ 로고 텍스트도 더 작게 */
+  }
+  .sidebar {
+    width: 0; /* ✅ 기본적으로 숨김 */
+    height: 100vh;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    background-color: #ff69b4;
+    transition: width 0.3s ease; /* ✅ 부드러운 애니메이션 효과 */
+    padding-top: 40px;
+    box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+    overflow-x: hidden; /* ✅ 스크롤 바 없애기 */
+  }
+
+  /* 사이드바 내부 메뉴 스타일 */
+  .sidebar a {
+    font-size: 14px !important; /* ✅ 글자 크기 줄이기 */
+    padding: 10px 15px !important; /* ✅ 메뉴 간격 줄이기 */
+  }
+
+  /* 사이드바가 열릴 때 */
+  .sidebar.open {
+    width: 220px !important; /* ✅ 사이드바가 열릴 때 너비 설정 */
+  }
 }
 
 /* 📌 600px 이상에서는 가로 정렬 유지 */
