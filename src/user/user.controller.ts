@@ -130,9 +130,17 @@ export class UserController {
   @ApiOperation({ summary: '다이아 충전' })
   async chargeDiamond(
     @Request() req,
-    @Body() body: { amount: number, paymentKey: string, orderId: string }
+    @Body() body: { amount: number; paymentKey: string; orderId: string },
   ) {
     return await this.userService.chargeDiamond(req.user.id, body.amount);
+  }
+
+  //엑세스 토큰 갱신
+  @ApiOperation({ summary: '엑세스 토큰 갱신' })
+  @Post('/auth/refresh')
+  async refreshAccessToken(@Request() req, @Res() res: Response) {
+    const refreshToken = req.cookies.refreshToken; // 쿠키에서 리프레시 토큰 가져오기
+    return await this.userService.refreshAccessToken(refreshToken, res);
   }
 }
 
