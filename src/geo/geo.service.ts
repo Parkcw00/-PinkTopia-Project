@@ -141,6 +141,7 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
           longitude: data.data[index].longitude
             ? parseFloat(data.data[index].longitude)
             : null,
+          sub_achievement_images: details.sub_achievement_images || null,
           ...details,
         };
       }),
