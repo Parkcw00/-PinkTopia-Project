@@ -19,6 +19,64 @@ body {
   height: 50px;
 }
 
+/* 로그인 & 회원가입 메뉴 스타일 (PC에서는 원래 크기 유지) */
+#authMenu {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  right: 20px;
+  font-size: 14px; /* PC에서는 원래 크기 유지 */
+  gap: 10px;
+}
+
+/* 로그인/회원가입 링크 스타일 */
+#authMenu a {
+  color: white;
+  text-decoration: none;
+  font-size: 14px; /* PC에서는 유지 */
+  padding: 6px 10px;
+  border-radius: 5px;
+}
+
+#authMenu a:hover {
+  text-decoration: underline;
+}
+
+/* 📌 로그인 & 회원가입 버튼 스타일 */
+.nav .login-links {
+  font-size: 14px; /* 폰트 크기 줄이기 */
+  display: flex;
+  align-items: center;
+  gap: 5px; /* 로그인과 회원가입 사이 간격 */
+  position: absolute;
+  right: 20px; /* 오른쪽 정렬 */
+}
+
+/* 로그인 & 회원가입 링크 스타일 */
+.nav .login-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 12px; /* 모바일에서 글자 크기 줄이기 */
+  padding: 5px 8px;
+  border-radius: 5px;
+}
+
+.nav .login-links a:hover {
+  text-decoration: underline;
+}
+
+/* 📌 모바일에서 로그인/회원가입 크기 더 줄이기 */
+@media (max-width: 500px) {
+  .nav .login-links {
+    font-size: 12px; /* 모바일에서 폰트 크기 더 줄이기 */
+    right: 10px; /* 더 오른쪽으로 정렬 */
+  }
+
+  .nav .login-links a {
+    font-size: 11px; /* 모바일에서 더 작은 글씨 */
+    padding: 4px 6px;
+  }
+}
 /* 📌 모바일 스타일 (768px 이하일 때 적용) */
 @media (max-width: 768px) {
   .nav {
@@ -52,6 +110,17 @@ body {
 
   .route-finder {
     width: 100%;
+  }
+
+  #authMenu {
+    font-size: 12px; /* 모바일에서 폰트 크기 축소 */
+    right: 1px; /* 위치 조정 */
+    gap: 3px; /* 간격 줄이기 */
+  }
+
+  #authMenu a {
+    font-size: 12px; /* 모바일에서 폰트 크기 줄이기 */
+    padding: 4px 6px; /* 버튼 크기 축소 */
   }
 
   #map {

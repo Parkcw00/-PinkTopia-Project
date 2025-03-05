@@ -54,14 +54,15 @@
 
         .store-container {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
+            /* 한 줄에 2개 */
             gap: 20px;
             padding: 20px;
             max-width: 900px;
             margin: 0 auto;
-            margin-top: 20px;
         }
 
+        /* 스토어 아이템 카드 크기 조정 */
         .store-item {
             background: white;
             padding: 15px;
@@ -69,6 +70,10 @@
             box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
             text-align: center;
             transition: transform 0.2s;
+            width: 100%;
+            /* 가로 크기 조정 */
+            max-width: 280px;
+            /* 너무 커지는 것 방지 */
         }
 
         .store-item:hover {

@@ -32,13 +32,16 @@
         /* 인벤토리 그리드 스타일 수정 */
         .inventory-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
+            /* 한 줄에 2개 */
             gap: 20px;
             padding: 20px;
-            max-width: 900px;
+            max-width: 800px;
+            /* 너무 넓어지는 것 방지 */
             margin: 0 auto;
         }
 
+        /* 인벤토리 아이템 크기 조정 */
         .inventory-item {
             background: white;
             padding: 15px;
@@ -46,7 +49,12 @@
             box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
             text-align: center;
             transition: transform 0.2s;
+            width: 100%;
+            /* 가로 크기 조정 */
+            max-width: 300px;
+            /* 너무 커지는 것 방지 */
         }
+
 
         .inventory-item:hover {
             transform: scale(1.05);
