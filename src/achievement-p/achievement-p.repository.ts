@@ -108,6 +108,10 @@ export class AchievementPRepository {
 
     // reward가 문자열일 경우 JSON 파싱, 없으면 기본값 반환
     if (achievement?.reward) {
+      console.log('STEP 0');
+      console.log({ reward: achievement.reward });
+      // { reward: '{gam:100, dia:3}' }
+      // { reward: '{"gam":100, "dia":3}' }
       const rewardData =
         typeof achievement.reward === 'string'
           ? JSON.parse(achievement.reward)
@@ -126,7 +130,7 @@ export class AchievementPRepository {
       .update()
       .set({ pink_gem: () => 'pink_gem + :gem' }) // 보상을 안전하게 추가
       .where('id = :user_id', { user_id })
-      .setParameter('gem', gem) // SQL 인젝션 방지
+      .setParameter('gem', gem) // SQL 인젝션 방지  <- 이거 주석처리하고 테스트 해보기
       .execute();
   }
 
@@ -137,7 +141,7 @@ export class AchievementPRepository {
       .update()
       .set({ pink_dia: () => 'pink_dia + :dia' }) // 보상을 안전하게 추가
       .where('id = :user_id', { user_id })
-      .setParameter('dia', dia) // SQL 인젝션 방지
+      .setParameter('dia', dia) // SQL 인젝션 방지 <- 이거 주석처리하고 테스트 해보기
       .execute();
   }
 }
