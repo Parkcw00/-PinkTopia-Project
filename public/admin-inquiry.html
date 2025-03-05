@@ -296,10 +296,16 @@
                             'Authorization': `${accessToken}`,
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ answer })
+                        body: JSON.stringify({ 
+                            answer: answer,
+                            content: answer,
+                            attachmentUrl: 'none'
+                        })
                     });
 
                     if (!answerResponse.ok) {
+                        const errorText = await answerResponse.text();
+                        console.log('답변 등록 실패 응답:', errorText);
                         throw new Error('답변 등록에 실패했습니다.');
                     }
 
@@ -328,13 +334,17 @@
                         }
                     }
 
+                    let isRefundSuccessful = false;
+
                     if (isApproved) {
                         // 환불 승인 처리
-                        console.log('환불 요청 데이터:', {
+                        const refundData = {
                             paymentKey,
-                            cancelReason: '고객 환불 요청',
-                            cancelAmount: amount
-                        });
+                            amount: amount,
+                            cancelReason: '고객 환불 요청'
+                        };
+
+                        console.log('환불 요청 데이터:', refundData);
 
                         const refundResponse = await fetch('http://localhost:3000/payment/refund', {
                             method: 'POST',
@@ -342,23 +352,36 @@
                                 'Authorization': `${accessToken}`,
                                 'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify({
-                                paymentKey: paymentKey,
-                                cancelReason: '고객 환불 요청',
-                                cancelAmount: amount
-                            })
+                            body: JSON.stringify(refundData)
                         });
 
+                        const responseText = await refundResponse.text();
+                        console.log('환불 응답:', responseText);
+
+                        let refundResult;
+                        try {
+                            refundResult = JSON.parse(responseText);
+                            console.log('환불 처리 결과:', refundResult);
+                        } catch (e) {
+                            console.log('환불 응답이 JSON이 아닙니다:', responseText);
+                        }
+
                         if (!refundResponse.ok) {
-                            const errorData = await refundResponse.json();
-                            console.error('환불 요청 실패:', await refundResponse.text());
-                            throw new Error(errorData.message || '환불 처리에 실패했습니다.');
+                            // 이미 환불된 결제인 경우 답변만 등록
+                            if (refundResult?.message === "이미 환불된 결제입니다.") {
+                                console.log('이미 환불된 결제입니다. 답변만 등록합니다.');
+                                isRefundSuccessful = true;
+                            } else {
+                                throw new Error('환불 처리에 실패했습니다. ' + responseText);
+                            }
+                        } else {
+                            isRefundSuccessful = true;
                         }
                     }
 
                     // 답변 등록
                     const answer = isApproved ? 
-                        '환불이 승인되었습니다. 영업일 기준 3-5일 내에 결제하신 수단으로 환불됩니다.' :
+                        (isRefundSuccessful ? '환불이 승인되었습니다. 영업일 기준 3-5일 내에 결제하신 수단으로 환불됩니다.' : '환불 처리 중 오류가 발생했습니다. 관리자에게 문의해주세요.') :
                         document.getElementById(`answer-${inquiryId}`).value;
 
                     const answerResponse = await fetch(`http://localhost:3000/inquiry/${inquiryId}/answer`, {
@@ -367,14 +390,20 @@
                             'Authorization': `${accessToken}`,
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ answer })
+                        body: JSON.stringify({ 
+                            answer: answer,
+                            content: answer,
+                            attachmentUrl: 'none'
+                        })
                     });
 
                     if (!answerResponse.ok) {
+                        const errorText = await answerResponse.text();
+                        console.log('답변 등록 실패 응답:', errorText);
                         throw new Error('답변 등록에 실패했습니다.');
                     }
 
-                    alert(isApproved ? '환불이 승인되었습니다.' : '환불이 거절되었습니다.');
+                    alert(isApproved ? (isRefundSuccessful ? '환불이 승인되었습니다.' : '환불 처리 중 오류가 발생했습니다.') : '환불이 거절되었습니다.');
                     loadInquiries(); // 목록 새로고침
                 } catch (error) {
                     console.error('환불 처리 실패:', error);

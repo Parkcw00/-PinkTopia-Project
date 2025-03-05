@@ -34,6 +34,10 @@ export class CreateInquiryDto {
   @IsOptional()
   paymentKey?: string;
 
+  @IsNumber()
+  @IsOptional()
+  amount?: number;
+
   @IsString()
   @IsOptional()
   refundReason?: string;

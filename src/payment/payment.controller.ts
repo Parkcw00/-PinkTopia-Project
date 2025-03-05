@@ -33,10 +33,10 @@ export class PaymentController {
   @Post('refund')
   @UseGuards(UserGuard)
   async refundPayment(
-    @Body() body: { paymentKey: string; cancelReason: string; cancelAmount: number },
+    @Body() body: { paymentKey: string; cancelReason: string; amount: number },
     @Request() req,
   ) {
     const userId = req.user.id;
-    return this.paymentService.refundPayment(body.paymentKey, body.cancelReason, userId, body.cancelAmount);
+    return this.paymentService.refundPayment(body.paymentKey, body.cancelReason, userId, body.amount);
   }
 }

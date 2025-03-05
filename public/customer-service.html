@@ -198,7 +198,9 @@
                         purchaseSelect.innerHTML = `
                             <option value="">결제 내역을 선택해주세요</option>
                             ${purchases.map(purchase => `
-                                <option value="${purchase.paymentKey}" ${purchase.isRefunded ? 'disabled' : ''}>
+                                <option value="${purchase.paymentKey}" 
+                                    data-purchase='${JSON.stringify({amount: purchase.amount})}'
+                                    ${purchase.isRefunded ? 'disabled' : ''}>
                                     ${purchase.itemName} - ${new Date(purchase.createdAt).toLocaleDateString()}
                                     ${purchase.isRefunded ? ' (환불완료)' : ''}
                                 </option>
@@ -238,27 +240,49 @@
                 e.preventDefault();
 
                 try {
-                    const formData = new FormData();
-                    formData.append('type', inquiryType.value);
-                    formData.append('title', document.getElementById('title').value);
-                    formData.append('content', document.getElementById('content').value);
+                    const data = {
+                        type: inquiryType.value,
+                        title: document.getElementById('title').value,
+                        content: document.getElementById('content').value
+                    };
 
                     if (inquiryType.value === 'refund') {
-                        formData.append('paymentKey', document.getElementById('purchaseHistory').value);
-                        formData.append('refundReason', document.getElementById('refundReason').value);
+                        const purchaseSelect = document.getElementById('purchaseHistory');
+                        
+                        if (!purchaseSelect.value) {
+                            throw new Error('환불할 결제 내역을 선택해주세요.');
+                        }
+
+                        const selectedOption = purchaseSelect.options[purchaseSelect.selectedIndex];
+                        if (!selectedOption || !selectedOption.dataset.purchase) {
+                            throw new Error('선택된 결제 내역 정보를 찾을 수 없습니다.');
+                        }
+
+                        const purchaseData = JSON.parse(selectedOption.dataset.purchase);
+                        if (!purchaseData.amount) {
+                            throw new Error('결제 금액 정보를 찾을 수 없습니다.');
+                        }
+                        
+                        data.paymentKey = purchaseSelect.value;
+                        data.refundReason = document.getElementById('refundReason').value;
+                        data.amount = Number(purchaseData.amount);
+
+                        // 디버깅을 위한 로그
+                        console.log('환불 요청 데이터:', data);
                     }
 
                     const attachment = document.getElementById('attachment').files[0];
                     if (attachment) {
-                        formData.append('attachment', attachment);
+                        data.attachment = attachment;
                     }
 
                     const response = await fetch('/inquiry', {
                         method: 'POST',
                         headers: {
-                            'Authorization': accessToken
+                            'Authorization': accessToken,
+                            'Content-Type': 'application/json'
                         },
-                        body: formData
+                        body: JSON.stringify(data)
                     });
 
                     if (!response.ok) {

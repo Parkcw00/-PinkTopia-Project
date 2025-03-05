@@ -30,6 +30,9 @@ export class Inquiry {
   paymentKey: string;
 
   @Column({ nullable: true })
+  amount: number;
+
+  @Column({ nullable: true })
   refundReason: string;
 
   @Column({ nullable: true })
