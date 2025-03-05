@@ -118,8 +118,8 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
 
         return {
           id,
-          latitude: parseFloat(location[0]),
-          longitude: parseFloat(location[1]),
+          longitude: parseFloat(location[0]),
+          latitude: parseFloat(location[1]),
         };
       })
       .filter((item) => item !== null); // null 값 제거
@@ -234,8 +234,8 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
     // 1. GEO에서 반경 5m 내의 북마크 ID 목록 가져오기
     const nearbyIds = (await this.client.georadius(
       this.S_GEO_KEY,
-      longitude,
       latitude,
+      longitude,
       5,
       'm',
     )) as string[];
@@ -268,8 +268,8 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
     const nearestIds = (await this.client.geosearch(
       this.P_GEO_KEY,
       'FROMLONLAT',
-      longitude,
       latitude,
+      longitude,
       'BYRADIUS',
       5,
       'm',
