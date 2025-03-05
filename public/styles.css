@@ -44,40 +44,30 @@ body {
   }
 
   .map-section {
-    flex-direction: column; /* 📌 모바일에서 세로 정렬 */
-  }
-
-  .route-finder,
-  #map {
-    width: 100%;
-    flex: none;
-    height: 300px;
-  }
-}
-
-/* 📌 모바일 스타일 (768px 이하일 때 적용) */
-@media (max-width: 768px) {
-  .map-section {
     display: flex;
     flex-direction: column; /* 📌 모바일에서 세로 정렬 */
     align-items: center; /* 가운데 정렬 */
+    width: 100%;
   }
 
-  .route-finder,
+  .route-finder {
+    width: 100%;
+  }
+
   #map {
     width: 100%;
-    flex: none;
-    height: 300px;
+    min-height: 300px !important; /* 📌 모바일에서도 높이 유지 */
   }
 }
 
-/* 📌 추가: 600px 이상에서는 가로 정렬 유지 */
+/* 📌 600px 이상에서는 가로 정렬 유지 */
 @media (min-width: 600px) {
   .map-section {
     display: flex !important;
     flex-direction: row !important; /* 가로 정렬 강제 */
     justify-content: space-between; /* 양쪽 정렬 */
     gap: 20px;
+    width: 100%;
   }
 
   .route-finder {
@@ -85,8 +75,9 @@ body {
   }
 
   #map {
+    flex: 2;
     width: 100%;
-    min-height: 400px; /* 최소 높이 지정 */
+    min-height: 400px !important; /* 📌 최소 높이 지정 */
     background: #f0f0f0; /* 테스트용 배경 추가 */
   }
 }
