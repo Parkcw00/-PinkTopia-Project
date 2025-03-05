@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고객센터 | PinkTopia</title>
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .inquiry-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group select,
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .form-group textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        .submit-button {
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .submit-button:hover {
+            background-color: #ff4da6;
+        }
+
+        .inquiry-history {
+            margin-top: 40px;
+        }
+
+        .inquiry-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .inquiry-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .status-pending {
+            background-color: #ffd700;
+            color: #000;
+        }
+
+        .status-completed {
+            background-color: #90ee90;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>고객센터</h1>
+        
+        <!-- 문의하기 폼 -->
+        <div class="inquiry-form">
+            <h2>문의하기</h2>
+            <form id="inquiryForm">
+                <div class="form-group">
+                    <label for="inquiryType">문의 유형</label>
+                    <select id="inquiryType" required>
+                        <option value="">선택해주세요</option>
+                        <option value="refund">환불 요청</option>
+                        <option value="payment">결제 문의</option>
+                        <option value="bug">버그 신고</option>
+                        <option value="suggestion">기능 제안</option>
+                        <option value="other">기타 문의</option>
+                    </select>
+                </div>
+
+                <!-- 환불 요청 시에만 표시되는 필드들 -->
+                <div id="refundFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="purchaseHistory">환불할 결제 내역 선택</label>
+                        <select id="purchaseHistory" required>
+                            <option value="">결제 내역을 선택해주세요</option>
+                        </select>
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            * 환불하고 싶은 결제 내역을 선택해주세요.
+                        </small>
+                        <button type="button" class="submit-button" style="margin-top: 10px;" onclick="createTestPayment()">
+                            테스트 결제 내역 생성
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label for="refundReason">환불 사유</label>
+                        <select id="refundReason" required>
+                            <option value="">환불 사유를 선택해주세요</option>
+                            <option value="단순 변심">단순 변심</option>
+                            <option value="상품 오배송">상품 오배송</option>
+                            <option value="상품 하자">상품 하자</option>
+                            <option value="서비스 이용 불가">서비스 이용 불가</option>
+                            <option value="기타">기타</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="title">제목</label>
+                    <input type="text" id="title" required placeholder="문의 제목을 입력해주세요">
+                </div>
+
+                <div class="form-group">
+                    <label for="content">내용</label>
+                    <textarea id="content" required placeholder="자세한 내용을 입력해주세요"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="attachment">첨부파일 (선택)</label>
+                    <input type="file" id="attachment" accept="image/*">
+                </div>
+
+                <button type="submit" class="submit-button">문의하기</button>
+            </form>
+        </div>
+
+        <!-- 문의 내역 -->
+        <div class="inquiry-history">
+            <h2>나의 문의 내역</h2>
+            <div id="inquiryList">
+                <!-- 문의 내역이 여기에 동적으로 추가됨 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                alert('로그인이 필요한 서비스입니다.');
+                window.location.href = '/public/log-in.html';
+                return;
+            }
+
+            // 문의 유형 선택에 따른 필드 표시/숨김
+            const inquiryType = document.getElementById('inquiryType');
+            const refundFields = document.getElementById('refundFields');
+
+            // 결제 내역 로드
+            async function loadPurchaseHistory() {
+                try {
+                    const response = await fetch('/payment/history', {
+                        headers: {
+                            'Authorization': accessToken
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('결제 내역을 불러오는데 실패했습니다.');
+                    }
+
+                    const purchases = await response.json();
+                    const purchaseSelect = document.getElementById('purchaseHistory');
+                    
+                    // 결제 내역이 있는 경우에만 옵션 추가
+                    if (purchases.length > 0) {
+                        purchaseSelect.innerHTML = `
+                            <option value="">결제 내역을 선택해주세요</option>
+                            ${purchases.map(purchase => `
+                                <option value="${purchase.paymentKey}" ${purchase.isRefunded ? 'disabled' : ''}>
+                                    ${purchase.itemName} - ${new Date(purchase.createdAt).toLocaleDateString()}
+                                    ${purchase.isRefunded ? ' (환불완료)' : ''}
+                                </option>
+                            `).join('')}
+                        `;
+                    } else {
+                        purchaseSelect.innerHTML = '<option value="">환불 가능한 결제 내역이 없습니다.</option>';
+                    }
+                } catch (error) {
+                    console.error('결제 내역 로드 실패:', error);
+                }
+            }
+
+            inquiryType.addEventListener('change', () => {
+                refundFields.style.display = 
+                    inquiryType.value === 'refund' ? 'block' : 'none';
+                if (inquiryType.value === 'refund') {
+                    loadPurchaseHistory();
+                }
+            });
+
+            // URL에서 결제 키 가져오기
+            const urlParams = new URLSearchParams(window.location.search);
+            const paymentKey = urlParams.get('paymentKey');
+            if (paymentKey) {
+                inquiryType.value = 'refund';
+                refundFields.style.display = 'block';
+                loadPurchaseHistory().then(() => {
+                    const purchaseSelect = document.getElementById('purchaseHistory');
+                    purchaseSelect.value = paymentKey;
+                });
+            }
+
+            // 문의하기 폼 제출
+            const inquiryForm = document.getElementById('inquiryForm');
+            inquiryForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                try {
+                    const formData = new FormData();
+                    formData.append('type', inquiryType.value);
+                    formData.append('title', document.getElementById('title').value);
+                    formData.append('content', document.getElementById('content').value);
+
+                    if (inquiryType.value === 'refund') {
+                        formData.append('paymentKey', document.getElementById('purchaseHistory').value);
+                        formData.append('refundReason', document.getElementById('refundReason').value);
+                    }
+
+                    const attachment = document.getElementById('attachment').files[0];
+                    if (attachment) {
+                        formData.append('attachment', attachment);
+                    }
+
+                    const response = await fetch('/inquiry', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': accessToken
+                        },
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || '문의 등록에 실패했습니다.');
+                    }
+
+                    alert('문의가 등록되었습니다.');
+                    inquiryForm.reset();
+                    loadInquiries(); // 문의 내역 새로고침
+                } catch (error) {
+                    console.error('문의 등록 실패:', error);
+                    alert(error.message || '문의 등록에 실패했습니다.');
+                }
+            });
+
+            // 문의 내역 로드
+            async function loadInquiries() {
+                try {
+                    const response = await fetch('/inquiry/my', {
+                        headers: {
+                            'Authorization': accessToken
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || '문의 내역을 불러오는데 실패했습니다.');
+                    }
+
+                    const inquiries = await response.json();
+                    const inquiryList = document.getElementById('inquiryList');
+                    inquiryList.innerHTML = inquiries.map(inquiry => `
+                        <div class="inquiry-item">
+                            <span class="inquiry-status ${inquiry.status === 'pending' ? 'status-pending' : 'status-completed'}">
+                                ${inquiry.status === 'pending' ? '처리중' : '답변완료'}
+                            </span>
+                            <h3>${inquiry.title}</h3>
+                            <p>${inquiry.content}</p>
+                            <small>${new Date(inquiry.createdAt).toLocaleDateString()}</small>
+                            ${inquiry.answer ? `
+                                <div class="answer">
+                                    <strong>답변:</strong>
+                                    <p>${inquiry.answer}</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('');
+                } catch (error) {
+                    console.error('문의 내역 로드 실패:', error);
+                    alert(error.message || '문의 내역을 불러오는데 실패했습니다.');
+                }
+            }
+
+            // 초기 문의 내역 로드
+            loadInquiries();
+
+            // 테스트 결제 내역 생성
+            async function createTestPayment() {
+                try {
+                    const response = await fetch('/payment/test', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': accessToken
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('테스트 결제 내역 생성에 실패했습니다.');
+                    }
+
+                    alert('테스트 결제 내역이 생성되었습니다.');
+                    loadPurchaseHistory(); // 결제 내역 새로고침
+                } catch (error) {
+                    console.error('테스트 결제 내역 생성 실패:', error);
+                    alert(error.message || '테스트 결제 내역 생성에 실패했습니다.');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

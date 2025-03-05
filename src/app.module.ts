@@ -29,6 +29,8 @@ import { S3Module } from './s3/s3.module';
 import { LocationHistoryModule } from './location-history/location-history.module';
 import { ValkeyModule } from './valkey/valkey.module';
 import { PinkmongAppearLocationModule } from './pinkmong-appear-location/pinkmong-appear-location.module';
+import { InquiryModule } from './inquiry/inquiry.module';
+import { PaymentModule } from './payment/payment.module';
 
 const typeOrmModuleOptions = {
   useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
@@ -45,7 +47,7 @@ const typeOrmModuleOptions = {
     //     ? 'dist/**/*.entity.js' // 배포 환경에서는 컴파일된 파일 사용 - dist 폴더 사용
     //     : 'src/**/*.entity.ts',  // 개발 환경에서는 TypeScript 파일 사용 - src 폴더 안에 있음음 사용
     // ],
-    synchronize: configService.get('DB_SYNC'), //true, // 기존 테이블이 있다면 자동으로 수정됨
+    synchronize: true,
     // migrations: [__dirname + '/**/migrations/*.{ts,js}'], // 모든 폴더 내의 migrations 폴더에서 마이그레이션 파일을 자동으로 등록
     migrationsRun: !configService.get('DB_SYNC'), // 앱 실행 시 마이그레이션 적용
     dropSchema: configService.get('DB_SYNC'),
@@ -66,6 +68,7 @@ const typeOrmModuleOptions = {
         DB_PORT: Joi.number().required(),
         DB_NAME: Joi.string().required(),
         DB_SYNC: Joi.boolean().required(),
+        TOSS_SECRET_KEY: Joi.string().required(),
       }),
     }),
 
@@ -94,6 +97,8 @@ const typeOrmModuleOptions = {
     LocationHistoryModule,
     ValkeyModule,
     PinkmongAppearLocationModule,
+    InquiryModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
