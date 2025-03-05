@@ -9,6 +9,8 @@ import { SubAchievement } from '../sub-achievement/entities/sub-achievement.enti
 import { AchievementC } from '../achievement-c/entities/achievement-c.entity';
 import { Achievement } from '../achievement/entities/achievement.entity';
 import { ValkeyModule } from 'src/valkey/valkey.module';
+import { DataSource } from 'typeorm';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -21,7 +23,15 @@ import { ValkeyModule } from 'src/valkey/valkey.module';
     ValkeyModule,
   ], // ✅ TypeORM 모듈에 AchievementP 등록
   controllers: [AchievementPController],
-  providers: [AchievementPService, AchievementPRepository], // ✅ Repository 등록
+  providers: [
+    AchievementPService,
+    AchievementPRepository,
+    {
+      provide: 'DATA_SOURCE',
+      useFactory: (dataSource: DataSource) => dataSource,
+      inject: [DataSource], // ✅ DataSource 타입 사용
+    },
+  ], // ✅ Repository 등록
   exports: [AchievementPService, AchievementPRepository], // ✅ 다른 모듈에서 사용 가능하도록 export
 })
 export class AchievementPModule {}

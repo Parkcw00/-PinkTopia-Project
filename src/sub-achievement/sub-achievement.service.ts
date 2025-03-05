@@ -182,7 +182,6 @@ export class SubAchievementService {
     return { subAchievement: save };
   }
 
-  /** 이 아레 다 수정하기 */
   async findOne(id: string) {
     //: Promise<SubAchievement> {
     const idS = Number(id);

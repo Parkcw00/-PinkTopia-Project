@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Inject, Injectable } from '@nestjs/common';
+import { QueryRunner, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AchievementP } from './entities/achievement-p.entity';
 import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
@@ -7,9 +7,13 @@ import { AchievementC } from '../achievement-c/entities/achievement-c.entity';
 import { User } from '../user/entities/user.entity';
 import { Achievement } from '../achievement/entities/achievement.entity';
 import { RewardAchievementC } from '../achievement-p/dto/reword-achievement-p.dto';
+import { DataSource } from 'typeorm';
+
 @Injectable()
 export class AchievementPRepository {
   constructor(
+    @Inject('DATA_SOURCE')
+    private readonly dataSource: DataSource,
     @InjectRepository(Achievement)
     private readonly entityA: Repository<Achievement>,
 
@@ -23,6 +27,11 @@ export class AchievementPRepository {
     @InjectRepository(User)
     private readonly entityU: Repository<User>,
   ) {}
+
+  // QueryRunner 생성 메서드 추가
+  getQueryRunner(): QueryRunner {
+    return this.dataSource.createQueryRunner();
+  }
 
   // 유저의 업적P 가져오기
   async findPByUser(user_id: number): Promise<AchievementP[] | []> {
