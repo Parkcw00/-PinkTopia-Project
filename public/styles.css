@@ -102,6 +102,35 @@ body {
   .sidebar.open {
     width: 220px !important; /* ✅ 사이드바가 열릴 때 너비 설정 */
   }
+
+  .user-assets {
+    font-size: 16px !important; /* ✅ 글자 크기 줄이기 */
+    display: flex !important;
+    align-items: center;
+    gap: 5px !important; /* ✅ 간격 줄이기 */
+    padding: 4px 8px !important; /* ✅ 패딩 줄이기 */
+    border-radius: 10px !important; /* ✅ 둥글기 줄이기 */
+    box-shadow: 0 2px 5px rgba(255, 98, 182, 0.2);
+    position: absolute !important;
+    right: 10px !important; /* ✅ 오른쪽 정렬 */
+    top: 53px !important; /* ✅ 네비게이션 바와 간격 조정 */
+  }
+
+  .user-assets .asset-item {
+    font-size: 12px !important; /* ✅ 더 작은 글자 크기 */
+    display: flex !important;
+    align-items: center !important;
+    gap: 3px !important; /* ✅ 아이콘과 숫자 간격 줄이기 */
+  }
+
+  .user-assets .asset-item img {
+    width: 14px !important; /* ✅ 아이콘 크기 줄이기 */
+    height: 14px !important;
+  }
+
+  .user-assets span {
+    font-size: 12px !important; /* ✅ 숫자 크기 줄이기 */
+  }
 }
 
 /* 📌 600px 이상에서는 가로 정렬 유지 */
