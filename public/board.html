@@ -411,6 +411,7 @@
 
         document.addEventListener("DOMContentLoaded", function () {
             const accessToken = localStorage.getItem("accessToken");
+            const userId = localStorage.getItem("user_id"); // 🔹 로그인한 유저 ID 가져오기
 
             if (accessToken) {
                 document.getElementById('loggedInMenu').style.display = 'block';

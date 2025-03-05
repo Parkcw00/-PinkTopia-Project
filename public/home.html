@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>홈 | PinkTopia</title>
-    <link rel="stylesheet" href="/public/H,J,C/styles.css" />
+    <link rel="stylesheet" href="/public/styles.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -268,11 +268,11 @@
         }
     </style>
     <script src="/socket.io/socket.io.js"></script>
-    <script type="text/javascript"
-        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=620f82a72553514014eda92cefcbbaf3"></script>
 </head>
 
 <body>
+    <!-- 카카오맵 API 스크립트 추가 -->
+    <script src="locationUpdates.js"></script>
     <script
         src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=5dc1bc6ffb574e60204390643bad8557&libraries=services,clusterer,drawing"></script>
     <div id="overlay"></div>
@@ -755,12 +755,6 @@
             </div>
         </div>
     </div>
-
-    <!-- 카카오맵 API 스크립트 추가 -->
-    <script type="text/javascript"
-        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5dc1bc6ffb574e60204390643bad8557"></script>
-    <script src="/public/H,J,C/script.js"></script>
-    <script src="locationUpdates.js"></script>
 </body>
 
 </html>
