@@ -80,10 +80,13 @@ export class EventController {
    */
   @Patch(':eventId')
   @UseGuards(UserGuard, AdminGuard)
+  @UseInterceptors(FileInterceptor('file')) // ✅ 파일 업로드 처리 추가
   updateEvent(
     @Param('eventId') eventId: number,
+    @UploadedFile() file: Express.Multer.File, // ✅ 파일 받기 추가
     @Body() updateEventDto: UpdateEventDto,
   ) {
+    console.log('🛠️ 이벤트 수정 요청 들어옴:', eventId, updateEventDto);
     return this.eventService.updateEvent(eventId, updateEventDto);
   }
 

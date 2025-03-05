@@ -253,6 +253,40 @@
             padding: 10px;
             border-bottom: 1px solid #eee;
         }
+
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .pagination button {
+            margin: 5px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: 1px solid #ff69b4;
+            background-color: #ff69b4;
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .pagination button:hover {
+            background-color: #f846a5;
+        }
+
+        .pagination button:disabled {
+            background-color: #ddd;
+            border-color: #ddd;
+            cursor: not-allowed;
+        }
+
+        #page-info {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 0 10px;
+            color: #000000;
+        }
     </style>
 </head>
 
@@ -313,6 +347,13 @@
         <div class="post-list" id="postList">
             <!-- 게시글 목록이 여기에 동적으로 추가됩니다 -->
         </div>
+
+        <div class="pagination">
+            <button id="prev-btn" onclick="changePage(-1)" disabled>이전</button>
+            <span id="page-info">1</span>
+            <button id="next-btn" onclick="changePage(1)">다음</button>
+        </div>
+
     </div>
 
     <!-- 게시글 상세 모달 -->
@@ -370,6 +411,7 @@
 
         document.addEventListener("DOMContentLoaded", function () {
             const accessToken = localStorage.getItem("accessToken");
+            const userId = localStorage.getItem("user_id"); // 🔹 로그인한 유저 ID 가져오기
 
             if (accessToken) {
                 document.getElementById('loggedInMenu').style.display = 'block';
@@ -383,43 +425,89 @@
             loadPosts();
         });
 
+        let currentPage = 1;
+        const itemsPerPage = 10; // 한 페이지당 게시글 수
+        let totalPosts = 1;
+        let allPosts = []; // 전체 게시글 저장
 
         async function loadPosts() {
             try {
                 const response = await fetch('http://localhost:3000/post', {
-                    headers: {
-                        Authorization: `${localStorage.getItem('accessToken')}`,
-                    },
+                    headers: { Authorization: `${localStorage.getItem('accessToken')}` },
                 });
-                const posts = await response.json();
-                console.log(posts);
-                const postList = document.getElementById('postList');
-                postList.innerHTML = '';
 
-                for (const post of posts) {
-                    const userResponse = await fetch(
-                        `http://localhost:3000/users/${post.user_id}`,
-                        {
-                            headers: {
-                                Authorization: `${localStorage.getItem('accessToken')}`,
-                            },
-                        },
-                    );
-                    const user = await userResponse.json();
-                    const postElement = document.createElement('div');
-                    postElement.className = 'post-item';
-                    postElement.onclick = () => showPostDetail(post.id);
-                    postElement.innerHTML = `
-                        <div class="post-title">${post.title}</div>
-                        <div class="post-info">
-                            작성자: ${user.nickname} |
-                            작성일: ${new Date(post.created_at).toLocaleString()}
-                        </div>
-                    `;
-                    postList.appendChild(postElement);
-                }
+                allPosts = await response.json();
+                // 🔹 게시글을 최신순(내림차순)으로 정렬 (created_at 기준)
+                allPosts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                totalPages = Math.ceil(allPosts.length / itemsPerPage); // 총 페이지 수 계산
+
+                displayPosts();
             } catch (error) {
                 console.error('게시글 로딩 실패:', error);
+            }
+        }
+
+        function formatKoreanTime(dateString) {
+            if (!dateString) return "날짜 없음";
+
+            const date = new Date(dateString);
+
+            // UTC 기준 시간에서 9시간 추가하여 KST로 변환
+            date.setHours(date.getHours() + 9);
+
+            return date.toLocaleString("ko-KR", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false,
+            });
+        }
+
+
+        function displayPosts() {
+            const postList = document.getElementById('postList');
+            postList.innerHTML = '';
+
+            const loggedInUserId = localStorage.getItem('user_id'); // 🔹 로그인한 유저 ID 가져오기
+
+            // 현재 페이지에서 보여줄 게시글 가져오기
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedPosts = allPosts.slice(start, end);
+
+            paginatedPosts.forEach(async (post) => {
+                const userResponse = await fetch(`http://localhost:3000/users/${post.user_id}`, {
+                    headers: { Authorization: `${localStorage.getItem('accessToken')}` },
+                });
+                const user = await userResponse.json();
+
+                const postElement = document.createElement('div');
+                postElement.className = 'post-item';
+                postElement.onclick = () => showPostDetail(post.id);
+                postElement.innerHTML = `
+            <div class="post-title">${post.title}</div>
+            <div class="post-info">
+                작성자: ${user.nickname} |
+                작성일:  ${formatKoreanTime(post.created_at)}
+            </div>
+             ${loggedInUserId == post.user_id ? `<button class="delete-btn" onclick="deletePost(event, ${post.id})">삭제</button>` : ''}
+        `;
+                postList.appendChild(postElement);
+            });
+
+            // 페이지네이션 정보 업데이트
+            document.getElementById("page-info").textContent = `${currentPage} / ${totalPages}`;
+            document.getElementById("prev-btn").disabled = currentPage === 1;
+            document.getElementById("next-btn").disabled = currentPage >= totalPages;
+        }
+
+        function changePage(offset) {
+            if ((currentPage + offset) > 0 && (currentPage + offset) <= totalPages) {
+                currentPage += offset;
+                displayPosts();
             }
         }
 
@@ -445,7 +533,7 @@
                 document.getElementById('modalTitle').textContent = post.title;
                 document.getElementById('modalContent').textContent = post.content;
                 document.getElementById('modalInfo').textContent =
-                    `작성자: ${user.nickname} | 작성일: ${new Date(post.created_at).toLocaleString()}`;
+                    `작성자: ${user.nickname} | 작성일: ${formatKoreanTime(post.created_at)}`;
 
                 // 이미지 섹션 추가
                 const fileSection = document.createElement('div');
@@ -499,7 +587,7 @@
                         <div>${comment.content}</div>
                         <div class="post-info">
                             ${user.nickname} |
-                            ${new Date(comment.created_at).toLocaleString()}
+                            ${formatKoreanTime(comment.created_at)}
                         </div>
                     `;
                     commentList.appendChild(commentElement);
@@ -589,6 +677,90 @@
                 alert('게시글 작성에 실패했습니다.');
             }
         }
+
+        async function deletePost(event, postId) {
+            event.stopPropagation(); // 게시글 상세보기 이벤트 막기
+
+            if (!confirm("정말 삭제하시겠습니까?")) return;
+
+            try {
+                const response = await fetch(`http://localhost:3000/post/${postId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: `${localStorage.getItem('accessToken')}`,
+                    },
+                });
+
+                if (response.ok) {
+                    alert("게시글이 삭제되었습니다.");
+                    loadPosts(); // 삭제 후 게시글 목록 다시 불러오기
+                } else {
+                    alert("게시글 삭제에 실패했습니다.");
+                }
+            } catch (error) {
+                console.error('게시글 삭제 실패:', error);
+                alert("게시글 삭제에 실패했습니다.");
+            }
+        }
+
+        async function loadComments(postId) {
+            try {
+                const response = await fetch(`http://localhost:3000/comment/${postId}`, {
+                    headers: { Authorization: `${localStorage.getItem('accessToken')}` },
+                });
+
+                const comments = await response.json();
+                const loggedInUserId = localStorage.getItem('user_id'); // 🔹 로그인한 유저 ID 가져오기
+
+                const commentList = document.getElementById('commentList');
+                commentList.innerHTML = '';
+
+                for (const comment of comments) {
+                    const userResponse = await fetch(`http://localhost:3000/users/${comment.user_id}`, {
+                        headers: { Authorization: `${localStorage.getItem('accessToken')}` },
+                    });
+                    const user = await userResponse.json();
+
+                    const commentElement = document.createElement('div');
+                    commentElement.className = 'comment-item';
+                    commentElement.innerHTML = `
+                <div>${comment.content}</div>
+                <div class="post-info">
+                    ${user.nickname} | ${formatKoreanTime(comment.created_at)}
+                </div>
+                ${loggedInUserId == comment.user_id ? `<button class="delete-btn" onclick="deleteComment(${comment.id})">삭제</button>` : ''}
+            `;
+                    commentList.appendChild(commentElement);
+                }
+            } catch (error) {
+                console.error('댓글 로딩 실패:', error);
+            }
+        }
+
+        async function deleteComment(commentId) {
+            if (!confirm("댓글을 삭제하시겠습니까?")) return;
+
+            try {
+                const response = await fetch(`http://localhost:3000/comment/${commentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: `${localStorage.getItem('accessToken')}`,
+                    },
+                });
+
+                if (response.ok) {
+                    alert("댓글이 삭제되었습니다.");
+                    loadComments(currentPostId); // 삭제 후 댓글 목록 다시 불러오기
+                } else {
+                    alert("댓글 삭제에 실패했습니다.");
+                }
+            } catch (error) {
+                console.error('댓글 삭제 실패:', error);
+                alert("댓글 삭제에 실패했습니다.");
+            }
+        }
+
+
 
         async function logout() {
             localStorage.removeItem('accessToken');

@@ -22,19 +22,12 @@ import { AchievementPService } from './achievement-p.service';
 export class AchievementPController {
   constructor(private readonly APService: AchievementPService) {}
 
-  // 로그인 시 유저의 업적P 발키로 올리기
-  @UseGuards(UserGuard)
-  @Post('fill-valkey')
-  async fillValkey(@Request() req) {
-    return await this.APService.fillValkey(req.user.id);
-  }
-
   // 수행으로 등록
   @UseGuards(UserGuard)
   @Post('/subAchievementId/:subAchievementId')
   async post(
     @Request() req,
-    @Param('subAchievementId') subAchievementId: string,
+    @Param('subAchievementId') subAchievementId: number,
   ) {
     console.log('P 생성 컨트롤러');
     return this.APService.post(req.user.id, subAchievementId);
@@ -45,7 +38,7 @@ export class AchievementPController {
   @Delete('/subAchievementId/:subAchievementId')
   async deleteByUserNSub(
     @Request() req,
-    @Param('subAchievementId') subAchievementId: string,
+    @Param('subAchievementId') subAchievementId: number,
   ) {
     return this.APService.deleteByUserNSub(req.user.id, subAchievementId);
   }
