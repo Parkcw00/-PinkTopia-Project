@@ -1,0 +1,92 @@
+/* 기본 스타일 */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
+}
+
+/* 네비게이션 스타일 */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ff69b4;
+  padding: 15px;
+  color: white;
+  font-weight: bold;
+  position: relative;
+  height: 50px;
+}
+
+/* 📌 모바일 스타일 (768px 이하일 때 적용) */
+@media (max-width: 768px) {
+  .nav {
+    flex-direction: row;
+    height: auto;
+    padding: 10px;
+  }
+
+  .menu-icon {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .menu {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .menu a {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .map-section {
+    flex-direction: column; /* 📌 모바일에서 세로 정렬 */
+  }
+
+  .route-finder,
+  #map {
+    width: 100%;
+    flex: none;
+    height: 300px;
+  }
+}
+
+/* 📌 모바일 스타일 (768px 이하일 때 적용) */
+@media (max-width: 768px) {
+  .map-section {
+    display: flex;
+    flex-direction: column; /* 📌 모바일에서 세로 정렬 */
+    align-items: center; /* 가운데 정렬 */
+  }
+
+  .route-finder,
+  #map {
+    width: 100%;
+    flex: none;
+    height: 300px;
+  }
+}
+
+/* 📌 추가: 600px 이상에서는 가로 정렬 유지 */
+@media (min-width: 600px) {
+  .map-section {
+    display: flex !important;
+    flex-direction: row !important; /* 가로 정렬 강제 */
+    justify-content: space-between; /* 양쪽 정렬 */
+    gap: 20px;
+  }
+
+  .route-finder {
+    flex: 1;
+  }
+
+  #map {
+    width: 100%;
+    min-height: 400px; /* 최소 높이 지정 */
+    background: #f0f0f0; /* 테스트용 배경 추가 */
+  }
+}
