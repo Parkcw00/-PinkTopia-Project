@@ -19,6 +19,41 @@ export class DirectionService {
   ) {}
 
   async createBookmarks() {
+    try {
+      // 🔹 S_GEO_KEY 데이터 조회
+      const dataGeoS = await this.geoService.getGeoData('sub-achievement');
+      console.log('S Geo 데이터 : ', dataGeoS);
+      const bookmarkDetailsS = await this.geoService.getHashData(
+        dataGeoS, //.members,
+        'bookmarkS',
+      );
+
+      // 🔹 P_GEO_KEY 데이터 조회
+      const dataGeoP = await this.geoService.getGeoData(
+        'pinkmong-appear-location',
+      );
+      const bookmarkDetailsP = await this.geoService.getHashData(
+        dataGeoP, //.members,
+        'bookmarkP',
+      );
+      console.log(
+        '배열 형태 북마커S : ',
+        ...bookmarkDetailsS,
+        '배열 형태 북마커P : ',
+        ...bookmarkDetailsP,
+      );
+      // 🔹 두 결과를 합쳐서 반환
+      return [...bookmarkDetailsS, ...bookmarkDetailsP];
+    } catch (error) {
+      console.error('❌ Error in BookmarkerService:', error);
+      throw error;
+    }
+  }
+
+  /* const bookMarker = await this.geoService.addBookmarker();
+    console.log('배열 형태 북마커 : ', bookMarker);
+    return bookMarker;*/
+  /*
     // ✅ Redis SCAN을 사용하여 패턴에 맞는 키들을 가져옴
 
     // 서브업적 키만 가져옴
@@ -98,8 +133,7 @@ export class DirectionService {
       }
     }
     //console.log({ bookmarksS, bookmarksP });
-    return { bookmarksS, bookmarksP };
-  }
+    return { bookmarksS, bookmarksP };*/
 
   //발키 P,S 읽어오기
   // 사용자와 거리가 5m 이내인 경우 목록만들기 이벤트S 실행
@@ -116,7 +150,7 @@ export class DirectionService {
     // 🏆 서브업적
     try {
       console.log('🔍 keyssS 확인:1');
-      const nearBybookmarksS = await this.geoService.getNearbyBookmarkP(
+      const nearBybookmarksS = await this.geoService.getNearbyBookmarksS(
         latitude,
         longitude,
       );

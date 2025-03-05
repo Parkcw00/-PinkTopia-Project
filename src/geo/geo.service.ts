@@ -3,7 +3,7 @@ import Redis from 'ioredis';
 
 @Injectable()
 export class GeoService implements OnModuleInit, OnModuleDestroy {
-  private readonly S_GEO_KEY = 'sub-achievement';
+  private readonly S_GEO_KEY = 'sub-achievement'; // Valkey 내 Geo 데이터 키
   private readonly P_GEO_KEY = 'pinkmong-appear-location'; // Valkey 내 Geo 데이터 키
   private readonly client: Redis;
 
@@ -100,6 +100,124 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
       region_theme: data.region_theme,
     });
   }
+  //////////////////////////////
+
+  // geo 읽어서 맵에 북마커 추가하기
+  // 🔹 특정 키의 모든 Geo 데이터를 조회
+  async getGeoData(geoKey) {
+    // console.log('키 : ', geoKey);
+    const members = await this.client.zrange(geoKey, 0, -1);
+    if (!members.length) return { data: [], members: [] };
+    const geoData = await this.client.geopos(geoKey, ...members);
+    console.log('Z범위(members) : ', members, '좌표(geoData): ', geoData);
+
+    let data = members
+      .map((id, index) => {
+        const location = geoData[index]; // geoData[index]가 존재하는지 확인
+        if (!location || location.length < 2) return null; // location이 null 또는 undefined면 null 반환
+
+        return {
+          id,
+          latitude: parseFloat(location[0]),
+          longitude: parseFloat(location[1]),
+        };
+      })
+      .filter((item) => item !== null); // null 값 제거
+    return { data, members };
+  }
+
+  // 🔹 특정 키의 모든 Hash 데이터를 조회
+  async getHashData(data, prefix) {
+    return await Promise.all(
+      data.members.map(async (member, index) => {
+        const hashKey = `${prefix}:${member}`;
+        const details = await this.client.hgetall(hashKey);
+        return {
+          id: member,
+          title: details.title || '',
+          latitude: data.data[index].latitude
+            ? parseFloat(data.data[index].latitude)
+            : null,
+          longitude: data.data[index].longitude
+            ? parseFloat(data.data[index].longitude)
+            : null,
+          ...details,
+        };
+      }),
+    );
+  }
+
+  /* async addBookmarker() {
+    try {
+      //zrange로 모든 멤버를 가져오고, geopos로 해당 멤버들의 좌표를 조회
+      // 1. S_GEO_KEY에서 모든 Geo 데이터 가져오기
+      const sGeoData = await this.client.geopos(
+        this.S_GEO_KEY,
+        ...(await this.client.zrange(this.S_GEO_KEY, 0, -1)),
+      );
+      //Redis 클라이언트를 통해 this.S_GEO_KEY라는 키에 저장된 데이터를 조회
+      // zrange(키, 시작위치, 끝 위치)
+      const sMembers = await this.client.zrange(this.S_GEO_KEY, 0, -1);
+
+      // 2. S_GEO_KEY의 Hash 데이터 가져오기
+      const bookmarkDetails1 = await Promise.all(
+        sMembers.map(async (member, index) => {
+          const hashKey = `bookmarkS:${member}`;
+          const details = await this.client.hgetall(hashKey);
+          const [longitude, latitude] = sGeoData[index] || [];
+          return {
+            id: member,
+            title: details.title || '',
+            latitude: latitude ? parseFloat(latitude) : null,
+            longitude: longitude ? parseFloat(longitude) : null,
+            sub_achievement_images: details.sub_achievement_images || null,
+            ...details,
+          };
+          /**details에 답긴 정보
+            achievement_id: data.achievement_id,           // number
+            content: data.content,                         // string
+            mission_type: data.mission_type,               // string
+            expiration_at: data.expiration_at,             // string | ''
+            created_at: data.created_at,                   // string | ''
+            updated_at: data.updated_at, */
+  /*
+        }),
+      );*/
+
+  // 3. P_GEO_KEY에서 모든 Geo 데이터 가져오기
+  /* const pGeoData = await this.client.geopos(
+        this.P_GEO_KEY,
+        ...(await this.client.zrange(this.P_GEO_KEY, 0, -1)),
+      );
+      const pMembers = await this.client.zrange(this.P_GEO_KEY, 0, -1);
+
+      // 4. P_GEO_KEY의 Hash 데이터 가져오기
+      const bookmarkDetails2 = await Promise.all(
+        pMembers.map(async (member, index) => {
+          const hashKey = `bookmarkP:${member}`;
+          const details = await this.client.hgetall(hashKey);
+          const [longitude, latitude] = pGeoData[index] || [];
+          return {
+            id: member,
+            title: details.title || '',
+            latitude: latitude ? parseFloat(latitude) : null,
+            longitude: longitude ? parseFloat(longitude) : null,
+            ...details,
+          };
+          /**details에 답긴 정보
+            region_theme: data.region_theme,               // string*/ /*
+        }),
+      );
+
+      // 5. 두 결과 합치기
+      return [...bookmarkDetails1, ...bookmarkDetails2];
+    } catch (error) {
+      console.error('Error in addBookmarker:', error);
+      throw error;
+    }
+  }*/
+
+  /////////////////////////////////////
 
   /**
    * 반경 5m 이내 북마크 검색 및 상세 정보 반환
@@ -111,6 +229,7 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
     latitude: number,
     longitude: number,
   ): Promise<any[]> {
+    console.log('범위탐색');
     // 1. GEO에서 반경 5m 내의 북마크 ID 목록 가져오기
     const nearbyIds = (await this.client.georadius(
       this.S_GEO_KEY,
@@ -119,6 +238,7 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
       5,
       'm',
     )) as string[];
+    console.log('범위탐색 nearbyIds: ', nearbyIds);
     // 2. ID 목록을 기반으로 Hash에서 상세 정보 가져오기
     const bookmarkDetails = await Promise.all(
       nearbyIds.map(async (id) => {
@@ -129,7 +249,8 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
       }),
     );
 
-    return bookmarkDetails;
+    console.log('범위탐색 bookmarkDetails: ', bookmarkDetails);
+    return bookmarkDetails; // 널이 반환됨
   }
 
   /**

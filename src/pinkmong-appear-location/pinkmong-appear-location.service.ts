@@ -25,15 +25,8 @@ export class PinkmongAppearLocationService {
     }
 
     for (const location of locations) {
-      const key = `pinkmong-appear-location:${location.id}`;
+      const key = `pinkmong-appear-location`; //:${location.id}`; // 고유 ID 사용
 
-      // 2. GeoService를 통해 반경 5m 내의 다른 북마크 정보 가져오기
-      const nearbyBookmarks = await this.geoService.getNearbyBookmarkP(
-        location.latitude,
-        location.longitude,
-      );
-
-      // 3. Valkey에 저장할 데이터 생성
       const locationData = {
         id: location.id,
         title: location.title,

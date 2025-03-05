@@ -37,11 +37,8 @@ export class SubAchievementService {
       throw new NotFoundException('DB에 서브업적 데이터가 없습니다.');
     }
 
-    // 2. GeoService를 활용하여 파이프라인 생성
-    //const pipeline = this.geoService.multi();
-
     for (const sub of dbSub) {
-      const key = `sub-achievement:${sub.id}`;
+      const key = `sub-achievement`;
       const image =
         typeof sub.sub_achievement_images === 'string'
           ? [sub.sub_achievement_images] // 문자열이면 배열로 변환
@@ -167,7 +164,7 @@ export class SubAchievementService {
     // const delete_achievement_c  =
     await this.repository.delete_achievement_c(achievement_id);
 
-    const key = `sub-achievement:${save.id}`;
+    const key = `sub-achievement`; //:${save.id}`;
     const subData = {
       id: save.id,
       achievement_id: save.achievement_id,
