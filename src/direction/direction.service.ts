@@ -50,91 +50,6 @@ export class DirectionService {
     }
   }
 
-  /* const bookMarker = await this.geoService.addBookmarker();
-    console.log('배열 형태 북마커 : ', bookMarker);
-    return bookMarker;*/
-  /*
-    // ✅ Redis SCAN을 사용하여 패턴에 맞는 키들을 가져옴
-
-    // 서브업적 키만 가져옴
-    const keysS: string[] =
-      await this.valkeyService.getKeysByPattern(`sub-achievement:*`);
-    console.log('🔍 keyssS 확인:', keysS);
-
-    // 핑크몽 발생위치 키만 가져옴
-    const keysP: string[] = await this.valkeyService.getKeysByPattern(
-      `pinkmong-appear-location:*`,
-    );
-    console.log('🔍 keyssP 확인:', keysP);
-
-    const bookmarksS: Array<{
-      subId: any;
-      title: any;
-      latitude: any;
-      longitude: any;
-      mission_type: any;
-      content: any;
-      expiration_at: any;
-      sub_achievement_images: any;
-      achievement_id: any;
-      deleted_at: any;
-    }> = [];
-
-    const bookmarksP: Array<{
-      title: any;
-      latitude: any;
-      longitude: any;
-      region_theme: any;
-      //  content: any; 보류 ㅜㅜ
-      deleted_at: any;
-    }> = [];
-
-    if (!keysS || keysS.length < 1) {
-      throw new NotFoundException('발키에 서브업적 데이터가 없습니다.');
-    }
-    // 반복문 돌면서 키값으로 데이터 읽어오기
-    for (let keyS of keysS) {
-      const data: any = await this.valkeyService.get(keyS);
-
-      if (data && Object.keys(data).length > 0) {
-        bookmarksS.push({
-          subId: data.id,
-          title: data.title,
-          latitude: data.latitude,
-          longitude: data.longitude,
-          mission_type: data.mission_type,
-          content: data.content,
-          expiration_at: data.expiration_at,
-          sub_achievement_images: data.sub_achievement_images,
-          achievement_id: data.achievement_id,
-          deleted_at: data.deleted_at,
-        });
-      }
-    }
-    // console.log('타입확인', bookmarksS);
-
-    if (!keysP || keysP.length < 1) {
-      throw new NotFoundException('발키에 핑크몽 리스트트 데이터가 없습니다.');
-    }
-
-    for (let keyP of keysP) {
-      const dataP: any = await this.valkeyService.get(keyP);
-      // console.log('타입확인', dataP);
-
-      if (dataP && Object.keys(dataP).length > 0) {
-        bookmarksP.push({
-          title: dataP.title,
-          latitude: dataP.latitude,
-          longitude: dataP.longitude,
-          region_theme: dataP.region_theme,
-          //    content: dataP.content,
-          deleted_at: dataP.deleted_at,
-        });
-      }
-    }
-    //console.log({ bookmarksS, bookmarksP });
-    return { bookmarksS, bookmarksP };*/
-
   //발키 P,S 읽어오기
   // 사용자와 거리가 5m 이내인 경우 목록만들기 이벤트S 실행
   //   유저id에 연결된 업적P 목록과 겹치지 않는지 확인. 겹치면 throw, 없으면 업적P에 추가, 알림창 보이기
@@ -162,11 +77,8 @@ export class DirectionService {
           console.log(
             `🎉 이벤트 실행: 유저 ${user_id}가 서브 업적 북마크 [${bookmark.title}] 주변에 진입했습니다.`,
           );
-          try {
-            await this.APService.post(user_id, bookmark.id);
-          } catch (error) {
-            console.error('❌ 업적P 완료 처리 실패:', error);
-          }
+
+          await this.APService.post(user_id, bookmark.id);
         }
       }
     } catch (error) {
@@ -203,11 +115,7 @@ export class DirectionService {
             },
           );
           console.log(`핑크몽 API 호출 성공:`, response.data);
-        } catch (error) {
-          console.error(
-            `핑크몽 API 호출 실패 (테마: ${nearBybookmarkP.region_theme}):`,
-          );
-        }
+        } catch (error) {}
 
         return { triggered: true, bookmark: nearBybookmarkP }; // [변경됨]: 단일 북마크 반환
       } else {

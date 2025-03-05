@@ -36,7 +36,6 @@ export class PinkmongAppearLocationService {
         created_at: location.created_at?.toISOString() || '',
         updated_at: location.updated_at?.toISOString() || '',
         deleted_at: location.deleted_at?.toISOString() || '',
-        nearby_bookmarks: nearbyBookmarks, // 추가된 주변 데이터
       };
 
       console.log('🚀 저장할 데이터:', locationData);

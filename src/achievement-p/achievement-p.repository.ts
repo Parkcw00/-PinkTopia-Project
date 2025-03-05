@@ -6,7 +6,7 @@ import { SubAchievement } from '../sub-achievement/entities/sub-achievement.enti
 import { AchievementC } from '../achievement-c/entities/achievement-c.entity';
 import { User } from '../user/entities/user.entity';
 import { Achievement } from '../achievement/entities/achievement.entity';
-
+import { RewardAchievementC } from '../achievement-p/dto/reword-achievement-p.dto';
 @Injectable()
 export class AchievementPRepository {
   constructor(
@@ -90,36 +90,45 @@ export class AchievementPRepository {
   async saveC(achievement: AchievementC): Promise<AchievementC> {
     return await this.entityC.save(achievement);
   }
-  // 유저에게 보상 지급
-  //async giveReward()
-  // 보상 조회
-  async reward(achievementId: number): Promise<{ reward: any }> {
+
+  async reward(achievementId: number): Promise<RewardAchievementC> {
     const achievement = await this.entityA.findOne({
       where: { id: achievementId },
       select: ['reward'],
     });
 
-    return achievement ? { reward: achievement.reward } : { reward: null };
+    // reward가 문자열일 경우 JSON 파싱, 없으면 기본값 반환
+    if (achievement?.reward) {
+      const rewardData =
+        typeof achievement.reward === 'string'
+          ? JSON.parse(achievement.reward)
+          : achievement.reward;
+      return { reward: rewardData };
+    }
+
+    return { reward: { gem: 0, dia: 0 } };
   }
 
   // 보상 수여 update entityU
-  // 💎 Pink Gem 업데이트
+  // 💎 Pink Gem 업데이트 (SQL 인젝션 방지)
   async gem(user_id: number, gem: number) {
     return await this.entityU
       .createQueryBuilder()
       .update()
-      .set({ pink_gem: () => `pink_gem + ${gem}` }) // 현재 값에 gem 추가
+      .set({ pink_gem: () => 'pink_gem + :gem' }) // 보상을 안전하게 추가
       .where('id = :user_id', { user_id })
+      .setParameter('gem', gem) // SQL 인젝션 방지
       .execute();
   }
 
-  // 💎 Pink Diamond 업데이트
+  // 💎 Pink Diamond 업데이트 (SQL 인젝션 방지)
   async dia(user_id: number, dia: number) {
     return await this.entityU
       .createQueryBuilder()
       .update()
-      .set({ pink_dia: () => `pink_dia + ${dia}` }) // 현재 값에 dia 추가
+      .set({ pink_dia: () => 'pink_dia + :dia' }) // 보상을 안전하게 추가
       .where('id = :user_id', { user_id })
+      .setParameter('dia', dia) // SQL 인젝션 방지
       .execute();
   }
 }
