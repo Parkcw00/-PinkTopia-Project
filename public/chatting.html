@@ -41,16 +41,18 @@
             display: inline-block;
         }
 
+        /* 내 메시지 색상 변경 */
         .my-message {
             float: right;
         }
 
         .my-message .message-content {
-            background-color: #dcf8c6;
+            background-color: #ffb3d9;
         }
 
+        /* 상대방 메시지 색상 변경 */
         .message:not(.my-message) .message-content {
-            background-color: white;
+            background-color: #ffe6f2;
             float: left;
         }
 
@@ -67,13 +69,14 @@
             margin-left: 8px;
         }
 
+        /* 시스템 메시지 색상 변경 */
         .system {
             text-align: center;
         }
 
         .system .message-content {
             background: none;
-            color: #666;
+            color: #141012;
             font-style: italic;
         }
 
@@ -85,17 +88,19 @@
             border-radius: 8px;
         }
 
+        /* 입력창 테두리 색상 변경 */
         .input-area input {
             flex: 1;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 2px solid #ff69b4;
             border-radius: 4px;
             font-size: 14px;
         }
 
+        /* 버튼 색상 변경 */
         .button {
             padding: 10px 20px;
-            background-color: #4caf50;
+            background-color: #ff69b4;
             color: white;
             border: none;
             border-radius: 4px;
@@ -103,8 +108,9 @@
             font-size: 14px;
         }
 
+        /* 버튼 hover 색상 변경 */
         .button:hover {
-            background-color: #45a049;
+            background-color: #ff4da6;
         }
 
         /* 메시지 컨테이너 clear fix */
@@ -124,7 +130,8 @@
 </head>
 
 <body>
-    <div class="nav" style="display: flex; justify-content: space-between; background-color: #ff69b4; padding: 15px; color: white; font-weight: bold;">
+    <div class="nav"
+        style="display: flex; justify-content: space-between; background-color: #ff69b4; padding: 15px; color: white; font-weight: bold;">
         <div>
             <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTophia</a>
         </div>
