@@ -236,7 +236,10 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
       this.S_GEO_KEY,
       longitude,
       latitude,
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/dev
       5,
       'm',
     )) as string[];
@@ -269,8 +272,8 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
     const nearestIds = (await this.client.geosearch(
       this.P_GEO_KEY,
       'FROMLONLAT',
-      latitude,
       longitude,
+      latitude,
       'BYRADIUS',
       5,
       'm',
