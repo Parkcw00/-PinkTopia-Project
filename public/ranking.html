@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>랭킹 | PinkTopia</title>
+    <link rel="stylesheet" href="/public/styles.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -207,7 +208,7 @@
             font-weight: bold;
             color: #993969;
             background: #ffe4f0;
-            padding: 8px 12px;
+            padding: 8px 8px;
             /* 🔹 박스 크기 조절 */
             border-radius: 7px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -221,7 +222,7 @@
             position: absolute;
             right: 22px;
             /* 원하는 만큼 조정 */
-            top: 200px;
+            top: 100px;
             /* 원하는 위치로 조정 */
         }
 
@@ -426,19 +427,25 @@
 
                 // 🔹 포인트 랭킹 가져오기
                 const pointResponse = await fetch(`${baseURL}/user/ranking/point`);
-                // console.log("📡 포인트 랭킹 응답 상태:", pointResponse.status);
                 if (!pointResponse.ok) throw new Error("포인트 랭킹 데이터를 불러오지 못했습니다.");
                 const pointData = await pointResponse.json();
-                // console.log("📊 포인트 랭킹 데이터:", pointData);
                 myPointRank = displayRanking('pointRanking', pointData, 'collection_point', myNickname); // 내 순위 저장
 
                 // 🔹 업적 랭킹 가져오기
+                // const achievementResponse = await fetch(`${baseURL}/user/ranking/achievement`);
+                // if (!achievementResponse.ok) throw new Error("업적 랭킹 데이터를 불러오지 못했습니다.");
+                // const achievementData = await achievementResponse.json();
+                // myAchievementRank = displayRanking('achievementRanking', achievementData, 'achievementCount', myNickname); // 내 순위 저장
+
+                // 🔹 업적 랭킹 가져오기
                 const achievementResponse = await fetch(`${baseURL}/user/ranking/achievement`);
-                // console.log("📡 업적 랭킹 응답 상태:", achievementResponse.status);
                 if (!achievementResponse.ok) throw new Error("업적 랭킹 데이터를 불러오지 못했습니다.");
-                const achievementData = await achievementResponse.json();
-                // console.log("📊 업적 랭킹 데이터:", achievementData);
-                myAchievementRank = displayRanking('achievementRanking', achievementData, 'achievementCount', myNickname); // 내 순위 저장
+                let achievementData = await achievementResponse.json();
+
+                // 🔽 **업적 개수 기준으로 내림차순 정렬 (많은 순서대로)**
+                achievementData.sort((a, b) => b.achievementCount - a.achievementCount);
+
+                myAchievementRank = displayRanking('achievementRanking', achievementData, 'achievementCount', myNickname);
 
                 // 🔹 내 순위 표시 업데이트
                 updateMyRank(myPointRank, myAchievementRank);

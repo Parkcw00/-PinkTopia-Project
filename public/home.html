@@ -323,7 +323,7 @@
                         <label for="end" class="form-label">도착지</label>
                         <input type="text" class="form-control" id="end" placeholder="도착지를 입력하세요" />
                     </div>
-                    <button class="route-button" onclick="findRoute()" style="
+                    <button class="route-button" onclick="openDirection()" style="
                 width: 100%;
                 padding: 10px;
                 background: #ff69b4;
@@ -653,7 +653,7 @@
                     // 기본 메뉴만 있는 경우
                     menuList.innerHTML += `
                         <a href="/public/chattingrooms.html">채팅</a>
-                        <a href="/public/pinkmong-dex.html">핑크몽 개인 도감</a>
+                        <a href="/public/collection.html">핑크몽 개인 도감</a>
                         <a href="/public/inventory.html">인벤토리 아이템</a>
                         <a href="/public/achievements.html">업적</a>
                     `;
