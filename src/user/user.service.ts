@@ -545,6 +545,8 @@ export class UserService {
     } catch (error) {
       throw new InternalServerErrorException('다이아 차감 중 오류가 발생했습니다.');
     }
+  }
+
   // 🔹 엑세스 토큰 갱신
   async refreshAccessToken(refreshToken: string, @Res() res: Response) {
     if (!refreshToken) {
