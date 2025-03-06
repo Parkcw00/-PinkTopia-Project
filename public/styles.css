@@ -157,7 +157,7 @@ body {
 
   .store-item button,
   .inventory-item button {
-    font-size: 15px !important; /* 태블릿에서 버튼 폰트 크기 조정 */
+    font-size: 17px !important; /* 태블릿에서 버튼 폰트 크기 조정 */
     padding: 8px !important;
   }
 }
