@@ -127,16 +127,19 @@ body {
     width: 100%;
     min-height: 300px !important; /* 📌 모바일에서도 높이 유지 */
   }
+
   #userProfileBox {
-    position: fixed;
+    position: absolute; /* ✅ 네비게이션 바 내부에서만 움직이도록 설정 */
     right: 10px; /* ✅ 네비게이션 바의 오른쪽 끝에 정렬 */
-    top: 80px; /* ✅ 네비게이션 바 바로 아래로 배치 */
+    top: 75px; /* ✅ 네비게이션 바의 중간 정렬 */
+    transform: translateY(-50%); /* ✅ 세로 정렬 조정 */
 
     max-width: 140px !important; /* ✅ 강제 적용 */
     font-size: 12px !important; /* ✅ 글자 크기 더 줄이기 */
     padding: 4px 6px !important;
     display: flex;
     align-items: center;
+    white-space: nowrap; /* ✅ 텍스트 줄바꿈 방지 */
   }
 
   #userProfileBox img {
