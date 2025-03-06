@@ -32,12 +32,17 @@ export class DirectionController {
   @Patch('compare-bookmark')
   async compareBookmark(
     @Request() req,
-    @Body() compareDirection: { user_direction: { latitude: number; longitude: number } },
+    @Body()
+    compareDirection: {
+      user_direction: { latitude: number; longitude: number };
+    },
     @ConnectedSocket() client: Socket,
   ) {
+    console.log(compareDirection);
     return this.directionService.compareBookmark(
       req.user.id,
-      compareDirection.user_direction.latitude,compareDirection.user_direction.longitude,
+      compareDirection.user_direction.latitude,
+      compareDirection.user_direction.longitude,
       client,
     );
   }
