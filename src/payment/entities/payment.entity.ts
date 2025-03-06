@@ -21,6 +21,9 @@ export class Payment {
   @Column({ default: false })
   isRefunded: boolean;
 
+  @Column({ nullable: true })
+  diamondBeforePurchase: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
