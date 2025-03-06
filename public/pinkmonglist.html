@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>핑크몽 조회</title>
+    <link rel="stylesheet" href="/public/styles.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -379,9 +380,12 @@
                     <td><a href="pinkmong-detail.html?id=${pinkmong.id}">상세보기</a></td>
                 </tr>`;
             });
+            const totalPages = Math.ceil(filteredPinkmongs.length / itemsPerPage);
 
+            // 페이지 정보 업데이트
+            document.getElementById("page-info").textContent = `${currentPage} / ${totalPages}`;
             document.getElementById("prev-btn").disabled = currentPage === 1;
-            document.getElementById("next-btn").disabled = end >= filteredPinkmongs.length;
+            document.getElementById("next-btn").disabled = currentPage >= totalPages;
         }
 
         function changePage(offset) {
@@ -440,7 +444,7 @@
                 localStorage.removeItem("accessToken");
 
                 console.log("✅ 로그아웃 성공! 페이지 이동");
-                window.location.href = "/public/log-in.html"; // 로그인 페이지로 이동
+                window.location.href = "/"; //
             } catch (error) {
                 console.error("❌ 로그아웃 실패:", error);
                 alert("로그아웃 중 오류가 발생했습니다.");

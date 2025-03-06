@@ -7,10 +7,7 @@ import { CreateChattingDto } from './dto/create-chatting.dto';
 import { ChattingRepository } from './chatting.repository';
 import { S3Service } from '../s3/s3.service';
 import { UploadChattingDto } from './dto/create-upload-chatting.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Chatting } from './entities/chatting.entity';
-import { ValkeyService } from 'src/valkey/valkey.service';
+import { ValkeyService } from '../valkey/valkey.service';
 
 @Injectable()
 export class ChattingService {
@@ -39,9 +36,9 @@ export class ChattingService {
       // Redis에서 메시지 수 확인
       const messageCount = await this.valkeyService.llen(chatting_room_id);
 
-      if (messageCount >= 5) {
-        // 5개 이상일 경우 오래된 메시지를 DB에 저장
-        for (let i = 0; i < messageCount - 5; i++) {
+      if (messageCount >= 1000) {
+        // 1000개 이상일 경우 오래된 메시지를 DB에 저장
+        for (let i = 0; i < messageCount - 1000; i++) {
           const msg = await this.valkeyService.lpop(chatting_room_id); // Redis에서 오래된 메시지 가져오기
           if (msg) {
             // DB에 저장

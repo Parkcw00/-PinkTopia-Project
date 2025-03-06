@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="https://static.toss.im/icons/png/4x/icon-toss-logo.png" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>결제하기 | PinkTopia</title>
+    <script src="https://js.tosspayments.com/v2/standard"></script>
+  </head>
+
+  <body>
+    <!-- 주문서 영역 -->
+    <div class="wrapper">
+      <div class="box_section" style="padding: 40px 30px 50px 30px; margin-top: 30px; margin-bottom: 50px">
+        <!-- 결제 정보 표시 -->
+        <div class="payment-info" style="margin-bottom: 30px;">
+          <h2 id="orderTitle" style="color: #333; margin-bottom: 20px;">결제 정보</h2>
+          <div class="info-row" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span>상품명</span>
+            <span id="orderName" style="font-weight: bold;"></span>
+          </div>
+          <div class="info-row" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+            <span>결제 금액</span>
+            <span id="orderAmount" style="font-weight: bold; color: #ff69b4;"></span>
+          </div>
+          <hr style="margin: 20px 0;">
+        </div>
+
+        <!-- 결제 UI -->
+        <div id="payment-method"></div>
+        <!-- 이용약관 UI -->
+        <div id="agreement"></div>
+
+        <!-- 결제하기 버튼 -->
+        <div class="result wrapper">
+          <button class="button" id="payment-button" style="margin-top: 30px">
+            결제하기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const clientKey = 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm';
+      
+      async function main() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const itemName = urlParams.get('itemName') || '상품';
+        const price = parseInt(urlParams.get('price')) || 0;
+        const type = urlParams.get('type');
+
+        // 결제 정보 표시
+        document.getElementById('orderName').textContent = itemName;
+        document.getElementById('orderAmount').textContent = price.toLocaleString() + '원';
+        
+        if (type === 'diamond') {
+          document.getElementById('orderTitle').textContent = '다이아 충전';
+        }
+
+        // 토스페이먼츠 초기화
+        const tossPayments = TossPayments(clientKey);
+        // 결제 위젯 초기화 (비회원 결제)
+        const widgets = tossPayments.widgets({ customerKey: TossPayments.ANONYMOUS });
+
+        // 결제 금액 설정
+        await widgets.setAmount({
+          currency: 'KRW',
+          value: price,
+        });
+
+        // 결제 UI와 이용약관 렌더링
+        await Promise.all([
+          widgets.renderPaymentMethods({
+            selector: '#payment-method',
+            variantKey: 'DEFAULT',
+          }),
+          widgets.renderAgreement({
+            selector: '#agreement',
+            variantKey: 'AGREEMENT'
+          }),
+        ]);
+
+        // 결제하기 버튼 이벤트 연결
+        const button = document.getElementById('payment-button');
+        button.addEventListener('click', async () => {
+          try {
+            const orderId = generateRandomString(); // orderId를 한 번만 생성
+            await widgets.requestPayment({
+              orderId: orderId,
+              orderName: itemName,
+              customerName: '구매자',
+              // URL 경로 수정 - /public/toss/ 추가
+              successUrl: window.location.origin + `/public/toss/success.html?orderId=${orderId}&amount=${price}&itemName=${encodeURIComponent(itemName)}&type=${type}`,
+              failUrl: window.location.origin + `/public/toss/fail.html?orderId=${orderId}&message=결제실패`,
+              // 필수 고객 정보
+              customerMobilePhone: '01012341234',
+              customerEmail: 'customer@example.com',
+            });
+          } catch (error) {
+            if (error.code === 'USER_CANCEL') {
+              alert('결제가 취소되었습니다.');
+            } else {
+              alert('결제 시스템 연결 중 오류가 발생했습니다.');
+              console.error('결제 실패:', error);
+            }
+          }
+        });
+      }
+
+      function generateRandomString() {
+        return Math.random().toString(36).slice(2);
+      }
+
+      main().catch(error => {
+        console.error('초기화 실패:', error);
+        alert('결제 시스템 초기화 중 오류가 발생했습니다.');
+      });
+    </script>
+  </body>
+</html>

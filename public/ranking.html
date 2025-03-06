@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>랭킹 | PinkTopia</title>
+    <link rel="stylesheet" href="/public/styles.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -192,6 +193,44 @@
             cursor: pointer;
             color: white;
         }
+
+        .ranking-info {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #993969;
+            margin-bottom: 10px;
+        }
+
+        #myRankContainer {
+            font-size: 16px;
+            /* 🔹 폰트 크기 조정 */
+            font-weight: bold;
+            color: #993969;
+            background: #ffe4f0;
+            padding: 8px 8px;
+            /* 🔹 박스 크기 조절 */
+            border-radius: 7px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+
+            /* 🔹 박스 크기 유지 */
+            display: inline-block;
+            /* ✅ 자동 크기 조정 */
+
+            /* 🔹 오른쪽 정렬 */
+            position: absolute;
+            right: 22px;
+            /* 원하는 만큼 조정 */
+            top: 100px;
+            /* 원하는 위치로 조정 */
+        }
+
+
+        #myRankContainer:hover {
+            transform: scale(1.05);
+            /* 🔹 마우스 올리면 살짝 커지게 */
+        }
     </style>
 </head>
 
@@ -240,6 +279,12 @@
 
     <div class="container">
         <h1>랭킹</h1>
+
+        <!-- 🔹 랭킹 초기화 안내 문구 추가 -->
+        <p class="ranking-info"> ⭐ 랭킹은 10위까지 표시됩니다. ⭐</p>
+        <p class="ranking-info"> ⭐ 랭킹은 1분 30초마다 초기화됩니다. ⭐</p>
+
+        <div id="myRankContainer" style="text-align:right; font-weight:bold; margin-bottom: 10px;"></div>
 
         <div class="tabs">
             <div class="tab active" onclick="showRanking('point')">포인트 랭킹</div>
@@ -296,6 +341,9 @@
                 document.getElementById('loggedInMenu').style.display = 'none';
                 document.getElementById('loggedOutMenu').style.display = 'block';
             }
+
+            console.log("✅ DOMContentLoaded 이벤트 실행됨");
+            fetchRankings();
         });
 
         async function logout() {
@@ -325,7 +373,7 @@
                 localStorage.removeItem("accessToken");
 
                 console.log("✅ 로그아웃 성공! 페이지 이동");
-                window.location.href = "/public/log-in.html"; // 로그인 페이지로 이동
+                window.location.href = "/"; //
             } catch (error) {
                 console.error("❌ 로그아웃 실패:", error);
                 alert("로그아웃 중 오류가 발생했습니다.");
@@ -335,64 +383,116 @@
 
         function showRanking(type) {
             // 모든 탭과 섹션의 active 클래스 제거
-            document
-                .querySelectorAll('.tab')
-                .forEach((tab) => tab.classList.remove('active'));
-            document
-                .querySelectorAll('.ranking-section')
-                .forEach((section) => section.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach((tab) => tab.classList.remove('active'));
+            document.querySelectorAll('.ranking-section').forEach((section) => section.classList.remove('active'));
 
             // 선택된 탭과 섹션에 active 클래스 추가
             if (type === 'point') {
                 document.querySelector('.tab:first-child').classList.add('active');
-                document
-                    .getElementById('pointRankingSection')
-                    .classList.add('active');
+                document.getElementById('pointRankingSection').classList.add('active');
+                updateMyRank(myPointRank, myAchievementRank); // 🔹 내 순위 다시 표시
             } else {
                 document.querySelector('.tab:last-child').classList.add('active');
-                document
-                    .getElementById('achievementRankingSection')
-                    .classList.add('active');
+                document.getElementById('achievementRankingSection').classList.add('active');
+                updateMyRank(myPointRank, myAchievementRank); // 🔹 내 순위 다시 표시
             }
         }
+
+
+        let myPointRank = null; // 🔹 포인트 랭킹 내 순위 저장
+        let myAchievementRank = null; // 🔹 업적 랭킹 내 순위 저장
+
+        const baseURL = "http://localhost:3000"; // NestJS 서버 주소
 
         async function fetchRankings() {
             try {
-                // 포인트 랭킹 가져오기
-                const pointResponse = await fetch('/user/ranking/point');
-                const pointData = await pointResponse.json();
-                displayRanking('pointRanking', pointData, 'collection_point');
+                const accessToken = localStorage.getItem("accessToken");
+                let myNickname = null;
 
-                // 업적 랭킹 가져오기
-                const achievementResponse = await fetch('/user/ranking/achievement');
-                const achievementData = await achievementResponse.json();
-                displayRanking(
-                    'achievementRanking',
-                    achievementData,
-                    'achievementCount',
-                );
+                // 🔹 로그인한 사용자의 닉네임 가져오기
+                if (accessToken) {
+                    const userResponse = await fetch(`${baseURL}/user/me`, {
+                        method: "GET",
+                        headers: { "Authorization": accessToken }
+                    });
+
+                    if (userResponse.ok) {
+                        const userData = await userResponse.json();
+                        myNickname = userData.nickname;
+                        console.log("👤 내 닉네임:", myNickname);
+                    } else {
+                        console.warn("❌ 사용자 정보를 가져오는 데 실패");
+                    }
+                }
+
+                // 🔹 포인트 랭킹 가져오기
+                const pointResponse = await fetch(`${baseURL}/user/ranking/point`);
+                if (!pointResponse.ok) throw new Error("포인트 랭킹 데이터를 불러오지 못했습니다.");
+                const pointData = await pointResponse.json();
+                myPointRank = displayRanking('pointRanking', pointData, 'collection_point', myNickname); // 내 순위 저장
+
+                // 🔹 업적 랭킹 가져오기
+                // const achievementResponse = await fetch(`${baseURL}/user/ranking/achievement`);
+                // if (!achievementResponse.ok) throw new Error("업적 랭킹 데이터를 불러오지 못했습니다.");
+                // const achievementData = await achievementResponse.json();
+                // myAchievementRank = displayRanking('achievementRanking', achievementData, 'achievementCount', myNickname); // 내 순위 저장
+
+                // 🔹 업적 랭킹 가져오기
+                const achievementResponse = await fetch(`${baseURL}/user/ranking/achievement`);
+                if (!achievementResponse.ok) throw new Error("업적 랭킹 데이터를 불러오지 못했습니다.");
+                let achievementData = await achievementResponse.json();
+
+                // 🔽 **업적 개수 기준으로 내림차순 정렬 (많은 순서대로)**
+                achievementData.sort((a, b) => b.achievementCount - a.achievementCount);
+
+                myAchievementRank = displayRanking('achievementRanking', achievementData, 'achievementCount', myNickname);
+
+                // 🔹 내 순위 표시 업데이트
+                updateMyRank(myPointRank, myAchievementRank);
+
             } catch (error) {
-                console.error(
-                    '랭킹 데이터를 가져오는 중 오류가 발생했습니다:',
-                    error,
-                );
+                console.error('❌ 랭킹 데이터를 가져오는 중 오류:', error);
+                alert("랭킹 데이터를 불러오는 데 문제가 발생했습니다.");
             }
         }
 
-        function displayRanking(tableId, data, scoreField) {
+        function displayRanking(tableId, data, scoreField, myNickname) {
             const tbody = document.querySelector(`#${tableId} tbody`);
             tbody.innerHTML = '';
+
+            let myRank = null;
 
             data.forEach((user, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td class="rank">${index + 1}</td>
-                    <td>${user.nickname}</td>
-                    <td>${user[scoreField]}</td>
-                `;
+            <td class="rank">${index + 1}</td>
+            <td>${user.nickname}</td>
+            <td>${user[scoreField]}</td>
+        `;
                 tbody.appendChild(row);
+
+                if (myNickname && user.nickname === myNickname) {
+                    myRank = index + 1;
+                    console.log(`📌 ${myNickname}의 ${tableId} 순위:`, myRank);
+                }
             });
+
+            return myRank;
         }
+
+        function updateMyRank(pointRank, achievementRank) {
+            // console.log("✅ updateMyRank 실행됨 - 포인트 순위:", pointRank, "업적 순위:", achievementRank);
+
+            const myRankContainer = document.getElementById('myRankContainer');
+            myRankContainer.innerHTML = `
+        <div style="text-align:right; font-weight:bold; margin-top: 10px;">
+            포인트 랭킹 내 순위: ${pointRank ? pointRank + "위" : "기록 없음"}<br>
+            업적 달성 랭킹 내 순위: ${achievementRank ? achievementRank + "위" : "기록 없음"}
+        </div>
+    `;
+        }
+
+
     </script>
 </body>
 

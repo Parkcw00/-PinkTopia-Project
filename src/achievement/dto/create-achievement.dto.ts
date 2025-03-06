@@ -10,13 +10,17 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Achievement } from '../entities/achievement.entity';
 import { AchievementCategory } from '../enums/achievement-category.enum';
+export interface Reward {
+  gem: number;
+  dia: number;
+}
 
 export class CreateAchievementDto extends PickType(Achievement, [
   'expiration_at',
   'title',
   'content',
   'category',
-  'reward',
+  // 'reward',
 ] as const) {
   //,'expiration_at'
 
@@ -37,7 +41,7 @@ export class CreateAchievementDto extends PickType(Achievement, [
 
   @ApiProperty({ example: 'pinkJam : 100' })
   @IsString({ message: 'pinkJam : 100 처럼 적어주세요' })
-  reward: string;
+  reward: Reward;
 
   @ApiProperty({
     type: 'array',

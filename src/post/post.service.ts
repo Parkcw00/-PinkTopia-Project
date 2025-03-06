@@ -5,6 +5,7 @@ import { Post } from './entities/post.entity';
 import { PostRepository } from './post.repository';
 import { S3Service } from '../s3/s3.service';
 import { ValkeyService } from '../valkey/valkey.service';
+import { toZonedTime } from 'date-fns-tz'; // ✅ 한국 시간 변환 라이브러리
 
 @Injectable()
 export class PostService {
@@ -34,29 +35,43 @@ export class PostService {
   }
 
   async findPosts(): Promise<Post[]> {
-    const posts = await this.postRepository.findPosts();
-
     const cachedPosts: any = await this.valkeyService.get(`posts:`);
     if (cachedPosts) {
       console.log(cachedPosts);
       return cachedPosts; // 캐시된 데이터 반환
     }
+    const posts = await this.postRepository.findPosts();
+    // ✅ 조회된 게시글들의 시간 변환 (UTC → KST)
+    posts.forEach((post) => {
+      post.created_at = this.convertToKoreanTime(post.created_at);
+      post.updated_at = this.convertToKoreanTime(post.updated_at);
+    });
     await this.valkeyService.set(`posts:`, posts, 60);
     return posts;
   }
 
   async findPost(id: number): Promise<Post> {
-    const post = await this.postRepository.findPost(id);
-    if (!post) {
-      throw new NotFoundException(`게시글을 찾을 수 없습니다.`);
-    }
     const cachedPost: any = await this.valkeyService.get(`post:${id}`);
     if (cachedPost) {
       console.log(cachedPost);
       return cachedPost; // 캐시된 데이터 반환
     }
+    const post = await this.postRepository.findPost(id);
+    if (!post) {
+      throw new NotFoundException(`게시글을 찾을 수 없습니다.`);
+    }
+    // ✅ 단일 게시글 시간 변환 (UTC → KST)
+    post.created_at = this.convertToKoreanTime(post.created_at);
+    post.updated_at = this.convertToKoreanTime(post.updated_at);
     await this.valkeyService.set(`post:${id}`, post, 60);
     return post;
+  }
+
+  // ✅ 한국 시간 변환 함수 (Date → Date)
+  private convertToKoreanTime(date: Date | null): Date {
+    if (!date) return new Date(); // ✅ null이 아니라 현재 시간을 반환하도록 변경
+    const timeZone = 'Asia/Seoul';
+    return toZonedTime(date, timeZone);
   }
 
   async updatePost(

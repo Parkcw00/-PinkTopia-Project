@@ -2,6 +2,8 @@ import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 @Injectable()
 export class ValkeyService implements OnModuleDestroy {
+  private readonly client: Redis;
+  
   createQueryBuilder(arg0: string) {
     throw new Error('Method not implemented.');
   }
@@ -16,7 +18,6 @@ export class ValkeyService implements OnModuleDestroy {
   pipeline() {
     throw new Error('Method not implemented.');
   }
-  private readonly client: Redis;
   constructor() {
     this.client = new Redis({
       host: 'localhost', // Docker 컨테이너와 같은 네트워크일 경우 'valkey' 사용 가능
@@ -61,34 +62,7 @@ export class ValkeyService implements OnModuleDestroy {
     let cursor = '0';
     await this.client.scan(cursor, 'MATCH', pattern, 'COUNT', 100);
   }
-  // Redis SCAN을 사용하여 키 목록을 가져오는 함수
-  /* async scanKeys(pattern: string, count: number = 100): Promise<string[]> {
-    let cursor = '0';
-    let keys: string[] = [];
 
-    do {
-      const [newCursor, foundKeys]: [string, string[]] = await this.client.scan(
-        cursor,
-        'MATCH',
-        pattern,
-        'COUNT',
-        count.toString(), // count 값을 숫자가 아닌 문자열로 전달
-      );
-
-      cursor = newCursor;
-      if (Array.isArray(foundKeys)) {
-        keys = keys.concat(foundKeys);
-      }
-    } while (cursor !== '0'); // cursor가 0이 되면 종료
-
-    return keys ?? [];
-  }
-
-  // Redis에서 해시 데이터 가져오기
-  async hgetall(key: string): Promise<any> {
-    const data = await this.client.hgetall(key);
-    return data ? data : null;
-  }*/
   async getKeysByPattern(
     pattern: string,
     count: number = 100,
@@ -141,17 +115,4 @@ export class ValkeyService implements OnModuleDestroy {
       throw error;
     }
   }
-
-  /*
-  async zrange(
-    key: string,
-    start: number,
-    end: number,
-    withScores: string,
-  ): Promise<any[]> {
-    return this.client.zrange(key, start, end, withScores);
-  }
-  async smembers(key: string): Promise<string[]> {
-    return this.client.smembers(key);
-  }*/
 }

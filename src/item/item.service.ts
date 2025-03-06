@@ -5,9 +5,9 @@ import { StoreItemRepository } from '../store-item/store-item.repository';
 import { Item } from './entities/item.entity';
 import { InventoryRepository } from '../inventory/inventory.repository';
 import { UpdateItemDto } from './dto/update-item.dto';
-import { UserRepository } from 'src/user/user.repository';
+import { UserRepository } from '../user/user.repository';
 import { CreateItemWithInventoryDto } from './dto/create-item-with-inventory.dto';
-import { ValkeyService } from 'src/valkey/valkey.service';
+import { ValkeyService } from '../valkey/valkey.service';
 
 @Injectable()
 export class ItemService {

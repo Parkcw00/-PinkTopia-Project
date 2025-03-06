@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>채팅방 초대</title>
+    <link rel="stylesheet" href="/public/styles.css">
 </head>
+
 <body>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const roomId = urlParams.get('roomId');
-            
+
             if (!roomId) {
                 alert('올바르지 않은 초대 링크입니다.');
                 window.location.href = '/public/log-in.html';
@@ -19,7 +22,7 @@
 
             // 로그인 상태 확인
             const accessToken = localStorage.getItem('accessToken');
-            
+
             if (!accessToken) {
                 // 로그인되지 않은 경우만 초대 정보 저장 후 로그인 페이지로 이동
                 localStorage.setItem('pendingInvite', JSON.stringify({
@@ -71,4 +74,5 @@
         });
     </script>
 </body>
-</html> 
+
+</html>

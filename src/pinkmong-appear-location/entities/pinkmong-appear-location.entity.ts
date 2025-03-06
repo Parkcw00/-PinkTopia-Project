@@ -1,4 +1,4 @@
-import { CatchPinkmong } from 'src/catch_pinkmong/entities/catch_pinkmong.entity';
+import { CatchPinkmong } from '../../catch_pinkmong/entities/catch_pinkmong.entity';
 import {
   Column,
   CreateDateColumn,
@@ -57,4 +57,12 @@ export class PinkmongAppearLocation {
     (catchPinkmong) => catchPinkmong.pinkmongAppearLocation,
   )
   catchPinkmong: CatchPinkmong[];
+}
+
+export enum RegionTheme {
+  FOREST = 'forest',
+  DESERT = 'desert',
+  OCEAN = 'ocean',
+  MOUNTAIN = 'mountain',
+  CITY = 'city',
 }

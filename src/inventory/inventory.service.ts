@@ -1,10 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ItemRepository } from 'src/item/item.repository';
-import { CreateItemDto } from 'src/item/dto/create-item.dto';
+import { ItemRepository } from '../item/item.repository';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { InventoryRepository } from './inventory.repository';
-import { UserRepository } from 'src/user/user.repository';
-import { ValkeyService } from 'src/valkey/valkey.service';
+import { UserRepository } from '../user/user.repository';
+import { ValkeyService } from '../valkey/valkey.service';
 
 @Injectable()
 export class InventoryService {
@@ -24,9 +23,14 @@ export class InventoryService {
     if (!inventory) {
       throw new NotFoundException('유저의 인벤토리를 찾을 수 없습니다.');
     }
+
+    // ✅ [🚀 캐시 삭제] 아이템을 불러오기 전에 먼저 캐시 삭제!
+    await this.valkeyService.del(`invenItems:${userId}`);
+
     const items = await this.itemRepository.findItemsByInventoryId(
       inventory.id,
     );
+
     const invenItems = items.map((item) => ({
       id: item.id,
       count: item.count,
@@ -35,12 +39,8 @@ export class InventoryService {
       potion: item.store_item.potion,
       potionTime: item.store_item.potion_time,
     }));
-    const cachedinvenItems: any = await this.valkeyService.get(
-      `invenItems:${userId}`,
-    );
-    if (cachedinvenItems) {
-      return cachedinvenItems; // 캐시된 데이터 반환
-    }
+
+    // ✅ [🔥 최신 데이터 캐싱]
     await this.valkeyService.set(`invenItems:${userId}`, invenItems, 600);
 
     return invenItems;

@@ -1,5 +1,5 @@
-import { Achievement } from 'src/achievement/entities/achievement.entity';
-import { User } from 'src/user/entities/user.entity';
+import { Achievement } from '../../achievement/entities/achievement.entity';
+import { User } from '../../user/entities/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -12,26 +12,26 @@ import {
 @Entity({ name: 'achievementC' })
 export class AchievementC {
   @PrimaryGeneratedColumn()
-  id: number;//
+  id: number; //
 
   @ManyToOne(() => User, (user) => user.achievement_c, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
-  user: User;//
+  user: User; //
 
   @Column({ type: 'int', nullable: false })
-  user_id: number;//
+  user_id: number; //
 
   @ManyToOne(() => Achievement, (achievement) => achievement.achievement_c, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'achievement_id' })
-  achievement: Achievement;//
+  achievement: Achievement; //
 
   @Column({ type: 'int', nullable: false })
-  achievement_id: number;//
+  achievement_id: number; //
 
   @CreateDateColumn()
-  created_at: Date;//
+  created_at: Date; //
 }

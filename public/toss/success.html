@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="https://static.toss.im/icons/png/4x/icon-toss-logo.png" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>결제 완료 | PinkTopia</title>
+  </head>
+
+  <body>
+    <div class="box_section" style="width: 600px">
+      <img width="100px" src="https://static.toss.im/illusts/check-blue-spot-ending-frame.png" />
+      <h2 id="successTitle">결제를 완료했어요</h2>
+
+      <div class="p-grid typography--p" style="margin-top: 50px">
+        <div class="p-grid-col text--left"><b>상품명</b></div>
+        <div class="p-grid-col text--right" id="itemName"></div>
+      </div>
+      <div class="p-grid typography--p" style="margin-top: 10px">
+        <div class="p-grid-col text--left"><b>결제금액</b></div>
+        <div class="p-grid-col text--right" id="amount"></div>
+      </div>
+      <div class="p-grid" style="margin-top: 30px">
+        <button class="button p-grid-col5" id="redirectButton" onclick="redirectToPage()">
+          확인
+        </button>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', async () => {
+        // 토큰 확인
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+          alert('로그인이 필요합니다.');
+          window.location.href = '/public/log-in.html';
+          return;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        try {
+          // 다이아 충전인 경우에만 처리
+          if (urlParams.get('type') === 'diamond') {
+            const itemName = urlParams.get('itemName');
+            const diamondAmount = Number(itemName.replace(/[^0-9]/g, '')); // "100다이아" -> 100
+
+            const response = await fetch('/user/charge-diamond', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `${accessToken}`
+              },
+              body: JSON.stringify({
+                amount: diamondAmount,
+                paymentKey: urlParams.get('paymentKey'),
+                orderId: urlParams.get('orderId')
+              })
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.message || '다이아 충전 처리 중 오류가 발생했습니다.');
+            }
+
+            const result = await response.json();
+            document.getElementById('successTitle').textContent = result.message;
+            
+            // 상품명과 결제금액 표시
+            document.getElementById('itemName').textContent = itemName;
+            document.getElementById('amount').textContent = 
+              new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' })
+                .format(urlParams.get('amount'));
+          }
+
+          // 3초 후 상점으로 이동
+          setTimeout(() => {
+            window.location.href = '/public/store-item.html';
+          }, 3000);
+        } catch (error) {
+          console.error('결제 처리 실패:', error);
+          alert(error.message || '결제 처리 중 오류가 발생했습니다.');
+        }
+      });
+
+      // 확인 버튼 클릭 시 상점으로 이동
+      function redirectToPage() {
+        window.location.href = '/public/store-item.html';
+      }
+    </script>
+  </body>
+</html>
