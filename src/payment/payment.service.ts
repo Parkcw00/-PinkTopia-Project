@@ -65,8 +65,14 @@ export class PaymentService {
           throw new Error('환불 금액이 결제 금액보다 클 수 없습니다.');
         }
         
-        // 환불된 다이아 수량만큼 차감
-        const diamondAmount = Math.floor(amount / 200); // 1다이아당 200원
+        // 상품명에서 다이아 수량 추출
+        const diamondMatch = payment.itemName.match(/(\d+)\s*다이아/);
+        if (!diamondMatch) {
+          throw new Error('올바르지 않은 상품명입니다.');
+        }
+        const diamondAmount = parseInt(diamondMatch[1]);
+        
+        // 다이아 차감
         await this.userService.deductDiamond(userId, diamondAmount);
 
         // 결제 내역의 환불 상태 업데이트
@@ -79,6 +85,7 @@ export class PaymentService {
           success: true,
           message: '테스트 결제 환불이 완료되었습니다.',
           refundAmount: amount,
+          deductedDiamond: diamondAmount
         };
       }
 
@@ -149,8 +156,14 @@ export class PaymentService {
         throw new Error(responseData.message || '환불 처리 중 오류가 발생했습니다.');
       }
 
-      // 환불된 다이아 수량만큼 차감
-      const diamondAmount = Math.floor(amount / 200); // 1다이아당 200원
+      // 상품명에서 다이아 수량 추출
+      const diamondMatch = payment.itemName.match(/(\d+)\s*다이아/);
+      if (!diamondMatch) {
+        throw new Error('올바르지 않은 상품명입니다.');
+      }
+      const diamondAmount = parseInt(diamondMatch[1]);
+      
+      // 다이아 차감
       await this.userService.deductDiamond(userId, diamondAmount);
 
       // 결제 내역의 환불 상태 업데이트
@@ -163,6 +176,7 @@ export class PaymentService {
         success: true,
         message: '환불이 완료되었습니다.',
         refundAmount: amount,
+        deductedDiamond: diamondAmount
       };
     } catch (error) {
       throw new BadRequestException(error.message || '환불 처리 중 오류가 발생했습니다.');
