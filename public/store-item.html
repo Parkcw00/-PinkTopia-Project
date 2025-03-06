@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>아이템 상점</title>
+    <link rel="stylesheet" href="/public/styles.css">
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -53,14 +54,15 @@
 
         .store-container {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
+            /* 한 줄에 2개 */
             gap: 20px;
             padding: 20px;
             max-width: 900px;
             margin: 0 auto;
-            margin-top: 20px;
         }
 
+        /* 스토어 아이템 카드 크기 조정 */
         .store-item {
             background: white;
             padding: 15px;
@@ -68,6 +70,10 @@
             box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
             text-align: center;
             transition: transform 0.2s;
+            width: 100%;
+            /* 가로 크기 조정 */
+            max-width: 280px;
+            /* 너무 커지는 것 방지 */
         }
 
         .store-item:hover {
@@ -374,6 +380,15 @@
         </div>
         <div style="position: absolute; right: 350px;">
             <a href="/public/customer-service.html" class="refund-button">환불 요청</a>
+        <div class="user-assets">
+            <div class="asset-item">
+                <img src="/public/images/gem.png" alt="젬">
+                <span id="userGem">로딩 중...</span> 젬
+            </div>
+            <div class="asset-item">
+                <img src="/public/images/dia.png" alt="다이아">
+                <span id="userDia">로딩 중...</span> 다이아
+            </div>
         </div>
     </div>
 
@@ -406,26 +421,18 @@
         </div>
     </div>
 
-    <div class="user-assets">
-        <div class="asset-item">
-            <img src="/public/images/gem.png" alt="젬">
-            <span id="userGem">로딩 중...</span> 젬
-        </div>
-        <div class="asset-item">
-            <img src="/public/images/dia.png" alt="다이아">
-            <span id="userDia">로딩 중...</span> 다이아
-        </div>
-    </div>
-
     <div class="page-title">
         <h1>아이템 상점</h1>
     </div>
 
-    <div class="diamond-shop-section" style="background-color: #f8f9fa; padding: 20px; margin-bottom: 30px; border-radius: 10px;">
+    <div class="diamond-shop-section"
+        style="background-color: #f8f9fa; padding: 20px; margin-bottom: 30px; border-radius: 10px;">
         <h2 style="color: #ff69b4; margin-bottom: 20px;">다이아 충전</h2>
-        <div class="diamond-products" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+        <div class="diamond-products"
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
             <!-- 다이아 상품 카드들 -->
-            <div class="diamond-product-card" style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <div class="diamond-product-card"
+                style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                 <div class="diamond-amount">
                     <img src="/public/images/dia.png" style="width: 30px; height: 30px;">
                     <span>100 다이아</span>
@@ -434,7 +441,8 @@
                 <button onclick="purchaseDiamond(100, 5000)" class="btn btn-pink">구매하기</button>
             </div>
 
-            <div class="diamond-product-card" style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <div class="diamond-product-card"
+                style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                 <div class="diamond-amount">
                     <img src="/public/images/dia.png" style="width: 30px; height: 30px;">
                     <span>500 다이아</span>
@@ -443,7 +451,8 @@
                 <button onclick="purchaseDiamond(500, 20000)" class="btn btn-pink">구매하기</button>
             </div>
 
-            <div class="diamond-product-card" style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <div class="diamond-product-card"
+                style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                 <div class="diamond-amount">
                     <img src="/public/images/dia.png" style="width: 30px; height: 30px;">
                     <span>1000 다이아</span>
@@ -658,12 +667,12 @@
             }
 
             // 결제 페이지로 이동
-            const checkoutUrl = `/public/toss/checkout.html?` + 
-                `itemId=diamond_${amount}` + 
-                `&itemName=${amount}다이아` + 
+            const checkoutUrl = `/public/toss/checkout.html?` +
+                `itemId=diamond_${amount}` +
+                `&itemName=${amount}다이아` +
                 `&price=${price}` +
                 `&type=diamond`; // 다이아 구매 타입 지정
-            
+
             window.location.href = checkoutUrl;
         }
     </script>
