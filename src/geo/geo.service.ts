@@ -236,10 +236,6 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
       this.S_GEO_KEY,
       longitude,
       latitude,
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/dev
       5,
       'm',
     )) as string[];
