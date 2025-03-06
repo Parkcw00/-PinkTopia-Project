@@ -593,7 +593,7 @@
                                 draggable: data.draggable,
                             });
                             console.log("다와간다2 마커 : ", marker)
-                            // marker.setMap(map); // ✅ **이 부분이 핵심**
+
                             var infowindow = new kakao.maps.InfoWindow({
                                 content: `<div style="padding:5px;">${data.info} <br>
                                       <a href="https://map.kakao.com/link/map/${data.info},${data.position.getLat()},${data.position.getLng()}" target="_blank" style="color:skyblue">큰지도보기</a> 
