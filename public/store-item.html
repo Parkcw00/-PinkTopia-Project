@@ -1,461 +1,513 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>아이템 상점</title>
-    <link rel="stylesheet" href="/public/styles.css">
+    <link rel="stylesheet" href="/public/styles.css" />
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #ffe4f7;
-            text-align: center;
-        }
+      body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #ffe4f7;
+        text-align: center;
+      }
 
-        .navbar {
-            background-color: #ff56b0;
-            color: white;
-            padding: 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5em;
-            position: relative;
-        }
+      .navbar {
+        background-color: #ff56b0;
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5em;
+        position: relative;
+      }
 
-        .navbar .nav-links {
-            position: absolute;
-            right: 15px;
-        }
+      .navbar .nav-links {
+        position: absolute;
+        right: 15px;
+      }
 
-        .navbar span {
-            font-weight: bold;
-        }
+      .navbar span {
+        font-weight: bold;
+      }
 
-        .navbar .nav-links a {
-            color: white;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 0.8em;
-        }
+      .navbar .nav-links a {
+        color: white;
+        text-decoration: none;
+        margin: 0 15px;
+        font-size: 0.8em;
+      }
 
-        .navbar .nav-links a:hover {
-            text-decoration: underline;
-        }
+      .navbar .nav-links a:hover {
+        text-decoration: underline;
+      }
 
-        h1 {
-            margin: 0;
-            color: #ff62b6;
-            font-size: 32px;
-        }
+      h1 {
+        margin: 0;
+        color: #ff62b6;
+        font-size: 32px;
+      }
 
-        .store-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            /* 한 줄에 2개 */
-            gap: 20px;
-            padding: 20px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
+      .store-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        /* 한 줄에 2개 */
+        gap: 20px;
+        padding: 20px;
+        max-width: 900px;
+        margin: 0 auto;
+      }
 
-        /* 스토어 아이템 카드 크기 조정 */
-        .store-item {
-            background: white;
-            padding: 15px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
-            text-align: center;
-            transition: transform 0.2s;
-            width: 100%;
-            /* 가로 크기 조정 */
-            max-width: 280px;
-            /* 너무 커지는 것 방지 */
-        }
+      /* 스토어 아이템 카드 크기 조정 */
+      .store-item {
+        background: white;
+        padding: 15px;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
+        text-align: center;
+        transition: transform 0.2s;
+        width: 100%;
+        /* 가로 크기 조정 */
+        max-width: 280px;
+        /* 너무 커지는 것 방지 */
+      }
 
-        .store-item:hover {
-            transform: scale(1.05);
-        }
+      .store-item:hover {
+        transform: scale(1.05);
+      }
 
-        .store-item img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 15px;
-            border: 3px solid #f38fc5;
-        }
+      .store-item img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 15px;
+        border: 3px solid #f38fc5;
+      }
 
-        .store-item h3 {
-            margin: 10px 0;
-            font-size: 20px;
-            color: #9c195f;
-        }
+      .store-item h3 {
+        margin: 10px 0;
+        font-size: 20px;
+        color: #9c195f;
+      }
 
-        .store-item p {
-            margin: 5px 0;
-            color: #2c121f;
-            font-size: 16px;
-        }
+      .store-item p {
+        margin: 5px 0;
+        color: #2c121f;
+        font-size: 16px;
+      }
 
-        .store-item button {
-            background-color: #f575b5;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s;
-        }
+      .store-item button {
+        background-color: #f575b5;
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background 0.3s;
+      }
 
-        .store-item button:hover {
-            background-color: #ff1493;
-        }
+      .store-item button:hover {
+        background-color: #ff1493;
+      }
 
-        /* 네비게이션 바 스타일 */
-        .nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #ff69b4;
-            padding: 15px;
-            color: white;
-            font-weight: bold;
-            position: relative;
-            height: 50px;
-        }
+      /* 네비게이션 바 스타일 */
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #ff69b4;
+        padding: 15px;
+        color: white;
+        font-weight: bold;
+        position: relative;
+        height: 50px;
+      }
 
-        /* 햄버거 메뉴 아이콘 스타일 */
-        .menu-icon {
-            position: absolute;
-            left: 15px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            z-index: 2;
-        }
+      /* 햄버거 메뉴 아이콘 스타일 */
+      .menu-icon {
+        position: absolute;
+        left: 15px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        z-index: 2;
+      }
 
-        .menu-icon .hamburger {
-            width: 25px;
-            height: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+      .menu-icon .hamburger {
+        width: 25px;
+        height: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
 
-        .menu-icon .hamburger span {
-            display: block;
-            height: 3px;
-            width: 100%;
-            background-color: white;
-            border-radius: 3px;
-            transition: all 0.3s ease;
-        }
+      .menu-icon .hamburger span {
+        display: block;
+        height: 3px;
+        width: 100%;
+        background-color: white;
+        border-radius: 3px;
+        transition: all 0.3s ease;
+      }
 
-        /* 로고 컨테이너 스타일 */
-        .nav .logo-container {
-            position: absolute;
-            left: 50px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-        }
+      /* 로고 컨테이너 스타일 */
+      .nav .logo-container {
+        position: absolute;
+        left: 50px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+      }
 
-        .nav img {
-            width: 45px;
-            height: 45px;
-            border-radius: 0;
-            object-fit: cover;
-        }
+      .nav img {
+        width: 45px;
+        height: 45px;
+        border-radius: 0;
+        object-fit: cover;
+      }
 
-        /* 로고 텍스트 */
-        .nav .logo-text {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 24px;
-        }
+      /* 로고 텍스트 */
+      .nav .logo-text {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 24px;
+      }
 
-        /* 사이드바 스타일 */
-        .sidebar {
-            height: 100%;
-            width: 0;
-            position: fixed;
-            z-index: 1000;
-            top: 0;
-            left: 0;
-            background-color: #ff69b4;
-            overflow-x: hidden;
-            transition: 0.5s;
-            padding-top: 60px;
-            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
-        }
+      /* 사이드바 스타일 */
+      .sidebar {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        background-color: #ff69b4;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+        box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+      }
 
-        .sidebar a {
-            padding: 15px 25px;
-            text-decoration: none;
-            font-size: 18px;
-            color: white;
-            display: block;
-            transition: 0.3s;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
+      .sidebar a {
+        padding: 15px 25px;
+        text-decoration: none;
+        font-size: 18px;
+        color: white;
+        display: block;
+        transition: 0.3s;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
 
-        .sidebar a:hover {
-            background-color: #ff4da6;
-        }
+      .sidebar a:hover {
+        background-color: #ff4da6;
+      }
 
-        .close-sidebar {
-            position: absolute;
-            top: 15px;
-            right: 25px;
-            font-size: 36px;
-            cursor: pointer;
-            color: white;
-        }
+      .close-sidebar {
+        position: absolute;
+        top: 15px;
+        right: 25px;
+        font-size: 36px;
+        cursor: pointer;
+        color: white;
+      }
 
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+      .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
 
-        .user-assets {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 20px;
-            background: white;
-            padding: 10px 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
-            z-index: 100;
-        }
+      .user-assets {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        gap: 20px;
+        background: white;
+        padding: 10px 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
+        z-index: 100;
+      }
 
-        .asset-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #9c195f;
-            font-weight: bold;
-        }
+      .asset-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #9c195f;
+        font-weight: bold;
+      }
 
-        .asset-item img {
-            width: 24px;
-            height: 24px;
-        }
+      .asset-item img {
+        width: 24px;
+        height: 24px;
+      }
 
-        /* 구매 버튼 스타일 수정 */
-        .buy-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
+      /* 구매 버튼 스타일 수정 */
+      .buy-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
 
-        .gem-button,
-        .dia-button {
-            flex: 1;
-            padding: 8px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s;
-            color: white;
-        }
+      .gem-button,
+      .dia-button {
+        flex: 1;
+        padding: 8px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+        color: white;
+      }
 
-        .gem-button {
-            background-color: #ff69b4;
-        }
+      .gem-button {
+        background-color: #ff69b4;
+      }
 
-        .dia-button {
-            background-color: #4a90e2;
-        }
+      .dia-button {
+        background-color: #4a90e2;
+      }
 
-        .gem-button:hover {
-            background-color: #ff1493;
-        }
+      .gem-button:hover {
+        background-color: #ff1493;
+      }
 
-        .dia-button:hover {
-            background-color: #357abd;
-        }
+      .dia-button:hover {
+        background-color: #357abd;
+      }
 
-        .page-title {
-            text-align: center;
-            margin: 20px 0;
-            position: relative;
-        }
+      .page-title {
+        text-align: center;
+        margin: 20px 0;
+        position: relative;
+      }
 
-        .page-title h1 {
-            color: #ff62b6;
-            font-size: 32px;
-            margin: 0;
-        }
+      .page-title h1 {
+        color: #ff62b6;
+        font-size: 32px;
+        margin: 0;
+      }
 
-        .store-container {
-            margin-top: 40px;
-            /* 상단 여백 추가 */
-        }
+      .store-container {
+        margin-top: 40px;
+        /* 상단 여백 추가 */
+      }
 
-        .btn-pink {
-            background-color: #ff69b4;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-        }
+      .btn-pink {
+        background-color: #ff69b4;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 10px;
+      }
 
-        .btn-pink:hover {
-            background-color: #ff4da6;
-        }
+      .btn-pink:hover {
+        background-color: #ff4da6;
+      }
 
-        .diamond-product-card {
-            text-align: center;
-            transition: transform 0.2s;
-        }
+      .diamond-product-card {
+        text-align: center;
+        transition: transform 0.2s;
+      }
 
-        .diamond-product-card:hover {
-            transform: translateY(-5px);
-        }
+      .diamond-product-card:hover {
+        transform: translateY(-5px);
+      }
 
-        .diamond-amount {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
+      .diamond-amount {
+        font-size: 1.2em;
+        font-weight: bold;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
 
-        .price {
-            color: #666;
-            font-size: 1.1em;
-            margin-bottom: 10px;
-        }
+      .price {
+        color: #666;
+        font-size: 1.1em;
+        margin-bottom: 10px;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="nav">
-        <div class="menu-icon" onclick="openSidebar()">
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+      <div class="menu-icon" onclick="openSidebar()">
+        <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
-        <div class="logo-container">
-            <img src="/public/images/123.jpg" alt="PinkTopia Logo">
+      </div>
+      <div class="logo-container">
+        <img src="/public/images/123.jpg" alt="PinkTopia Logo" />
+      </div>
+      <div class="logo-text">
+        <a href="/public/home.html" style="text-decoration: none; color: white"
+          >PinkTopia</a
+        >
+      </div>
+      <div class="user-assets">
+        <div class="asset-item">
+          <img src="/public/images/gem.png" alt="젬" />
+          <span id="userGem">로딩 중...</span> 젬
         </div>
-        <div class="logo-text">
-            <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
+        <div class="asset-item">
+          <img src="/public/images/dia.png" alt="다이아" />
+          <span id="userDia">로딩 중...</span> 다이아
         </div>
-        <div class="user-assets">
-            <div class="asset-item">
-                <img src="/public/images/gem.png" alt="젬">
-                <span id="userGem">로딩 중...</span> 젬
-            </div>
-            <div class="asset-item">
-                <img src="/public/images/dia.png" alt="다이아">
-                <span id="userDia">로딩 중...</span> 다이아
-            </div>
-        </div>
+      </div>
     </div>
 
     <div id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+      <div class="sidebar-header">
+        <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+      </div>
+      <div class="sidebar-content">
+        <a href="/public/home.html">홈</a>
+        <a href="/public/event.html">이벤트</a>
+        <a href="/public/store-item.html">아이템샵</a>
+        <a href="/public/board.html">게시글 (커뮤니티)</a>
+        <a href="/public/ranking.html">랭킹</a>
+        <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
+        <!-- 로그인 시 표시될 메뉴들 -->
+        <div id="loggedInMenu" style="display: none">
+          <a href="/public/chattingrooms.html">채팅</a>
+          <a href="/public/collection.html">핑크몽 개인 도감</a>
+          <a href="/public/inventory.html">인벤토리 아이템</a>
+          <a href="/public/achievements.html">업적</a>
+          <a href="/public/mypage.html">마이페이지</a>
+          <a href="#" onclick="logout()">로그아웃</a>
         </div>
-        <div class="sidebar-content">
-            <a href="/public/home.html">홈</a>
-            <a href="/public/event.html">이벤트</a>
-            <a href="/public/store-item.html">아이템샵</a>
-            <a href="/public/board.html">게시글 (커뮤니티)</a>
-            <a href="/public/ranking.html">랭킹</a>
-            <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
-            <!-- 로그인 시 표시될 메뉴들 -->
-            <div id="loggedInMenu" style="display: none;">
-                <a href="/public/chattingrooms.html">채팅</a>
-                <a href="/public/collection.html">핑크몽 개인 도감</a>
-                <a href="/public/inventory.html">인벤토리 아이템</a>
-                <a href="/public/achievements.html">업적</a>
-                <a href="/public/mypage.html">마이페이지</a>
-                <a href="#" onclick="logout()">로그아웃</a>
-            </div>
-            <!-- 로그인 안 된 경우 표시될 메뉴들 -->
-            <div id="loggedOutMenu">
-                <a href="/public/log-in.html">로그인</a>
-                <a href="/public/sign-up.html">회원가입</a>
-            </div>
+        <!-- 로그인 안 된 경우 표시될 메뉴들 -->
+        <div id="loggedOutMenu">
+          <a href="/public/log-in.html">로그인</a>
+          <a href="/public/sign-up.html">회원가입</a>
         </div>
+      </div>
     </div>
 
     <div class="page-title">
-        <h1>아이템 상점</h1>
+      <h1>아이템 상점</h1>
     </div>
 
-    <div class="diamond-shop-section"
-        style="background-color: #f8f9fa; padding: 20px; margin-bottom: 30px; border-radius: 10px;">
-        <h2 style="color: #ff69b4; margin-bottom: 20px;">다이아 충전</h2>
-        <div class="diamond-products"
-            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-            <!-- 다이아 상품 카드들 -->
-            <div class="diamond-product-card"
-                style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                <div class="diamond-amount">
-                    <img src="/public/images/dia.png" style="width: 30px; height: 30px;">
-                    <span>100 다이아</span>
-                </div>
-                <div class="price">5,000원</div>
-                <button onclick="purchaseDiamond(100, 5000)" class="btn btn-pink">구매하기</button>
-            </div>
-
-            <div class="diamond-product-card"
-                style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                <div class="diamond-amount">
-                    <img src="/public/images/dia.png" style="width: 30px; height: 30px;">
-                    <span>500 다이아</span>
-                </div>
-                <div class="price">20,000원</div>
-                <button onclick="purchaseDiamond(500, 20000)" class="btn btn-pink">구매하기</button>
-            </div>
-
-            <div class="diamond-product-card"
-                style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                <div class="diamond-amount">
-                    <img src="/public/images/dia.png" style="width: 30px; height: 30px;">
-                    <span>1000 다이아</span>
-                </div>
-                <div class="price">35,000원</div>
-                <button onclick="purchaseDiamond(1000, 35000)" class="btn btn-pink">구매하기</button>
-            </div>
+    <div
+      class="diamond-shop-section"
+      style="
+        background-color: #f8f9fa;
+        padding: 20px;
+        margin-bottom: 30px;
+        border-radius: 10px;
+      "
+    >
+      <h2 style="color: #ff69b4; margin-bottom: 20px">다이아 충전</h2>
+      <div
+        class="diamond-products"
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 20px;
+        "
+      >
+        <!-- 다이아 상품 카드들 -->
+        <div
+          class="diamond-product-card"
+          style="
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+          "
+        >
+          <div class="diamond-amount">
+            <img
+              src="/public/images/dia.png"
+              style="width: 30px; height: 30px"
+            />
+            <span>100 다이아</span>
+          </div>
+          <div class="price">5,000원</div>
+          <button onclick="purchaseDiamond(100, 5000)" class="btn btn-pink">
+            구매하기
+          </button>
         </div>
+
+        <div
+          class="diamond-product-card"
+          style="
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+          "
+        >
+          <div class="diamond-amount">
+            <img
+              src="/public/images/dia.png"
+              style="width: 30px; height: 30px"
+            />
+            <span>500 다이아</span>
+          </div>
+          <div class="price">20,000원</div>
+          <button onclick="purchaseDiamond(500, 20000)" class="btn btn-pink">
+            구매하기
+          </button>
+        </div>
+
+        <div
+          class="diamond-product-card"
+          style="
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+          "
+        >
+          <div class="diamond-amount">
+            <img
+              src="/public/images/dia.png"
+              style="width: 30px; height: 30px"
+            />
+            <span>1000 다이아</span>
+          </div>
+          <div class="price">35,000원</div>
+          <button onclick="purchaseDiamond(1000, 35000)" class="btn btn-pink">
+            구매하기
+          </button>
+        </div>
+      </div>
     </div>
 
     <div class="store-container" id="store-items">
-        <!-- 아이템이 여기에 추가될 예정 -->
+      <!-- 아이템이 여기에 추가될 예정 -->
     </div>
 
     <script>
-        async function fetchStoreItems() {
-            try {
-                const response = await fetch('http://localhost:3000/store-item');
-                const items = await response.json();
-                const storeContainer = document.getElementById('store-items');
+      async function fetchStoreItems() {
+        try {
+          const response = await fetch('/store-item');
+          const items = await response.json();
+          const storeContainer = document.getElementById('store-items');
 
-                storeContainer.innerHTML = items.map(item => `
+          storeContainer.innerHTML = items
+            .map(
+              (item) => `
                     <div class="store-item">
                         <img src="${item.item_image}" alt="${item.name}">
                         <h3>${item.name}</h3>
@@ -467,196 +519,203 @@
                             <button class="dia-button" onclick='buyItem(${JSON.stringify(item)}, "dia")'>다이아로 구매</button>
                         </div>
                     </div>
-                `).join('');
-            } catch (error) {
-                console.error('상점 아이템을 불러오는 중 오류 발생:', error);
-            }
+                `,
+            )
+            .join('');
+        } catch (error) {
+          console.error('상점 아이템을 불러오는 중 오류 발생:', error);
+        }
+      }
+
+      async function buyItem(item, paymentMethod) {
+        try {
+          const accessToken = localStorage.getItem('accessToken');
+          if (!accessToken) {
+            alert('로그인이 필요합니다.');
+            return;
+          }
+
+          // 구매 수량 입력 받기
+          const quantity = prompt('구매할 수량을 입력하세요:', '1');
+          if (quantity === null) {
+            alert('구매가 취소되었습니다.');
+            return;
+          }
+
+          const quantityNum = parseInt(quantity);
+          if (isNaN(quantityNum) || quantityNum < 1) {
+            alert('올바른 수량을 입력해주세요.');
+            return;
+          }
+
+          // 구매 확인
+          const totalPrice =
+            paymentMethod === 'gem'
+              ? item.gem_price * quantityNum
+              : item.dia_price * quantityNum;
+
+          const confirmMessage = `${item.name}을(를) ${quantityNum}개 구매하시겠습니까?\n총 가격: ${totalPrice.toLocaleString()} ${paymentMethod === 'gem' ? '젬' : '다이아'}`;
+
+          if (!confirm(confirmMessage)) {
+            alert('구매가 취소되었습니다.');
+            return;
+          }
+
+          const response = await fetch('/item', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: accessToken,
+            },
+            body: JSON.stringify({
+              storeItemId: item.id,
+              count: quantityNum,
+              paymentMethod: paymentMethod,
+            }),
+          });
+
+          const result = await response.json();
+
+          // 구매 성공 시에만 자산 새로고침
+          if (response.ok) {
+            alert(result.message);
+            // 잠시 대기 후 자산 새로고침
+            setTimeout(async () => {
+              await loadUserAssets();
+            }, 500);
+          } else {
+            throw new Error(result.message || '구매에 실패했습니다.');
+          }
+        } catch (error) {
+          console.error('구매 실패:', error);
+          alert(error.message || '구매에 실패했습니다.');
+        }
+      }
+
+      function openSidebar() {
+        document.getElementById('sidebar').style.width = '250px';
+      }
+
+      function closeSidebar() {
+        document.getElementById('sidebar').style.width = '0';
+      }
+
+      // loadUserAssets 함수 수정
+      async function loadUserAssets() {
+        try {
+          const accessToken = localStorage.getItem('accessToken');
+          if (!accessToken) {
+            console.log('로그인이 필요합니다.');
+            return;
+          }
+
+          // 엔드포인트를 /user/me로 수정
+          const response = await fetch('/user/me', {
+            headers: {
+              Authorization: accessToken,
+            },
+          });
+
+          if (!response.ok) {
+            const errorData = await response.text();
+            console.log('에러 응답:', errorData);
+            throw new Error(`API 요청 실패: ${response.status}`);
+          }
+
+          const userData = await response.json();
+          console.log('받은 유저 데이터:', userData);
+
+          // 서버에서 반환하는 데이터 구조에 맞게 접근
+          if (
+            userData &&
+            typeof userData.pink_gem === 'number' &&
+            typeof userData.pink_dia === 'number'
+          ) {
+            document.getElementById('userGem').textContent =
+              userData.pink_gem.toLocaleString();
+            document.getElementById('userDia').textContent =
+              userData.pink_dia.toLocaleString();
+          } else {
+            console.error('잘못된 유저 데이터 형식:', userData);
+            throw new Error('유저 데이터 형식이 올바르지 않습니다.');
+          }
+        } catch (error) {
+          console.error('유저 자산 로드 실패:', error.message);
+          console.log('에러 객체:', error);
+          document.getElementById('userGem').textContent = '0';
+          document.getElementById('userDia').textContent = '0';
+        }
+      }
+
+      // DOMContentLoaded 이벤트에 loadUserAssets 추가
+      document.addEventListener('DOMContentLoaded', function () {
+        const accessToken = localStorage.getItem('accessToken');
+
+        if (accessToken) {
+          document.getElementById('loggedInMenu').style.display = 'block';
+          document.getElementById('loggedOutMenu').style.display = 'none';
+          loadUserAssets(); // 자산 로드 추가
+        } else {
+          document.getElementById('loggedInMenu').style.display = 'none';
+          document.getElementById('loggedOutMenu').style.display = 'block';
         }
 
-        async function buyItem(item, paymentMethod) {
-            try {
-                const accessToken = localStorage.getItem('accessToken');
-                if (!accessToken) {
-                    alert('로그인이 필요합니다.');
-                    return;
-                }
+        fetchStoreItems();
+      });
 
-                // 구매 수량 입력 받기
-                const quantity = prompt('구매할 수량을 입력하세요:', '1');
-                if (quantity === null) {
-                    alert('구매가 취소되었습니다.');
-                    return;
-                }
+      async function logout() {
+        try {
+          const accessToken = localStorage.getItem('accessToken');
+          if (!accessToken) {
+            console.warn('🚨 로그아웃 시도: 이미 로그아웃된 상태');
+            window.location.href = '/public/log-in.html';
+            return;
+          }
 
-                const quantityNum = parseInt(quantity);
-                if (isNaN(quantityNum) || quantityNum < 1) {
-                    alert('올바른 수량을 입력해주세요.');
-                    return;
-                }
+          // 🔹 서버에 로그아웃 요청 보내기
+          const response = await fetch('/user/auth/logout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: accessToken,
+            },
+            credentials: 'include', // 쿠키도 함께 보내기
+          });
 
-                // 구매 확인
-                const totalPrice = paymentMethod === 'gem' ?
-                    item.gem_price * quantityNum :
-                    item.dia_price * quantityNum;
+          if (!response.ok) {
+            throw new Error('서버에서 로그아웃 처리 실패');
+          }
 
-                const confirmMessage = `${item.name}을(를) ${quantityNum}개 구매하시겠습니까?\n총 가격: ${totalPrice.toLocaleString()} ${paymentMethod === 'gem' ? '젬' : '다이아'}`;
+          // ✅ 로그아웃 성공 후, 토큰 삭제
+          localStorage.removeItem('accessToken');
 
-                if (!confirm(confirmMessage)) {
-                    alert('구매가 취소되었습니다.');
-                    return;
-                }
+          console.log('✅ 로그아웃 성공! 페이지 이동');
+          window.location.href = '/'; // 홈화면!
+        } catch (error) {
+          console.error('❌ 로그아웃 실패:', error);
+          alert('로그아웃 중 오류가 발생했습니다.');
+        }
+      }
 
-                const response = await fetch('http://localhost:3000/item', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': accessToken
-                    },
-                    body: JSON.stringify({
-                        storeItemId: item.id,
-                        count: quantityNum,
-                        paymentMethod: paymentMethod
-                    })
-                });
-
-                const result = await response.json();
-
-                // 구매 성공 시에만 자산 새로고침
-                if (response.ok) {
-                    alert(result.message);
-                    // 잠시 대기 후 자산 새로고침
-                    setTimeout(async () => {
-                        await loadUserAssets();
-                    }, 500);
-                } else {
-                    throw new Error(result.message || '구매에 실패했습니다.');
-                }
-
-            } catch (error) {
-                console.error('구매 실패:', error);
-                alert(error.message || '구매에 실패했습니다.');
-            }
+      function purchaseDiamond(amount, price) {
+        // 로그인 체크
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+          alert('로그인이 필요한 서비스입니다.');
+          window.location.href = '/public/log-in.html';
+          return;
         }
 
-        function openSidebar() {
-            document.getElementById('sidebar').style.width = "250px";
-        }
+        // 결제 페이지로 이동
+        const checkoutUrl =
+          `/public/toss/checkout.html?` +
+          `itemId=diamond_${amount}` +
+          `&itemName=${amount}다이아` +
+          `&price=${price}` +
+          `&type=diamond`; // 다이아 구매 타입 지정
 
-        function closeSidebar() {
-            document.getElementById('sidebar').style.width = "0";
-        }
-
-        // loadUserAssets 함수 수정
-        async function loadUserAssets() {
-            try {
-                const accessToken = localStorage.getItem('accessToken');
-                if (!accessToken) {
-                    console.log('로그인이 필요합니다.');
-                    return;
-                }
-
-                // 엔드포인트를 /user/me로 수정
-                const response = await fetch('http://localhost:3000/user/me', {
-                    headers: {
-                        'Authorization': accessToken
-                    }
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.text();
-                    console.log('에러 응답:', errorData);
-                    throw new Error(`API 요청 실패: ${response.status}`);
-                }
-
-                const userData = await response.json();
-                console.log('받은 유저 데이터:', userData);
-
-                // 서버에서 반환하는 데이터 구조에 맞게 접근
-                if (userData && typeof userData.pink_gem === 'number' && typeof userData.pink_dia === 'number') {
-                    document.getElementById('userGem').textContent = userData.pink_gem.toLocaleString();
-                    document.getElementById('userDia').textContent = userData.pink_dia.toLocaleString();
-                } else {
-                    console.error('잘못된 유저 데이터 형식:', userData);
-                    throw new Error('유저 데이터 형식이 올바르지 않습니다.');
-                }
-
-            } catch (error) {
-                console.error('유저 자산 로드 실패:', error.message);
-                console.log('에러 객체:', error);
-                document.getElementById('userGem').textContent = '0';
-                document.getElementById('userDia').textContent = '0';
-            }
-        }
-
-        // DOMContentLoaded 이벤트에 loadUserAssets 추가
-        document.addEventListener("DOMContentLoaded", function () {
-            const accessToken = localStorage.getItem("accessToken");
-
-            if (accessToken) {
-                document.getElementById('loggedInMenu').style.display = 'block';
-                document.getElementById('loggedOutMenu').style.display = 'none';
-                loadUserAssets(); // 자산 로드 추가
-            } else {
-                document.getElementById('loggedInMenu').style.display = 'none';
-                document.getElementById('loggedOutMenu').style.display = 'block';
-            }
-
-            fetchStoreItems();
-        });
-
-        async function logout() {
-            try {
-                const accessToken = localStorage.getItem("accessToken");
-                if (!accessToken) {
-                    console.warn("🚨 로그아웃 시도: 이미 로그아웃된 상태");
-                    window.location.href = "/public/log-in.html";
-                    return;
-                }
-
-                // 🔹 서버에 로그아웃 요청 보내기
-                const response = await fetch("http://localhost:3000/user/auth/logout", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": accessToken
-                    },
-                    credentials: "include" // 쿠키도 함께 보내기
-                });
-
-                if (!response.ok) {
-                    throw new Error("서버에서 로그아웃 처리 실패");
-                }
-
-                // ✅ 로그아웃 성공 후, 토큰 삭제
-                localStorage.removeItem("accessToken");
-
-                console.log("✅ 로그아웃 성공! 페이지 이동");
-                window.location.href = "/"; // 홈화면!
-            } catch (error) {
-                console.error("❌ 로그아웃 실패:", error);
-                alert("로그아웃 중 오류가 발생했습니다.");
-            }
-        }
-
-        function purchaseDiamond(amount, price) {
-            // 로그인 체크
-            const accessToken = localStorage.getItem('accessToken');
-            if (!accessToken) {
-                alert('로그인이 필요한 서비스입니다.');
-                window.location.href = '/public/log-in.html';
-                return;
-            }
-
-            // 결제 페이지로 이동
-            const checkoutUrl = `/public/toss/checkout.html?` +
-                `itemId=diamond_${amount}` +
-                `&itemName=${amount}다이아` +
-                `&price=${price}` +
-                `&type=diamond`; // 다이아 구매 타입 지정
-
-            window.location.href = checkoutUrl;
-        }
+        window.location.href = checkoutUrl;
+      }
     </script>
-</body>
-
+  </body>
 </html>

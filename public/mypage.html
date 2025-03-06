@@ -1,704 +1,714 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>마이페이지 | PinkTopia</title>
-    <link rel="stylesheet" href="/public/styles.css">
+    <link rel="stylesheet" href="/public/styles.css" />
     <style>
-        /* 네비게이션 바 스타일 */
-        .nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #ff69b4;
-            padding: 15px;
-            color: white;
-            font-weight: bold;
-            position: relative;
-            height: 50px;
-        }
+      /* 네비게이션 바 스타일 */
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #ff69b4;
+        padding: 15px;
+        color: white;
+        font-weight: bold;
+        position: relative;
+        height: 50px;
+      }
 
-        /* 햄버거 메뉴 아이콘 스타일 */
-        .menu-icon {
-            position: absolute;
-            left: 15px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            z-index: 2;
-        }
+      /* 햄버거 메뉴 아이콘 스타일 */
+      .menu-icon {
+        position: absolute;
+        left: 15px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        z-index: 2;
+      }
 
-        .menu-icon .hamburger {
-            width: 25px;
-            height: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+      .menu-icon .hamburger {
+        width: 25px;
+        height: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
 
-        .menu-icon .hamburger span {
-            display: block;
-            height: 3px;
-            width: 100%;
-            background-color: white;
-            border-radius: 3px;
-        }
+      .menu-icon .hamburger span {
+        display: block;
+        height: 3px;
+        width: 100%;
+        background-color: white;
+        border-radius: 3px;
+      }
 
-        /* 로고 컨테이너 위치 수정 */
-        .nav .logo-container {
-            position: absolute;
-            left: 50px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-        }
+      /* 로고 컨테이너 위치 수정 */
+      .nav .logo-container {
+        position: absolute;
+        left: 50px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+      }
 
-        .nav img {
-            width: 45px;
-            height: 45px;
-            border-radius: 0;
-            object-fit: cover;
-        }
+      .nav img {
+        width: 45px;
+        height: 45px;
+        border-radius: 0;
+        object-fit: cover;
+      }
 
-        /* 로고 텍스트 */
-        .nav .logo-text {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 24px;
-        }
+      /* 로고 텍스트 */
+      .nav .logo-text {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 24px;
+      }
 
-        /* 사이드바 스타일 */
-        .sidebar {
-            height: 100%;
-            width: 0;
-            position: fixed;
-            z-index: 1000;
-            top: 0;
-            left: 0;
-            background-color: #ff69b4;
-            overflow-x: hidden;
-            transition: 0.5s;
-            padding-top: 60px;
-            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
-        }
+      /* 사이드바 스타일 */
+      .sidebar {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        background-color: #ff69b4;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+        box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+      }
 
-        .sidebar a {
-            padding: 15px 25px;
-            text-decoration: none;
-            font-size: 18px;
-            color: white;
-            display: block;
-            transition: 0.3s;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
+      .sidebar a {
+        padding: 15px 25px;
+        text-decoration: none;
+        font-size: 18px;
+        color: white;
+        display: block;
+        transition: 0.3s;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
 
-        .sidebar a:hover {
-            background-color: #ff4da6;
-        }
+      .sidebar a:hover {
+        background-color: #ff4da6;
+      }
 
-        .close-sidebar {
-            position: absolute;
-            top: 15px;
-            right: 25px;
-            font-size: 36px;
-            cursor: pointer;
-            color: white;
-        }
+      .close-sidebar {
+        position: absolute;
+        top: 15px;
+        right: 25px;
+        font-size: 36px;
+        cursor: pointer;
+        color: white;
+      }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #ffe4f7;
-            text-align: center;
-        }
+      body {
+        font-family: 'Arial', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #ffe4f7;
+        text-align: center;
+      }
 
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
-        }
+      .container {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
+      }
 
-        h1 {
-            color: #ff62b6;
-            font-size: 32px;
-            font-weight: bold;
-        }
+      h1 {
+        color: #ff62b6;
+        font-size: 32px;
+        font-weight: bold;
+      }
 
-        /* 프로필 섹션 스타일 */
-        .profile-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-            padding: 20px;
-            background: #fff0f7;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
-            position: relative;
-        }
+      /* 프로필 섹션 스타일 */
+      .profile-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+        padding: 20px;
+        background: #fff0f7;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
+        position: relative;
+      }
 
-        .profile-image {
-            width: 130px;
-            height: 130px;
-            border-radius: 50%;
-            border: 4px solid #fd73bd;
-            object-fit: cover;
-            box-shadow: 0 4px 8px rgba(255, 122, 193, 0.3);
-            transition: transform 0.2s ease-in-out;
-        }
+      .profile-image {
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        border: 4px solid #fd73bd;
+        object-fit: cover;
+        box-shadow: 0 4px 8px rgba(255, 122, 193, 0.3);
+        transition: transform 0.2s ease-in-out;
+      }
 
-        .profile-image:hover {
-            transform: scale(1.05);
-        }
+      .profile-image:hover {
+        transform: scale(1.05);
+      }
 
-        /* 버튼 배치 */
-        .profile-buttons {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 15px;
-            padding: 0 20px;
-        }
+      /* 버튼 배치 */
+      .profile-buttons {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        margin-top: 15px;
+        padding: 0 20px;
+      }
 
-        .upload-btn {
-            width: 120px;
-            padding: 12px;
-            background-color: #f575b5;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: background 0.3s ease-in-out;
-        }
+      .upload-btn {
+        width: 120px;
+        padding: 12px;
+        background-color: #f575b5;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        transition: background 0.3s ease-in-out;
+      }
 
-        .upload-btn:hover {
-            background-color: #ff1493;
-        }
+      .upload-btn:hover {
+        background-color: #ff1493;
+      }
 
-        /* 탈퇴 버튼을 오른쪽 상단에 배치 */
-        .delete-account-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #ff647c;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s ease-in-out;
-        }
+      /* 탈퇴 버튼을 오른쪽 상단에 배치 */
+      .delete-account-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #ff647c;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.3s ease-in-out;
+      }
 
-        .delete-account-btn:hover {
-            background-color: #fc3f5b;
-        }
+      .delete-account-btn:hover {
+        background-color: #fc3f5b;
+      }
 
+      /* 입력 필드 및 버튼 스타일 개선 */
+      .info-section {
+        margin-top: 30px;
+        padding: 20px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(255, 98, 182, 0.2);
+      }
 
-        /* 입력 필드 및 버튼 스타일 개선 */
-        .info-section {
-            margin-top: 30px;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(255, 98, 182, 0.2);
-        }
+      .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f38fc5;
+      }
 
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #f38fc5;
-        }
+      .info-item input {
+        width: 65%;
+        padding: 10px;
+        border: 2px solid #f575b5;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border 0.3s ease-in-out;
+      }
 
-        .info-item input {
-            width: 65%;
-            padding: 10px;
-            border: 2px solid #f575b5;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border 0.3s ease-in-out;
-        }
+      .info-item input:focus {
+        border-color: #ff1493;
+        outline: none;
+      }
 
-        .info-item input:focus {
-            border-color: #ff1493;
-            outline: none;
-        }
+      .save-btn,
+      .logout-btn {
+        width: 100%;
+        padding: 12px;
+        margin-top: 15px;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background 0.3s ease-in-out;
+      }
 
-        .save-btn,
-        .logout-btn {
-            width: 100%;
-            padding: 12px;
-            margin-top: 15px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background 0.3s ease-in-out;
-        }
+      .save-btn {
+        background-color: #f575b5;
+        color: white;
+      }
 
-        .save-btn {
-            background-color: #f575b5;
-            color: white;
-        }
+      .save-btn:hover {
+        background-color: #ff1493;
+      }
 
-        .save-btn:hover {
-            background-color: #ff1493;
-        }
+      .logout-btn {
+        background-color: #ff647c;
+        color: white;
+      }
 
-        .logout-btn {
-            background-color: #ff647c;
-            color: white;
-        }
+      .logout-btn:hover {
+        background-color: #fc3f5b;
+      }
 
-        .logout-btn:hover {
-            background-color: #fc3f5b;
-        }
+      .user-assets {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        gap: 20px;
+        background: white;
+        padding: 10px 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(255, 113, 189, 0.733);
+        z-index: 100;
+      }
 
+      .asset-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #9c195f;
+        font-weight: bold;
+      }
 
-        .user-assets {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 20px;
-            background: white;
-            padding: 10px 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(255, 113, 189, 0.733);
-            z-index: 100;
-        }
+      .asset-item img {
+        width: 24px;
+        height: 24px;
+      }
 
-        .asset-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #9c195f;
-            font-weight: bold;
-        }
+      .nickname-box {
+        background-color: white;
+        /* ✅ 박스 배경색 */
+        border: 2px solid #ffffff;
+        /* ✅ 핑크색 테두리 */
+        border-radius: 20px;
+        /* ✅ 둥근 모서리 */
+        padding: 10px 20px;
+        /* ✅ 내부 여백 */
+        display: inline-block;
+        /* ✅ 글자 크기에 맞춰 박스 크기 조절 */
+        margin-top: 10px;
+        /* ✅ 위쪽 간격 */
+        box-shadow: 0 4px 6px rgba(255, 78, 173, 0.3);
+        /* ✅ 부드러운 그림자 효과 */
+      }
 
-        .asset-item img {
-            width: 24px;
-            height: 24px;
-        }
-
-        .nickname-box {
-            background-color: white;
-            /* ✅ 박스 배경색 */
-            border: 2px solid #ffffff;
-            /* ✅ 핑크색 테두리 */
-            border-radius: 20px;
-            /* ✅ 둥근 모서리 */
-            padding: 10px 20px;
-            /* ✅ 내부 여백 */
-            display: inline-block;
-            /* ✅ 글자 크기에 맞춰 박스 크기 조절 */
-            margin-top: 10px;
-            /* ✅ 위쪽 간격 */
-            box-shadow: 0 4px 6px rgba(255, 78, 173, 0.3);
-            /* ✅ 부드러운 그림자 효과 */
-        }
-
-        .nickname-display {
-            font-size: 18px;
-            /* ✅ 글자 크기 */
-            font-weight: bold;
-            /* ✅ 볼드 처리 */
-            color: #9c195f;
-            /* ✅ 핑크 색상 */
-            margin: 0;
-            /* ✅ 기본 마진 제거 */
-        }
+      .nickname-display {
+        font-size: 18px;
+        /* ✅ 글자 크기 */
+        font-weight: bold;
+        /* ✅ 볼드 처리 */
+        color: #9c195f;
+        /* ✅ 핑크 색상 */
+        margin: 0;
+        /* ✅ 기본 마진 제거 */
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="nav">
-        <div class="menu-icon" onclick="openSidebar()">
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+      <div class="menu-icon" onclick="openSidebar()">
+        <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
-        <div class="logo-container">
-            <img src="/public/images/123.jpg" alt="PinkTopia Logo">
-        </div>
-        <div class="logo-text">
-            <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
-        </div>
+      </div>
+      <div class="logo-container">
+        <img src="/public/images/123.jpg" alt="PinkTopia Logo" />
+      </div>
+      <div class="logo-text">
+        <a href="/public/home.html" style="text-decoration: none; color: white"
+          >PinkTopia</a
+        >
+      </div>
 
-        <div class="user-assets">
-            <div class="asset-item">
-                <img src="/public/images/gem.png" alt="젬">
-                <span id="userGem">로딩 중...</span> 젬
-            </div>
-            <div class="asset-item">
-                <img src="/public/images/dia.png" alt="다이아">
-                <span id="userDia">로딩 중...</span> 다이아
-            </div>
+      <div class="user-assets">
+        <div class="asset-item">
+          <img src="/public/images/gem.png" alt="젬" />
+          <span id="userGem">로딩 중...</span> 젬
         </div>
-
+        <div class="asset-item">
+          <img src="/public/images/dia.png" alt="다이아" />
+          <span id="userDia">로딩 중...</span> 다이아
+        </div>
+      </div>
     </div>
 
     <!-- 사이드바 -->
     <div id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+      <div class="sidebar-header">
+        <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+      </div>
+      <div class="sidebar-content">
+        <a href="/public/home.html">홈</a>
+        <a href="/public/event.html">이벤트</a>
+        <a href="/public/store-item.html">아이템샵</a>
+        <a href="/public/board.html">게시글 (커뮤니티)</a>
+        <a href="/public/ranking.html">랭킹</a>
+        <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
+        <!-- 로그인 시 표시될 메뉴들 -->
+        <div id="loggedInMenu" style="display: none">
+          <a href="/public/chattingrooms.html">채팅</a>
+          <a href="/public/collection.html">핑크몽 개인 도감</a>
+          <a href="/public/inventory.html">인벤토리 아이템</a>
+          <a href="/public/achievements.html">업적</a>
+          <a href="/public/mypage.html">마이페이지</a>
+          <a href="#" onclick="logout()">로그아웃</a>
         </div>
-        <div class="sidebar-content">
-            <a href="/public/home.html">홈</a>
-            <a href="/public/event.html">이벤트</a>
-            <a href="/public/store-item.html">아이템샵</a>
-            <a href="/public/board.html">게시글 (커뮤니티)</a>
-            <a href="/public/ranking.html">랭킹</a>
-            <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
-            <!-- 로그인 시 표시될 메뉴들 -->
-            <div id="loggedInMenu" style="display: none;">
-                <a href="/public/chattingrooms.html">채팅</a>
-                <a href="/public/collection.html">핑크몽 개인 도감</a>
-                <a href="/public/inventory.html">인벤토리 아이템</a>
-                <a href="/public/achievements.html">업적</a>
-                <a href="/public/mypage.html">마이페이지</a>
-                <a href="#" onclick="logout()">로그아웃</a>
-            </div>
-            <!-- 로그인 안 된 경우 표시될 메뉴들 -->
-            <div id="loggedOutMenu">
-                <a href="/public/log-in.html">로그인</a>
-                <a href="/public/sign-up.html">회원가입</a>
-            </div>
+        <!-- 로그인 안 된 경우 표시될 메뉴들 -->
+        <div id="loggedOutMenu">
+          <a href="/public/log-in.html">로그인</a>
+          <a href="/public/sign-up.html">회원가입</a>
         </div>
+      </div>
     </div>
 
     <div class="container">
-        <h1>마이페이지</h1>
+      <h1>마이페이지</h1>
 
-        <div class="profile-section">
-            <button class="delete-account-btn" id="deleteAccountBtn">회원 탈퇴</button>
-            <img id="profileImage" src="/public/images/1.png" alt="프로필 이미지" class="profile-image">
+      <div class="profile-section">
+        <button class="delete-account-btn" id="deleteAccountBtn">
+          회원 탈퇴
+        </button>
+        <img
+          id="profileImage"
+          src="/public/images/1.png"
+          alt="프로필 이미지"
+          class="profile-image"
+        />
 
-            <div class="nickname-box">
-                <p id="displayNickname" class="nickname-display"></p>
-            </div>
-
-            <div class="profile-buttons">
-                <button class="upload-btn" id="changeProfileBtn">프로필 변경</button>
-                <input type="file" id="fileInput" style="display: none;" accept="image/*">
-                <button class="upload-btn" id="deleteProfileBtn">프로필 삭제</button>
-            </div>
+        <div class="nickname-box">
+          <p id="displayNickname" class="nickname-display"></p>
         </div>
 
-
-        <div class="info-section">
-            <div class="info-item">
-                <span>닉네임:</span>
-                <input type="text" id="nickname" placeholder="새 닉네임 입력">
-            </div>
-            <div class="info-item">
-                <span>비밀번호 변경:</span>
-                <input type="password" id="password" placeholder="새 비밀번호 입력">
-            </div>
-            <button class="save-btn" id="saveProfileBtn">정보 수정</button>
+        <div class="profile-buttons">
+          <button class="upload-btn" id="changeProfileBtn">프로필 변경</button>
+          <input
+            type="file"
+            id="fileInput"
+            style="display: none"
+            accept="image/*"
+          />
+          <button class="upload-btn" id="deleteProfileBtn">프로필 삭제</button>
         </div>
+      </div>
 
-        <button class="logout-btn" onclick="logout()">로그아웃</button>
+      <div class="info-section">
+        <div class="info-item">
+          <span>닉네임:</span>
+          <input type="text" id="nickname" placeholder="새 닉네임 입력" />
+        </div>
+        <div class="info-item">
+          <span>비밀번호 변경:</span>
+          <input type="password" id="password" placeholder="새 비밀번호 입력" />
+        </div>
+        <button class="save-btn" id="saveProfileBtn">정보 수정</button>
+      </div>
+
+      <button class="logout-btn" onclick="logout()">로그아웃</button>
     </div>
 
     <script>
-        function openSidebar() {
-            document.getElementById('sidebar').style.width = "250px";
+      function openSidebar() {
+        document.getElementById('sidebar').style.width = '250px';
+      }
+
+      function closeSidebar() {
+        document.getElementById('sidebar').style.width = '0';
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const accessToken = localStorage.getItem('accessToken');
+
+        if (accessToken) {
+          document.getElementById('loggedInMenu').style.display = 'block';
+          document.getElementById('loggedOutMenu').style.display = 'none';
+          loadUserAssets();
+          loadUserProfile();
+        } else {
+          window.location.href = '/public/log-in.html';
         }
 
-        function closeSidebar() {
-            document.getElementById('sidebar').style.width = "0";
+        // ✅ [회원 탈퇴 버튼] 클릭 이벤트 추가
+        const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+        if (deleteAccountBtn) {
+          deleteAccountBtn.addEventListener('click', deleteAccount);
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const accessToken = localStorage.getItem('accessToken');
+        // ✅ [프로필 변경 버튼] 클릭 이벤트 추가
+        const changeProfileBtn = document.getElementById('changeProfileBtn');
+        if (changeProfileBtn) {
+          changeProfileBtn.addEventListener('click', function () {
+            document.getElementById('fileInput').click();
+          });
+        }
 
-            if (accessToken) {
-                document.getElementById('loggedInMenu').style.display = 'block';
-                document.getElementById('loggedOutMenu').style.display = 'none';
-                loadUserAssets();
-                loadUserProfile();
-            } else {
-                window.location.href = "/public/log-in.html";
-            }
+        // ✅ [정보 수정 버튼] 클릭 이벤트 추가
+        const saveProfileBtn = document.getElementById('saveProfileBtn');
+        if (saveProfileBtn) {
+          saveProfileBtn.addEventListener('click', updateProfile);
+        }
 
-            // ✅ [회원 탈퇴 버튼] 클릭 이벤트 추가
-            const deleteAccountBtn = document.getElementById("deleteAccountBtn");
-            if (deleteAccountBtn) {
-                deleteAccountBtn.addEventListener("click", deleteAccount);
-            }
-
-            // ✅ [프로필 변경 버튼] 클릭 이벤트 추가
-            const changeProfileBtn = document.getElementById("changeProfileBtn");
-            if (changeProfileBtn) {
-                changeProfileBtn.addEventListener("click", function () {
-                    document.getElementById("fileInput").click();
-                });
-            }
-
-            // ✅ [정보 수정 버튼] 클릭 이벤트 추가
-            const saveProfileBtn = document.getElementById("saveProfileBtn");
-            if (saveProfileBtn) {
-                saveProfileBtn.addEventListener("click", updateProfile);
-            }
-
-            // ✅ [프로필 삭제 버튼] 클릭 이벤트 추가
-            const deleteProfileBtn = document.getElementById("deleteProfileBtn");
-            if (deleteProfileBtn) {
-                deleteProfileBtn.addEventListener("click", async function () {
-                    if (!confirm("정말 프로필 이미지를 삭제하시겠습니까?")) return;
-
-                    try {
-                        const response = await fetch("http://localhost:3000/user/delete-profile", {
-                            method: "DELETE",
-                            headers: { "Authorization": localStorage.getItem("accessToken") }
-                        });
-
-                        if (!response.ok) throw new Error("프로필 삭제 실패");
-
-                        document.getElementById("profileImage").src = "/public/images/default-profile.png";
-                        alert("프로필 이미지가 삭제되었습니다.");
-                    } catch (error) {
-                        console.error("프로필 삭제 실패:", error);
-                    }
-                });
-            }
-
-            // ✅ [파일 업로드 이벤트 추가]
-            const fileInput = document.getElementById("fileInput");
-            if (fileInput) {
-                fileInput.addEventListener("change", async function (event) {
-                    const file = event.target.files[0];
-                    if (!file) return;
-
-                    const formData = new FormData();
-                    formData.append("file", file);
-
-                    try {
-                        const response = await fetch("http://localhost:3000/user/upload-profile", {
-                            method: "POST",
-                            headers: { "Authorization": localStorage.getItem("accessToken") },
-                            body: formData
-                        });
-
-                        if (!response.ok) throw new Error("프로필 업로드 실패");
-
-                        const result = await response.json();
-                        document.getElementById("profileImage").src = result.imageUrl;
-                        alert("프로필 이미지가 변경되었습니다.");
-                    } catch (error) {
-                        console.error("프로필 업로드 실패:", error);
-                    }
-                });
-            }
-        });
-
-        // ✅ [유저 정보 업데이트 함수]
-        // ✅ [정보 수정 함수] 비밀번호 변경 가능하도록 수정!
-        async function updateProfile() {
-            const nickname = document.getElementById("nickname").value.trim();
-            const password = document.getElementById("password").value.trim(); // 🔹 비밀번호 입력값 가져오기
-            const updateData = {};
-
-            if (nickname) updateData.nickname = nickname;
-            if (password) updateData.password = password; // 🔹 비밀번호가 있을 때만 추가
-
-            // ✅ 닉네임과 비밀번호가 모두 없을 경우, 요청 막기
-            if (!nickname && !password) {
-                alert("변경할 정보를 입력해주세요.");
-                return;
-            }
+        // ✅ [프로필 삭제 버튼] 클릭 이벤트 추가
+        const deleteProfileBtn = document.getElementById('deleteProfileBtn');
+        if (deleteProfileBtn) {
+          deleteProfileBtn.addEventListener('click', async function () {
+            if (!confirm('정말 프로필 이미지를 삭제하시겠습니까?')) return;
 
             try {
-                const response = await fetch("http://localhost:3000/user/me", {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": localStorage.getItem("accessToken")
-                    },
-                    body: JSON.stringify(updateData)
-                });
+              const response = await fetch('/user/delete-profile', {
+                method: 'DELETE',
+                headers: { Authorization: localStorage.getItem('accessToken') },
+              });
 
-                if (!response.ok) throw new Error("정보 수정 실패");
-                const result = await response.json();
+              if (!response.ok) throw new Error('프로필 삭제 실패');
 
-                alert("회원 정보가 수정되었습니다.");
-
-                // ✅ 닉네임 입력 시 바로 업데이트!
-                if (nickname) {
-                    document.getElementById("displayNickname").textContent = `현재 닉네임 : ${nickname}`;
-                }
+              document.getElementById('profileImage').src =
+                '/public/images/default-profile.png';
+              alert('프로필 이미지가 삭제되었습니다.');
             } catch (error) {
-                console.error("정보 수정 실패:", error);
-                alert("정보 수정 중 오류가 발생했습니다.");
+              console.error('프로필 삭제 실패:', error);
             }
+          });
         }
 
+        // ✅ [파일 업로드 이벤트 추가]
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput) {
+          fileInput.addEventListener('change', async function (event) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-        // ✅ [회원 탈퇴 함수]
-        async function deleteAccount() {
-            if (!confirm("정말 회원 탈퇴를 진행하시겠습니까?")) return;
+            const formData = new FormData();
+            formData.append('file', file);
 
             try {
-                const response = await fetch("http://localhost:3000/user/me", {
-                    method: "DELETE",
-                    headers: {
-                        "Authorization": localStorage.getItem("accessToken"),
-                        "Content-Type": "application/json"
-                    }
-                });
+              const response = await fetch('/user/upload-profile', {
+                method: 'POST',
+                headers: { Authorization: localStorage.getItem('accessToken') },
+                body: formData,
+              });
 
-                if (!response.ok) throw new Error("회원 탈퇴 실패");
+              if (!response.ok) throw new Error('프로필 업로드 실패');
 
-                alert("회원 탈퇴가 완료되었습니다.");
-                localStorage.removeItem("accessToken"); // 토큰 삭제
-                window.location.href = "/public/log-in.html"; // 로그인 페이지로 이동
+              const result = await response.json();
+              document.getElementById('profileImage').src = result.imageUrl;
+              alert('프로필 이미지가 변경되었습니다.');
             } catch (error) {
-                console.error("회원 탈퇴 실패:", error);
-                alert("회원 탈퇴 중 오류가 발생했습니다.");
+              console.error('프로필 업로드 실패:', error);
             }
+          });
+        }
+      });
+
+      // ✅ [유저 정보 업데이트 함수]
+      // ✅ [정보 수정 함수] 비밀번호 변경 가능하도록 수정!
+      async function updateProfile() {
+        const nickname = document.getElementById('nickname').value.trim();
+        const password = document.getElementById('password').value.trim(); // 🔹 비밀번호 입력값 가져오기
+        const updateData = {};
+
+        if (nickname) updateData.nickname = nickname;
+        if (password) updateData.password = password; // 🔹 비밀번호가 있을 때만 추가
+
+        // ✅ 닉네임과 비밀번호가 모두 없을 경우, 요청 막기
+        if (!nickname && !password) {
+          alert('변경할 정보를 입력해주세요.');
+          return;
         }
 
-        // ✅ [유저 정보 불러오기]
-        async function loadUserProfile() {
-            try {
-                const response = await fetch("http://localhost:3000/user/me", {
-                    headers: { "Authorization": localStorage.getItem('accessToken') }
-                });
+        try {
+          const response = await fetch('/user/me', {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: localStorage.getItem('accessToken'),
+            },
+            body: JSON.stringify(updateData),
+          });
 
-                if (!response.ok) throw new Error("유저 정보를 불러오지 못했습니다.");
+          if (!response.ok) throw new Error('정보 수정 실패');
+          const result = await response.json();
 
-                const userData = await response.json();
-                // 🔹 프로필 이미지 설정
-                document.getElementById("profileImage").src = userData.profile_image || "/public/images/default-profile.png";
+          alert('회원 정보가 수정되었습니다.');
 
-                // 자산 정보도 함께 업데이트
-                document.getElementById('userGem').textContent = userData.pink_gem.toLocaleString();
-                document.getElementById('userDia').textContent = userData.pink_dia.toLocaleString();
-
-                // 🔹 닉네임 표시 업데이트
-                document.getElementById("displayNickname").textContent = `현재 닉네임 : ${userData.nickname || "알 수 없음"}`;
-                // 🔹 닉네임 필드 비워두고, 기존 닉네임은 console.log로 확인 (디버깅 용도)
-                console.log("현재 닉네임:", userData.nickname);
-                document.getElementById("nickname").value = ""; // 🚨 닉네임 입력창은 비움
-            } catch (error) {
-                console.error("유저 정보 로드 실패:", error);
-            }
+          // ✅ 닉네임 입력 시 바로 업데이트!
+          if (nickname) {
+            document.getElementById('displayNickname').textContent =
+              `현재 닉네임 : ${nickname}`;
+          }
+        } catch (error) {
+          console.error('정보 수정 실패:', error);
+          alert('정보 수정 중 오류가 발생했습니다.');
         }
+      }
 
-        // ✅ [유저 자산 불러오기]
-        async function loadUserAssets() {
-            try {
-                const response = await fetch('http://localhost:3000/user/me', {
-                    headers: { 'Authorization': localStorage.getItem('accessToken') }
-                });
+      // ✅ [회원 탈퇴 함수]
+      async function deleteAccount() {
+        if (!confirm('정말 회원 탈퇴를 진행하시겠습니까?')) return;
 
-                if (!response.ok) throw new Error('자산 로드 실패');
-                const userData = await response.json();
+        try {
+          const response = await fetch('/user/me', {
+            method: 'DELETE',
+            headers: {
+              Authorization: localStorage.getItem('accessToken'),
+              'Content-Type': 'application/json',
+            },
+          });
 
-                document.getElementById('userGem').textContent = userData.pink_gem.toLocaleString();
-                document.getElementById('userDia').textContent = userData.pink_dia.toLocaleString();
-            } catch (error) {
-                console.error('자산 불러오기 실패:', error);
-            }
+          if (!response.ok) throw new Error('회원 탈퇴 실패');
+
+          alert('회원 탈퇴가 완료되었습니다.');
+          localStorage.removeItem('accessToken'); // 토큰 삭제
+          window.location.href = '/public/log-in.html'; // 로그인 페이지로 이동
+        } catch (error) {
+          console.error('회원 탈퇴 실패:', error);
+          alert('회원 탈퇴 중 오류가 발생했습니다.');
         }
+      }
 
+      // ✅ [유저 정보 불러오기]
+      async function loadUserProfile() {
+        try {
+          const response = await fetch('/user/me', {
+            headers: { Authorization: localStorage.getItem('accessToken') },
+          });
 
-        // 로그인 상태 체크
-        function checkLoginStatus() {
-            const accessToken = localStorage.getItem('accessToken');
-            if (accessToken) {
-                document.getElementById('loggedInMenu').style.display = 'block';
-                document.getElementById('loggedOutMenu').style.display = 'none';
-            } else {
-                window.location.href = '/public/log-in.html';
-            }
+          if (!response.ok) throw new Error('유저 정보를 불러오지 못했습니다.');
+
+          const userData = await response.json();
+          // 🔹 프로필 이미지 설정
+          document.getElementById('profileImage').src =
+            userData.profile_image || '/public/images/default-profile.png';
+
+          // 자산 정보도 함께 업데이트
+          document.getElementById('userGem').textContent =
+            userData.pink_gem.toLocaleString();
+          document.getElementById('userDia').textContent =
+            userData.pink_dia.toLocaleString();
+
+          // 🔹 닉네임 표시 업데이트
+          document.getElementById('displayNickname').textContent =
+            `현재 닉네임 : ${userData.nickname || '알 수 없음'}`;
+          // 🔹 닉네임 필드 비워두고, 기존 닉네임은 console.log로 확인 (디버깅 용도)
+          console.log('현재 닉네임:', userData.nickname);
+          document.getElementById('nickname').value = ''; // 🚨 닉네임 입력창은 비움
+        } catch (error) {
+          console.error('유저 정보 로드 실패:', error);
         }
+      }
 
-        // 페이지 로드 시 실행
-        document.addEventListener('DOMContentLoaded', function () {
-            loadUserAssets();
-        });
+      // ✅ [유저 자산 불러오기]
+      async function loadUserAssets() {
+        try {
+          const response = await fetch('/user/me', {
+            headers: { Authorization: localStorage.getItem('accessToken') },
+          });
 
+          if (!response.ok) throw new Error('자산 로드 실패');
+          const userData = await response.json();
 
-        // 로그아웃
-        async function logout() {
-            try {
-                const accessToken = localStorage.getItem("accessToken");
-                if (!accessToken) {
-                    console.warn("🚨 로그아웃 시도: 이미 로그아웃된 상태");
-                    window.location.href = "/public/log-in.html";
-                    return;
-                }
-
-                // 🔹 서버에 로그아웃 요청 보내기
-                const response = await fetch("http://localhost:3000/user/auth/logout", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": accessToken
-                    },
-                    credentials: "include" // 쿠키도 함께 보내기
-                });
-
-                if (!response.ok) {
-                    throw new Error("서버에서 로그아웃 처리 실패");
-                }
-
-                // ✅ 로그아웃 성공 후, 토큰 삭제
-                localStorage.removeItem("accessToken");
-
-                console.log("✅ 로그아웃 성공! 페이지 이동");
-                window.location.href = "/"; //
-            } catch (error) {
-                console.error("❌ 로그아웃 실패:", error);
-                alert("로그아웃 중 오류가 발생했습니다.");
-            }
+          document.getElementById('userGem').textContent =
+            userData.pink_gem.toLocaleString();
+          document.getElementById('userDia').textContent =
+            userData.pink_dia.toLocaleString();
+        } catch (error) {
+          console.error('자산 불러오기 실패:', error);
         }
+      }
 
-        // 회원 탈퇴 함수
-        async function deleteAccount() {
-            if (!confirm("정말 회원 탈퇴를 진행하시겠습니까?")) return;
-
-            try {
-                const response = await fetch("http://localhost:3000/user/me", {
-                    method: "DELETE",
-                    headers: {
-                        "Authorization": localStorage.getItem("accessToken"),
-                        "Content-Type": "application/json"
-                    }
-                });
-
-                if (!response.ok) throw new Error("회원 탈퇴 실패");
-
-                alert("회원 탈퇴가 완료되었습니다.");
-                localStorage.removeItem("accessToken"); // 토큰 삭제
-                window.location.href = "/public/log-in.html"; // 로그인 페이지로 이동
-            } catch (error) {
-                console.error("회원 탈퇴 실패:", error);
-                alert("회원 탈퇴 중 오류가 발생했습니다.");
-            }
+      // 로그인 상태 체크
+      function checkLoginStatus() {
+        const accessToken = localStorage.getItem('accessToken');
+        if (accessToken) {
+          document.getElementById('loggedInMenu').style.display = 'block';
+          document.getElementById('loggedOutMenu').style.display = 'none';
+        } else {
+          window.location.href = '/public/log-in.html';
         }
+      }
 
+      // 페이지 로드 시 실행
+      document.addEventListener('DOMContentLoaded', function () {
+        loadUserAssets();
+      });
 
+      // 로그아웃
+      async function logout() {
+        try {
+          const accessToken = localStorage.getItem('accessToken');
+          if (!accessToken) {
+            console.warn('🚨 로그아웃 시도: 이미 로그아웃된 상태');
+            window.location.href = '/public/log-in.html';
+            return;
+          }
+
+          // 🔹 서버에 로그아웃 요청 보내기
+          const response = await fetch('/user/auth/logout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: accessToken,
+            },
+            credentials: 'include', // 쿠키도 함께 보내기
+          });
+
+          if (!response.ok) {
+            throw new Error('서버에서 로그아웃 처리 실패');
+          }
+
+          // ✅ 로그아웃 성공 후, 토큰 삭제
+          localStorage.removeItem('accessToken');
+
+          console.log('✅ 로그아웃 성공! 페이지 이동');
+          window.location.href = '/'; //
+        } catch (error) {
+          console.error('❌ 로그아웃 실패:', error);
+          alert('로그아웃 중 오류가 발생했습니다.');
+        }
+      }
+
+      // 회원 탈퇴 함수
+      async function deleteAccount() {
+        if (!confirm('정말 회원 탈퇴를 진행하시겠습니까?')) return;
+
+        try {
+          const response = await fetch('/user/me', {
+            method: 'DELETE',
+            headers: {
+              Authorization: localStorage.getItem('accessToken'),
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!response.ok) throw new Error('회원 탈퇴 실패');
+
+          alert('회원 탈퇴가 완료되었습니다.');
+          localStorage.removeItem('accessToken'); // 토큰 삭제
+          window.location.href = '/public/log-in.html'; // 로그인 페이지로 이동
+        } catch (error) {
+          console.error('회원 탈퇴 실패:', error);
+          alert('회원 탈퇴 중 오류가 발생했습니다.');
+        }
+      }
     </script>
-
-</body>
-
+  </body>
 </html>

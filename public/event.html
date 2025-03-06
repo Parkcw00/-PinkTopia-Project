@@ -1,384 +1,400 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>이벤트 | PinkTophia</title>
-    <link rel="stylesheet" href="/public/styles.css">
+    <link rel="stylesheet" href="/public/styles.css" />
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+      }
 
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
+      .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
 
-        .tabs {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
+      .tabs {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
 
-        .tab {
-            padding: 10px 20px;
-            background-color: #ddd;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+      .tab {
+        padding: 10px 20px;
+        background-color: #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+      }
 
-        .tab.active {
-            background-color: #ff69b4;
-            color: white;
-        }
+      .tab.active {
+        background-color: #ff69b4;
+        color: white;
+      }
 
-        .event-item {
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background: white;
-            text-align: left;
-        }
+      .event-item {
+        padding: 15px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: white;
+        text-align: left;
+      }
 
-        .event-image {
-            width: 150px;
-            /* 🔥 정사각형 크기 설정 */
-            height: 150px;
-            /* 🔥 정사각형 크기 설정 */
-            object-fit: cover;
-            /* 🔥 이미지가 찌그러지지 않도록 자동 조정 */
-            border-radius: 8px;
-            margin-bottom: 10px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
+      .event-image {
+        width: 150px;
+        /* 🔥 정사각형 크기 설정 */
+        height: 150px;
+        /* 🔥 정사각형 크기 설정 */
+        object-fit: cover;
+        /* 🔥 이미지가 찌그러지지 않도록 자동 조정 */
+        border-radius: 8px;
+        margin-bottom: 10px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
 
-        .event-title {
-            font-size: 18px;
-            font-weight: bold;
-        }
+      .event-title {
+        font-size: 18px;
+        font-weight: bold;
+      }
 
-        .event-status {
-            margin-top: 5px;
-            font-size: 14px;
-            font-weight: bold;
-        }
+      .event-status {
+        margin-top: 5px;
+        font-size: 14px;
+        font-weight: bold;
+      }
 
-        .status-active {
-            color: green;
-        }
+      .status-active {
+        color: green;
+      }
 
-        .status-closed {
-            color: red;
-        }
+      .status-closed {
+        color: red;
+      }
 
-        .event-description {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #555;
-        }
+      .event-description {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #555;
+      }
 
-        /* 🔥 자세히 보기 버튼 스타일 추가 */
-        .details-button {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            background-color: #ff69b4;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.2s;
-        }
+      /* 🔥 자세히 보기 버튼 스타일 추가 */
+      .details-button {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+        background-color: #ff69b4;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition:
+          background 0.3s,
+          transform 0.2s;
+      }
 
-        .details-button:hover {
-            background-color: #ff4da6;
-            transform: scale(1.05);
-        }
+      .details-button:hover {
+        background-color: #ff4da6;
+        transform: scale(1.05);
+      }
 
-        .details-button:active {
-            background-color: #ff3385;
-            transform: scale(0.95);
-        }
+      .details-button:active {
+        background-color: #ff3385;
+        transform: scale(0.95);
+      }
 
-        /* 네비게이션 바 스타일 수정 */
-        .nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #ff69b4;
-            padding: 15px;
-            color: white;
-            font-weight: bold;
-            position: relative;
-            height: 50px;
-        }
+      /* 네비게이션 바 스타일 수정 */
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #ff69b4;
+        padding: 15px;
+        color: white;
+        font-weight: bold;
+        position: relative;
+        height: 50px;
+      }
 
-        .nav a {
-            color: white;
-            text-decoration: none;
-            margin: 0 10px;
-        }
+      .nav a {
+        color: white;
+        text-decoration: none;
+        margin: 0 10px;
+      }
 
-        /* 불필요한 네비게이션 관련 스타일 제거 */
-        .menu-icon,
-        .logo-container,
-        .logo-text,
-        #authMenu {
-            display: none;
-        }
+      /* 불필요한 네비게이션 관련 스타일 제거 */
+      .menu-icon,
+      .logo-container,
+      .logo-text,
+      #authMenu {
+        display: none;
+      }
 
-        /* 햄버거 메뉴 아이콘 스타일 */
-        .menu-icon {
-            position: absolute;
-            left: 15px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            z-index: 2;
-        }
+      /* 햄버거 메뉴 아이콘 스타일 */
+      .menu-icon {
+        position: absolute;
+        left: 15px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        z-index: 2;
+      }
 
-        .menu-icon .hamburger {
-            width: 25px;
-            height: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+      .menu-icon .hamburger {
+        width: 25px;
+        height: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
 
-        .menu-icon .hamburger span {
-            display: block;
-            height: 3px;
-            width: 100%;
-            background-color: white;
-            border-radius: 3px;
-            transition: all 0.3s ease;
-        }
+      .menu-icon .hamburger span {
+        display: block;
+        height: 3px;
+        width: 100%;
+        background-color: white;
+        border-radius: 3px;
+        transition: all 0.3s ease;
+      }
 
-        /* 로고 컨테이너 스타일 */
-        .nav .logo-container {
-            position: absolute;
-            left: 50px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-        }
+      /* 로고 컨테이너 스타일 */
+      .nav .logo-container {
+        position: absolute;
+        left: 50px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+      }
 
-        .nav img {
-            width: 45px;
-            height: 45px;
-            border-radius: 0;
-            object-fit: cover;
-        }
+      .nav img {
+        width: 45px;
+        height: 45px;
+        border-radius: 0;
+        object-fit: cover;
+      }
 
-        /* 로고 텍스트 */
-        .nav .logo-text {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 24px;
-        }
+      /* 로고 텍스트 */
+      .nav .logo-text {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 24px;
+      }
 
-        /* 사이드바 스타일 */
-        .sidebar {
-            height: 100%;
-            width: 0;
-            position: fixed;
-            z-index: 1000;
-            top: 0;
-            left: 0;
-            background-color: #ff69b4;
-            overflow-x: hidden;
-            transition: 0.5s;
-            padding-top: 60px;
-            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
-        }
+      /* 사이드바 스타일 */
+      .sidebar {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        background-color: #ff69b4;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+        box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+      }
 
-        .sidebar a {
-            padding: 15px 25px;
-            text-decoration: none;
-            font-size: 18px;
-            color: white;
-            display: block;
-            transition: 0.3s;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
+      .sidebar a {
+        padding: 15px 25px;
+        text-decoration: none;
+        font-size: 18px;
+        color: white;
+        display: block;
+        transition: 0.3s;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
 
-        .sidebar a:hover {
-            background-color: #ff4da6;
-        }
+      .sidebar a:hover {
+        background-color: #ff4da6;
+      }
 
-        .close-sidebar {
-            position: absolute;
-            top: 15px;
-            right: 25px;
-            font-size: 36px;
-            cursor: pointer;
-            color: white;
-        }
+      .close-sidebar {
+        position: absolute;
+        top: 15px;
+        right: 25px;
+        font-size: 36px;
+        cursor: pointer;
+        color: white;
+      }
 
-        .pagination {
-            margin-top: 20px;
-        }
+      .pagination {
+        margin-top: 20px;
+      }
 
-        .pagination button {
-            margin: 5px;
-            padding: 10px 15px;
-            border-radius: 5px;
-            border: none;
-            background-color: #ff61b0;
-            color: white;
-            cursor: pointer;
-            font-size: 1em;
-        }
+      .pagination button {
+        margin: 5px;
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: none;
+        background-color: #ff61b0;
+        color: white;
+        cursor: pointer;
+        font-size: 1em;
+      }
 
-        .pagination button:disabled {
-            background-color: #ddd;
-            cursor: not-allowed;
-        }
+      .pagination button:disabled {
+        background-color: #ddd;
+        cursor: not-allowed;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <!-- 네비게이션 바 추가 -->
     <div class="nav">
-        <div class="menu-icon" onclick="openSidebar()">
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+      <div class="menu-icon" onclick="openSidebar()">
+        <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
-        <div class="logo-container">
-            <img src="/public/images/123.jpg" alt="PinkTopia Logo">
-        </div>
-        <div class="logo-text">
-            <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
-        </div>
+      </div>
+      <div class="logo-container">
+        <img src="/public/images/123.jpg" alt="PinkTopia Logo" />
+      </div>
+      <div class="logo-text">
+        <a href="/public/home.html" style="text-decoration: none; color: white"
+          >PinkTopia</a
+        >
+      </div>
     </div>
 
     <!-- 사이드바 추가 -->
     <div id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+      <div class="sidebar-header">
+        <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+      </div>
+      <div class="sidebar-content">
+        <a href="/public/home.html">홈</a>
+        <a href="/public/event.html">이벤트</a>
+        <a href="/public/store-item.html">아이템샵</a>
+        <a href="/public/board.html">게시글 (커뮤니티)</a>
+        <a href="/public/ranking.html">랭킹</a>
+        <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
+        <!-- 로그인 시 표시될 메뉴들 -->
+        <div id="loggedInMenu" style="display: none">
+          <a href="/public/chattingrooms.html">채팅</a>
+          <a href="/public/collection.html">핑크몽 개인 도감</a>
+          <a href="/public/inventory.html">인벤토리 아이템</a>
+          <a href="/public/achievements.html">업적</a>
+          <a href="/public/mypage.html">마이페이지</a>
+          <a href="#" onclick="logout()">로그아웃</a>
         </div>
-        <div class="sidebar-content">
-            <a href="/public/home.html">홈</a>
-            <a href="/public/event.html">이벤트</a>
-            <a href="/public/store-item.html">아이템샵</a>
-            <a href="/public/board.html">게시글 (커뮤니티)</a>
-            <a href="/public/ranking.html">랭킹</a>
-            <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
-            <!-- 로그인 시 표시될 메뉴들 -->
-            <div id="loggedInMenu" style="display: none;">
-                <a href="/public/chattingrooms.html">채팅</a>
-                <a href="/public/collection.html">핑크몽 개인 도감</a>
-                <a href="/public/inventory.html">인벤토리 아이템</a>
-                <a href="/public/achievements.html">업적</a>
-                <a href="/public/mypage.html">마이페이지</a>
-                <a href="#" onclick="logout()">로그아웃</a>
-            </div>
-            <!-- 로그인 안 된 경우 표시될 메뉴들 -->
-            <div id="loggedOutMenu">
-                <a href="/public/log-in.html">로그인</a>
-                <a href="/public/sign-up.html">회원가입</a>
-            </div>
+        <!-- 로그인 안 된 경우 표시될 메뉴들 -->
+        <div id="loggedOutMenu">
+          <a href="/public/log-in.html">로그인</a>
+          <a href="/public/sign-up.html">회원가입</a>
         </div>
+      </div>
     </div>
 
     <div class="container">
-        <h2>이벤트 목록</h2>
+      <h2>이벤트 목록</h2>
 
-        <!-- 상단 탭 메뉴 -->
-        <div class="tabs">
-            <div class="tab active" onclick="filterEvents('all')">전체 이벤트</div>
-            <div class="tab" onclick="filterEvents('active')">진행 중</div>
-            <div class="tab" onclick="filterEvents('closed')">종료됨</div>
-        </div>
+      <!-- 상단 탭 메뉴 -->
+      <div class="tabs">
+        <div class="tab active" onclick="filterEvents('all')">전체 이벤트</div>
+        <div class="tab" onclick="filterEvents('active')">진행 중</div>
+        <div class="tab" onclick="filterEvents('closed')">종료됨</div>
+      </div>
 
-        <div id="eventList"></div>
-        <div class="pagination" id="pagination" style="margin-top: 20px;"></div>
+      <div id="eventList"></div>
+      <div class="pagination" id="pagination" style="margin-top: 20px"></div>
     </div>
 
     <script>
-        let events = []; // 모든 이벤트 저장
+      let events = []; // 모든 이벤트 저장
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                console.log("이벤트 데이터를 불러오는 중...");
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          console.log('이벤트 데이터를 불러오는 중...');
 
-                const response = await fetch('/event/events');
+          const response = await fetch('/event/events');
 
-                if (!response.ok) {
-                    throw new Error(`HTTP 오류 발생: ${response.status}`);
-                }
+          if (!response.ok) {
+            throw new Error(`HTTP 오류 발생: ${response.status}`);
+          }
 
-                const responseData = await response.json();
-                events = responseData.events;
-                console.log("✅ API에서 받은 이벤트 데이터:", events);
+          const responseData = await response.json();
+          events = responseData.events;
+          console.log('✅ API에서 받은 이벤트 데이터:', events);
 
-                filterEvents('all');
+          filterEvents('all');
+        } catch (error) {
+          console.error('이벤트 불러오기 실패:', error);
+          document.getElementById('eventList').innerHTML =
+            `<p>이벤트 정보를 불러오는 중 오류가 발생했습니다: ${error.message}</p>`;
+        }
+      });
 
-            } catch (error) {
-                console.error('이벤트 불러오기 실패:', error);
-                document.getElementById('eventList').innerHTML = `<p>이벤트 정보를 불러오는 중 오류가 발생했습니다: ${error.message}</p>`;
-            }
-        });
+      let event = []; // 모든 이벤트 데이터 저장
+      let currentPage = 1;
+      const itemsPerPage = 5; // 한 페이지에 표시할 이벤트 개수
+      let currentStatus = 'all'; // 현재 선택된 상태 ('all', 'active', 'closed')
 
-        let event = []; // 모든 이벤트 데이터 저장
-        let currentPage = 1;
-        const itemsPerPage = 5; // 한 페이지에 표시할 이벤트 개수
-        let currentStatus = "all"; // 현재 선택된 상태 ('all', 'active', 'closed')
+      function filterEvents(status, page = 1) {
+        currentPage = page;
+        currentStatus = status; // 현재 필터 상태 저장
+        const eventList = document.getElementById('eventList');
+        eventList.innerHTML = '';
 
-        function filterEvents(status, page = 1) {
-            currentPage = page;
-            currentStatus = status; // 현재 필터 상태 저장
-            const eventList = document.getElementById('eventList');
-            eventList.innerHTML = "";
+        let filteredEvents =
+          status === 'all'
+            ? events
+            : events.filter((event) => event.status === status);
 
-            let filteredEvents = (status === 'all') ? events : events.filter(event => event.status === status);
+        console.log(
+          `✅ ${status} 필터링된 이벤트 목록 (총 ${filteredEvents.length}개):`,
+          filteredEvents,
+        );
 
-            console.log(`✅ ${status} 필터링된 이벤트 목록 (총 ${filteredEvents.length}개):`, filteredEvents);
+        if (filteredEvents.length === 0) {
+          eventList.innerHTML = `<p>해당 이벤트가 없습니다.</p>`;
+          document.getElementById('pagination').innerHTML = ''; // 페이지네이션 숨김
+          return;
+        }
 
-            if (filteredEvents.length === 0) {
-                eventList.innerHTML = `<p>해당 이벤트가 없습니다.</p>`;
-                document.getElementById('pagination').innerHTML = ""; // 페이지네이션 숨김
-                return;
-            }
+        // 페이지네이션 적용
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const paginatedEvents = filteredEvents.slice(startIndex, endIndex);
 
-            // 페이지네이션 적용
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const paginatedEvents = filteredEvents.slice(startIndex, endIndex);
+        console.log(
+          `📌 현재 페이지 (${currentPage})에서 표시할 데이터:`,
+          paginatedEvents,
+        );
 
-            console.log(`📌 현재 페이지 (${currentPage})에서 표시할 데이터:`, paginatedEvents);
+        paginatedEvents.forEach((event) => {
+          const eventDiv = document.createElement('div');
+          eventDiv.className = 'event-item';
 
-            paginatedEvents.forEach(event => {
-                const eventDiv = document.createElement('div');
-                eventDiv.className = 'event-item';
+          const createdAt = new Date(event.created_at)
+            .toISOString()
+            .split('T')[0];
+          const expirationAt = event.expiration_at
+            ? new Date(event.expiration_at).toISOString().split('T')[0]
+            : '종료일 없음';
 
-                const createdAt = new Date(event.created_at).toISOString().split('T')[0];
-                const expirationAt = event.expiration_at ? new Date(event.expiration_at).toISOString().split('T')[0] : "종료일 없음";
-
-                eventDiv.innerHTML = `
+          eventDiv.innerHTML = `
             ${event.image ? `<img src="${event.image}" alt="이벤트 이미지" class="event-image">` : ''}
             <div class="event-title">${event.title}</div>
             <div class="event-status ${event.status === 'active' ? 'status-active' : 'status-closed'}">
@@ -391,98 +407,100 @@
             </div>
             <button class="details-button" onclick="goToEventDetail(${event.id})">자세히 보기</button>
         `;
-                eventList.appendChild(eventDiv);
-            });
-
-            // 페이지네이션 버튼 추가
-            renderPagination(filteredEvents.length);
-
-            // 현재 선택된 탭을 활성화
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelector(`.tab[onclick="filterEvents('${status}')"]`).classList.add('active');
-        }
-
-        function renderPagination(totalItems) {
-            const paginationContainer = document.getElementById('pagination');
-            paginationContainer.innerHTML = "";
-
-            const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-            if (totalPages <= 1) return; // 페이지가 1개 이하이면 페이지네이션 숨김
-
-            let paginationHTML = `
-            <button id="prev-btn" onclick="filterEvents('${currentStatus}', ${currentPage - 1})" 
-            ${currentPage === 1 ? "disabled" : ""}>이전</button>
-            <span id="page-info">${currentPage} / ${totalPages}</span>
-            <button id="next-btn" onclick="filterEvents('${currentStatus}', ${currentPage + 1})" 
-            ${currentPage >= totalPages ? "disabled" : ""}>다음</button>`;
-
-            paginationContainer.innerHTML = paginationHTML;
-        }
-
-        function goToEventDetail(eventId) {
-            window.location.href = `event-detail.html?id=${eventId}`;
-        }
-
-        function goToEventDetail(eventId) {
-            window.location.href = `event-detail.html?id=${eventId}`;
-        }
-
-        function openSidebar() {
-            document.getElementById('sidebar').style.width = "250px";
-        }
-
-        function closeSidebar() {
-            document.getElementById('sidebar').style.width = "0";
-        }
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const accessToken = localStorage.getItem("accessToken");
-
-            if (accessToken) {
-                document.getElementById('loggedInMenu').style.display = 'block';
-                document.getElementById('loggedOutMenu').style.display = 'none';
-            } else {
-                document.getElementById('loggedInMenu').style.display = 'none';
-                document.getElementById('loggedOutMenu').style.display = 'block';
-            }
+          eventList.appendChild(eventDiv);
         });
 
-        async function logout() {
-            try {
-                const accessToken = localStorage.getItem("accessToken");
-                if (!accessToken) {
-                    console.warn("🚨 로그아웃 시도: 이미 로그아웃된 상태");
-                    window.location.href = "/public/log-in.html";
-                    return;
-                }
+        // 페이지네이션 버튼 추가
+        renderPagination(filteredEvents.length);
 
-                // 🔹 서버에 로그아웃 요청 보내기
-                const response = await fetch("http://localhost:3000/user/auth/logout", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": accessToken
-                    },
-                    credentials: "include" // 쿠키도 함께 보내기
-                });
+        // 현재 선택된 탭을 활성화
+        document
+          .querySelectorAll('.tab')
+          .forEach((tab) => tab.classList.remove('active'));
+        document
+          .querySelector(`.tab[onclick="filterEvents('${status}')"]`)
+          .classList.add('active');
+      }
 
-                if (!response.ok) {
-                    throw new Error("서버에서 로그아웃 처리 실패");
-                }
+      function renderPagination(totalItems) {
+        const paginationContainer = document.getElementById('pagination');
+        paginationContainer.innerHTML = '';
 
-                // ✅ 로그아웃 성공 후, 토큰 삭제
-                localStorage.removeItem("accessToken");
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-                console.log("✅ 로그아웃 성공! 페이지 이동");
-                window.location.href = "/"; //
-            } catch (error) {
-                console.error("❌ 로그아웃 실패:", error);
-                alert("로그아웃 중 오류가 발생했습니다.");
-            }
+        if (totalPages <= 1) return; // 페이지가 1개 이하이면 페이지네이션 숨김
+
+        let paginationHTML = `
+            <button id="prev-btn" onclick="filterEvents('${currentStatus}', ${currentPage - 1})" 
+            ${currentPage === 1 ? 'disabled' : ''}>이전</button>
+            <span id="page-info">${currentPage} / ${totalPages}</span>
+            <button id="next-btn" onclick="filterEvents('${currentStatus}', ${currentPage + 1})" 
+            ${currentPage >= totalPages ? 'disabled' : ''}>다음</button>`;
+
+        paginationContainer.innerHTML = paginationHTML;
+      }
+
+      function goToEventDetail(eventId) {
+        window.location.href = `event-detail.html?id=${eventId}`;
+      }
+
+      function goToEventDetail(eventId) {
+        window.location.href = `event-detail.html?id=${eventId}`;
+      }
+
+      function openSidebar() {
+        document.getElementById('sidebar').style.width = '250px';
+      }
+
+      function closeSidebar() {
+        document.getElementById('sidebar').style.width = '0';
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const accessToken = localStorage.getItem('accessToken');
+
+        if (accessToken) {
+          document.getElementById('loggedInMenu').style.display = 'block';
+          document.getElementById('loggedOutMenu').style.display = 'none';
+        } else {
+          document.getElementById('loggedInMenu').style.display = 'none';
+          document.getElementById('loggedOutMenu').style.display = 'block';
         }
+      });
 
+      async function logout() {
+        try {
+          const accessToken = localStorage.getItem('accessToken');
+          if (!accessToken) {
+            console.warn('🚨 로그아웃 시도: 이미 로그아웃된 상태');
+            window.location.href = '/public/log-in.html';
+            return;
+          }
+
+          // 🔹 서버에 로그아웃 요청 보내기
+          const response = await fetch('/user/auth/logout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: accessToken,
+            },
+            credentials: 'include', // 쿠키도 함께 보내기
+          });
+
+          if (!response.ok) {
+            throw new Error('서버에서 로그아웃 처리 실패');
+          }
+
+          // ✅ 로그아웃 성공 후, 토큰 삭제
+          localStorage.removeItem('accessToken');
+
+          console.log('✅ 로그아웃 성공! 페이지 이동');
+          window.location.href = '/'; //
+        } catch (error) {
+          console.error('❌ 로그아웃 실패:', error);
+          alert('로그아웃 중 오류가 발생했습니다.');
+        }
+      }
     </script>
-</body>
-
+  </body>
 </html>
