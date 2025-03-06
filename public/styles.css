@@ -19,6 +19,64 @@ body {
   height: 50px;
 }
 
+/* 로그인 & 회원가입 메뉴 스타일 (PC에서는 원래 크기 유지) */
+#authMenu {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  right: 20px;
+  font-size: 14px; /* PC에서는 원래 크기 유지 */
+  gap: 10px;
+}
+
+/* 로그인/회원가입 링크 스타일 */
+#authMenu a {
+  color: white;
+  text-decoration: none;
+  font-size: 14px; /* PC에서는 유지 */
+  padding: 6px 10px;
+  border-radius: 5px;
+}
+
+#authMenu a:hover {
+  text-decoration: underline;
+}
+
+/* 📌 로그인 & 회원가입 버튼 스타일 */
+.nav .login-links {
+  font-size: 14px; /* 폰트 크기 줄이기 */
+  display: flex;
+  align-items: center;
+  gap: 5px; /* 로그인과 회원가입 사이 간격 */
+  position: absolute;
+  right: 20px; /* 오른쪽 정렬 */
+}
+
+/* 로그인 & 회원가입 링크 스타일 */
+.nav .login-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 12px; /* 모바일에서 글자 크기 줄이기 */
+  padding: 5px 8px;
+  border-radius: 5px;
+}
+
+.nav .login-links a:hover {
+  text-decoration: underline;
+}
+
+/* 📌 모바일에서 로그인/회원가입 크기 더 줄이기 */
+@media (max-width: 500px) {
+  .nav .login-links {
+    font-size: 12px; /* 모바일에서 폰트 크기 더 줄이기 */
+    right: 10px; /* 더 오른쪽으로 정렬 */
+  }
+
+  .nav .login-links a {
+    font-size: 11px; /* 모바일에서 더 작은 글씨 */
+    padding: 4px 6px;
+  }
+}
 /* 📌 모바일 스타일 (768px 이하일 때 적용) */
 @media (max-width: 768px) {
   .nav {
@@ -54,9 +112,93 @@ body {
     width: 100%;
   }
 
+  #authMenu {
+    font-size: 12px; /* 모바일에서 폰트 크기 축소 */
+    right: 1px; /* 위치 조정 */
+    gap: 3px; /* 간격 줄이기 */
+  }
+
+  #authMenu a {
+    font-size: 12px; /* 모바일에서 폰트 크기 줄이기 */
+    padding: 4px 6px; /* 버튼 크기 축소 */
+  }
+
   #map {
     width: 100%;
     min-height: 300px !important; /* 📌 모바일에서도 높이 유지 */
+  }
+  #userProfileBox {
+    max-width: 140px !important; /* ✅ 강제 적용 */
+    font-size: 12px !important; /* ✅ 글자 크기 더 줄이기 */
+    padding: 4px 6px !important;
+    display: flex;
+    align-items: center;
+  }
+
+  #userProfileBox img {
+    width: 25px !important; /* ✅ 더 작은 크기 */
+    height: 25px !important;
+    margin-right: 5px;
+  }
+
+  .nav .logo-text {
+    font-size: 16px !important; /* ✅ 로고 텍스트도 더 작게 */
+  }
+  .sidebar {
+    width: 0; /* ✅ 기본적으로 숨김 */
+    height: 100vh;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    background-color: #ff69b4;
+    transition: width 0.3s ease; /* ✅ 부드러운 애니메이션 효과 */
+    padding-top: 40px;
+    box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+    overflow-x: hidden; /* ✅ 스크롤 바 없애기 */
+  }
+
+  /* 사이드바 내부 메뉴 스타일 */
+  .sidebar a {
+    font-size: 14px !important; /* ✅ 글자 크기 줄이기 */
+    padding: 10px 15px !important; /* ✅ 메뉴 간격 줄이기 */
+    text-align: left !important; /* ✅ 왼쪽 정렬 적용 */
+    display: block; /* ✅ a 태그가 블록 요소로 정렬 */
+    padding-left: 20px !important; /* ✅ 왼쪽 여백 추가 */
+  }
+
+  /* 사이드바가 열릴 때 */
+  .sidebar.open {
+    width: 220px !important; /* ✅ 사이드바가 열릴 때 너비 설정 */
+  }
+
+  .user-assets {
+    font-size: 16px !important; /* ✅ 글자 크기 줄이기 */
+    display: flex !important;
+    align-items: center;
+    gap: 5px !important; /* ✅ 간격 줄이기 */
+    padding: 4px 8px !important; /* ✅ 패딩 줄이기 */
+    border-radius: 10px !important; /* ✅ 둥글기 줄이기 */
+    box-shadow: 0 2px 5px rgba(255, 98, 182, 0.2);
+    position: absolute !important;
+    right: 10px !important; /* ✅ 오른쪽 정렬 */
+    top: 53px !important; /* ✅ 네비게이션 바와 간격 조정 */
+  }
+
+  .user-assets .asset-item {
+    font-size: 12px !important; /* ✅ 더 작은 글자 크기 */
+    display: flex !important;
+    align-items: center !important;
+    gap: 3px !important; /* ✅ 아이콘과 숫자 간격 줄이기 */
+  }
+
+  .user-assets .asset-item img {
+    width: 14px !important; /* ✅ 아이콘 크기 줄이기 */
+    height: 14px !important;
+  }
+
+  .user-assets span {
+    font-size: 12px !important; /* ✅ 숫자 크기 줄이기 */
   }
 }
 
