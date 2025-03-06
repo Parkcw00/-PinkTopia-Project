@@ -24,7 +24,7 @@ export class CreateSubAchievementDto extends PickType(SubAchievement, [
   'longitude',
   'content',
   'latitude',
-  'expiration_at',
+  // 'expiration_at',
 ] as const) {
   @ApiProperty({ example: 1 })
   @IsInt() // 정수만 허용
@@ -69,7 +69,9 @@ export class CreateSubAchievementDto extends PickType(SubAchievement, [
   })
   mission_type: SubAchievementMissionType;
 
+  @IsOptional()
   @IsDate()
-  @Type(() => Date) // 문자열을 Date 객체로 변환
-  expiration_at: Date;
+  @Type(() => Date)
+  @Transform(({ value }) => (value ? new Date(value) : null))
+  expiration_at?: Date | null;
 }

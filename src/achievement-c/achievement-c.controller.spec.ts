@@ -1,12 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AchievementCController } from './achievement-c.controller';
 import { AchievementCService } from './achievement-c.service';
+import { UserGuard } from '../user/guards/user-guard';
+import { AdminGuard } from '../user/guards/admin.guard';
+import { CreateAchievementCDto } from './dto/create-achievement-c.dto';
 
 describe('AchievementCController', () => {
   let controller: AchievementCController;
   let service: AchievementCService;
 
-  // AchievementCService의 각 메서드를 모킹하여 컨트롤러의 동작만 검증
+  const mockAchievementC = { id: 1, user_id: 1, achievement_id: 1 };
+
   const mockService = {
     create: jest.fn(),
     findOne: jest.fn(),
@@ -15,13 +19,17 @@ describe('AchievementCController', () => {
   };
 
   beforeEach(async () => {
-    // 테스트 모듈 생성 시 컨트롤러와 모킹한 서비스를 주입
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AchievementCController],
       providers: [
+        { provide: AchievementCService, useValue: mockService },
         {
-          provide: AchievementCService,
-          useValue: mockService,
+          provide: UserGuard,
+          useValue: { canActivate: jest.fn().mockReturnValue(true) },
+        },
+        {
+          provide: AdminGuard,
+          useValue: { canActivate: jest.fn().mockReturnValue(true) },
         },
       ],
     }).compile();
@@ -31,55 +39,61 @@ describe('AchievementCController', () => {
   });
 
   afterEach(() => {
-    // 각 테스트 후 모킹된 함수 초기화
     jest.clearAllMocks();
   });
 
-  describe('create', () => {
-    it('올바른 DTO를 전달하면 service.create를 호출하고 결과를 반환해야 한다', async () => {
-      const dto = { user_id: 1, achievement_id: 1 };
-      const expectedResult = { id: 1, ...dto };
-      mockService.create.mockResolvedValue(expectedResult);
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
+  });
 
-      // 컨트롤러의 create 메서드는 Request 객체와 DTO를 받음 (여기서는 Request는 단순 객체로 대체)
-      const result = await controller.create({ user: { id: 1 } }, dto);
-      expect(result).toEqual(expectedResult);
-      expect(mockService.create).toHaveBeenCalledWith(dto);
+  describe('create', () => {
+    it('should create an AchievementC', async () => {
+      const req = { user: { id: 1 } };
+      const createDto: CreateAchievementCDto = {
+        user_id: 1,
+        achievement_id: 1,
+      };
+      mockService.create.mockResolvedValue(mockAchievementC);
+
+      const result = await controller.create(req, createDto);
+
+      expect(result).toEqual(mockAchievementC);
+      expect(mockService.create).toHaveBeenCalledWith(createDto);
     });
   });
 
   describe('findOne', () => {
-    it('achievementCId를 전달받아 service.findOne을 호출하고 결과를 반환해야 한다', async () => {
+    it('should return a single AchievementC', async () => {
       const achievementCId = '1';
-      const expectedResult = { 'Test Achievement': [{ id: 1, name: 'SubAchievement1' }] };
-      mockService.findOne.mockResolvedValue(expectedResult);
+      mockService.findOne.mockResolvedValue(mockAchievementC);
 
       const result = await controller.findOne(achievementCId);
-      expect(result).toEqual(expectedResult);
-      expect(mockService.findOne).toHaveBeenCalledWith(achievementCId);
+
+      expect(result).toEqual(mockAchievementC);
+      expect(mockService.findOne).toHaveBeenCalledWith('1');
     });
   });
 
   describe('find', () => {
-    it('service.findAll을 호출하여 모든 업적 데이터를 반환해야 한다', async () => {
-      const achievements = [{ id: 1 }, { id: 2 }];
-      mockService.findAll.mockResolvedValue(achievements);
+    it('should return all AchievementC records', async () => {
+      mockService.findAll.mockResolvedValue([mockAchievementC]);
 
       const result = await controller.find();
-      expect(result).toEqual(achievements);
+
+      expect(result).toEqual([mockAchievementC]);
       expect(mockService.findAll).toHaveBeenCalled();
     });
   });
 
   describe('remove', () => {
-    it('achievementCId를 전달받아 service.remove를 호출하고 결과를 반환해야 한다', async () => {
+    it('should remove an AchievementC', async () => {
       const achievementCId = '1';
-      const expectedResult = { message: '삭제 성공' };
-      mockService.remove.mockResolvedValue(expectedResult);
+      mockService.remove.mockResolvedValue({ message: '삭제 성공' });
 
       const result = await controller.remove(achievementCId);
-      expect(result).toEqual(expectedResult);
-      expect(mockService.remove).toHaveBeenCalledWith(achievementCId);
+
+      expect(result).toEqual({ message: '삭제 성공' });
+      expect(mockService.remove).toHaveBeenCalledWith('1');
     });
   });
 });

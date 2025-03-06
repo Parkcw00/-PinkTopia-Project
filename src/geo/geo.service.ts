@@ -234,8 +234,9 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
     // 1. GEO에서 반경 5m 내의 북마크 ID 목록 가져오기
     const nearbyIds = (await this.client.georadius(
       this.S_GEO_KEY,
-      latitude,
       longitude,
+      latitude,
+
       5,
       'm',
     )) as string[];

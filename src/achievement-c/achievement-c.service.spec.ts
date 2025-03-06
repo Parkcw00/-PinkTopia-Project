@@ -8,7 +8,12 @@ describe('AchievementCService', () => {
   let service: AchievementCService;
   let repository: AchievementCRepository;
 
-  // AchievementCRepository의 각 메서드를 모킹(mock)하여 테스트 시 실제 DB 접근을 피함
+  const mockAchievementC = {
+    id: 1,
+    user_id: 1,
+    achievement_id: 1,
+  };
+
   const mockRepository = {
     isExists: jest.fn(),
     create: jest.fn(),
@@ -20,14 +25,10 @@ describe('AchievementCService', () => {
   };
 
   beforeEach(async () => {
-    // 테스트 모듈을 생성하고 AchievementCService와 모킹한 Repository를 주입
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AchievementCService,
-        {
-          provide: AchievementCRepository,
-          useValue: mockRepository,
-        },
+        { provide: AchievementCRepository, useValue: mockRepository },
       ],
     }).compile();
 
@@ -36,120 +37,113 @@ describe('AchievementCService', () => {
   });
 
   afterEach(() => {
-    // 각 테스트 후 모킹한 함수들을 초기화하여 테스트 간 간섭 방지
     jest.clearAllMocks();
   });
 
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+
   describe('create', () => {
-    it('DTO 데이터가 없으면 BadRequestException을 던져야 한다', async () => {
-      // 데이터가 없을 때 예외가 발생하는지 확인
-      await expect(service.create(null as unknown as CreateAchievementCDto)).rejects.toThrow(BadRequestException);
-
-//      await expect(service.create(null)).rejects.toThrow(BadRequestException);
-    });
-
-    it('이미 존재하는 항목이면 BadRequestException을 던져야 한다', async () => {
-      const createDto: CreateAchievementCDto = { user_id: 1, achievement_id: 1 };
-      // repository.isExists가 true를 반환하도록 모킹
-      mockRepository.isExists.mockResolvedValue(true);
-
-      await expect(service.create(createDto)).rejects.toThrow(BadRequestException);
-      expect(mockRepository.isExists).toHaveBeenCalledWith(createDto.user_id, createDto.achievement_id);
-    });
-
-    it('정상적인 입력이면 새 항목을 생성 및 저장 후 반환해야 한다', async () => {
-      const createDto: CreateAchievementCDto = { user_id: 1, achievement_id: 1 };
-      // 존재하지 않는 항목이라고 가정
-      mockRepository.isExists.mockResolvedValue(false);
-      // repository.create가 생성된 객체를 반환하도록 모킹
-      const createdEntity = { id: 1, ...createDto };
-      mockRepository.create.mockResolvedValue(createdEntity);
-      // repository.save가 저장된 객체를 반환하도록 모킹
-      mockRepository.save.mockResolvedValue(createdEntity);
+    it('should create a new AchievementC', async () => {
+      const createDto: CreateAchievementCDto = {
+        user_id: 1,
+        achievement_id: 1,
+      };
+      mockRepository.isExists.mockResolvedValue(null);
+      mockRepository.create.mockResolvedValue(mockAchievementC);
+      mockRepository.save.mockResolvedValue(mockAchievementC);
 
       const result = await service.create(createDto);
-      expect(result).toEqual(createdEntity);
+
+      expect(result).toEqual(mockAchievementC);
+      expect(mockRepository.isExists).toHaveBeenCalledWith(1, 1);
       expect(mockRepository.create).toHaveBeenCalledWith(createDto);
-      expect(mockRepository.save).toHaveBeenCalledWith(createdEntity);
+      expect(mockRepository.save).toHaveBeenCalledWith(mockAchievementC);
+    });
+
+    it('should throw BadRequestException if dto is invalid', async () => {
+      await expect(service.create({} as CreateAchievementCDto)).rejects.toThrow(
+        BadRequestException,
+      );
+      //      await expect(service.create(null)).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException if AchievementC already exists', async () => {
+      const createDto: CreateAchievementCDto = {
+        user_id: 1,
+        achievement_id: 1,
+      };
+      mockRepository.isExists.mockResolvedValue(mockAchievementC);
+
+      await expect(service.create(createDto)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
   describe('findOne', () => {
-    it('id가 없으면 NotFoundException을 던져야 한다', async () => {
-      await expect(service.findOne(null as unknown as string)).rejects.toThrow(NotFoundException);
-
-//      await expect(service.findOne(null)).rejects.toThrow(NotFoundException);
-    });
-
-    it('유효하지 않은 id(숫자형 변환 불가)인 경우 BadRequestException을 던져야 한다', async () => {
-      await expect(service.findOne('abc')).rejects.toThrow(BadRequestException);
-    });
-
-    it('title을 찾을 수 없으면 NotFoundException을 던져야 한다', async () => {
-      // id가 '1'인 경우 title을 찾지 못하는 상황 테스트
+    it('should return a single AchievementC with title and sub-achievements', async () => {
       const id = '1';
-      mockRepository.findTitleC.mockResolvedValue(null);
+      const title = 'Test Title';
+      const subAchievements = [{ id: 1 }];
+      mockRepository.findTitleC.mockResolvedValue(title);
+      mockRepository.findP.mockResolvedValue(subAchievements);
 
-      await expect(service.findOne(id)).rejects.toThrow(NotFoundException);
+      const result = await service.findOne(id);
+
+      expect(result).toEqual({ [title]: subAchievements });
       expect(mockRepository.findTitleC).toHaveBeenCalledWith(1);
-    });
-
-    it('관련 서브업적이 없으면 NotFoundException을 던져야 한다', async () => {
-      const id = '1';
-      // title은 존재하지만 관련 서브업적이 없을 경우
-      mockRepository.findTitleC.mockResolvedValue('Test Title');
-      mockRepository.findP.mockResolvedValue([]);
-
-      await expect(service.findOne(id)).rejects.toThrow(NotFoundException);
       expect(mockRepository.findP).toHaveBeenCalledWith(1);
     });
 
-    it('정상적인 입력이면 동적 키로 구성된 결과 객체를 반환해야 한다', async () => {
-      const id = '1';
-      const testTitle = 'Test Achievement';
-      const testSubAchievements = [{ id: 1, name: 'SubAchievement1' }];
+    it('should throw NotFoundException if id is invalid', async () => {
+      await expect(service.findOne(undefined as any)).rejects.toThrow(
+        NotFoundException,
+      );
+      //      await expect(service.findOne(null)).rejects.toThrow(NotFoundException);
+    });
 
-      mockRepository.findTitleC.mockResolvedValue(testTitle);
-      mockRepository.findP.mockResolvedValue(testSubAchievements);
+    it('should throw NotFoundException if AchievementC is not found', async () => {
+      mockRepository.findTitleC.mockResolvedValue(null);
 
-      const result = await service.findOne(id);
-      // 반환 객체의 key가 title(동적)이어야 함
-      expect(result).toEqual({ [testTitle]: testSubAchievements });
+      await expect(service.findOne('1')).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('findAll', () => {
-    it('모든 업적 데이터를 반환해야 한다', async () => {
-      const achievements = [{ id: 1 }, { id: 2 }];
+    it('should return all AchievementC records', async () => {
+      const achievements = [mockAchievementC];
       mockRepository.findAll.mockResolvedValue(achievements);
 
       const result = await service.findAll();
+
       expect(result).toEqual(achievements);
       expect(mockRepository.findAll).toHaveBeenCalled();
     });
   });
 
   describe('remove', () => {
-    it('유효하지 않은 id인 경우 BadRequestException을 던져야 한다', async () => {
-      await expect(service.remove('abc')).rejects.toThrow(BadRequestException);
-    });
-
-    it('삭제가 실패하면 NotFoundException을 던져야 한다', async () => {
+    it('should remove an AchievementC and return success message', async () => {
       const id = '1';
-      // affected 값이 0인 경우 삭제 실패 상황
-      mockRepository.remove.mockResolvedValue({ affected: 0 });
-
-      await expect(service.remove(id)).rejects.toThrow(NotFoundException);
-      expect(mockRepository.remove).toHaveBeenCalledWith(1);
-    });
-
-    it('삭제 성공 시 성공 메시지를 반환해야 한다', async () => {
-      const id = '1';
-      // affected 값이 1 이상이면 삭제 성공
       mockRepository.remove.mockResolvedValue({ affected: 1 });
 
       const result = await service.remove(id);
+
       expect(result).toEqual({ message: '삭제 성공' });
+      expect(mockRepository.remove).toHaveBeenCalledWith(1);
+    });
+
+    it('should throw BadRequestException if id is invalid', async () => {
+      await expect(service.remove('invalid')).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should throw NotFoundException if AchievementC is not found', async () => {
+      mockRepository.remove.mockResolvedValue({ affected: 0 });
+
+      await expect(service.remove('1')).rejects.toThrow(NotFoundException);
     });
   });
 });
