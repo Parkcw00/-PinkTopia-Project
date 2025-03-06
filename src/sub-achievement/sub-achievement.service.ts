@@ -14,18 +14,22 @@ import { fixresArr, fixres } from './utils/format';
 
 import { S3Service } from '../s3/s3.service';
 import { ValkeyService } from '../valkey/valkey.service';
+import { GeoService } from '../geo/geo.service';
+import { getDistance } from 'geolib';
 import { Repository } from 'typeorm'; // TypeORM Repository
 import { InjectRepository } from '@nestjs/typeorm'; // TypeORM 의존성 주입
+import { date } from 'joi';
 
 @Injectable()
 export class SubAchievementService {
   constructor(
     private readonly repository: SubAchievementRepository,
     private readonly s3Service: S3Service,
+    private readonly geoService: GeoService,
     private readonly valkeyService: ValkeyService,
   ) {}
 
-  async fillValkey() {
+  async fillGeo() {
     // 1. DB에서 모든 서브업적 가져오기
     const dbSub: SubAchievement[] = await this.repository.getAll();
 
@@ -33,15 +37,12 @@ export class SubAchievementService {
       throw new NotFoundException('DB에 서브업적 데이터가 없습니다.');
     }
 
-    // 2. Redis에 일괄 저장 (Pipeline 사용)
-    const pipeline = this.valkeyService.getClient().pipeline();
-    if (!pipeline) {
-      throw new NotFoundException('Valkey(Pipeline)를 가져올 수 없습니다.');
-    }
-
     for (const sub of dbSub) {
-      const key = `sub-achievement:${sub.id}`; // 고유 ID 사용
-
+      const key = `sub-achievement`;
+      const image =
+        typeof sub.sub_achievement_images === 'string'
+          ? [sub.sub_achievement_images] // 문자열이면 배열로 변환
+          : sub.sub_achievement_images;
       const subData = {
         id: sub.id,
         achievement_id: sub.achievement_id,
@@ -49,23 +50,17 @@ export class SubAchievementService {
         content: sub.content,
         longitude: sub.longitude,
         latitude: sub.latitude,
-        sub_achievement_images: sub.sub_achievement_images,
-        mission_type: sub.mission_type,
-        expiration_at: sub.expiration_at,
-        created_at: sub.created_at?.toISOString() || null,
-        updated_at: sub.updated_at?.toISOString() || null,
+        sub_achievement_images: image,
+        mission_type: sub.mission_type as SubAchievementMissionType,
+        expiration_at: new Date(sub.expiration_at).toISOString(),
+        created_at: sub.created_at?.toISOString() || '',
+        updated_at: sub.updated_at?.toISOString() || '',
       };
-      console.log(subData);
 
-      pipeline.set(key, JSON.stringify(subData)); // Redis에 저장
+      await this.geoService.geoAddBookmarkS(key, subData);
     }
-
-    await pipeline.exec(); // 🚀 일괄 실행 (반드시 await 사용)
-
-    console.log(`✅ ${dbSub.length}개의 서브업적이 Valkey에 저장되었습니다.`);
-
     return {
-      message: `✅ ${dbSub.length}개의 서브업적이 Valkey에 저장되었습니다.`,
+      message: `✅ ${dbSub.length}개의 서브업적이 GeoService에 저장되었습니다.`,
     };
   }
 
@@ -134,7 +129,7 @@ export class SubAchievementService {
     }
 
     const sub_achievement_images = await this.s3Service.uploadFiles(files);
-
+    /*
     //  새로운 엔티티 생성
     const createSub = `achievement_id: ${achievement_id}, // ✅ 관계 매핑
       expiration_at: expirationAt ?? undefined, // ✅ null → undefined 변환
@@ -150,7 +145,7 @@ export class SubAchievementService {
 
     // Redis에 저장
     await this.valkeyService.set(key, createSub);
-
+*/
     const subAchievement = await this.repository.create({
       achievement_id: achievement_id, // ✅ 관계 매핑
       expiration_at: expirationAt ?? undefined, // ✅ null → undefined 변환
@@ -168,8 +163,23 @@ export class SubAchievementService {
     // achievement_id가 일치하는 모든 데이터를 achievement_c 테이블에서 삭제하기
     // const delete_achievement_c  =
     await this.repository.delete_achievement_c(achievement_id);
+
+    const key = `sub-achievement`; //:${save.id}`;
+    const subData = {
+      id: save.id,
+      achievement_id: save.achievement_id,
+      title: save.title,
+      content: save.content,
+      longitude: save.longitude,
+      latitude: save.latitude,
+      sub_achievement_images: sub_achievement_images,
+      mission_type: save.mission_type as SubAchievementMissionType,
+      expiration_at: new Date(save.expiration_at).toISOString(),
+      created_at: save.created_at?.toISOString() || '',
+      updated_at: save.updated_at?.toISOString() || '',
+    };
+    await this.geoService.geoAddBookmarkS(key, subData);
     return { subAchievement: save };
-    // return fixres(save);
   }
 
   async findOne(id: string) {

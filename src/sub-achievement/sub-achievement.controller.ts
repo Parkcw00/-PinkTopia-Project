@@ -31,7 +31,7 @@ export class SubAchievementController {
   //@UseGuards(UserGuard, AdminGuard)
   @Post('fill-valkey')
   async fillValkey() {
-    return await await this.service.fillValkey();
+    return await await this.service.fillGeo();
   }
 
   // 생성

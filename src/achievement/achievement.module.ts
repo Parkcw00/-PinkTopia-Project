@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { S3Service } from 'src/s3/s3.service';
+import { S3Service } from '../s3/s3.service';
 import { Achievement } from './entities/achievement.entity';
 import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
 import { AchievementService } from './achievement.service';
@@ -8,7 +8,7 @@ import { AchievementController } from './achievement.controller';
 import { AchievementC } from '../achievement-c/entities/achievement-c.entity';
 import { AchievementRepository } from './achievement.repository';
 import { User } from '../user/entities/user.entity';
-import { ValkeyModule } from 'src/valkey/valkey.module';
+import { ValkeyModule } from '../valkey/valkey.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Achievement, SubAchievement, AchievementC, User]),

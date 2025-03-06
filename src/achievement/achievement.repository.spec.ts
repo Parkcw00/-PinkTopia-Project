@@ -29,7 +29,7 @@ describe('AchievementRepository', () => {
 
   it('deleteById should call repository.delete()', async () => {
     const deleteSpy = jest.spyOn(mockRepo, 'delete').mockResolvedValue({} as any);
-    await repository.deleteById(1);
+    await repository.softDelete(1);
     expect(deleteSpy).toHaveBeenCalledWith(1);
   });
 });

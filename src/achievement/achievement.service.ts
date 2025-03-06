@@ -29,7 +29,6 @@ export class AchievementService {
     createAchievementDto: CreateAchievementDto,
     files: Express.Multer.File[], // 여러 파일을 받도록 수정
   ): Promise<Achievement> {
-    console.log('생성 서비스');
     if (!createAchievementDto || !createAchievementDto.title) {
       throw new BadRequestException('올바른 데이터를 입력하세요.');
     }
@@ -41,7 +40,6 @@ export class AchievementService {
     if (alreadyExists) {
       throw new NotFoundException(`이미 있는 업적 이름 입니다.`);
     }
-    console.log('생성 서비스1');
     // 새로운 엔티티 생성
 
     const achievement_images = await this.s3Service.uploadFiles(files);
@@ -73,12 +71,11 @@ export class AchievementService {
       expiration_at: expirationAt,
     });
 
-    console.log('생성 서비스2' + { achievement });
+    // console.log('생성 서비스2' + { ...achievement });
 
     if (!achievement) {
       throw new NotFoundException(`업적 생성 실패`);
     }
-    console.log('생성 서비스3');
 
     // 데이터베이스에 저장 -> 레포지토리에서 함
     // const save = await this.repository.save(achievement);

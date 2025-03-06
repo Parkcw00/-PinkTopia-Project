@@ -68,9 +68,15 @@ export class EventService {
    * @returns 해당 이벤트 정보 반환
    */
   async getEvent(eventId: number) {
+    console.log(`🔍 이벤트 조회: ${eventId}`);
     const event = await this.eventRepository.findById(eventId);
-    if (!event)
+
+    if (!event) {
+      console.error('❌ 이벤트를 찾을 수 없음:', eventId);
       throw new NotFoundException({ message: '이벤트가 존재하지 않습니다.' });
+    }
+
+    console.log('✅ 이벤트 조회 성공:', event);
     return event;
   }
 
@@ -92,21 +98,31 @@ export class EventService {
       throw new NotFoundException({ message: '이벤트가 존재하지 않습니다.' });
     }
 
-    // expiration_at이 문자열로 들어올 경우 변환
+    // expiration_at이 문자열이면 Date 타입으로 변환
     if (updateEventDto.expiration_at) {
-      updateEventDto.expiration_at = new Date(
-        updateEventDto.expiration_at,
-      ) as any;
+      try {
+        updateEventDto.expiration_at = new Date(
+          updateEventDto.expiration_at,
+        ) as any;
+      } catch (error) {
+        throw new Error('expiration_at 날짜 변환 오류');
+      }
     }
 
-    // 새로운 파일이 업로드되면 S3에 업로드하고 URL 변경
+    // 파일 업로드가 있을 경우 새로운 이미지 URL 설정
+    let fileUrl: string | undefined = event.image; // 기존 이미지 유지
     if (file) {
-      const fileUrl = await this.s3Service.uploadFile(file);
-      updateEventDto = { ...updateEventDto, fileUrl }; // 새 파일 URL 업데이트
+      fileUrl = await this.s3Service.uploadFile(file);
     }
+
+    // 기존 데이터 유지하면서 새로운 값 덮어쓰기
+    Object.assign(event, updateEventDto, { image: fileUrl });
+
+    console.log('🔄 업데이트할 이벤트 데이터:', event); // 로그 추가
 
     await this.eventRepository.updateEvent(event, updateEventDto);
-    return { message: '이벤트 수정 성공', updateEventDto };
+
+    return { message: '이벤트 수정 성공', event };
   }
 
   /**

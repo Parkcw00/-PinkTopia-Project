@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>홈 | PinkTopia</title>
-    <link rel="stylesheet" href="/public/H,J,C/styles.css" />
+    <link rel="stylesheet" href="./styles.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -230,18 +230,49 @@
             left: 50%;
             transform: translate(-50%, -50%);
             padding: 20px;
-            background-color: white;
-            border: 1px solid #ccc;
+            background-color: #ff84c1;
+            border: 1px solid #ff84c1;
             z-index: 1000;
             text-align: center;
         }
+
+        #userProfileBox {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            /* 배경을 흰색으로 설정 */
+            padding: 10px 15px;
+            border-radius: 20px;
+            /* 둥근 네모 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #ff5faf;
+            /* 기본 글자색 */
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        #userProfileBox img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+            border: 2px solid #ff7fbf;
+            /* 핑크 테두리 */
+        }
+
+        #userProfileBox .welcome-text {
+            color: #ff78bc;
+            /* 핑크색 */
+            font-weight: bold;
+        }
     </style>
-    <script src="/socket.io/socket.io.js"></script>
-    <script type="text/javascript"
-        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=620f82a72553514014eda92cefcbbaf3"></script>
+    <!-- "https://cdn.socket.io/4.3.2/socket.io.min.js" -->
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
 </head>
 
 <body>
+    <!-- 카카오맵 API 스크립트 추가 -->
     <script
         src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=5dc1bc6ffb574e60204390643bad8557&libraries=services,clusterer,drawing"></script>
     <div id="overlay"></div>
@@ -260,11 +291,13 @@
             </div>
         </div>
         <div class="logo-container">
-            <img src="/public/images/123.jpg" alt="PinkTopia Logo" />
+            <img src="./images/123.jpg" alt="PinkTopia Logo" />
         </div>
         <div class="logo-text">
             <a href="/public/home.html" style="text-decoration: none; color: white">PinkTopia</a>
         </div>
+        <!-- 로그인 상태에 따라 변경될 영역 -->
+        <div id="authMenu" style="margin-left: auto; display: flex; align-items: center;"></div>
     </div>
     <div class="container">
         <h1>홈</h1>
@@ -312,6 +345,8 @@
 
             <div id="map" style="flex: 2; height: 400px; border-radius: 10px;">
                 <script>
+                    // document.addEventListener("DOMContentLoaded", function () {
+
                     let mapContainer = document.getElementById('map'),
                         mapOption = {
                             center: new kakao.maps.LatLng(0, 0),
@@ -325,7 +360,7 @@
                             let lat = position.coords.latitude,
                                 lon = position.coords.longitude;
                             let locPosition = new kakao.maps.LatLng(lat, lon),
-                                message = '<div style="padding:5px;">여기에 계신가요?!</div>';
+                                message = '<div style="padding:5px;">현재 위치</div>';
                             displayMarker(locPosition, message);
                         });
                     } else {
@@ -356,19 +391,24 @@
                     let zoomControl = new kakao.maps.ZoomControl();
                     map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
 
+
                     // 마커 정보 배열 (출발지, 도착지)
                     let markers = [
                         {
                             key: 'start',
                             info: '출발지',
-                            position: savedStart ? new kakao.maps.LatLng(savedStart.lat, savedStart.lng) : new kakao.maps.LatLng(36.3275, 127.4268),
+                            position: savedStart
+                                ? new kakao.maps.LatLng(savedStart.lat, savedStart.lng)
+                                : new kakao.maps.LatLng(36.3275, 127.4268),
                             imageUrl: 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/red_b.png',
                             storageKey: 'startLocation',
                         },
                         {
                             key: 'end',
                             info: '도착지',
-                            position: savedEnd ? new kakao.maps.LatLng(savedEnd.lat, savedEnd.lng) : new kakao.maps.LatLng(36.340309, 127.389999),
+                            position: savedEnd
+                                ? new kakao.maps.LatLng(savedEnd.lat, savedEnd.lng)
+                                : new kakao.maps.LatLng(36.340309, 127.389999),
                             imageUrl: 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/blue_b.png',
                             storageKey: 'endLocation',
                         },
@@ -380,30 +420,41 @@
                             data.imageUrl,
                             new kakao.maps.Size(50, 50),
                         );
+
                         let marker = new kakao.maps.Marker({
                             position: data.position,
                             image: markerImage,
                             map: map,
-                            draggable: true,
+                            draggable: true, // 드래그 가능하도록 설정
                         });
 
-                        // 마커 위에 정보창 추가
+                        // 정보창 생성
                         let infowindow = new kakao.maps.InfoWindow({
                             content: `<div style="padding:5px;">${data.info}</div>`,
                         });
+
+                        // 마커에 정보창 표시
                         infowindow.open(map, marker);
 
-                        // 드래그 종료 시 좌표 저장 (입력창 업데이트는 별도 이벤트에서 처리)
+                        // 마커 드래그 종료 시 좌표 및 정보창 위치 업데이트
                         kakao.maps.event.addListener(marker, 'dragend', function () {
                             let position = marker.getPosition();
+
+                            // 정보창도 마커의 새 위치로 이동
+                            infowindow.setPosition(position);
+
+                            // 새로운 좌표를 localStorage에 저장
                             localStorage.setItem(
                                 data.storageKey,
                                 JSON.stringify({ lat: position.getLat(), lng: position.getLng() }),
                             );
+
                             console.log(`${data.info} 위치 저장됨:`, position.getLat(), position.getLng());
                         });
 
+                        // 각 마커 및 정보창을 객체에 저장
                         data.marker = marker;
+                        data.infowindow = infowindow;
                     });
 
                     // 전역 변수로 출발지, 도착지 마커 지정
@@ -435,7 +486,7 @@
                             }
                         });
                     }
-
+                    ///////////////////////////////////////////////////////////////////////
                     // 마커 이동 시 입력창에 좌표 업데이트
                     function updateInputValue(marker, addressInputId) {
                         let inputElement = document.getElementById(addressInputId);
@@ -482,51 +533,57 @@
                     document.getElementById('start').addEventListener('change', function () {
                         setMarkerPosition(startMarker, 'start');
                     });
-                    // 북마커 데이터 호출 및 지도에 추가
-                    let markerData = [];
 
-                    fetch('http://localhost:3000/direction/bookmarke')
-                        .then((response) => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! Status: ${response.status}`);
-                            }
-                            console.log('✅ 패치 성공');
-                            return response.json();
-                        })
-                        .then((data) => {
-                            console.log('북마커 데이터:', data);
-                            if (data.bookmarksS && Array.isArray(data.bookmarksS)) {
-                                data.bookmarksS.forEach((bookmarkeS) => {
-                                    markerData.push({
-                                        position: new kakao.maps.LatLng(bookmarkeS.latitude, bookmarkeS.longitude),
-                                        imageUrl: bookmarkeS.sub_achievement_images,
-                                        size: new kakao.maps.Size(20, 20),
-                                        info: bookmarkeS.title,
-                                        draggable: false,
-                                    });
-                                });
-                            }
-                            if (data.bookmarksP && Array.isArray(data.bookmarksP)) {
-                                data.bookmarksP.forEach((bookmarkeP) => {
-                                    markerData.push({
-                                        position: new kakao.maps.LatLng(bookmarkeP.latitude, bookmarkeP.longitude),
-                                        imageUrl: 'https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FbnZWDr%2FbtsMxEa1tat%2Fd4s5w26JdYrq0b7Qp9wDt1%2Fimg.png',
-                                        size: new kakao.maps.Size(20, 20),
-                                        info: bookmarkeP.title,
-                                        draggable: false,
-                                    });
-                                });
-                            }
-                            addMarkersToMap();
-                        })
-                        .catch((error) => console.error('Error fetching data:', error));
 
-                    function addMarkersToMap() {
-                        if (markerData.length === 0) {
+                    /////////////////////////////////////////////////////////
+                    //         function checkLoginStatus() {
+                    // const accessToken = localStorage.getItem("accessToken");
+                    // const authMenu = document.getElementById("authMenu");
+
+                    document.addEventListener("DOMContentLoaded", function () {
+                        geoBookmark()
+                    });
+                    function geoBookmark() {
+                        fetch('http://localhost:3000/direction/bookmark')
+                            .then((response) => {
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! Status: ${response.status}`);
+                                }
+                                console.log('✅ 패치 성공');
+                                return response.json();
+                            })
+                            .then((data) => {
+                                console.log('📌 북마커 데이터 로드 성공:', data);
+                                let markerDataB = [];
+                                if (data) { // 북마커 데이터 호출 및 지도에 추가
+
+                                    data.forEach(bookmark => {
+                                        console.log('이번 북마커는 : ', bookmark)
+                                        markerDataB.push({
+                                            // markerData.data.map((bookmark) => ({
+                                            position: new kakao.maps.LatLng(bookmark.latitude, bookmark.longitude),
+                                            imageUrl:
+                                                bookmark.sub_achievement_images ||
+                                                'https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FbnZWDr%2FbtsMxEa1tat%2Fd4s5w26JdYrq0b7Qp9wDt1%2Fimg.png',
+                                            size: new kakao.maps.Size(40, 40),
+                                            info: bookmark.title || '이름 없음',
+                                            draggable: false,
+                                        });
+                                        console.log("북마커 좌표 확인:", bookmark.latitude, bookmark.longitude);
+                                    })
+                                }
+                                addMarkersToMap(markerDataB)
+                            })
+                            .catch((error) => console.error('Error fetching data:', error));
+                    }
+                    function addMarkersToMap(markerData) {
+                        if (!markerData || markerData.length === 0) {
                             console.warn('📢 북마커 데이터 없음');
                             return;
                         }
+                        console.log("다와간다 북마커 : ", markerData)
                         var bounds = new kakao.maps.LatLngBounds();
+
                         markerData.forEach(function (data) {
                             var markerImage = new kakao.maps.MarkerImage(data.imageUrl, data.size);
                             var marker = new kakao.maps.Marker({
@@ -535,16 +592,30 @@
                                 map: map,
                                 draggable: data.draggable,
                             });
+                            console.log("다와간다2 마커 : ", marker)
+                            // marker.setMap(map); // ✅ **이 부분이 핵심**
                             var infowindow = new kakao.maps.InfoWindow({
                                 content: `<div style="padding:5px;">${data.info} <br>
                                       <a href="https://map.kakao.com/link/map/${data.info},${data.position.getLat()},${data.position.getLng()}" target="_blank" style="color:skyblue">큰지도보기</a> 
                                       <a href="https://map.kakao.com/link/to/${data.info},${data.position.getLat()},${data.position.getLng()}" target="_blank" style="color:blue">길찾기</a></div>`,
                             });
-                            infowindow.open(map, marker);
+
+                            kakao.maps.event.addListener(marker, 'mouseover', function () {
+                                infowindow.open(map, marker);
+                            });
+
+                            kakao.maps.event.addListener(marker, 'mouseout', function () {
+                                infowindow.close();
+                            });
+
                             bounds.extend(data.position);
+                            // infowindow.open(map, marker);
+                            //  bounds.extend(data.position);
                         });
                         map.setBounds(bounds);
                     }
+
+
                 </script>
             </div>
         </div>
@@ -600,6 +671,44 @@
             }
         });
 
+        document.addEventListener("DOMContentLoaded", function () {
+            checkLoginStatus();
+        });
+
+        function checkLoginStatus() {
+            const accessToken = localStorage.getItem("accessToken");
+            const authMenu = document.getElementById("authMenu");
+
+            if (accessToken) {
+                fetch("http://localhost:3000/user/me", {
+                    headers: { "Authorization": accessToken }
+                })
+                    .then(response => response.json())
+                    .then(userData => {
+                        const profileImage = userData.profile_image || "./images/default-profile.png"; // 기본 이미지
+
+                        authMenu.innerHTML = `
+                    <div id="userProfileBox" onclick="goToProfile()" style="cursor: pointer;">
+                    <img src="${profileImage}" alt="프로필 사진">
+                    <span><span class="welcome-text">환영합니다!</span> <strong>${userData.nickname}</strong>님!</span>
+                    </div>
+                    <a href="#" onclick="logout()" style="margin-left: 15px; color: white; text-decoration: none;">로그아웃</a>
+                `;
+                    })
+                    .catch(error => {
+                        console.error("유저 정보 불러오기 실패:", error);
+                        authMenu.innerHTML = `<a href="/public/log-in.html" style="color: white;">로그인</a> / <a href="/public/sign-up.html" style="color: white;">회원가입</a>`;
+                    });
+            } else {
+                authMenu.innerHTML = `<a href="/public/log-in.html" style="color: white;">로그인</a> / <a href="/public/sign-up.html" style="color: white;">회원가입</a>`;
+            }
+        }
+
+        function goToProfile() {
+            window.location.href = "/public/mypage.html";
+        }
+
+
         async function logout() {
             try {
                 const accessToken = localStorage.getItem('accessToken');
@@ -625,12 +734,9 @@
                 if (!response.ok) {
                     throw new Error('서버에서 로그아웃 처리 실패');
                 }
-
-                // ✅ 로그아웃 성공 후, 토큰 삭제
-                localStorage.removeItem('accessToken');
-
-                console.log('✅ 로그아웃 성공! 페이지 이동');
-                window.location.href = '/public/log-in.html'; // 로그인 페이지로 이동
+                localStorage.removeItem("accessToken");
+                console.log("✅ 로그아웃 성공! 페이지 이동");
+                window.location.href = "/";
             } catch (error) {
                 console.error('❌ 로그아웃 실패:', error);
                 alert('로그아웃 중 오류가 발생했습니다.');
@@ -688,12 +794,8 @@
             </div>
         </div>
     </div>
-
-    <!-- 카카오맵 API 스크립트 추가 -->
-    <script type="text/javascript"
-        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5dc1bc6ffb574e60204390643bad8557"></script>
-    <script src="/public/H,J,C/script.js"></script>
-    <script src="locationUpdates.js"></script>
+    <script src="./locationUpdates.js"></script>
+    <!-- public\locationUpdates.js -->
 </body>
 
 </html>

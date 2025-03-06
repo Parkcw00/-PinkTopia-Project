@@ -233,6 +233,26 @@
             cursor: pointer;
             color: white;
         }
+
+        .pagination {
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            margin: 5px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            background-color: #ff61b0;
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .pagination button:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -295,6 +315,7 @@
         </div>
 
         <div id="eventList"></div>
+        <div class="pagination" id="pagination" style="margin-top: 20px;"></div>
     </div>
 
     <script>
@@ -322,36 +343,85 @@
             }
         });
 
-        function filterEvents(status) {
+        let event = []; // 모든 이벤트 데이터 저장
+        let currentPage = 1;
+        const itemsPerPage = 5; // 한 페이지에 표시할 이벤트 개수
+        let currentStatus = "all"; // 현재 선택된 상태 ('all', 'active', 'closed')
+
+        function filterEvents(status, page = 1) {
+            currentPage = page;
+            currentStatus = status; // 현재 필터 상태 저장
             const eventList = document.getElementById('eventList');
             eventList.innerHTML = "";
 
             let filteredEvents = (status === 'all') ? events : events.filter(event => event.status === status);
 
-            console.log(`✅ ${status} 필터링된 이벤트 목록:`, filteredEvents);
+            console.log(`✅ ${status} 필터링된 이벤트 목록 (총 ${filteredEvents.length}개):`, filteredEvents);
 
             if (filteredEvents.length === 0) {
                 eventList.innerHTML = `<p>해당 이벤트가 없습니다.</p>`;
+                document.getElementById('pagination').innerHTML = ""; // 페이지네이션 숨김
                 return;
             }
 
-            filteredEvents.forEach(event => {
+            // 페이지네이션 적용
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedEvents = filteredEvents.slice(startIndex, endIndex);
+
+            console.log(`📌 현재 페이지 (${currentPage})에서 표시할 데이터:`, paginatedEvents);
+
+            paginatedEvents.forEach(event => {
                 const eventDiv = document.createElement('div');
                 eventDiv.className = 'event-item';
+
+                const createdAt = new Date(event.created_at).toISOString().split('T')[0];
+                const expirationAt = event.expiration_at ? new Date(event.expiration_at).toISOString().split('T')[0] : "종료일 없음";
+
                 eventDiv.innerHTML = `
-                    ${event.image ? `<img src="${event.image}" alt="이벤트 이미지" class="event-image">` : ''}
-                    <div class="event-title">${event.title}</div>
-                    <div class="event-status ${event.status === 'active' ? 'status-active' : 'status-closed'}">
-                        ${event.status === 'active' ? '진행 중' : '종료됨'}
-                    </div>
-                    <div class="event-description">${event.content}</div>
-                    <button class="details-button" onclick="goToEventDetail(${event.id})">자세히 보기</button>
-                `;
+            ${event.image ? `<img src="${event.image}" alt="이벤트 이미지" class="event-image">` : ''}
+            <div class="event-title">${event.title}</div>
+            <div class="event-status ${event.status === 'active' ? 'status-active' : 'status-closed'}">
+                ${event.status === 'active' ? '진행 중' : '종료됨'}
+            </div>
+            <div class="event-description">${event.content}</div>
+            <div class="event-dates">
+                <p><strong>시작일:</strong> ${createdAt}</p>
+                <p><strong>종료일:</strong> ${expirationAt}</p>
+            </div>
+            <button class="details-button" onclick="goToEventDetail(${event.id})">자세히 보기</button>
+        `;
                 eventList.appendChild(eventDiv);
             });
 
+            // 페이지네이션 버튼 추가
+            renderPagination(filteredEvents.length);
+
+            // 현재 선택된 탭을 활성화
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.querySelector(`.tab[onclick="filterEvents('${status}')"]`).classList.add('active');
+        }
+
+        function renderPagination(totalItems) {
+            const paginationContainer = document.getElementById('pagination');
+            paginationContainer.innerHTML = "";
+
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+            if (totalPages <= 1) return; // 페이지가 1개 이하이면 페이지네이션 숨김
+
+            let paginationHTML = `
+            <button id="prev-btn" onclick="filterEvents('${currentStatus}', ${currentPage - 1})" 
+            ${currentPage === 1 ? "disabled" : ""}>이전</button>
+            <span id="page-info">${currentPage} / ${totalPages}</span>
+            <button id="next-btn" onclick="filterEvents('${currentStatus}', ${currentPage + 1})" 
+            ${currentPage >= totalPages ? "disabled" : ""}>다음</button>`;
+
+            paginationContainer.innerHTML = paginationHTML;
+        }
+
+        function goToEventDetail(eventId) {
+            window.location.href = `event-detail.html?id=${eventId}`;
         }
 
         function goToEventDetail(eventId) {

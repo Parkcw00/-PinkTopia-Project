@@ -380,9 +380,12 @@
                     <td><a href="pinkmong-detail.html?id=${pinkmong.id}">상세보기</a></td>
                 </tr>`;
             });
+            const totalPages = Math.ceil(filteredPinkmongs.length / itemsPerPage);
 
+            // 페이지 정보 업데이트
+            document.getElementById("page-info").textContent = `${currentPage} / ${totalPages}`;
             document.getElementById("prev-btn").disabled = currentPage === 1;
-            document.getElementById("next-btn").disabled = end >= filteredPinkmongs.length;
+            document.getElementById("next-btn").disabled = currentPage >= totalPages;
         }
 
         function changePage(offset) {

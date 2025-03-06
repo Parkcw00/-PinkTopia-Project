@@ -31,6 +31,7 @@ import { ValkeyModule } from './valkey/valkey.module';
 import { PinkmongAppearLocationModule } from './pinkmong-appear-location/pinkmong-appear-location.module';
 import { InquiryModule } from './inquiry/inquiry.module';
 import { PaymentModule } from './payment/payment.module';
+import { GeoModule } from './geo/geo.module';
 
 const typeOrmModuleOptions = {
   useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
@@ -99,6 +100,7 @@ const typeOrmModuleOptions = {
     PinkmongAppearLocationModule,
     InquiryModule,
     PaymentModule,
+    GeoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
