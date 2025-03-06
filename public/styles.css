@@ -128,6 +128,10 @@ body {
     min-height: 300px !important; /* 📌 모바일에서도 높이 유지 */
   }
   #userProfileBox {
+    position: fixed;
+    right: 10px; /* ✅ 네비게이션 바의 오른쪽 끝에 정렬 */
+    top: 80px; /* ✅ 네비게이션 바 바로 아래로 배치 */
+
     max-width: 140px !important; /* ✅ 강제 적용 */
     font-size: 12px !important; /* ✅ 글자 크기 더 줄이기 */
     padding: 4px 6px !important;
