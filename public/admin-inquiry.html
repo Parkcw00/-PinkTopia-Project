@@ -269,7 +269,12 @@
                             ` : ''}
                             ${inquiry.status === 'pending' ? `
                                 <div class="answer-form">
-                                    <textarea id="answer-${inquiry.id}" placeholder="답변을 입력해주세요"></textarea>
+                                    <textarea 
+                                        id="answer-${inquiry.id}" 
+                                        name="answer"
+                                        placeholder="답변을 입력해주세요"
+                                        required
+                                    ></textarea>
                                     <button onclick="submitAnswer(${inquiry.id})" class="submit-button">답변하기</button>
                                 </div>
                             ` : ''}

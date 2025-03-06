@@ -87,6 +87,53 @@
             background-color: #90ee90;
             color: #000;
         }
+
+        /* 모달 스타일 추가 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: white;
+            margin: 50px auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 8px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close-button {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .detail-button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .detail-button:hover {
+            background-color: #357abd;
+        }
     </style>
 </head>
 <body>
@@ -99,7 +146,11 @@
             <form id="inquiryForm">
                 <div class="form-group">
                     <label for="inquiryType">문의 유형</label>
-                    <select id="inquiryType" required>
+                    <select 
+                        id="inquiryType" 
+                        name="inquiryType"
+                        required
+                    >
                         <option value="">선택해주세요</option>
                         <option value="refund">환불 요청</option>
                         <option value="payment">결제 문의</option>
@@ -112,24 +163,28 @@
                 <!-- 환불 요청 시에만 표시되는 필드들 -->
                 <div id="refundFields" style="display: none;">
                     <div class="form-group">
-                        <label for="purchaseHistory">환불할 결제 내역 선택</label>
-                        <select id="purchaseHistory" required>
-                            <option value="">결제 내역을 선택해주세요</option>
+                        <label for="purchaseHistory">구매 내역</label>
+                        <select 
+                            id="purchaseHistory" 
+                            name="purchaseHistory"
+                            required
+                        >
+                            <option value="">구매 내역을 선택해주세요</option>
                         </select>
                         <small style="color: #666; display: block; margin-top: 5px;">
                             * 환불하고 싶은 결제 내역을 선택해주세요.
                         </small>
-                        <button type="button" class="submit-button" style="margin-top: 10px;" onclick="createTestPayment()">
-                            테스트 결제 내역 생성
-                        </button>
                     </div>
                     <div class="form-group">
                         <label for="refundReason">환불 사유</label>
-                        <select id="refundReason" required>
+                        <select 
+                            id="refundReason" 
+                            name="refundReason"
+                            required
+                        >
                             <option value="">환불 사유를 선택해주세요</option>
-                            <option value="단순 변심">단순 변심</option>
-                            <option value="상품 오배송">상품 오배송</option>
-                            <option value="상품 하자">상품 하자</option>
+                            <option value="실수로 구매">실수로 구매</option>
+                            <option value="상품 불만족">상품 불만족</option>
                             <option value="서비스 이용 불가">서비스 이용 불가</option>
                             <option value="기타">기타</option>
                         </select>
@@ -138,17 +193,33 @@
 
                 <div class="form-group">
                     <label for="title">제목</label>
-                    <input type="text" id="title" required placeholder="문의 제목을 입력해주세요">
+                    <input 
+                        type="text" 
+                        id="title" 
+                        name="title"
+                        required 
+                        placeholder="문의 제목을 입력해주세요"
+                    >
                 </div>
 
                 <div class="form-group">
                     <label for="content">내용</label>
-                    <textarea id="content" required placeholder="자세한 내용을 입력해주세요"></textarea>
+                    <textarea 
+                        id="content" 
+                        name="content"
+                        required 
+                        placeholder="자세한 내용을 입력해주세요"
+                    ></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="attachment">첨부파일 (선택)</label>
-                    <input type="file" id="attachment" accept="image/*">
+                    <input 
+                        type="file" 
+                        id="attachment" 
+                        name="attachment"
+                        accept="image/*"
+                    >
                 </div>
 
                 <button type="submit" class="submit-button">문의하기</button>
@@ -164,7 +235,78 @@
         </div>
     </div>
 
+    <!-- 모달 추가 -->
+    <div id="inquiryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
     <script>
+        // 모달 관련 함수들을 전역 스코프로 이동
+        function openModal(inquiry) {
+            const modal = document.getElementById('inquiryModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalContent.innerHTML = `
+                <h2>${inquiry.title}</h2>
+                <div style="margin: 10px 0;">
+                    <span class="inquiry-status ${inquiry.status === 'pending' ? 'status-pending' : 'status-completed'}">
+                        ${inquiry.status === 'pending' ? '처리중' : '답변완료'}
+                    </span>
+                    <small style="margin-left: 10px;">${new Date(inquiry.createdAt).toLocaleString()}</small>
+                </div>
+                <div style="margin: 20px 0;">
+                    <strong>문의 유형:</strong> ${
+                        inquiry.type === 'refund' ? '환불 요청' :
+                        inquiry.type === 'payment' ? '결제 문의' :
+                        inquiry.type === 'bug' ? '버그 신고' :
+                        inquiry.type === 'suggestion' ? '기능 제안' : '기타 문의'
+                    }
+                </div>
+                <div style="margin: 20px 0;">
+                    <strong>문의 내용:</strong>
+                    <p style="white-space: pre-wrap;">${inquiry.content}</p>
+                </div>
+                ${inquiry.attachmentUrl ? `
+                    <div style="margin: 20px 0;">
+                        <strong>첨부파일:</strong><br>
+                        <img src="${inquiry.attachmentUrl}" alt="첨부 이미지" style="max-width: 100%; margin-top: 10px; border-radius: 4px;">
+                    </div>
+                ` : ''}
+                ${inquiry.type === 'refund' ? `
+                    <div style="margin: 20px 0;">
+                        <strong>환불 정보:</strong>
+                        <p>결제 키: ${inquiry.paymentKey}</p>
+                        <p>환불 사유: ${inquiry.refundReason}</p>
+                        <p>환불 금액: ${inquiry.amount?.toLocaleString()}원</p>
+                    </div>
+                ` : ''}
+                ${inquiry.answer ? `
+                    <div style="margin: 20px 0; padding-top: 20px; border-top: 1px solid #eee;">
+                        <strong>답변:</strong>
+                        <p style="white-space: pre-wrap;">${inquiry.answer}</p>
+                    </div>
+                ` : ''}
+            `;
+            
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('inquiryModal');
+            modal.style.display = 'none';
+        }
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            const modal = document.getElementById('inquiryModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             const accessToken = localStorage.getItem('accessToken');
             if (!accessToken) {
@@ -197,14 +339,24 @@
                     if (purchases.length > 0) {
                         purchaseSelect.innerHTML = `
                             <option value="">결제 내역을 선택해주세요</option>
-                            ${purchases.map(purchase => `
-                                <option value="${purchase.paymentKey}" 
-                                    data-purchase='${JSON.stringify({amount: purchase.amount})}'
-                                    ${purchase.isRefunded ? 'disabled' : ''}>
-                                    ${purchase.itemName} - ${new Date(purchase.createdAt).toLocaleDateString()}
-                                    ${purchase.isRefunded ? ' (환불완료)' : ''}
-                                </option>
-                            `).join('')}
+                            ${purchases.map(purchase => {
+                                const isDisabled = purchase.isRefunded || purchase.usedDiamonds > 0;
+                                const disabledReason = purchase.isRefunded ? ' (환불완료)' : 
+                                                     purchase.usedDiamonds > 0 ? ` (${purchase.usedDiamonds}개 사용됨)` : '';
+                                
+                                return `
+                                    <option value="${purchase.paymentKey}" 
+                                        data-purchase='${JSON.stringify({
+                                            amount: purchase.amount,
+                                            remainingDiamonds: purchase.remainingDiamonds,
+                                            usedDiamonds: purchase.usedDiamonds
+                                        })}'
+                                        ${isDisabled ? 'disabled' : ''}>
+                                        ${purchase.itemName} - ${new Date(purchase.createdAt).toLocaleDateString()}
+                                        ${disabledReason}
+                                    </option>
+                                `;
+                            }).join('')}
                         `;
                     } else {
                         purchaseSelect.innerHTML = '<option value="">환불 가능한 결제 내역이 없습니다.</option>';
@@ -215,9 +367,17 @@
             }
 
             inquiryType.addEventListener('change', () => {
-                refundFields.style.display = 
-                    inquiryType.value === 'refund' ? 'block' : 'none';
-                if (inquiryType.value === 'refund') {
+                const isRefundType = inquiryType.value === 'refund';
+                refundFields.style.display = isRefundType ? 'block' : 'none';
+                
+                // 환불 관련 필드들의 required 속성 동적 처리
+                const purchaseHistorySelect = document.getElementById('purchaseHistory');
+                const refundReasonSelect = document.getElementById('refundReason');
+                
+                purchaseHistorySelect.required = isRefundType;
+                refundReasonSelect.required = isRefundType;
+                
+                if (isRefundType) {
                     loadPurchaseHistory();
                 }
             });
@@ -248,9 +408,13 @@
 
                     if (inquiryType.value === 'refund') {
                         const purchaseSelect = document.getElementById('purchaseHistory');
+                        const refundReasonSelect = document.getElementById('refundReason');
                         
                         if (!purchaseSelect.value) {
                             throw new Error('환불할 결제 내역을 선택해주세요.');
+                        }
+                        if (!refundReasonSelect.value) {
+                            throw new Error('환불 사유를 선택해주세요.');
                         }
 
                         const selectedOption = purchaseSelect.options[purchaseSelect.selectedIndex];
@@ -258,36 +422,78 @@
                             throw new Error('선택된 결제 내역 정보를 찾을 수 없습니다.');
                         }
 
-                        const purchaseData = JSON.parse(selectedOption.dataset.purchase);
-                        if (!purchaseData.amount) {
-                            throw new Error('결제 금액 정보를 찾을 수 없습니다.');
-                        }
-                        
-                        data.paymentKey = purchaseSelect.value;
-                        data.refundReason = document.getElementById('refundReason').value;
-                        data.amount = Number(purchaseData.amount);
+                        try {
+                            const purchaseData = JSON.parse(selectedOption.dataset.purchase);
+                            if (!purchaseData.amount || typeof purchaseData.amount !== 'number') {
+                                throw new Error('유효하지 않은 결제 금액입니다.');
+                            }
 
-                        // 디버깅을 위한 로그
-                        console.log('환불 요청 데이터:', data);
+                            // 다이아몬드 사용 여부 확인
+                            if (purchaseData.usedDiamonds > 0) {
+                                throw new Error(`이미 ${purchaseData.usedDiamonds}개의 다이아몬드가 사용되어 환불이 불가능합니다.`);
+                            }
+                            
+                            data.paymentKey = purchaseSelect.value;
+                            data.refundReason = refundReasonSelect.value;
+                            data.amount = purchaseData.amount;
+                            data.remainingDiamonds = purchaseData.remainingDiamonds;
+                        } catch (error) {
+                            console.error('결제 데이터 파싱 실패:', error);
+                            throw new Error('결제 정보 처리 중 오류가 발생했습니다.');
+                        }
                     }
 
+                    // 첨부파일이 있는 경우 FormData 사용
                     const attachment = document.getElementById('attachment').files[0];
                     if (attachment) {
-                        data.attachment = attachment;
-                    }
+                        const formData = new FormData();
+                        // 일반 데이터 추가
+                        formData.append('type', data.type);
+                        formData.append('title', data.title);
+                        formData.append('content', data.content);
+                        
+                        // 환불 관련 데이터 추가
+                        if (data.paymentKey) {
+                            formData.append('paymentKey', data.paymentKey);
+                            formData.append('refundReason', data.refundReason);
+                            // amount는 숫자 타입으로 전송
+                            const amountBlob = new Blob(
+                                [JSON.stringify(data.amount)],
+                                { type: 'application/json' }
+                            );
+                            formData.append('amount', amountBlob);
+                        }
+                        
+                        // 첨부파일 추가
+                        formData.append('attachment', attachment);
 
-                    const response = await fetch('/inquiry', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': accessToken,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
-                    });
+                        const response = await fetch('/inquiry', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': accessToken
+                            },
+                            body: formData
+                        });
 
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || '문의 등록에 실패했습니다.');
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || '문의 등록에 실패했습니다.');
+                        }
+                    } else {
+                        // 첨부파일이 없는 경우 JSON으로 전송
+                        const response = await fetch('/inquiry', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': accessToken,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || '문의 등록에 실패했습니다.');
+                        }
                     }
 
                     alert('문의가 등록되었습니다.');
@@ -321,14 +527,13 @@
                                 ${inquiry.status === 'pending' ? '처리중' : '답변완료'}
                             </span>
                             <h3>${inquiry.title}</h3>
-                            <p>${inquiry.content}</p>
+                            <p>${inquiry.content.length > 100 ? inquiry.content.substring(0, 100) + '...' : inquiry.content}</p>
                             <small>${new Date(inquiry.createdAt).toLocaleDateString()}</small>
-                            ${inquiry.answer ? `
-                                <div class="answer">
-                                    <strong>답변:</strong>
-                                    <p>${inquiry.answer}</p>
-                                </div>
-                            ` : ''}
+                            <div style="text-align: right;">
+                                <button class="detail-button" onclick='openModal(${JSON.stringify(inquiry)})'>
+                                    상세보기
+                                </button>
+                            </div>
                         </div>
                     `).join('');
                 } catch (error) {
@@ -339,29 +544,6 @@
 
             // 초기 문의 내역 로드
             loadInquiries();
-
-            // 테스트 결제 내역 생성
-            async function createTestPayment() {
-                try {
-                    const response = await fetch('/payment/test', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': accessToken
-                        }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('테스트 결제 내역 생성에 실패했습니다.');
-                    }
-
-                    alert('테스트 결제 내역이 생성되었습니다.');
-                    loadPurchaseHistory(); // 결제 내역 새로고침
-                } catch (error) {
-                    console.error('테스트 결제 내역 생성 실패:', error);
-                    alert(error.message || '테스트 결제 내역 생성에 실패했습니다.');
-                }
-            }
         });
     </script>
 </body>
