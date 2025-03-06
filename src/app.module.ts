@@ -29,6 +29,7 @@ import { S3Module } from './s3/s3.module';
 import { LocationHistoryModule } from './location-history/location-history.module';
 import { ValkeyModule } from './valkey/valkey.module';
 import { PinkmongAppearLocationModule } from './pinkmong-appear-location/pinkmong-appear-location.module';
+import { GeoModule } from './geo/geo.module';
 
 const typeOrmModuleOptions = {
   useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
@@ -94,6 +95,7 @@ const typeOrmModuleOptions = {
     LocationHistoryModule,
     ValkeyModule,
     PinkmongAppearLocationModule,
+    GeoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

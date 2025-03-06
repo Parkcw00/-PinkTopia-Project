@@ -21,7 +21,6 @@ export class PinkmongAppearLocationController {
   //@UseGuards(UserGuard, AdminGuard)
   @Post('fill-valkey')
   async fillValkey() {
-    console.log('아ㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏㅏ');
     return await this.service.fillValkey();
   }
 

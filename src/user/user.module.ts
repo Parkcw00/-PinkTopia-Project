@@ -4,7 +4,7 @@ import { UserController, UsersController } from './user.controller';
 import { UserService } from './user.service';
 import { UserRepository } from './user.repository';
 import { User } from './entities/user.entity';
-import { AchievementC } from 'src/achievement-c/entities/achievement-c.entity';
+import { AchievementC } from '../achievement-c/entities/achievement-c.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserGuard } from './guards/user-guard';

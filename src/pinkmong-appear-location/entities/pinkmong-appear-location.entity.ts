@@ -58,3 +58,11 @@ export class PinkmongAppearLocation {
   )
   catchPinkmong: CatchPinkmong[];
 }
+
+export enum RegionTheme {
+  FOREST = 'forest',
+  DESERT = 'desert',
+  OCEAN = 'ocean',
+  MOUNTAIN = 'mountain',
+  CITY = 'city',
+}
