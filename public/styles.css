@@ -65,6 +65,103 @@ body {
   text-decoration: underline;
 }
 
+/* 아이템 컨테이너 */
+.store-container,
+.inventory-grid {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 10px !important;
+}
+
+/* 아이템 카드 */
+.store-item,
+.inventory-item {
+  flex: 0 1 calc(50% - 10px) !important;
+  max-width: 180px !important;
+  background: white !important;
+  padding: 15px !important;
+  border-radius: 15px !important;
+  box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3) !important;
+  text-align: center !important;
+  transition: transform 0.2s !important;
+}
+
+/* 이미지 크기 조정 */
+.store-item img,
+.inventory-item img {
+  width: 100% !important;
+  height: auto !important;
+  object-fit: contain !important;
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+/* 버튼 크기 */
+.store-item button,
+.inventory-item button {
+  width: 100% !important;
+  padding: 8px !important;
+  font-size: 18px !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+}
+
+/* 📌 모바일에서도 2개씩 정렬 유지 */
+@media (max-width: 600px) {
+  .store-item,
+  .inventory-item {
+    flex: 0 1 calc(50% - 10px) !important;
+    max-width: 150px !important;
+    font-size: 14px !important; /* 스마트폰에서 폰트 줄이기 */
+  }
+
+  .store-item h3,
+  .inventory-item h3 {
+    font-size: 14px !important; /* 제목 크기 줄이기 */
+  }
+
+  .store-item p,
+  .inventory-item p {
+    font-size: 12px !important; /* 설명 폰트 크기 줄이기 */
+  }
+
+  .store-item button,
+  .inventory-item button {
+    width: 100% !important;
+    padding: 8px !important;
+    font-size: 14px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+  }
+}
+
+/* 📌 태블릿(768px 이하)에서도 유지 */
+@media (max-width: 768px) {
+  .store-item,
+  .inventory-item {
+    flex: 0 1 calc(50% - 10px) !important;
+    max-width: 180px !important;
+    font-size: 15px !important; /* 태블릿에서 폰트 약간 줄이기 */
+  }
+
+  .store-item h3,
+  .inventory-item h3 {
+    font-size: 16px !important; /* 제목 크기 줄이기 */
+  }
+
+  .store-item p,
+  .inventory-item p {
+    font-size: 13px !important; /* 설명 폰트 크기 줄이기 */
+  }
+
+  .store-item button,
+  .inventory-item button {
+    font-size: 15px !important; /* 태블릿에서 버튼 폰트 크기 조정 */
+    padding: 8px !important;
+  }
+}
+
 /* 📌 모바일에서 로그인/회원가입 크기 더 줄이기 */
 @media (max-width: 500px) {
   .nav .login-links {
