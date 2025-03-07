@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PinkTopia UI</title>
+    <title>PinkTopia - 업적</title>
     <link rel="stylesheet" href="/public/styles.css">
     <style>
         body {
@@ -12,8 +12,121 @@
             margin: 0;
             padding: 0;
             background-color: #ffe4f7;
+            display: flex;
+            min-height: 100vh;
         }
 
+        /* 사이드바 스타일 */
+        .sidebar {
+            width: 250px;
+            background-color: #ff69b4;
+            color: white;
+            position: fixed;
+            height: 100%;
+            left: -250px;
+            top: 0;
+            transition: left 0.3s ease;
+            z-index: 1000;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .close-sidebar {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+            background: none;
+            border: none;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .sidebar-menu-item {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar-menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-menu-item.active {
+            background-color: #ffb6c1;
+            font-weight: bold;
+        }
+
+        .sidebar-user {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: auto;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            margin-right: 10px;
+        }
+
+        .user-name {
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 메인 컨텐츠 스타일 */
+        .main-content {
+            flex: 1;
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
+            padding-top: 50px; /* 네비게이션 바 높이만큼 패딩 추가 */
+        }
+
+        /* 네비게이션 바 */
         .nav {
             display: flex;
             justify-content: space-between;
@@ -23,220 +136,474 @@
             color: white;
             font-weight: bold;
             height: 50px;
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+        }
+
+        .nav-title {
+            text-align: center;
+            flex-grow: 1;
+            font-size: 1.5rem;
         }
 
         .menu-icon {
-            position: absolute;
-            left: 15px;
-            height: 100%;
-            display: flex;
-            align-items: center;
             cursor: pointer;
-            z-index: 2;
+            font-size: 1.5rem;
         }
 
-        .menu-icon .hamburger {
-            width: 25px;
-            height: 20px;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tabs {
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            justify-content: space-around;
+            background-color: #ffb6c1;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
         }
 
-        .menu-icon .hamburger span {
-            display: block;
-            height: 3px;
-            width: 100%;
-            background-color: white;
-            border-radius: 3px;
-            transition: all 0.3s ease;
-        }
-
-        .nav .logo-container {
-            position: absolute;
-            left: 50px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-        }
-
-        .nav img {
-            width: 45px;
-            height: 45px;
-            border-radius: 0;
-            object-fit: cover;
-        }
-
-        .nav .logo-text {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 24px;
-        }
-
-        .user-assets {
-            position: absolute;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            background: white;
-            padding: 8px 15px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
-        }
-
-        .asset-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: #9c195f;
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px 0;
+            cursor: pointer;
             font-weight: bold;
+            color: #333;
+            transition: background-color 0.3s;
         }
 
-        .asset-item img {
+        .tab.active {
+            background-color: #ff69b4;
+            color: white;
+        }
+
+        .achievement-list {
+            display: none;
+        }
+
+        .achievement-list.active {
+            display: block;
+        }
+
+        .achievement-item {
+            background-color: white;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .achievement-header {
+            padding: 15px;
+            background-color: #ffb6c1;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .achievement-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .achievement-category {
+            background-color: #ff69b4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .achievement-content {
+            padding: 15px;
+            display: none;
+        }
+
+        .achievement-content.active {
+            display: block;
+        }
+
+        .achievement-description {
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .reward-info {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .reward-item {
+            background-color: #f8f8f8;
+            border-radius: 5px;
+            padding: 8px 12px;
+            margin-right: 10px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .reward-item img {
             width: 20px;
             height: 20px;
+            margin-right: 5px;
         }
 
-        /* 사이드바 스타일 */
-        .sidebar {
+        .sub-achievements {
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        .sub-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            background-color: #f8f8f8;
+        }
+
+        .sub-item-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            margin-right: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: transparent;
+        }
+
+        .sub-item.completed .sub-item-check {
+            background-color: #ff69b4;
+            border-color: #ff69b4;
+            color: white;
+        }
+
+        .expiry-date {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        .achievement-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            flex-grow: 1;
+            height: 8px;
+            background-color: #eee;
+            border-radius: 4px;
+            margin: 0 10px;
+            overflow: hidden;
+        }
+
+        .progress-filled {
             height: 100%;
-            width: 0;
+            background-color: #ff69b4;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+
+        .empty-state img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* 오버레이 - 사이드바 열릴 때 배경 어둡게 */
+        .sidebar-overlay {
             position: fixed;
-            z-index: 1000;
             top: 0;
             left: 0;
-            background-color: #ff69b4;
-            overflow-x: hidden;
-            transition: 0.5s;
-            padding-top: 60px;
-            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
         }
 
-        .sidebar a {
-            padding: 15px 25px;
-            text-decoration: none;
-            font-size: 18px;
-            color: white;
+        .sidebar-overlay.active {
             display: block;
-            transition: 0.3s;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .sidebar a:hover {
-            background-color: #ff4da6;
-        }
-
-        .close-sidebar {
-            position: absolute;
-            top: 15px;
-            right: 25px;
-            font-size: 36px;
-            cursor: pointer;
-            color: white;
+        /* 반응형 스타일 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="nav">
-        <div class="menu-icon" onclick="openSidebar()">
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+    <!-- 사이드바 -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="sidebar-logo">PinkTopia</a>
+            <button class="close-sidebar">&times;</button>
         </div>
-        <div class="logo-container">
-            <img src="/public/images/123.jpg" alt="PinkTopia Logo">
+        <div class="sidebar-menu">
+            <a href="/public/index.html" class="sidebar-menu-item">홈</a>
+            <a href="/public/events.html" class="sidebar-menu-item">이벤트</a>
+            <a href="/public/achievements.html" class="sidebar-menu-item active">업적</a>
+            <a href="/public/chat.html" class="sidebar-menu-item">채팅</a>
+            <a href="/public/profile.html" class="sidebar-menu-item">프로필</a>
+            <a href="/public/map.html" class="sidebar-menu-item">지도</a>
         </div>
-        <div class="logo-text">
-            <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
-        </div>
-        <div id="userAssets" class="user-assets" style="display: none;">
-            <div class="asset-item">
-                <img src="/public/images/gem.png" alt="젬">
-                <span id="userGem">로딩 중...</span> 젬
+        <div class="sidebar-user">
+            <div class="user-info">
+                <div class="user-avatar"></div>
+                <div class="user-name">사용자</div>
             </div>
-            <div class="asset-item">
-                <img src="/public/images/dia.png" alt="다이아">
-                <span id="userDia">로딩 중...</span> 다이아
-            </div>
+            <button class="logout-btn">로그아웃</button>
         </div>
     </div>
 
-    <div id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
-        </div>
-        <div class="sidebar-content" id="sidebarContent">
-            <a href="/public/home.html">홈</a>
-            <a href="/public/event.html">이벤트</a>
-            <a href="/public/store-item.html">아이템샵</a>
-            <a href="/public/board.html">게시글 (커뮤니티)</a>
-            <a href="/public/ranking.html">랭킹</a>
-            <a href="/public/customer-service.html">문의센터</a>
+    <!-- 사이드바 오버레이 -->
+    <div class="sidebar-overlay"></div>
+
+    <!-- 네비게이션 바 -->
+    <div class="nav">
+        <div class="menu-icon">≡</div>
+        <div class="nav-title">업적</div>
+    </div>
+
+    <!-- 메인 컨텐츠 -->
+    <div class="main-content">
+        <div class="container">
+            <div class="tabs">
+                <div class="tab active" data-tab="all">전체 업적</div>
+                <div class="tab" data-tab="active">진행중인 업적</div>
+                <div class="tab" data-tab="completed">완료된 업적</div>
+            </div>
+
+            <!-- 전체 업적 목록 -->
+            <div class="achievement-list active" id="all-achievements">
+                <!-- 업적 항목은 JavaScript로 동적 생성됨 -->
+            </div>
+
+            <!-- 진행중인 업적 목록 -->
+            <div class="achievement-list" id="active-achievements">
+                <!-- 업적 항목은 JavaScript로 동적 생성됨 -->
+            </div>
+
+            <!-- 완료된 업적 목록 -->
+            <div class="achievement-list" id="completed-achievements">
+                <!-- 업적 항목은 JavaScript로 동적 생성됨 -->
+            </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", async function () {
-            const accessToken = localStorage.getItem("accessToken");
-            if (accessToken) {
-                document.getElementById("userAssets").style.display = "flex";
-                await loadUserAssets();
-                document.getElementById("sidebarContent").innerHTML += `
-                    <a href="/public/chattingrooms.html">채팅</a>
-                    <a href="/public/collection.html">핑크몽 개인 도감</a>
-                    <a href="/public/inventory.html">인벤토리 아이템</a>
-                    <a href="/public/achievements.html">업적</a>
-                    <a href="/public/mypage.html">마이페이지</a>
-                    <a href="#" onclick="logout()">로그아웃</a>
-                `;
-            }
+        // 사이드바 제어
+        const menuIcon = document.querySelector('.menu-icon');
+        const sidebar = document.querySelector('.sidebar');
+        const closeSidebar = document.querySelector('.close-sidebar');
+        const sidebarOverlay = document.querySelector('.sidebar-overlay');
+
+        menuIcon.addEventListener('click', () => {
+            sidebar.classList.add('open');
+            sidebarOverlay.classList.add('active');
         });
 
-        function openSidebar() {
-            document.getElementById('sidebar').style.width = "250px";
+        function closeSidebarFunc() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
         }
 
-        function closeSidebar() {
-            document.getElementById('sidebar').style.width = "0";
+        closeSidebar.addEventListener('click', closeSidebarFunc);
+        sidebarOverlay.addEventListener('click', closeSidebarFunc);
+
+        // 탭 전환 기능
+        const tabs = document.querySelectorAll('.tab');
+        const achievementLists = document.querySelectorAll('.achievement-list');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 모든 탭에서 active 클래스 제거
+                tabs.forEach(t => t.classList.remove('active'));
+                
+                // 클릭된 탭에 active 클래스 추가
+                tab.classList.add('active');
+                
+                // 모든 업적 목록 숨기기
+                achievementLists.forEach(list => list.classList.remove('active'));
+                
+                // 선택된 탭에 해당하는 업적 목록 표시
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-achievements`).classList.add('active');
+            });
+        });
+
+        // 업적 토글 기능
+        function toggleAchievement(element) {
+            const content = element.nextElementSibling;
+            content.classList.toggle('active');
         }
 
-        async function loadUserAssets() {
+        // API에서 업적 데이터 가져오기
+        async function fetchAchievements() {
             try {
-                const response = await fetch("http://localhost:3000/user/me", {
-                    headers: { "Authorization": localStorage.getItem("accessToken") }
-                });
-                if (!response.ok) throw new Error("유저 데이터를 불러오지 못했습니다.");
-                const userData = await response.json();
-                document.getElementById("userGem").textContent = userData.pink_gem.toLocaleString();
-                document.getElementById("userDia").textContent = userData.pink_dia.toLocaleString();
+                // 전체 업적 가져오기
+                const allResponse = await fetch('/achievement');
+                const allAchievements = await allResponse.json();
+                
+                // 활성화된 업적 가져오기
+                const activeResponse = await fetch('/achievement/active');
+                const activeAchievements = await activeResponse.json();
+                
+                // 완료된 업적 가져오기
+                const completedResponse = await fetch('/achievement/done');
+                const completedAchievements = await completedResponse.json();
+                
+                // 업적 목록 표시
+                renderAchievements('all-achievements', allAchievements);
+                renderAchievements('active-achievements', activeAchievements);
+                renderAchievements('completed-achievements', completedAchievements);
             } catch (error) {
-                console.error("유저 자산 로드 실패:", error);
+                console.error('업적 데이터를 가져오는 중 오류 발생:', error);
+                
+                // 오류 발생 시 각 목록에 오류 메시지 표시
+                document.getElementById('all-achievements').innerHTML = '<div class="empty-state">업적 데이터를 불러올 수 없습니다.</div>';
+                document.getElementById('active-achievements').innerHTML = '<div class="empty-state">업적 데이터를 불러올 수 없습니다.</div>';
+                document.getElementById('completed-achievements').innerHTML = '<div class="empty-state">업적 데이터를 불러올 수 없습니다.</div>';
             }
         }
 
-        async function logout() {
-            try {
-                const response = await fetch("http://localhost:3000/user/auth/logout", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": localStorage.getItem("accessToken")
-                    },
-                    credentials: "include"
-                });
-                if (!response.ok) throw new Error("로그아웃 실패");
-            } catch (error) {
-                console.error("로그아웃 오류:", error);
+        // 업적 목록 렌더링 함수
+        function renderAchievements(containerId, achievements) {
+            const container = document.getElementById(containerId);
+            
+            if (!achievements || achievements.length === 0) {
+                container.innerHTML = '<div class="empty-state">업적이 없습니다.</div>';
+                return;
             }
-            localStorage.removeItem("accessToken");
-            window.location.href = "/public/home.html";
+            
+            let html = '';
+            
+            achievements.forEach(achievement => {
+                // 서브 업적 가져오기
+                let subAchievementsHtml = '';
+                if (achievement.sub_achievement && achievement.sub_achievement.length > 0) {
+                    achievement.sub_achievement.forEach(sub => {
+                        const isCompleted = sub.achievement_p && sub.achievement_p.some(p => p.complete);
+                        subAchievementsHtml += `
+                            <div class="sub-item ${isCompleted ? 'completed' : ''}">
+                                <div class="sub-item-check">${isCompleted ? '✓' : ''}</div>
+                                <div class="sub-item-text">${sub.title}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    subAchievementsHtml = '<div class="empty-state">서브 업적이 없습니다.</div>';
+                }
+                
+                // 진행률 계산
+                let progressPercent = 0;
+                let completedCount = 0;
+                let totalCount = achievement.sub_achievement ? achievement.sub_achievement.length : 0;
+                
+                if (totalCount > 0) {
+                    achievement.sub_achievement.forEach(sub => {
+                        if (sub.achievement_p && sub.achievement_p.some(p => p.complete)) {
+                            completedCount++;
+                        }
+                    });
+                    progressPercent = (completedCount / totalCount) * 100;
+                }
+                
+                // 보상 정보 파싱
+                let rewardHtml = '';
+                if (achievement.reward) {
+                    let reward;
+                    if (typeof achievement.reward === 'string') {
+                        try {
+                            reward = JSON.parse(achievement.reward);
+                        } catch (e) {
+                            reward = { gem: 0, dia: 0 };
+                        }
+                    } else {
+                        reward = achievement.reward;
+                    }
+                    
+                    if (reward.gem && reward.gem > 0) {
+                        rewardHtml += `
+                            <div class="reward-item">
+                                <img src="/public/images/gem.png" alt="Gem"> ${reward.gem}
+                            </div>
+                        `;
+                    }
+                    
+                    if (reward.dia && reward.dia > 0) {
+                        rewardHtml += `
+                            <div class="reward-item">
+                                <img src="/public/images/dia.png" alt="Diamond"> ${reward.dia}
+                            </div>
+                        `;
+                    }
+                }
+                
+                // 만료일 포맷팅
+                const expiryDate = achievement.expiration_at 
+                    ? new Date(achievement.expiration_at).toLocaleDateString('ko-KR', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      }) 
+                    : '무기한';
+                
+                html += `
+                    <div class="achievement-item">
+                        <div class="achievement-header" onclick="toggleAchievement(this)">
+                            <div class="achievement-title">${achievement.title}</div>
+                            <div class="achievement-category">${achievement.category}</div>
+                        </div>
+                        <div class="achievement-content">
+                            <div class="achievement-description">${achievement.content}</div>
+                            <div class="reward-info">${rewardHtml}</div>
+                            <div class="achievement-progress">
+                                <span>${completedCount}/${totalCount}</span>
+                                <div class="progress-bar">
+                                    <div class="progress-filled" style="width: ${progressPercent}%"></div>
+                                </div>
+                                <span>${Math.round(progressPercent)}%</span>
+                            </div>
+                            <div class="sub-achievements">
+                                ${subAchievementsHtml}
+                            </div>
+                            <div class="expiry-date">만료일: ${expiryDate}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
         }
+
+        // 페이지 로드 시 업적 데이터 가져오기
+        document.addEventListener('DOMContentLoaded', fetchAchievements);
     </script>
 </body>
 
