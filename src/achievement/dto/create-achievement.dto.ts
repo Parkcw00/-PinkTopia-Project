@@ -20,10 +20,8 @@ export class CreateAchievementDto extends PickType(Achievement, [
   'title',
   'content',
   'category',
-  // 'reward',
+  // 'reward'
 ] as const) {
-  //,'expiration_at'
-
   @ApiProperty({ example: '대전 빵집투어어' })
   @IsString()
   title: string;

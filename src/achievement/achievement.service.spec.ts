@@ -1,202 +1,163 @@
-// import { Test, TestingModule } from '@nestjs/testing';
-// import { AchievementService } from './achievement.service';
-// import { AchievementRepository } from './achievement.repository';
-// import { S3Service } from '../s3/s3.service';
-// import {
-//   BadRequestException,
-//   NotFoundException,
-//   ConflictException,
-// } from '@nestjs/common';
-// import { CreateAchievementDto } from './dto/create-achievement.dto';
-// import { UpdateAchievementDto } from './dto/update-achievement.dto';
-// import { AchievementCategory } from './enums/achievement-category.enum';
+import { Test, TestingModule } from '@nestjs/testing';
+import { AchievementService } from './achievement.service';
+import { AchievementRepository } from './achievement.repository';
+import { S3Service } from '../s3/s3.service';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { AchievementCategory } from './enums/achievement-category.enum';
+import { Achievement } from './entities/achievement.entity';
+import { CreateAchievementDto } from './dto/create-achievement.dto';
 
-// describe('AchievementService', () => {
-//   let service: AchievementService;
-//   let repository: AchievementRepository;
-//   let s3Service: S3Service;
+describe('AchievementService', () => {
+  let service: AchievementService;
+  let repository: jest.Mocked<AchievementRepository>;
+  let s3Service: jest.Mocked<S3Service>;
+  const mockAchievement = {
+    id: 1,
+    title: 'Test Achievement',
+    content: 'Test Content',
+    category: 'JEJU_TOUR',
+    expiration_at: '2025-12-31T00:00:00.000Z',
+    achievement_images: ['mock-image-url'],
+    reward: { gem: 100, dia: 5 },
+    achievement_c: undefined,
+    sub_achievement: undefined,
+    created_at: expect.any(String),
+    updated_at: expect.any(String),
+    deleted_at: null,
+  };
 
-//   const mockAchievement = {
-//     id: 1,
-//     title: 'Test Achievement',
-//     category: AchievementCategory.CHALLENGE,
-//     reward: '{ "gem": 100, "dia": 3 }',
-//     achievement_images: ['url1'],
-//     content: 'Test Content',
-//     expiration_at: '2025-12-31 23:59:59',
-//   };
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        AchievementService,
+        {
+          provide: AchievementRepository,
+          useValue: {
+            findByTitle: jest.fn(),
+            create: jest.fn(),
+            save: jest.fn(),
+          },
+        },
+        {
+          provide: S3Service,
+          useValue: {
+            uploadFiles: jest.fn(),
+          },
+        },
+      ],
+    }).compile();
 
-//   const mockRepository = {
-//     findByTitle: jest.fn(),
-//     create: jest.fn(),
-//     findAll: jest.fn(),
-//     findAllDone: jest.fn(),
-//     findAllActive: jest.fn(),
-//     findCategory: jest.fn(),
-//     findOne: jest.fn(),
-//     findByAId: jest.fn(),
-//     update: jest.fn(),
-//     softDelete: jest.fn(),
-//   };
+    service = module.get<AchievementService>(AchievementService);
+    repository = module.get<AchievementRepository>(
+      AchievementRepository,
+    ) as jest.Mocked<AchievementRepository>;
+    s3Service = module.get<S3Service>(S3Service) as jest.Mocked<S3Service>;
+  });
+  describe('create', () => {
+    it('should create an achievement successfully', async () => {
+      const createAchievementDto: CreateAchievementDto = {
+        title: 'Test Achievement',
+        category: AchievementCategory.JEJU_TOUR,
+        reward: { gem: 100, dia: 5 },
+        content: 'Test Content',
+        expiration_at: new Date('2025-12-31'),
+      };
+      const files: Express.Multer.File[] = [];
+      const mockAchievement = {
+        id: 1,
+        ...createAchievementDto,
+        achievement_images: ['mock-image-url'],
+        achievement_c: undefined, // 추가
+        created_at: undefined, // 추가 (또는 expect.any(String) 사용 가능)
+        deleted_at: null, // 추가
+        sub_achievement: undefined, // 추가
+        updated_at: undefined, // 추가 (또는 expect.any(String) 사용 가능)
+        expiration_at: '2025-12-31 00:00:00', // 서비스에서 사용하는 형식에 맞게 수정
+      } as unknown as Achievement;
 
-//   const mockS3Service = {
-//     uploadFiles: jest.fn(),
-//     deleteFile: jest.fn(),
-//   };
+      repository.findByTitle.mockResolvedValue(null);
+      s3Service.uploadFiles.mockResolvedValue(['mock-image-url']);
+      repository.create.mockResolvedValue(mockAchievement);
 
-//   beforeEach(async () => {
-//     const module: TestingModule = await Test.createTestingModule({
-//       providers: [
-//         AchievementService,
-//         { provide: AchievementRepository, useValue: mockRepository },
-//         { provide: S3Service, useValue: mockS3Service },
-//       ],
-//     }).compile();
+      const result = await service.create(createAchievementDto, files);
 
-//     service = module.get<AchievementService>(AchievementService);
-//     repository = module.get<AchievementRepository>(AchievementRepository);
-//     s3Service = module.get<S3Service>(S3Service);
-//   });
+      expect(repository.findByTitle).toHaveBeenCalledWith(
+        createAchievementDto.title,
+      );
+      expect(s3Service.uploadFiles).toHaveBeenCalledWith(files);
+      expect(repository.create).toHaveBeenCalledWith({
+        title: createAchievementDto.title,
+        category: createAchievementDto.category,
+        reward: createAchievementDto.reward,
+        content: createAchievementDto.content,
+        achievement_images: ['mock-image-url'],
+        expiration_at: expect.any(String),
+      });
+      expect(result).toEqual(mockAchievement);
+    });
+  });
+  /*
+  describe('create', () => {
+    it('should create an achievement successfully', async () => {
+      const createAchievementDto: CreateAchievementDto = {
+        title: 'Test Achievement',
+        category: AchievementCategory.JEJU_TOUR,
+        reward: { gem: 100, dia: 5 }, //'Test Reward',
+        content: 'Test Content',
+        expiration_at: new Date('2025-12-31'),
+      };
+      const files: Express.Multer.File[] = [];
+      const mockAchievement = {
+        id: 1,
+        ...createAchievementDto,
+        achievement_images: ['mock-image-url'],
+      } as unknown as Achievement;
 
-//   afterEach(() => {
-//     jest.clearAllMocks();
-//   });
+      repository.findByTitle.mockResolvedValue(null);
+      s3Service.uploadFiles.mockResolvedValue(['mock-image-url']);
+      repository.create.mockResolvedValue(mockAchievement);
 
-//   it('should be defined', () => {
-//     expect(service).toBeDefined();
-//   });
+      const result = await service.create(createAchievementDto, files);
 
-//   describe('create', () => {
-//     it('should create a new Achievement', async () => {
-//       const createDto: CreateAchievementDto = {
-//         title: 'Test Achievement',
-//         category: AchievementCategory.CHALLENGE,
-//         reward: { gem: 100, dia: 3 },
-//         content: 'Test Content',
-//         expiration_at: new Date('2025-12-31'),
-//       };
-//       const files = [{ originalname: 'image.png' }] as Express.Multer.File[];
-//       mockRepository.findByTitle.mockResolvedValue(null);
-//       mockS3Service.uploadFiles.mockResolvedValue(['url1']);
-//       mockRepository.create.mockResolvedValue(mockAchievement);
+      expect(repository.findByTitle).toHaveBeenCalledWith(
+        createAchievementDto.title,
+      );
+      expect(s3Service.uploadFiles).toHaveBeenCalledWith(files);
+      expect(repository.create).toHaveBeenCalledWith({
+        title: createAchievementDto.title,
+        category: createAchievementDto.category,
+        reward: createAchievementDto.reward,
+        content: createAchievementDto.content,
+        achievement_images: ['mock-image-url'],
+        expiration_at: expect.any(String),
+      });
+      expect(result).toEqual(mockAchievement);
+    });
 
-//       const result = await service.create(createDto, files);
+    it('should throw NotFoundException if title already exists', async () => {
+      const createAchievementDto: CreateAchievementDto = {
+        title: 'Existing Title',
+        category: AchievementCategory.JEJU_TOUR,
+        reward: { gem: 100, dia: 5 }, //'Test Reward',
+        content: 'Test Content',
+        expiration_at: new Date('2025-12-31'),
+      };
+      const files: Express.Multer.File[] = [];
 
-//       expect(result).toEqual(
-//         expect.objectContaining({ title: 'Test Achievement' }),
-//       );
-//       expect(mockS3Service.uploadFiles).toHaveBeenCalledWith(files);
-//       expect(mockRepository.create).toHaveBeenCalled();
-//     });
+      repository.findByTitle.mockResolvedValue({ id: 1 } as Achievement);
 
-//     it('should throw BadRequestException if dto is invalid', async () => {
-//       await expect(service.create(null, [])).rejects.toThrow(
-//         BadRequestException,
-//       );
-//     });
+      await expect(service.create(createAchievementDto, files)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
 
-//     it('should throw NotFoundException if title already exists', async () => {
-//       const createDto: CreateAchievementDto = {
-//         title: 'Test Achievement',
-//       } as any;
-//       mockRepository.findByTitle.mockResolvedValue(mockAchievement);
+    it('should throw BadRequestException if DTO is invalid', async () => {
+      const createAchievementDto = {} as CreateAchievementDto;
+      const files: Express.Multer.File[] = [];
 
-//       await expect(service.create(createDto, [])).rejects.toThrow(
-//         NotFoundException,
-//       );
-//     });
-//   });
-
-//   describe('findAll', () => {
-//     it('should return all achievements', async () => {
-//       mockRepository.findAll.mockResolvedValue([mockAchievement]);
-
-//       const result = await service.findAll();
-
-//       expect(result).toEqual([
-//         expect.objectContaining({ title: 'Test Achievement' }),
-//       ]);
-//       expect(mockRepository.findAll).toHaveBeenCalled();
-//     });
-
-//     it('should throw NotFoundException if no achievements exist', async () => {
-//       mockRepository.findAll.mockResolvedValue(null);
-
-//       await expect(service.findAll()).rejects.toThrow(NotFoundException);
-//     });
-//   });
-
-//   describe('findOne', () => {
-//     it('should return an achievement with sub-achievements', async () => {
-//       const id = '1';
-//       mockRepository.findOne.mockResolvedValue(mockAchievement);
-//       mockRepository.findByAId.mockResolvedValue([{ id: 1 }]);
-
-//       const result = await service.findOne(id);
-
-//       expect(result).toEqual({
-//         title: 'Test Achievement',
-//         subAchievements: [{ id: 1 }],
-//       });
-//     });
-
-//     it('should throw BadRequestException if id is invalid', async () => {
-//       await expect(service.findOne('invalid')).rejects.toThrow(
-//         BadRequestException,
-//       );
-//     });
-//   });
-
-//   describe('update', () => {
-//     it('should update an existing achievement', async () => {
-//       const id = '1';
-//       const updateDto: UpdateAchievementDto = { title: 'Updated Title' };
-//       mockRepository.findOne.mockResolvedValue(mockAchievement);
-//       mockRepository.findByTitle.mockResolvedValue(null);
-//       mockRepository.update.mockResolvedValue(undefined);
-//       mockRepository.findOne.mockResolvedValue({
-//         ...mockAchievement,
-//         title: 'Updated Title',
-//       });
-
-//       const result = await service.update(id, updateDto, []);
-
-//       expect(result[0]).toEqual({ message: '수정 성공' });
-//       expect(result[1].title).toBe('Updated Title');
-//     });
-
-//     it('should throw ConflictException if new title already exists', async () => {
-//       const id = '1';
-//       const updateDto: UpdateAchievementDto = { title: 'Existing Title' };
-//       mockRepository.findOne.mockResolvedValue(mockAchievement);
-//       mockRepository.findByTitle.mockResolvedValue({
-//         id: 2,
-//         title: 'Existing Title',
-//       });
-
-//       await expect(service.update(id, updateDto, [])).rejects.toThrow(
-//         ConflictException,
-//       );
-//     });
-//   });
-
-//   describe('remove', () => {
-//     it('should soft delete an achievement', async () => {
-//       const id = '1';
-//       mockRepository.softDelete.mockResolvedValue(undefined);
-//       mockRepository.findOne.mockResolvedValue(null);
-
-//       const result = await service.remove(id);
-
-//       expect(result).toEqual({ message: '삭제 성공' });
-//     });
-
-//     it('should throw NotFoundException if deletion fails', async () => {
-//       const id = '1';
-//       mockRepository.softDelete.mockResolvedValue(undefined);
-//       mockRepository.findOne.mockResolvedValue(mockAchievement);
-
-//       await expect(service.remove(id)).rejects.toThrow(NotFoundException);
-//     });
-//   });
-// });
+      await expect(service.create(createAchievementDto, files)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+  });*/
+});

@@ -73,5 +73,5 @@ export class CreateSubAchievementDto extends PickType(SubAchievement, [
   @IsDate()
   @Type(() => Date)
   @Transform(({ value }) => (value ? new Date(value) : null))
-  expiration_at?: Date | null;
+  expiration_at?: Date;
 }
