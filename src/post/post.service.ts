@@ -109,7 +109,10 @@ export class PostService {
       post_image: imageUrls,
     });
 
+    // 캐시 삭제 (전체 목록과 개별 게시글 모두)
     await this.valkeyService.del(`posts:`);
+    await this.valkeyService.del(`post:${id}`);
+
     return updatedPost;
   }
 
