@@ -5,14 +5,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Payment } from './entities/payment.entity';
 import { MoreThan } from 'typeorm';
+import { PaymentRepository } from './payment.repository';
 
 @Injectable()
 export class PaymentService {
   constructor(
     private readonly userService: UserService,
     private readonly configService: ConfigService,
-    @InjectRepository(Payment)
-    private paymentRepository: Repository<Payment>,
+    private readonly paymentRepository: PaymentRepository,
   ) {}
 
   async createTestPayment(userId: number) {
