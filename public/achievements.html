@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PinkTopia UI</title>
+    <link rel="stylesheet" href="/public/styles.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffe4f7;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ff69b4;
+            padding: 15px;
+            color: white;
+            font-weight: bold;
+            height: 50px;
+            position: relative;
+        }
+
+        .menu-icon {
+            position: absolute;
+            left: 15px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .menu-icon .hamburger {
+            width: 25px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-icon .hamburger span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: white;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .nav .logo-container {
+            position: absolute;
+            left: 50px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav img {
+            width: 45px;
+            height: 45px;
+            border-radius: 0;
+            object-fit: cover;
+        }
+
+        .nav .logo-text {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+        }
+
+        .user-assets {
+            position: absolute;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: white;
+            padding: 8px 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
+        }
+
+        .asset-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #9c195f;
+            font-weight: bold;
+        }
+
+        .asset-item img {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* 사이드바 스타일 */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            background-color: #ff69b4;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar a {
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar a:hover {
+            background-color: #ff4da6;
+        }
+
+        .close-sidebar {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 36px;
+            cursor: pointer;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav">
+        <div class="menu-icon" onclick="openSidebar()">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        <div class="logo-container">
+            <img src="/public/images/123.jpg" alt="PinkTopia Logo">
+        </div>
+        <div class="logo-text">
+            <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
+        </div>
+        <div id="userAssets" class="user-assets" style="display: none;">
+            <div class="asset-item">
+                <img src="/public/images/gem.png" alt="젬">
+                <span id="userGem">로딩 중...</span> 젬
+            </div>
+            <div class="asset-item">
+                <img src="/public/images/dia.png" alt="다이아">
+                <span id="userDia">로딩 중...</span> 다이아
+            </div>
+        </div>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+        </div>
+        <div class="sidebar-content" id="sidebarContent">
+            <a href="/public/home.html">홈</a>
+            <a href="/public/event.html">이벤트</a>
+            <a href="/public/store-item.html">아이템샵</a>
+            <a href="/public/board.html">게시글 (커뮤니티)</a>
+            <a href="/public/ranking.html">랭킹</a>
+            <a href="/public/customer-service.html">문의센터</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            const accessToken = localStorage.getItem("accessToken");
+            if (accessToken) {
+                document.getElementById("userAssets").style.display = "flex";
+                await loadUserAssets();
+                document.getElementById("sidebarContent").innerHTML += `
+                    <a href="/public/chattingrooms.html">채팅</a>
+                    <a href="/public/collection.html">핑크몽 개인 도감</a>
+                    <a href="/public/inventory.html">인벤토리 아이템</a>
+                    <a href="/public/achievements.html">업적</a>
+                    <a href="/public/mypage.html">마이페이지</a>
+                `;
+            }
+        });
+
+        function openSidebar() {
+            document.getElementById('sidebar').style.width = "250px";
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').style.width = "0";
+        }
+
+        async function loadUserAssets() {
+            try {
+                const response = await fetch("http://localhost:3000/user/me", {
+                    headers: { "Authorization": localStorage.getItem("accessToken") }
+                });
+                if (!response.ok) throw new Error("유저 데이터를 불러오지 못했습니다.");
+                const userData = await response.json();
+                document.getElementById("userGem").textContent = userData.pink_gem.toLocaleString();
+                document.getElementById("userDia").textContent = userData.pink_dia.toLocaleString();
+            } catch (error) {
+                console.error("유저 자산 로드 실패:", error);
+            }
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch("http://localhost:3000/user/auth/logout", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": localStorage.getItem("accessToken")
+                    },
+                    credentials: "include"
+                });
+                if (!response.ok) throw new Error("로그아웃 실패");
+            } catch (error) {
+                console.error("로그아웃 오류:", error);
+            }
+            localStorage.removeItem("accessToken");
+            window.location.href = "/public/home.html";
+        }
+    </script>
+</body>
+
+</html>
