@@ -212,7 +212,7 @@
                     ></textarea>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="attachmentField">
                     <label for="attachment">첨부파일 (선택)</label>
                     <input 
                         type="file" 
@@ -370,6 +370,10 @@
                 const isRefundType = inquiryType.value === 'refund';
                 refundFields.style.display = isRefundType ? 'block' : 'none';
                 
+                // 환불 요청 시 첨부파일 필드 숨김
+                const attachmentField = document.getElementById('attachmentField');
+                attachmentField.style.display = isRefundType ? 'none' : 'block';
+                
                 // 환불 관련 필드들의 required 속성 동적 처리
                 const purchaseHistorySelect = document.getElementById('purchaseHistory');
                 const refundReasonSelect = document.getElementById('refundReason');
@@ -379,6 +383,8 @@
                 
                 if (isRefundType) {
                     loadPurchaseHistory();
+                    // 환불 요청 시 첨부파일 비우기
+                    document.getElementById('attachment').value = '';
                 }
             });
 
@@ -388,6 +394,11 @@
             if (paymentKey) {
                 inquiryType.value = 'refund';
                 refundFields.style.display = 'block';
+                
+                // 환불 요청 시 첨부파일 필드 숨김
+                const attachmentField = document.getElementById('attachmentField');
+                attachmentField.style.display = 'none';
+                
                 loadPurchaseHistory().then(() => {
                     const purchaseSelect = document.getElementById('purchaseHistory');
                     purchaseSelect.value = paymentKey;
@@ -443,26 +454,17 @@
                         }
                     }
 
-                    // 첨부파일이 있는 경우 FormData 사용
+                    // 환불 요청 여부 확인
+                    const isRefundType = inquiryType.value === 'refund';
+                    
+                    // 첨부파일이 있고 환불 요청이 아닌 경우에만 FormData 사용
                     const attachment = document.getElementById('attachment').files[0];
-                    if (attachment) {
+                    if (attachment && !isRefundType) {
                         const formData = new FormData();
                         // 일반 데이터 추가
                         formData.append('type', data.type);
                         formData.append('title', data.title);
                         formData.append('content', data.content);
-                        
-                        // 환불 관련 데이터 추가
-                        if (data.paymentKey) {
-                            formData.append('paymentKey', data.paymentKey);
-                            formData.append('refundReason', data.refundReason);
-                            // amount는 숫자 타입으로 전송
-                            const amountBlob = new Blob(
-                                [JSON.stringify(data.amount)],
-                                { type: 'application/json' }
-                            );
-                            formData.append('amount', amountBlob);
-                        }
                         
                         // 첨부파일 추가
                         formData.append('attachment', attachment);
@@ -480,14 +482,18 @@
                             throw new Error(errorData.message || '문의 등록에 실패했습니다.');
                         }
                     } else {
-                        // 첨부파일이 없는 경우 JSON으로 전송
+                        // 첨부파일이 없거나 환불 요청인 경우 JSON으로 전송
+                        
+                        // 환불 요청인 경우 환불 관련 데이터 추가
+                        let requestData = { ...data }; // data 객체 복사
+                        
                         const response = await fetch('/inquiry', {
                             method: 'POST',
                             headers: {
                                 'Authorization': accessToken,
                                 'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify(data)
+                            body: JSON.stringify(requestData)
                         });
 
                         if (!response.ok) {
