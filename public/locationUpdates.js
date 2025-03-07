@@ -223,33 +223,4 @@ function requestLocationHistory() {
   } else {
     alert('Geolocation을 지원하지 않는 브라우저입니다.');
   }
-  async function logout() {
-    try {
-      const accessToken = localStorage.getItem('accessToken');
-      if (!accessToken) {
-        console.warn(':경광등: 로그아웃 시도: 이미 로그아웃된 상태');
-        window.location.href = '/public/log-in.html';
-        return;
-      }
-      // :작은_파란색_다이아몬드: 서버에 로그아웃 요청 보내기
-      const response = await fetch('http://localhost:3000/user/auth/logout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: accessToken,
-        },
-        credentials: 'include', // 쿠키도 함께 보내기
-      });
-      if (!response.ok) {
-        throw new Error('서버에서 로그아웃 처리 실패');
-      }
-      // :흰색_확인_표시: 로그아웃 성공 후, 토큰 삭제
-      localStorage.removeItem('accessToken');
-      console.log(':흰색_확인_표시: 로그아웃 성공! 페이지 이동');
-      window.location.href = '/public/log-in.html'; // 로그인 페이지로 이동
-    } catch (error) {
-      console.error(':x: 로그아웃 실패:', error);
-      alert('로그아웃 중 오류가 발생했습니다.');
-    }
-  }
 }
