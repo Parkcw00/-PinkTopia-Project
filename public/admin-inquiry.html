@@ -385,9 +385,18 @@
                     }
 
                     // 답변 등록
-                    const answer = isApproved ? 
-                        (isRefundSuccessful ? '환불이 승인되었습니다. 영업일 기준 3-5일 내에 결제하신 수단으로 환불됩니다.' : '환불 처리 중 오류가 발생했습니다. 관리자에게 문의해주세요.') :
-                        document.getElementById(`answer-${inquiryId}`).value;
+                    const adminAnswer = document.getElementById(`answer-${inquiryId}`).value;
+                    
+                    // 환불 상태 메시지 (필요한 경우 추가)
+                    let refundMessage = '';
+                    if (isApproved) {
+                        refundMessage = isRefundSuccessful ? 
+                            '\n\n[시스템 메시지] 환불이 승인되었습니다. 영업일 기준 3-5일 내에 결제하신 수단으로 환불됩니다.' : 
+                            '\n\n[시스템 메시지] 환불 처리 중 오류가 발생했습니다. 관리자에게 문의해주세요.';
+                    }
+                    
+                    // 관리자 답변과 시스템 메시지 결합
+                    const answer = adminAnswer + refundMessage;
 
                     const answerResponse = await fetch(`http://localhost:3000/inquiry/${inquiryId}/answer`, {
                         method: 'PUT',
