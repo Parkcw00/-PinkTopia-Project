@@ -1,851 +1,1035 @@
 <!doctype html>
 <html lang="ko">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>게시판 | PinkTopia</title>
-    <link rel="stylesheet" href="/public/styles.css">
+    <link rel="stylesheet" href="/public/styles.css" />
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+      }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
 
-        /* 네비게이션 바 스타일 */
-        .nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #ff69b4;
-            padding: 15px;
-            color: white;
-            font-weight: bold;
-            position: relative;
-            height: 50px;
-        }
+      /* 네비게이션 바 스타일 */
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #ff69b4;
+        padding: 15px;
+        color: white;
+        font-weight: bold;
+        position: relative;
+        height: 50px;
+      }
 
-        /* 햄버거 메뉴 아이콘 스타일 */
-        .menu-icon {
-            position: absolute;
-            left: 15px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            z-index: 2;
-        }
+      /* 햄버거 메뉴 아이콘 스타일 */
+      .menu-icon {
+        position: absolute;
+        left: 15px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        z-index: 2;
+      }
 
-        .menu-icon .hamburger {
-            width: 25px;
-            height: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+      .menu-icon .hamburger {
+        width: 25px;
+        height: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
 
-        .menu-icon .hamburger span {
-            display: block;
-            height: 3px;
-            width: 100%;
-            background-color: white;
-            border-radius: 3px;
-            transition: all 0.3s ease;
-        }
+      .menu-icon .hamburger span {
+        display: block;
+        height: 3px;
+        width: 100%;
+        background-color: white;
+        border-radius: 3px;
+        transition: all 0.3s ease;
+      }
 
-        /* 로고 컨테이너 스타일 */
-        .nav .logo-container {
-            position: absolute;
-            left: 50px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-        }
+      /* 로고 컨테이너 스타일 */
+      .nav .logo-container {
+        position: absolute;
+        left: 50px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+      }
 
-        .nav img {
-            width: 45px;
-            height: 45px;
-            border-radius: 0;
-            object-fit: cover;
-        }
+      .nav img {
+        width: 45px;
+        height: 45px;
+        border-radius: 0;
+        object-fit: cover;
+      }
 
-        /* 로고 텍스트 */
-        .nav .logo-text {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 24px;
-        }
+      /* 로고 텍스트 */
+      .nav .logo-text {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 24px;
+      }
 
-        /* 사이드바 스타일 */
-        .sidebar {
-            height: 100%;
-            width: 0;
-            position: fixed;
-            z-index: 1000;
-            top: 0;
-            left: 0;
-            background-color: #ff69b4;
-            overflow-x: hidden;
-            transition: 0.5s;
-            padding-top: 60px;
-            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
-        }
+      /* 사이드바 스타일 */
+      .sidebar {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        background-color: #ff69b4;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+        box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+      }
 
-        .sidebar a {
-            padding: 15px 25px;
-            text-decoration: none;
-            font-size: 18px;
-            color: white;
-            display: block;
-            transition: 0.3s;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
+      .sidebar a {
+        padding: 15px 25px;
+        text-decoration: none;
+        font-size: 18px;
+        color: white;
+        display: block;
+        transition: 0.3s;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
 
-        .sidebar a:hover {
-            background-color: #ff4da6;
-        }
+      .sidebar a:hover {
+        background-color: #ff4da6;
+      }
 
-        .close-sidebar {
-            position: absolute;
-            top: 15px;
-            right: 25px;
-            font-size: 36px;
-            cursor: pointer;
-            color: white;
-        }
+      .close-sidebar {
+        position: absolute;
+        top: 15px;
+        right: 25px;
+        font-size: 36px;
+        cursor: pointer;
+        color: white;
+      }
 
-        /* 기존 board.html 스타일 유지 */
-        .board-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+      /* 기존 board.html 스타일 유지 */
+      .board-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
 
-        .write-btn {
-            padding: 10px 20px;
-            background-color: #ff69b4;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+      .write-btn {
+        padding: 10px 20px;
+        background-color: #ff69b4;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
 
-        .post-list {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
+      .post-list {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
 
-        .post-item {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-        }
+      .post-item {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+      }
 
-        .post-item:hover {
-            background-color: #f5f5f5;
-        }
+      .post-item:hover {
+        background-color: #f5f5f5;
+      }
 
-        .post-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
+      .post-title {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
 
-        .post-info {
-            font-size: 0.9em;
-            color: #666;
-        }
+      .post-info {
+        font-size: 0.9em;
+        color: #666;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
 
-        .post-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
+      .post-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
 
-        .modal-content {
-            background-color: white;
-            width: 80%;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-        }
+      .modal-content {
+        background-color: white;
+        width: 80%;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        max-height: 80vh;
+        overflow-y: auto;
+        position: relative;
+      }
 
-        .close-btn {
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            font-size: 24px;
-            color: #666;
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 0;
-        }
+      .close-btn {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        font-size: 24px;
+        color: #666;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 0;
+      }
 
-        .close-btn:hover {
-            color: #ff69b4;
-        }
+      .close-btn:hover {
+        color: #ff69b4;
+      }
 
-        .file-section {
-            margin: 20px 0;
-        }
+      .file-section {
+        margin: 20px 0;
+      }
 
-        .image-preview {
-            max-width: 100%;
-            margin: 10px 0;
-            cursor: pointer;
-        }
+      .image-preview {
+        max-width: 100%;
+        margin: 10px 0;
+        cursor: pointer;
+      }
 
-        .file-link {
-            display: block;
-            padding: 10px;
-            margin: 5px 0;
-            background-color: #f5f5f5;
-            border-radius: 5px;
-            color: #333;
-            text-decoration: none;
-        }
+      .file-link {
+        display: block;
+        padding: 10px;
+        margin: 5px 0;
+        background-color: #f5f5f5;
+        border-radius: 5px;
+        color: #333;
+        text-decoration: none;
+      }
 
-        .file-link:hover {
-            background-color: #e5e5e5;
-        }
+      .file-link:hover {
+        background-color: #e5e5e5;
+      }
 
-        .comment-section {
-            margin-top: 20px;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-        }
+      .comment-section {
+        margin-top: 20px;
+        border-top: 1px solid #eee;
+        padding-top: 20px;
+      }
 
-        .comment-input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
+      .comment-input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
 
-        .comment-list {
-            margin-top: 15px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
+      .comment-list {
+        margin-top: 15px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
 
-        .comment-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
+      .comment-item {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+      }
 
-        .pagination {
-            margin-top: 20px;
-            text-align: center;
-        }
+      .pagination {
+        margin-top: 20px;
+        text-align: center;
+      }
 
-        .pagination button {
-            margin: 5px;
-            padding: 10px 15px;
-            border-radius: 5px;
-            border: 1px solid #ff69b4;
-            background-color: #ff69b4;
-            color: white;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s ease;
-        }
+      .pagination button {
+        margin: 5px;
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: 1px solid #ff69b4;
+        background-color: #ff69b4;
+        color: white;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+      }
 
-        .pagination button:hover {
-            background-color: #f846a5;
-        }
+      .pagination button:hover {
+        background-color: #f846a5;
+      }
 
-        .pagination button:disabled {
-            background-color: #ddd;
-            border-color: #ddd;
-            cursor: not-allowed;
-        }
+      .pagination button:disabled {
+        background-color: #ddd;
+        border-color: #ddd;
+        cursor: not-allowed;
+      }
 
-        #page-info {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin: 0 10px;
-            color: #000000;
-        }
+      #page-info {
+        font-size: 1.2em;
+        font-weight: bold;
+        margin: 0 10px;
+        color: #000000;
+      }
+
+      .edit-btn,
+      .delete-btn {
+        padding: 5px 10px;
+        margin-left: 5px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+
+      .edit-btn {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      .delete-btn {
+        background-color: #f44336;
+        color: white;
+      }
+
+      .post-actions,
+      .comment-actions {
+        float: right;
+        margin-left: 10px;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <!-- 네비게이션 바 -->
     <div class="nav">
-        <div class="menu-icon" onclick="openSidebar()">
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+      <div class="menu-icon" onclick="openSidebar()">
+        <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
-        <div class="logo-container">
-            <img src="/public/images/123.jpg" alt="PinkTopia Logo">
-        </div>
-        <div class="logo-text">
-            <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
-        </div>
+      </div>
+      <div class="logo-container">
+        <img src="/public/images/123.jpg" alt="PinkTopia Logo" />
+      </div>
+      <div class="logo-text">
+        <a href="/public/home.html" style="text-decoration: none; color: white"
+          >PinkTopia</a
+        >
+      </div>
     </div>
 
     <!-- 사이드바 -->
     <div id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+      <div class="sidebar-header">
+        <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+      </div>
+      <div class="sidebar-content">
+        <a href="/public/home.html">홈</a>
+        <a href="/public/event.html">이벤트</a>
+        <a href="/public/store-item.html">아이템샵</a>
+        <a href="/public/board.html">게시글 (커뮤니티)</a>
+        <a href="/public/ranking.html">랭킹</a>
+        <a href="/public/customer-service.html">문의센터</a>
+        <!-- 로그인 시 표시될 메뉴들 -->
+        <div id="loggedInMenu" style="display: none">
+          <a href="/public/chattingrooms.html">채팅</a>
+          <a href="/public/collection.html">핑크몽 개인 도감</a>
+          <a href="/public/inventory.html">인벤토리 아이템</a>
+          <a href="/public/achievements.html">업적</a>
+          <a href="/public/mypage.html">마이페이지</a>
+          <a href="#" onclick="logout()">로그아웃</a>
         </div>
-        <div class="sidebar-content">
-            <a href="/public/home.html">홈</a>
-            <a href="/public/event.html">이벤트</a>
-            <a href="/public/store-item.html">아이템샵</a>
-            <a href="/public/board.html">게시글 (커뮤니티)</a>
-            <a href="/public/ranking.html">랭킹</a>
-            <a href="/public/customer-service.html">문의센터</a>
-            <!-- 로그인 시 표시될 메뉴들 -->
-            <div id="loggedInMenu" style="display: none;">
-                <a href="/public/chattingrooms.html">채팅</a>
-                <a href="/public/collection.html">핑크몽 개인 도감</a>
-                <a href="/public/inventory.html">인벤토리 아이템</a>
-                <a href="/public/achievements.html">업적</a>
-                <a href="/public/mypage.html">마이페이지</a>
-                <a href="#" onclick="logout()">로그아웃</a>
-            </div>
-            <!-- 로그인 안 된 경우 표시될 메뉴들 -->
-            <div id="loggedOutMenu">
-                <a href="/public/log-in.html">로그인</a>
-                <a href="/public/sign-up.html">회원가입</a>
-            </div>
+        <!-- 로그인 안 된 경우 표시될 메뉴들 -->
+        <div id="loggedOutMenu">
+          <a href="/public/log-in.html">로그인</a>
+          <a href="/public/sign-up.html">회원가입</a>
         </div>
+      </div>
     </div>
 
     <!-- 기존 컨텐츠 -->
     <div class="container">
-        <div class="board-header">
-            <h1>게시판</h1>
-            <button class="write-btn" onclick="showWriteModal()">글쓰기</button>
-        </div>
+      <div class="board-header">
+        <h1>게시판</h1>
+        <button class="write-btn" onclick="showWriteModal()">글쓰기</button>
+      </div>
 
-        <div class="post-list" id="postList">
-            <!-- 게시글 목록이 여기에 동적으로 추가됩니다 -->
-        </div>
+      <div class="post-list" id="postList">
+        <!-- 게시글 목록이 여기에 동적으로 추가됩니다 -->
+      </div>
 
-        <div class="pagination">
-            <button id="prev-btn" onclick="changePage(-1)" disabled>이전</button>
-            <span id="page-info">1</span>
-            <button id="next-btn" onclick="changePage(1)">다음</button>
-        </div>
-
+      <div class="pagination">
+        <button id="prev-btn" onclick="changePage(-1)" disabled>이전</button>
+        <span id="page-info">1</span>
+        <button id="next-btn" onclick="changePage(1)">다음</button>
+      </div>
     </div>
 
     <!-- 게시글 상세 모달 -->
     <div class="post-modal" id="postModal" onclick="closeModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <button class="close-btn" onclick="closeModal()">×</button>
-            <h2 id="modalTitle"></h2>
-            <div class="post-info" id="modalInfo"></div>
-            <br />
-            <div id="modalContent"></div>
-            <div class="comment-section">
-                <h3>댓글</h3>
-                <textarea class="comment-input" id="commentInput" placeholder="댓글을 입력하세요"></textarea>
-                <button class="write-btn" onclick="addComment()">댓글 작성</button>
-                <div class="comment-list" id="commentList"></div>
-            </div>
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="close-btn" onclick="closeModal()">×</button>
+        <h2 id="modalTitle"></h2>
+        <div class="post-info" id="modalInfo"></div>
+        <br />
+        <div id="modalContent"></div>
+        <div class="comment-section">
+          <h3>댓글</h3>
+          <textarea
+            class="comment-input"
+            id="commentInput"
+            placeholder="댓글을 입력하세요"
+          ></textarea>
+          <button class="write-btn" onclick="addComment()">댓글 작성</button>
+          <div class="comment-list" id="commentList"></div>
         </div>
+      </div>
     </div>
 
     <!-- 게시글 작성 모달 -->
     <div class="post-modal" id="writeModal" onclick="closeWriteModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h2>글쓰기</h2>
-            <input type="text" id="writeTitle" placeholder="제목을 입력하세요" style="
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <h2>글쓰기</h2>
+        <input
+          type="text"
+          id="writeTitle"
+          placeholder="제목을 입력하세요"
+          style="
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
-          " />
-            <textarea id="writeContent" placeholder="내용을 입력하세요" style="
+          "
+        />
+        <textarea
+          id="writeContent"
+          placeholder="내용을 입력하세요"
+          style="
             width: 100%;
             height: 200px;
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
-          "></textarea>
-            <input type="file" id="writeFiles" multiple style="
+          "
+        ></textarea>
+        <input
+          type="file"
+          id="writeFiles"
+          multiple
+          style="
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
-          " />
-            <button class="write-btn" onclick="submitPost()">작성하기</button>
-            <button class="write-btn" onclick="closeWriteModal()" style="background-color: #999">
-                취소
-            </button>
-        </div>
+          "
+        />
+        <button class="write-btn" onclick="submitPost()">작성하기</button>
+        <button
+          class="write-btn"
+          onclick="closeWriteModal()"
+          style="background-color: #999"
+        >
+          취소
+        </button>
+      </div>
+    </div>
+
+    <!-- 게시글 수정 모달 -->
+    <div class="post-modal" id="editModal" onclick="closeEditModal()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <h2>글 수정</h2>
+        <input
+          type="text"
+          id="editTitle"
+          placeholder="제목을 입력하세요"
+          style="
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+          "
+        />
+        <textarea
+          id="editContent"
+          placeholder="내용을 입력하세요"
+          style="
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+          "
+        ></textarea>
+        <input
+          type="file"
+          id="editFiles"
+          multiple
+          style="
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+          "
+        />
+        <button class="write-btn" onclick="submitEdit()">수정 완료</button>
+        <button
+          class="write-btn"
+          onclick="closeEditModal()"
+          style="background-color: #999"
+        >
+          취소
+        </button>
+      </div>
     </div>
 
     <script>
-        let currentPostId = null;
+      let currentPostId = null;
+      let editingPostId = null;
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const accessToken = localStorage.getItem("accessToken");
-            const userId = localStorage.getItem("user_id"); // 🔹 로그인한 유저 ID 가져오기
+      document.addEventListener('DOMContentLoaded', async function () {
+        const accessToken = localStorage.getItem('accessToken');
 
-            if (accessToken) {
-                document.getElementById('loggedInMenu').style.display = 'block';
-                document.getElementById('loggedOutMenu').style.display = 'none';
-            } else {
-                document.getElementById('loggedInMenu').style.display = 'none';
-                document.getElementById('loggedOutMenu').style.display = 'block';
-            }
+        if (accessToken) {
+          try {
+            // 내 정보 조회하여 user_id 가져오기
+            const response = await fetch('http://localhost:3000/user/me', {
+              headers: {
+                Authorization: `${accessToken}`,
+              },
+            });
+            const userData = await response.json();
+            localStorage.setItem('user_id', userData.id); // user_id 저장
 
-            // ✅ 게시글 목록을 강제 로드
-            loadPosts();
-        });
-
-        let currentPage = 1;
-        const itemsPerPage = 10;
-        let allPosts = []; // 전체 게시글 저장
-        let totalPages = 1;
-
-        // ✅ 게시글 불러오기
-        async function loadPosts() {
-            try {
-                const response = await fetch('http://localhost:3000/post', {
-                    headers: { Authorization: `${localStorage.getItem('accessToken')}` },
-                });
-
-                allPosts = await response.json();
-
-                // ✅ 최신순 정렬 (내림차순)
-                allPosts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-                // ✅ 총 페이지 수 재계산
-                totalPages = Math.max(1, Math.ceil(allPosts.length / itemsPerPage));
-
-                // ✅ 페이지를 첫 페이지로 초기화
-                currentPage = 1;
-
-                // ✅ 게시글 정렬이 확실히 완료된 후 페이지네이션 적용
-                displayPosts();
-            } catch (error) {
-                console.error('게시글 로딩 실패:', error);
-            }
+            document.getElementById('loggedInMenu').style.display = 'block';
+            document.getElementById('loggedOutMenu').style.display = 'none';
+          } catch (error) {
+            console.error('사용자 정보 로딩 실패:', error);
+            localStorage.removeItem('accessToken');
+            document.getElementById('loggedInMenu').style.display = 'none';
+            document.getElementById('loggedOutMenu').style.display = 'block';
+          }
+        } else {
+          document.getElementById('loggedInMenu').style.display = 'none';
+          document.getElementById('loggedOutMenu').style.display = 'block';
         }
 
-        // ✅ 게시글 리스트 표시
-        async function displayPosts() {
-            const postList = document.getElementById('postList');
-            postList.innerHTML = '';
+        // 게시글 목록 로드
+        loadPosts();
+      });
 
-            // ✅ 현재 페이지에서 보여줄 게시글 가져오기
-            const start = (currentPage - 1) * itemsPerPage;
-            const end = start + itemsPerPage;
-            const paginatedPosts = allPosts.slice(start, end); // 최신순 정렬된 상태에서 슬라이스 적용
+      let currentPage = 1;
+      const itemsPerPage = 10;
+      let allPosts = []; // 전체 게시글 저장
+      let totalPages = 1;
 
-            // ✅ 모든 fetch 요청을 병렬로 실행 후 결과를 한 번에 처리
-            const userRequests = paginatedPosts.map(post =>
-                fetch(`http://localhost:3000/users/${post.user_id}`, {
-                    headers: { Authorization: `${localStorage.getItem('accessToken')}` },
-                }).then(response => response.json())
-            );
+      // ✅ 게시글 불러오기
+      async function loadPosts() {
+        try {
+          const response = await fetch('http://localhost:3000/post', {
+            headers: {
+              Authorization: `${localStorage.getItem('accessToken')}`,
+            },
+          });
 
-            try {
-                const users = await Promise.all(userRequests);
+          allPosts = await response.json();
 
-                paginatedPosts.forEach((post, index) => {
-                    const user = users[index];
+          // ✅ 최신순 정렬 (내림차순)
+          allPosts.sort(
+            (a, b) => new Date(b.created_at) - new Date(a.created_at),
+          );
 
-                    const postElement = document.createElement('div');
-                    postElement.className = 'post-item';
-                    postElement.onclick = () => showPostDetail(post.id);
-                    postElement.innerHTML = `
+          // ✅ 총 페이지 수 재계산
+          totalPages = Math.max(1, Math.ceil(allPosts.length / itemsPerPage));
+
+          // ✅ 페이지를 첫 페이지로 초기화
+          currentPage = 1;
+
+          // ✅ 게시글 정렬이 확실히 완료된 후 페이지네이션 적용
+          displayPosts();
+        } catch (error) {
+          console.error('게시글 로딩 실패:', error);
+        }
+      }
+
+      // ✅ 게시글 리스트 표시
+      async function displayPosts() {
+        const postList = document.getElementById('postList');
+        postList.innerHTML = '';
+
+        // ✅ 현재 페이지에서 보여줄 게시글 가져오기
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        const paginatedPosts = allPosts.slice(start, end); // 최신순 정렬된 상태에서 슬라이스 적용
+
+        // ✅ 모든 fetch 요청을 병렬로 실행 후 결과를 한 번에 처리
+        const userRequests = paginatedPosts.map((post) =>
+          fetch(`http://localhost:3000/users/${post.user_id}`, {
+            headers: {
+              Authorization: `${localStorage.getItem('accessToken')}`,
+            },
+          }).then((response) => response.json()),
+        );
+
+        try {
+          const users = await Promise.all(userRequests);
+
+          paginatedPosts.forEach((post, index) => {
+            const user = users[index];
+            const isAuthor = post.user_id == localStorage.getItem('user_id'); // 작성자 확인
+
+            const postElement = document.createElement('div');
+            postElement.className = 'post-item';
+            postElement.onclick = () => showPostDetail(post.id);
+            postElement.innerHTML = `
                 <div class="post-title">${post.title}</div>
                 <div class="post-info">
                     작성자: ${user.nickname} |
                     작성일: ${formatKoreanTime(post.created_at)}
+                    ${
+                      isAuthor
+                        ? `
+                      <div class="post-actions">
+                        <button onclick="event.stopPropagation(); showEditModal(${post.id})" class="edit-btn">수정</button>
+                        <button onclick="event.stopPropagation(); deletePost(${post.id})" class="delete-btn">삭제</button>
+                      </div>
+                    `
+                        : ''
+                    }
                 </div>
             `;
-                    postList.appendChild(postElement);
-                });
+            postList.appendChild(postElement);
+          });
 
-                // ✅ 페이지네이션 버튼 상태 업데이트
-                document.getElementById("page-info").textContent = `${currentPage} / ${totalPages}`;
-                document.getElementById("prev-btn").disabled = currentPage === 1;
-                document.getElementById("next-btn").disabled = currentPage >= totalPages;
-            } catch (error) {
-                console.error("게시글 작성자 정보 불러오기 실패:", error);
-            }
+          // ✅ 페이지네이션 버튼 상태 업데이트
+          document.getElementById('page-info').textContent =
+            `${currentPage} / ${totalPages}`;
+          document.getElementById('prev-btn').disabled = currentPage === 1;
+          document.getElementById('next-btn').disabled =
+            currentPage >= totalPages;
+        } catch (error) {
+          console.error('게시글 작성자 정보 불러오기 실패:', error);
         }
+      }
 
-        // ✅ 페이지 이동
-        function changePage(offset) {
-            if ((currentPage + offset) > 0 && (currentPage + offset) <= totalPages) {
-                currentPage += offset;
-                displayPosts();
-            }
+      // ✅ 페이지 이동
+      function changePage(offset) {
+        if (currentPage + offset > 0 && currentPage + offset <= totalPages) {
+          currentPage += offset;
+          displayPosts();
         }
+      }
 
-        // ✅ 시간 형식 변환 (한국 시간)
-        function formatKoreanTime(dateString) {
-            if (!dateString) return "날짜 없음";
+      // ✅ 시간 형식 변환 (한국 시간)
+      function formatKoreanTime(dateString) {
+        if (!dateString) return '날짜 없음';
 
-            const date = new Date(dateString);
-            date.setHours(date.getHours() + 9); // UTC -> KST 변환
+        const date = new Date(dateString);
+        date.setHours(date.getHours() + 9); // UTC -> KST 변환
 
-            return date.toLocaleString("ko-KR", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hour12: false,
+        return date.toLocaleString('ko-KR', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false,
+        });
+      }
+
+      async function showPostDetail(postId) {
+        try {
+          const response = await fetch(`http://localhost:3000/post/${postId}`, {
+            headers: {
+              Authorization: `${localStorage.getItem('accessToken')}`,
+            },
+          });
+          const post = await response.json();
+          currentPostId = postId;
+          const userResponse = await fetch(
+            `http://localhost:3000/users/${post.user_id}`,
+            {
+              headers: {
+                Authorization: `${localStorage.getItem('accessToken')}`,
+              },
+            },
+          );
+          const user = await userResponse.json();
+
+          document.getElementById('modalTitle').textContent = post.title;
+          document.getElementById('modalContent').textContent = post.content;
+          document.getElementById('modalInfo').textContent =
+            `작성자: ${user.nickname} | 작성일: ${formatKoreanTime(post.created_at)}`;
+
+          // 이미지 섹션 추가
+          const fileSection = document.createElement('div');
+          fileSection.className = 'file-section';
+
+          if (post.post_image && post.post_image.length > 0) {
+            post.post_image.forEach((imageUrl) => {
+              const img = document.createElement('img');
+              img.src = imageUrl;
+              img.className = 'image-preview';
+              img.onclick = () => window.open(imageUrl, '_blank');
+              fileSection.appendChild(img);
             });
+            document.getElementById('modalContent').appendChild(fileSection);
+          }
+
+          loadComments(postId);
+          document.getElementById('postModal').style.display = 'block';
+        } catch (error) {
+          console.error('게시글 상세 로딩 실패:', error);
         }
+      }
 
+      async function loadComments(postId) {
+        try {
+          const response = await fetch(
+            `http://localhost:3000/comment/${postId}`,
+            {
+              headers: {
+                Authorization: `${localStorage.getItem('accessToken')}`,
+              },
+            },
+          );
+          const comments = await response.json();
+          console.log(comments);
+          const commentList = document.getElementById('commentList');
+          commentList.innerHTML = '';
+          for (const comment of comments) {
+            const userResponse = await fetch(
+              `http://localhost:3000/users/${comment.user_id}`,
+              {
+                headers: { Authorization: localStorage.getItem('accessToken') },
+              },
+            );
+            const user = await userResponse.json();
+            const isCommentAuthor =
+              comment.user_id == localStorage.getItem('user_id');
 
-        async function showPostDetail(postId) {
-            try {
-                const response = await fetch(`http://localhost:3000/post/${postId}`, {
-                    headers: {
-                        Authorization: `${localStorage.getItem('accessToken')}`,
-                    },
-                });
-                const post = await response.json();
-                currentPostId = postId;
-                const userResponse = await fetch(
-                    `http://localhost:3000/users/${post.user_id}`,
-                    {
-                        headers: {
-                            Authorization: `${localStorage.getItem('accessToken')}`,
-                        },
-                    },
-                );
-                const user = await userResponse.json();
-
-                document.getElementById('modalTitle').textContent = post.title;
-                document.getElementById('modalContent').textContent = post.content;
-                document.getElementById('modalInfo').textContent =
-                    `작성자: ${user.nickname} | 작성일: ${formatKoreanTime(post.created_at)}`;
-
-                // 이미지 섹션 추가
-                const fileSection = document.createElement('div');
-                fileSection.className = 'file-section';
-
-                if (post.post_image && post.post_image.length > 0) {
-                    post.post_image.forEach((imageUrl) => {
-                        const img = document.createElement('img');
-                        img.src = imageUrl;
-                        img.className = 'image-preview';
-                        img.onclick = () => window.open(imageUrl, '_blank');
-                        fileSection.appendChild(img);
-                    });
-                    document.getElementById('modalContent').appendChild(fileSection);
-                }
-
-                loadComments(postId);
-                document.getElementById('postModal').style.display = 'block';
-            } catch (error) {
-                console.error('게시글 상세 로딩 실패:', error);
-            }
-        }
-
-        async function loadComments(postId) {
-            try {
-                const response = await fetch(
-                    `http://localhost:3000/comment/${postId}`,
-                    {
-                        headers: {
-                            Authorization: `${localStorage.getItem('accessToken')}`,
-                        },
-                    },
-                );
-                const comments = await response.json();
-                console.log(comments);
-                const commentList = document.getElementById('commentList');
-                commentList.innerHTML = '';
-                for (const comment of comments) {
-                    const userResponse = await fetch(
-                        `http://localhost:3000/users/${comment.user_id}`,
-                        {
-                            headers: {
-                                Authorization: `${localStorage.getItem('accessToken')}`,
-                            },
-                        },
-                    );
-                    const user = await userResponse.json();
-                    const commentElement = document.createElement('div');
-                    commentElement.className = 'comment-item';
-                    commentElement.innerHTML = `
-                        <div>${comment.content}</div>
-                        <div class="post-info">
-                            ${user.nickname} |
-                            ${formatKoreanTime(comment.created_at)}
-                        </div>
-                    `;
-                    commentList.appendChild(commentElement);
-                }
-            } catch (error) {
-                console.error('댓글 로딩 실패:', error);
-            }
-        }
-
-        async function addComment() {
-            const content = document.getElementById('commentInput').value;
-            if (!content.trim()) return;
-
-            try {
-                console.log(content);
-                await fetch(`http://localhost:3000/comment/${currentPostId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `${localStorage.getItem('accessToken')}`,
-                    },
-                    body: JSON.stringify({
-                        content: content,
-                    }),
-                });
-
-                document.getElementById('commentInput').value = '';
-                loadComments(currentPostId);
-            } catch (error) {
-                console.error('댓글 작성 실패:', error);
-            }
-        }
-
-        function closeModal() {
-            document.getElementById('postModal').style.display = 'none';
-            currentPostId = null;
-        }
-
-        function showWriteModal() {
-            document.getElementById('writeModal').style.display = 'block';
-        }
-
-        function closeWriteModal() {
-            document.getElementById('writeModal').style.display = 'none';
-        }
-
-        async function submitPost() {
-            const title = document.getElementById('writeTitle').value;
-            const content = document.getElementById('writeContent').value;
-            const files = document.getElementById('writeFiles').files;
-
-            if (!title.trim() || !content.trim()) {
-                alert('제목과 내용을 모두 입력해주세요.');
-                return;
-            }
-
-            try {
-                const formData = new FormData();
-                formData.append('title', title);
-                formData.append('content', content);
-
-                if (files) {
-                    for (let i = 0; i < files.length; i++) {
-                        formData.append('files', files[i]);
-                    }
-                }
-
-                const response = await fetch('http://localhost:3000/post', {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `${localStorage.getItem('accessToken')}`,
-                    },
-                    body: formData,
-                });
-
-                if (response.ok) {
-                    closeWriteModal();
-                    document.getElementById('writeTitle').value = '';
-                    document.getElementById('writeContent').value = '';
-                    document.getElementById('writeFiles').value = '';
-                    loadPosts();
-                } else {
-                    alert('게시글 작성에 실패했습니다.');
-                }
-            } catch (error) {
-                console.error('게시글 작성 실패:', error);
-                alert('게시글 작성에 실패했습니다.');
-            }
-        }
-
-        async function deletePost(event, postId) {
-            event.stopPropagation(); // 게시글 상세보기 이벤트 막기
-
-            if (!confirm("정말 삭제하시겠습니까?")) return;
-
-            try {
-                const response = await fetch(`http://localhost:3000/post/${postId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        Authorization: `${localStorage.getItem('accessToken')}`,
-                    },
-                });
-
-                if (response.ok) {
-                    alert("게시글이 삭제되었습니다.");
-                    loadPosts(); // 삭제 후 게시글 목록 다시 불러오기
-                } else {
-                    alert("게시글 삭제에 실패했습니다.");
-                }
-            } catch (error) {
-                console.error('게시글 삭제 실패:', error);
-                alert("게시글 삭제에 실패했습니다.");
-            }
-        }
-
-        async function loadComments(postId) {
-            try {
-                const response = await fetch(`http://localhost:3000/comment/${postId}`, {
-                    headers: { Authorization: `${localStorage.getItem('accessToken')}` },
-                });
-
-                const comments = await response.json();
-                const loggedInUserId = localStorage.getItem('user_id'); // 🔹 로그인한 유저 ID 가져오기
-
-                const commentList = document.getElementById('commentList');
-                commentList.innerHTML = '';
-
-                for (const comment of comments) {
-                    const userResponse = await fetch(`http://localhost:3000/users/${comment.user_id}`, {
-                        headers: { Authorization: `${localStorage.getItem('accessToken')}` },
-                    });
-                    const user = await userResponse.json();
-
-                    const commentElement = document.createElement('div');
-                    commentElement.className = 'comment-item';
-                    commentElement.innerHTML = `
+            const commentElement = document.createElement('div');
+            commentElement.className = 'comment-item';
+            commentElement.innerHTML = `
                 <div>${comment.content}</div>
                 <div class="post-info">
-                    ${user.nickname} | ${formatKoreanTime(comment.created_at)}
+                    ${user.nickname} |
+                    ${formatKoreanTime(comment.created_at)}
+                    ${
+                      isCommentAuthor
+                        ? `
+                      <div class="comment-actions">
+                        <button onclick="editComment(${comment.id})" class="edit-btn">수정</button>
+                        <button onclick="deleteComment(${comment.id})" class="delete-btn">삭제</button>
+                      </div>
+                    `
+                        : ''
+                    }
                 </div>
-                ${loggedInUserId == comment.user_id ? `<button class="delete-btn" onclick="deleteComment(${comment.id})">삭제</button>` : ''}
             `;
-                    commentList.appendChild(commentElement);
-                }
-            } catch (error) {
-                console.error('댓글 로딩 실패:', error);
+            commentList.appendChild(commentElement);
+          }
+        } catch (error) {
+          console.error('댓글 로딩 실패:', error);
+        }
+      }
+
+      async function addComment() {
+        const content = document.getElementById('commentInput').value;
+        if (!content.trim()) return;
+
+        try {
+          console.log(content);
+          await fetch(`http://localhost:3000/comment/${currentPostId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `${localStorage.getItem('accessToken')}`,
+            },
+            body: JSON.stringify({
+              content: content,
+            }),
+          });
+
+          document.getElementById('commentInput').value = '';
+          loadComments(currentPostId);
+        } catch (error) {
+          console.error('댓글 작성 실패:', error);
+        }
+      }
+
+      function closeModal() {
+        document.getElementById('postModal').style.display = 'none';
+        currentPostId = null;
+      }
+
+      function showWriteModal() {
+        document.getElementById('writeModal').style.display = 'block';
+      }
+
+      function closeWriteModal() {
+        document.getElementById('writeModal').style.display = 'none';
+      }
+
+      async function submitPost() {
+        const title = document.getElementById('writeTitle').value;
+        const content = document.getElementById('writeContent').value;
+        const files = document.getElementById('writeFiles').files;
+
+        if (!title.trim() || !content.trim()) {
+          alert('제목과 내용을 모두 입력해주세요.');
+          return;
+        }
+
+        try {
+          const formData = new FormData();
+          formData.append('title', title);
+          formData.append('content', content);
+
+          if (files) {
+            for (let i = 0; i < files.length; i++) {
+              formData.append('files', files[i]);
             }
+          }
+
+          const response = await fetch('http://localhost:3000/post', {
+            method: 'POST',
+            headers: {
+              Authorization: `${localStorage.getItem('accessToken')}`,
+            },
+            body: formData,
+          });
+
+          if (response.ok) {
+            closeWriteModal();
+            document.getElementById('writeTitle').value = '';
+            document.getElementById('writeContent').value = '';
+            document.getElementById('writeFiles').value = '';
+            loadPosts();
+          } else {
+            alert('게시글 작성에 실패했습니다.');
+          }
+        } catch (error) {
+          console.error('게시글 작성 실패:', error);
+          alert('게시글 작성에 실패했습니다.');
         }
+      }
 
-        async function deleteComment(commentId) {
-            if (!confirm("댓글을 삭제하시겠습니까?")) return;
+      async function deletePost(postId) {
+        if (!confirm('게시글을 삭제하시겠습니까?')) return;
 
-            try {
-                const response = await fetch(`http://localhost:3000/comment/${commentId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        Authorization: `${localStorage.getItem('accessToken')}`,
-                    },
-                });
+        try {
+          const response = await fetch(`http://localhost:3000/post/${postId}`, {
+            method: 'DELETE',
+            headers: { Authorization: localStorage.getItem('accessToken') },
+          });
 
-                if (response.ok) {
-                    alert("댓글이 삭제되었습니다.");
-                    loadComments(currentPostId); // 삭제 후 댓글 목록 다시 불러오기
-                } else {
-                    alert("댓글 삭제에 실패했습니다.");
-                }
-            } catch (error) {
-                console.error('댓글 삭제 실패:', error);
-                alert("댓글 삭제에 실패했습니다.");
-            }
+          if (response.ok) {
+            alert('게시글이 삭제되었습니다.');
+            loadPosts();
+            closeModal();
+          }
+        } catch (error) {
+          console.error('게시글 삭제 실패:', error);
         }
+      }
 
+      async function deleteComment(commentId) {
+        if (!confirm('댓글을 삭제하시겠습니까?')) return;
 
+        try {
+          const response = await fetch(
+            `http://localhost:3000/comment/${currentPostId}/comments/${commentId}`,
+            {
+              method: 'DELETE',
+              headers: { Authorization: localStorage.getItem('accessToken') },
+            },
+          );
 
-        async function logout() {
-            localStorage.removeItem('accessToken');
-            await fetch(`http://localhost:3000/user/auth/logout`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `${localStorage.getItem('accessToken')}`,
-                },
-            });
-            window.location.reload();
+          if (response.ok) {
+            alert('댓글이 삭제되었습니다.');
+            loadComments(currentPostId);
+          }
+        } catch (error) {
+          console.error('댓글 삭제 실패:', error);
         }
+      }
 
-        function openSidebar() {
-            document.getElementById('sidebar').style.width = "250px";
-        }
-
-        function closeSidebar() {
-            document.getElementById('sidebar').style.width = "0";
-        }
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const accessToken = localStorage.getItem("accessToken");
-
-            if (accessToken) {
-                document.getElementById('loggedInMenu').style.display = 'block';
-                document.getElementById('loggedOutMenu').style.display = 'none';
-            } else {
-                document.getElementById('loggedInMenu').style.display = 'none';
-                document.getElementById('loggedOutMenu').style.display = 'block';
-            }
+      async function logout() {
+        localStorage.removeItem('accessToken');
+        await fetch(`http://localhost:3000/user/auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${localStorage.getItem('accessToken')}`,
+          },
         });
+        window.location.reload();
+      }
 
-        async function logout() {
-            try {
-                const accessToken = localStorage.getItem("accessToken");
-                if (!accessToken) {
-                    console.warn("🚨 로그아웃 시도: 이미 로그아웃된 상태");
-                    window.location.href = "/public/log-in.html";
-                    return;
-                }
+      function openSidebar() {
+        document.getElementById('sidebar').style.width = '250px';
+      }
 
-                // 🔹 서버에 로그아웃 요청 보내기
-                const response = await fetch("http://localhost:3000/user/auth/logout", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": accessToken
-                    },
-                    credentials: "include" // 쿠키도 함께 보내기
-                });
+      function closeSidebar() {
+        document.getElementById('sidebar').style.width = '0';
+      }
 
-                if (!response.ok) {
-                    throw new Error("서버에서 로그아웃 처리 실패");
-                }
+      async function logout() {
+        try {
+          const accessToken = localStorage.getItem('accessToken');
+          if (!accessToken) {
+            console.warn('🚨 로그아웃 시도: 이미 로그아웃된 상태');
+            window.location.href = '/public/log-in.html';
+            return;
+          }
 
-                // ✅ 로그아웃 성공 후, 토큰 삭제
-                localStorage.removeItem("accessToken");
+          // 🔹 서버에 로그아웃 요청 보내기
+          const response = await fetch(
+            'http://localhost:3000/user/auth/logout',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: accessToken,
+              },
+              credentials: 'include', // 쿠키도 함께 보내기
+            },
+          );
 
-                console.log("✅ 로그아웃 성공! 페이지 이동");
-                window.location.href = "/"; //
-            } catch (error) {
-                console.error("❌ 로그아웃 실패:", error);
-                alert("로그아웃 중 오류가 발생했습니다.");
-            }
+          if (!response.ok) {
+            throw new Error('서버에서 로그아웃 처리 실패');
+          }
+
+          // ✅ 로그아웃 성공 후, 토큰 삭제
+          localStorage.removeItem('accessToken');
+
+          console.log('✅ 로그아웃 성공! 페이지 이동');
+          window.location.href = '/'; //
+        } catch (error) {
+          console.error('❌ 로그아웃 실패:', error);
+          alert('로그아웃 중 오류가 발생했습니다.');
+        }
+      }
+
+      async function showEditModal(postId) {
+        try {
+          const response = await fetch(`http://localhost:3000/post/${postId}`, {
+            headers: { Authorization: localStorage.getItem('accessToken') },
+          });
+          const post = await response.json();
+
+          document.getElementById('editTitle').value = post.title;
+          document.getElementById('editContent').value = post.content;
+          editingPostId = postId;
+          document.getElementById('editModal').style.display = 'block';
+        } catch (error) {
+          console.error('게시글 수정 모달 열기 실패:', error);
+        }
+      }
+
+      function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+        editingPostId = null;
+      }
+
+      async function submitEdit() {
+        const title = document.getElementById('editTitle').value;
+        const content = document.getElementById('editContent').value;
+        const files = document.getElementById('editFiles').files;
+
+        if (!title.trim() || !content.trim()) {
+          alert('제목과 내용을 모두 입력해주세요.');
+          return;
         }
 
-    </script>
-</body>
+        try {
+          const formData = new FormData();
+          formData.append('title', title);
+          formData.append('content', content);
 
+          if (files && files.length > 0) {
+            for (let i = 0; i < files.length; i++) {
+              formData.append('files', files[i]);
+            }
+          }
+
+          const response = await fetch(
+            `http://localhost:3000/post/${editingPostId}`,
+            {
+              method: 'PATCH',
+              headers: {
+                Authorization: localStorage.getItem('accessToken'),
+              },
+              body: formData,
+            },
+          );
+
+          if (response.ok) {
+            closeEditModal();
+            loadPosts();
+            closeModal();
+          } else {
+            alert('게시글 수정에 실패했습니다.');
+          }
+        } catch (error) {
+          console.error('게시글 수정 실패:', error);
+          alert('게시글 수정에 실패했습니다.');
+        }
+      }
+
+      async function editComment(commentId) {
+        const newContent = prompt('수정할 내용을 입력하세요:');
+        if (!newContent) return;
+
+        try {
+          const response = await fetch(
+            `http://localhost:3000/comment/${currentPostId}/comments/${commentId}`,
+            {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: localStorage.getItem('accessToken'),
+              },
+              body: JSON.stringify({ content: newContent }),
+            },
+          );
+
+          if (response.ok) {
+            loadComments(currentPostId);
+          } else {
+            alert('댓글 수정에 실패했습니다.');
+          }
+        } catch (error) {
+          console.error('댓글 수정 실패:', error);
+        }
+      }
+    </script>
+  </body>
 </html>
