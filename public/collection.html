@@ -286,6 +286,20 @@
             background-color: #ff69b4;
             color: white;
         }
+
+        .empty-message-container {
+            position: absolute;
+            /* 화면에서 독립적으로 배치 */
+            top: 40%;
+            /* 화면 중앙 위치 */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            /* 정확한 중앙 정렬 */
+            text-align: center;
+            /* 텍스트 가운데 정렬 */
+            width: 100%;
+            /* 필요 시 조절 가능 */
+        }
     </style>
 </head>
 
@@ -486,10 +500,26 @@
             grid.innerHTML = '';
 
             if (filteredPinkmongs.length === 0) {
-                grid.innerHTML = '<p style="text-align: center; font-size: 1.2em; color: #666;">발견된 핑크몽이 없습니다!</p>';
-                updatePaginationButtons(true); // 페이지네이션 비활성화
+                grid.innerHTML = `
+        <div class="empty-message-container">
+            <p style="font-size: 1.5em; font-weight: bold; color: #666;">발견된 핑크몽이 없습니다!</p>
+            <p style="font-size: 1em; color: #999;">핑크몽을 발견하고 도감을 채워보세요!</p>
+        </div>
+    `;
+
+                // 🔹 페이지네이션 버튼 숨기기
+                document.getElementById('prev-btn').style.display = 'none';
+                document.getElementById('next-btn').style.display = 'none';
+                document.getElementById('page-info').style.display = 'none';
+
                 return;
             }
+
+            // 🔹 핑크몽이 있을 경우 페이지네이션 버튼 다시 보이게 설정
+            document.getElementById('prev-btn').style.display = 'inline-block';
+            document.getElementById('next-btn').style.display = 'inline-block';
+            document.getElementById('page-info').style.display = 'inline-block';
+
 
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
