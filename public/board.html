@@ -5,13 +5,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>게시판 | PinkTopia</title>
-    <link rel="stylesheet" href="/public/styles.css">
+    <link rel="stylesheet" href="/public/styles.css" />
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #ffe4f7;
+            background-color: #f9f9f9;
         }
 
         .container {
@@ -165,6 +165,9 @@
         .post-info {
             font-size: 0.9em;
             color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .post-modal {
@@ -288,6 +291,31 @@
             margin: 0 10px;
             color: #000000;
         }
+
+        .edit-btn,
+        .delete-btn {
+            padding: 5px 10px;
+            margin-left: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .edit-btn {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .post-actions,
+        .comment-actions {
+            float: right;
+            margin-left: 10px;
+        }
     </style>
 </head>
 
@@ -302,10 +330,10 @@
             </div>
         </div>
         <div class="logo-container">
-            <img src="/public/images/123.jpg" alt="PinkTopia Logo">
+            <img src="/public/images/123.jpg" alt="PinkTopia Logo" />
         </div>
         <div class="logo-text">
-            <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
+            <a href="/public/home.html" style="text-decoration: none; color: white">PinkTopia</a>
         </div>
     </div>
 
@@ -320,14 +348,14 @@
             <a href="/public/store-item.html">아이템샵</a>
             <a href="/public/board.html">게시글 (커뮤니티)</a>
             <a href="/public/ranking.html">랭킹</a>
+            <a href="/public/customer-service.html">문의센터</a>
             <!-- 로그인 시 표시될 메뉴들 -->
-            <div id="loggedInMenu" style="display: none;">
+            <div id="loggedInMenu" style="display: none">
                 <a href="/public/chattingrooms.html">채팅</a>
                 <a href="/public/collection.html">핑크몽 개인 도감</a>
                 <a href="/public/inventory.html">인벤토리 아이템</a>
                 <a href="/public/achievements.html">업적</a>
                 <a href="/public/mypage.html">마이페이지</a>
-                <a href="/public/customer-service.html">고객 센터</a>
                 <a href="#" onclick="logout()">로그아웃</a>
             </div>
             <!-- 로그인 안 된 경우 표시될 메뉴들 -->
@@ -354,7 +382,6 @@
             <span id="page-info">1</span>
             <button id="next-btn" onclick="changePage(1)">다음</button>
         </div>
-
     </div>
 
     <!-- 게시글 상세 모달 -->
@@ -407,22 +434,104 @@
         </div>
     </div>
 
+    <!-- 게시글 수정 모달 -->
+    <div class="post-modal" id="editModal" onclick="closeEditModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2>글 수정</h2>
+            <input type="text" id="editTitle" placeholder="제목을 입력하세요" style="
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+          " />
+            <textarea id="editContent" placeholder="내용을 입력하세요" style="
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+          "></textarea>
+            <input type="file" id="editFiles" multiple style="
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+          " />
+            <button class="write-btn" onclick="submitEdit()">수정 완료</button>
+            <button class="write-btn" onclick="closeEditModal()" style="background-color: #999">
+                취소
+            </button>
+        </div>
+    </div>
+
+    <!-- 게시글 수정 모달 -->
+    <div class="post-modal" id="editModal" onclick="closeEditModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2>글 수정</h2>
+            <input type="text" id="editTitle" placeholder="제목을 입력하세요" style="
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+          " />
+            <textarea id="editContent" placeholder="내용을 입력하세요" style="
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+          "></textarea>
+            <input type="file" id="editFiles" multiple style="
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+          " />
+            <button class="write-btn" onclick="submitEdit()">수정 완료</button>
+            <button class="write-btn" onclick="closeEditModal()" style="background-color: #999">
+                취소
+            </button>
+        </div>
+    </div>
+
     <script>
         let currentPostId = null;
+        let editingPostId = null;
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const accessToken = localStorage.getItem("accessToken");
-            const userId = localStorage.getItem("user_id"); // 🔹 로그인한 유저 ID 가져오기
+        document.addEventListener('DOMContentLoaded', async function () {
+            const accessToken = localStorage.getItem('accessToken');
 
             if (accessToken) {
-                document.getElementById('loggedInMenu').style.display = 'block';
-                document.getElementById('loggedOutMenu').style.display = 'none';
+                try {
+                    // 내 정보 조회하여 user_id 가져오기
+                    const response = await fetch('http://localhost:3000/user/me', {
+                        headers: {
+                            Authorization: `${accessToken}`,
+                        },
+                    });
+                    const userData = await response.json();
+                    localStorage.setItem('user_id', userData.id); // user_id 저장
+
+                    document.getElementById('loggedInMenu').style.display = 'block';
+                    document.getElementById('loggedOutMenu').style.display = 'none';
+                } catch (error) {
+                    console.error('사용자 정보 로딩 실패:', error);
+                    localStorage.removeItem('accessToken');
+                    document.getElementById('loggedInMenu').style.display = 'none';
+                    document.getElementById('loggedOutMenu').style.display = 'block';
+                }
             } else {
                 document.getElementById('loggedInMenu').style.display = 'none';
                 document.getElementById('loggedOutMenu').style.display = 'block';
             }
 
-            // ✅ 게시글 목록을 강제 로드
+            // 게시글 목록 로드
             loadPosts();
         });
 
@@ -435,13 +544,17 @@
         async function loadPosts() {
             try {
                 const response = await fetch('http://localhost:3000/post', {
-                    headers: { Authorization: `${localStorage.getItem('accessToken')}` },
+                    headers: {
+                        Authorization: `${localStorage.getItem('accessToken')}`,
+                    },
                 });
 
                 allPosts = await response.json();
 
                 // ✅ 최신순 정렬 (내림차순)
-                allPosts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                allPosts.sort(
+                    (a, b) => new Date(b.created_at) - new Date(a.created_at),
+                );
 
                 // ✅ 총 페이지 수 재계산
                 totalPages = Math.max(1, Math.ceil(allPosts.length / itemsPerPage));
@@ -467,10 +580,12 @@
             const paginatedPosts = allPosts.slice(start, end); // 최신순 정렬된 상태에서 슬라이스 적용
 
             // ✅ 모든 fetch 요청을 병렬로 실행 후 결과를 한 번에 처리
-            const userRequests = paginatedPosts.map(post =>
+            const userRequests = paginatedPosts.map((post) =>
                 fetch(`http://localhost:3000/users/${post.user_id}`, {
-                    headers: { Authorization: `${localStorage.getItem('accessToken')}` },
-                }).then(response => response.json())
+                    headers: {
+                        Authorization: `${localStorage.getItem('accessToken')}`,
+                    },
+                }).then((response) => response.json()),
             );
 
             try {
@@ -478,6 +593,7 @@
 
                 paginatedPosts.forEach((post, index) => {
                     const user = users[index];
+                    const isAuthor = post.user_id == localStorage.getItem('user_id'); // 작성자 확인
 
                     const postElement = document.createElement('div');
                     postElement.className = 'post-item';
@@ -487,23 +603,34 @@
                 <div class="post-info">
                     작성자: ${user.nickname} |
                     작성일: ${formatKoreanTime(post.created_at)}
+                    ${isAuthor
+                            ? `
+                      <div class="post-actions">
+                        <button onclick="event.stopPropagation(); showEditModal(${post.id})" class="edit-btn">수정</button>
+                        <button onclick="event.stopPropagation(); deletePost(${post.id})" class="delete-btn">삭제</button>
+                      </div>
+                    `
+                            : ''
+                        }
                 </div>
             `;
                     postList.appendChild(postElement);
                 });
 
                 // ✅ 페이지네이션 버튼 상태 업데이트
-                document.getElementById("page-info").textContent = `${currentPage} / ${totalPages}`;
-                document.getElementById("prev-btn").disabled = currentPage === 1;
-                document.getElementById("next-btn").disabled = currentPage >= totalPages;
+                document.getElementById('page-info').textContent =
+                    `${currentPage} / ${totalPages}`;
+                document.getElementById('prev-btn').disabled = currentPage === 1;
+                document.getElementById('next-btn').disabled =
+                    currentPage >= totalPages;
             } catch (error) {
-                console.error("게시글 작성자 정보 불러오기 실패:", error);
+                console.error('게시글 작성자 정보 불러오기 실패:', error);
             }
         }
 
         // ✅ 페이지 이동
         function changePage(offset) {
-            if ((currentPage + offset) > 0 && (currentPage + offset) <= totalPages) {
+            if (currentPage + offset > 0 && currentPage + offset <= totalPages) {
                 currentPage += offset;
                 displayPosts();
             }
@@ -511,22 +638,21 @@
 
         // ✅ 시간 형식 변환 (한국 시간)
         function formatKoreanTime(dateString) {
-            if (!dateString) return "날짜 없음";
+            if (!dateString) return '날짜 없음';
 
             const date = new Date(dateString);
             date.setHours(date.getHours() + 9); // UTC -> KST 변환
 
-            return date.toLocaleString("ko-KR", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
+            return date.toLocaleString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
                 hour12: false,
             });
         }
-
 
         async function showPostDetail(postId) {
             try {
@@ -592,21 +718,31 @@
                     const userResponse = await fetch(
                         `http://localhost:3000/users/${comment.user_id}`,
                         {
-                            headers: {
-                                Authorization: `${localStorage.getItem('accessToken')}`,
-                            },
+                            headers: { Authorization: localStorage.getItem('accessToken') },
                         },
                     );
                     const user = await userResponse.json();
+                    const isCommentAuthor =
+                        comment.user_id == localStorage.getItem('user_id');
+
                     const commentElement = document.createElement('div');
                     commentElement.className = 'comment-item';
                     commentElement.innerHTML = `
-                        <div>${comment.content}</div>
-                        <div class="post-info">
-                            ${user.nickname} |
-                            ${formatKoreanTime(comment.created_at)}
-                        </div>
-                    `;
+                <div>${comment.content}</div>
+                <div class="post-info">
+                    ${user.nickname} |
+                    ${formatKoreanTime(comment.created_at)}
+                    ${isCommentAuthor
+                            ? `
+                      <div class="comment-actions">
+                        <button onclick="editComment(${comment.id})" class="edit-btn">수정</button>
+                        <button onclick="deleteComment(${comment.id})" class="delete-btn">삭제</button>
+                      </div>
+                    `
+                            : ''
+                        }
+                </div>
+            `;
                     commentList.appendChild(commentElement);
                 }
             } catch (error) {
@@ -695,89 +831,45 @@
             }
         }
 
-        async function deletePost(event, postId) {
-            event.stopPropagation(); // 게시글 상세보기 이벤트 막기
-
-            if (!confirm("정말 삭제하시겠습니까?")) return;
+        async function deletePost(postId) {
+            if (!confirm('게시글을 삭제하시겠습니까?')) return;
 
             try {
                 const response = await fetch(`http://localhost:3000/post/${postId}`, {
                     method: 'DELETE',
-                    headers: {
-                        Authorization: `${localStorage.getItem('accessToken')}`,
-                    },
+                    headers: { Authorization: localStorage.getItem('accessToken') },
                 });
 
                 if (response.ok) {
-                    alert("게시글이 삭제되었습니다.");
-                    loadPosts(); // 삭제 후 게시글 목록 다시 불러오기
-                } else {
-                    alert("게시글 삭제에 실패했습니다.");
+                    alert('게시글이 삭제되었습니다.');
+                    loadPosts();
+                    closeModal();
                 }
             } catch (error) {
                 console.error('게시글 삭제 실패:', error);
-                alert("게시글 삭제에 실패했습니다.");
-            }
-        }
-
-        async function loadComments(postId) {
-            try {
-                const response = await fetch(`http://localhost:3000/comment/${postId}`, {
-                    headers: { Authorization: `${localStorage.getItem('accessToken')}` },
-                });
-
-                const comments = await response.json();
-                const loggedInUserId = localStorage.getItem('user_id'); // 🔹 로그인한 유저 ID 가져오기
-
-                const commentList = document.getElementById('commentList');
-                commentList.innerHTML = '';
-
-                for (const comment of comments) {
-                    const userResponse = await fetch(`http://localhost:3000/users/${comment.user_id}`, {
-                        headers: { Authorization: `${localStorage.getItem('accessToken')}` },
-                    });
-                    const user = await userResponse.json();
-
-                    const commentElement = document.createElement('div');
-                    commentElement.className = 'comment-item';
-                    commentElement.innerHTML = `
-                <div>${comment.content}</div>
-                <div class="post-info">
-                    ${user.nickname} | ${formatKoreanTime(comment.created_at)}
-                </div>
-                ${loggedInUserId == comment.user_id ? `<button class="delete-btn" onclick="deleteComment(${comment.id})">삭제</button>` : ''}
-            `;
-                    commentList.appendChild(commentElement);
-                }
-            } catch (error) {
-                console.error('댓글 로딩 실패:', error);
             }
         }
 
         async function deleteComment(commentId) {
-            if (!confirm("댓글을 삭제하시겠습니까?")) return;
+            if (!confirm('댓글을 삭제하시겠습니까?')) return;
 
             try {
-                const response = await fetch(`http://localhost:3000/comment/${commentId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        Authorization: `${localStorage.getItem('accessToken')}`,
+                const response = await fetch(
+                    `http://localhost:3000/comment/${currentPostId}/comments/${commentId}`,
+                    {
+                        method: 'DELETE',
+                        headers: { Authorization: localStorage.getItem('accessToken') },
                     },
-                });
+                );
 
                 if (response.ok) {
-                    alert("댓글이 삭제되었습니다.");
-                    loadComments(currentPostId); // 삭제 후 댓글 목록 다시 불러오기
-                } else {
-                    alert("댓글 삭제에 실패했습니다.");
+                    alert('댓글이 삭제되었습니다.');
+                    loadComments(currentPostId);
                 }
             } catch (error) {
                 console.error('댓글 삭제 실패:', error);
-                alert("댓글 삭제에 실패했습니다.");
             }
         }
-
-
 
         async function logout() {
             localStorage.removeItem('accessToken');
@@ -792,59 +884,142 @@
         }
 
         function openSidebar() {
-            document.getElementById('sidebar').style.width = "250px";
+            document.getElementById('sidebar').style.width = '250px';
         }
 
         function closeSidebar() {
-            document.getElementById('sidebar').style.width = "0";
+            document.getElementById('sidebar').style.width = '0';
         }
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const accessToken = localStorage.getItem("accessToken");
-
-            if (accessToken) {
-                document.getElementById('loggedInMenu').style.display = 'block';
-                document.getElementById('loggedOutMenu').style.display = 'none';
-            } else {
-                document.getElementById('loggedInMenu').style.display = 'none';
-                document.getElementById('loggedOutMenu').style.display = 'block';
-            }
-        });
 
         async function logout() {
             try {
-                const accessToken = localStorage.getItem("accessToken");
+                const accessToken = localStorage.getItem('accessToken');
                 if (!accessToken) {
-                    console.warn("🚨 로그아웃 시도: 이미 로그아웃된 상태");
-                    window.location.href = "/public/log-in.html";
+                    console.warn('🚨 로그아웃 시도: 이미 로그아웃된 상태');
+                    window.location.href = '/public/log-in.html';
                     return;
                 }
 
                 // 🔹 서버에 로그아웃 요청 보내기
-                const response = await fetch("http://localhost:3000/user/auth/logout", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": accessToken
+                const response = await fetch(
+                    'http://localhost:3000/user/auth/logout',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: accessToken,
+                        },
+                        credentials: 'include', // 쿠키도 함께 보내기
                     },
-                    credentials: "include" // 쿠키도 함께 보내기
-                });
+                );
 
                 if (!response.ok) {
-                    throw new Error("서버에서 로그아웃 처리 실패");
+                    throw new Error('서버에서 로그아웃 처리 실패');
                 }
 
                 // ✅ 로그아웃 성공 후, 토큰 삭제
-                localStorage.removeItem("accessToken");
+                localStorage.removeItem('accessToken');
 
-                console.log("✅ 로그아웃 성공! 페이지 이동");
-                window.location.href = "/"; //
+                console.log('✅ 로그아웃 성공! 페이지 이동');
+                window.location.href = '/'; //
             } catch (error) {
-                console.error("❌ 로그아웃 실패:", error);
-                alert("로그아웃 중 오류가 발생했습니다.");
+                console.error('❌ 로그아웃 실패:', error);
+                alert('로그아웃 중 오류가 발생했습니다.');
             }
         }
 
+        async function showEditModal(postId) {
+            try {
+                const response = await fetch(`http://localhost:3000/post/${postId}`, {
+                    headers: { Authorization: localStorage.getItem('accessToken') },
+                });
+                const post = await response.json();
+
+                document.getElementById('editTitle').value = post.title;
+                document.getElementById('editContent').value = post.content;
+                editingPostId = postId;
+                document.getElementById('editModal').style.display = 'block';
+            } catch (error) {
+                console.error('게시글 수정 모달 열기 실패:', error);
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            editingPostId = null;
+        }
+
+        async function submitEdit() {
+            const title = document.getElementById('editTitle').value;
+            const content = document.getElementById('editContent').value;
+            const files = document.getElementById('editFiles').files;
+
+            if (!title.trim() || !content.trim()) {
+                alert('제목과 내용을 모두 입력해주세요.');
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('title', title);
+                formData.append('content', content);
+
+                if (files && files.length > 0) {
+                    for (let i = 0; i < files.length; i++) {
+                        formData.append('files', files[i]);
+                    }
+                }
+
+                const response = await fetch(
+                    `http://localhost:3000/post/${editingPostId}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            Authorization: localStorage.getItem('accessToken'),
+                        },
+                        body: formData,
+                    },
+                );
+
+                if (response.ok) {
+                    closeEditModal();
+                    loadPosts();
+                    closeModal();
+                } else {
+                    alert('게시글 수정에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('게시글 수정 실패:', error);
+                alert('게시글 수정에 실패했습니다.');
+            }
+        }
+
+        async function editComment(commentId) {
+            const newContent = prompt('수정할 내용을 입력하세요:');
+            if (!newContent) return;
+
+            try {
+                const response = await fetch(
+                    `http://localhost:3000/comment/${currentPostId}/comments/${commentId}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: localStorage.getItem('accessToken'),
+                        },
+                        body: JSON.stringify({ content: newContent }),
+                    },
+                );
+
+                if (response.ok) {
+                    loadComments(currentPostId);
+                } else {
+                    alert('댓글 수정에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('댓글 수정 실패:', error);
+            }
+        }
     </script>
 </body>
 
