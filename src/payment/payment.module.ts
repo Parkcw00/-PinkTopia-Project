@@ -6,6 +6,7 @@ import { Payment } from './entities/payment.entity';
 import { UserModule } from '../user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { ValkeyModule } from '../valkey/valkey.module';
+import { PaymentRepository } from './payment.repository';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { ValkeyModule } from '../valkey/valkey.module';
     ValkeyModule,
   ],
   controllers: [PaymentController],
-  providers: [PaymentService],
-  exports: [PaymentService],
+  providers: [PaymentService, PaymentRepository],
+  exports: [PaymentService, PaymentRepository],
 })
 export class PaymentModule {} 
