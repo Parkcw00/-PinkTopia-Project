@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>고객센터 | PinkTopia</title>
+    <title>고객 센터 | PinkTopia</title>
     <link rel="stylesheet" href="/public/styles.css" />
     <style>
         /* 전체 레이아웃 스타일 */
@@ -320,13 +320,13 @@
             <a href="/public/store-item.html">아이템샵</a>
             <a href="/public/board.html">게시글 (커뮤니티)</a>
             <a href="/public/ranking.html">랭킹</a>
-            <a href="/public/customer-service.html">문의센터</a>
             <div id="loggedInMenu" style="display: none">
                 <a href="/public/chattingrooms.html">채팅</a>
                 <a href="/public/collection.html">핑크몽 개인 도감</a>
                 <a href="/public/inventory.html">인벤토리 아이템</a>
                 <a href="/public/achievements.html">업적</a>
                 <a href="/public/mypage.html">마이페이지</a>
+                <a href="/public/customer-service.html">고객 센터</a>
                 <a href="#" onclick="logout()">로그아웃</a>
             </div>
             <div id="loggedOutMenu">
@@ -336,7 +336,7 @@
         </div>
     </div>
     <div class="container">
-        <h1>고객센터</h1>
+        <h1>고객 센터</h1>
 
         <!-- 문의하기 폼 -->
         <div class="inquiry-form">
@@ -507,7 +507,7 @@
                 const accessToken = localStorage.getItem('accessToken');
                 if (!accessToken) {
                     console.warn('🚨 로그아웃 시도: 이미 로그아웃된 상태');
-                    window.location.href = '/public/log-in.html';
+                    window.location.href = '/public/home.html';
                     return;
                 }
 
@@ -526,7 +526,7 @@
                 }
                 localStorage.removeItem('accessToken');
                 console.log('✅ 로그아웃 성공! 페이지 이동');
-                window.location.href = '/';
+                window.location.href = '/public/home.html';
             } catch (error) {
                 console.error('❌ 로그아웃 실패:', error);
                 alert('로그아웃 중 오류가 발생했습니다.');
