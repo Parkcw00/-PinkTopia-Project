@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/public/styles.css">
     <style>
         body {
-            background-color: #f5f5f5;
+            background-color: #fdf1f1;
             font-family: 'Arial', sans-serif;
         }
 
@@ -263,6 +263,29 @@
             margin: 0 10px;
             font-weight: bold;
         }
+
+        .filter-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filter-buttons .tab {
+            padding: 10px 20px;
+            background-color: #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            border: none;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .filter-buttons .tab.active {
+            background-color: #ff69b4;
+            color: white;
+        }
     </style>
 </head>
 
@@ -294,7 +317,6 @@
             <a href="/public/store-item.html">아이템샵</a>
             <a href="/public/board.html">게시글 (커뮤니티)</a>
             <a href="/public/ranking.html">랭킹</a>
-            <a href="/public/customer-service.html">문의센터</a>
             <!-- 로그인 시 표시될 메뉴들 -->
             <div id="loggedInMenu" style="display: none;">
                 <a href="/public/chattingrooms.html">채팅</a>
@@ -302,6 +324,7 @@
                 <a href="/public/inventory.html">인벤토리 아이템</a>
                 <a href="/public/achievements.html">업적</a>
                 <a href="/public/mypage.html">마이페이지</a>
+                <a href="/public/customer-service.html">고객 센터</a>
                 <a href="#" onclick="logout()">로그아웃</a>
             </div>
             <!-- 로그인 안 된 경우 표시될 메뉴들 -->
@@ -315,6 +338,15 @@
     <div class="collection-header">
         <h1>핑크몽 도감</h1>
     </div>
+
+    <div class="filter-buttons">
+        <button class="tab active" onclick="filterCollection('all')">전체조회</button>
+        <button class="tab" onclick="filterCollection('owned')">발견</button>
+        <button class="tab" onclick="filterCollection('unowned')">미발견</button>
+    </div>
+
+
+
     <div class="collection-grid" id="collectionGrid"></div>
     <div class="pagination" style="text-align: center; margin: 20px 0;">
         <button id="prev-btn" onclick="changePage(-1)" disabled>이전</button>
@@ -327,6 +359,7 @@
         const itemsPerPage = 20;
         let allPinkmongs = [];
         let userCollections = new Set();
+        let filteredPinkmongs = [];
 
         function openSidebar() {
             document.getElementById('sidebar').style.width = "250px";
@@ -364,6 +397,24 @@
             return true;
         }
 
+        function filterCollection(type) {
+            if (type === 'all') {
+                filteredPinkmongs = [...allPinkmongs]; // 전체 핑크몽
+            } else if (type === 'owned') {
+                filteredPinkmongs = allPinkmongs.filter(pinkmong => userCollections.has(String(pinkmong.id))); // 보유한 핑크몽
+            } else if (type === 'unowned') {
+                filteredPinkmongs = allPinkmongs.filter(pinkmong => !userCollections.has(String(pinkmong.id))); // 미보유 핑크몽
+            }
+
+            // 🔹 버튼 스타일 업데이트
+            document.querySelectorAll('.filter-buttons .tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`.filter-buttons .tab[onclick="filterCollection('${type}')"]`).classList.add('active');
+
+            currentPage = 1;
+            displayPinkmongs();
+            updatePaginationButtons();
+        }
+
         async function loadCollection() {
             if (!checkLogin()) return;
 
@@ -381,6 +432,7 @@
 
                 const pinkmongResult = await pinkmongResponse.json();
                 console.log('Collection API 응답:', pinkmongResult);
+                allPinkmongs = pinkmongResult.pinkmongs;
 
                 // 등급 우선순위 설정
                 const gradeOrder = {
@@ -419,6 +471,9 @@
                 userCollections = new Set(collectionResult.map(col => col.id));
                 console.log('유저가 보유한 핑크몽 ID:', Array.from(userCollections));
 
+                // ✅ 기본값으로 전체 목록을 설정
+                filteredPinkmongs = [...allPinkmongs];
+
                 displayPinkmongs();
                 updatePaginationButtons();
             } catch (error) {
@@ -430,39 +485,56 @@
             const grid = document.getElementById('collectionGrid');
             grid.innerHTML = '';
 
+            if (filteredPinkmongs.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; font-size: 1.2em; color: #666;">발견된 핑크몽이 없습니다!</p>';
+                updatePaginationButtons(true); // 페이지네이션 비활성화
+                return;
+            }
+
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
-            const currentPinkmongs = allPinkmongs.slice(startIndex, endIndex);
+            const currentPinkmongs = filteredPinkmongs.slice(startIndex, endIndex); // ✅ `filteredPinkmongs` 사용
 
             currentPinkmongs.forEach(pinkmong => {
-                const isCollected = userCollections.has(pinkmong.id);
+                const isCollected = userCollections.has(String(pinkmong.id));
                 const card = document.createElement('div');
                 card.className = `pinkmong-card ${!isCollected ? 'not-collected' : ''} grade-${pinkmong.grade?.toLowerCase() || 'unknown'}`;
 
                 card.innerHTML = `
-                    <img class="pinkmong-image ${!isCollected ? 'uncollected' : ''}" 
-                         src="${pinkmong.pinkmong_image}" 
-                         alt="${isCollected ? pinkmong.name : '???'}">
-                    <div class="pinkmong-info">
-                        <div class="pinkmong-name">${isCollected ? pinkmong.name : '???'}</div>
-                        <div class="pinkmong-grade">등급: ${isCollected ? pinkmong.grade : '???'}</div>
-                        <div class="pinkmong-region">지역: ${isCollected ? pinkmong.region_theme : '???'}</div>
-                        <div class="pinkmong-description">${isCollected ? pinkmong.explain : '아직 발견하지 못한 핑크몽입니다.'}</div>
-                    </div>
-                `;
+            <img class="pinkmong-image ${!isCollected ? 'uncollected' : ''}" 
+                src="${pinkmong.pinkmong_image}" 
+                alt="${isCollected ? pinkmong.name : '???'}">
+            <div class="pinkmong-info">
+                <div class="pinkmong-name">${isCollected ? pinkmong.name : '???'}</div>
+                <div class="pinkmong-grade">등급: ${isCollected ? pinkmong.grade : '???'}</div>
+                <div class="pinkmong-region">지역: ${isCollected ? pinkmong.region_theme : '???'}</div>
+                <div class="pinkmong-description">${isCollected ? pinkmong.explain : '아직 발견하지 못한 핑크몽입니다.'}</div>
+            </div>
+        `;
 
                 grid.appendChild(card);
             });
 
-            document.getElementById('page-info').textContent = currentPage;
+            // document.getElementById('page-info').textContent = currentPage;
+            updatePaginationButtons();
         }
 
-        function updatePaginationButtons() {
+        function updatePaginationButtons(disableAll = false) {
             const prevBtn = document.getElementById('prev-btn');
             const nextBtn = document.getElementById('next-btn');
+            const pageInfo = document.getElementById('page-info');
 
+            if (disableAll || filteredPinkmongs.length === 0) {
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+                pageInfo.textContent = `1 / 1`;
+                return;
+            }
+
+            const maxPage = Math.ceil(filteredPinkmongs.length / itemsPerPage);
             prevBtn.disabled = currentPage === 1;
-            nextBtn.disabled = currentPage >= Math.ceil(allPinkmongs.length / itemsPerPage);
+            nextBtn.disabled = currentPage >= maxPage;
+            pageInfo.textContent = `${currentPage} / ${maxPage}`;
         }
 
         function changePage(delta) {
@@ -471,7 +543,9 @@
             updatePaginationButtons();
         }
 
-        window.onload = loadCollection;
+        window.onload = () => {
+            loadCollection();
+        };
 
 
         async function logout() {

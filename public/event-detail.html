@@ -232,6 +232,7 @@
         <div id="eventTitle" class="event-title"></div>
         <div id="eventStatus" class="event-status"></div>
         <div id="eventDescription" class="event-description"></div>
+        <div id="eventDates" class="event-dates"></div>
         <button class="back-button" onclick="goBack()">목록으로 돌아가기</button>
     </div>
 
@@ -262,13 +263,15 @@
                 document.getElementById('eventStatus').textContent = (event.status === 'active') ? '진행 중' : '종료됨';
                 document.getElementById('eventStatus').className = `event-status ${event.status === 'active' ? 'status-active' : 'status-closed'}`;
                 document.getElementById('eventDescription').textContent = event.content;
-
                 if (event.image) {
                     document.getElementById('eventImage').src = event.image;
                 } else {
                     document.getElementById('eventImage').style.display = 'none';
                 }
 
+                const startDate = new Date(event.created_at).toISOString().split('T')[0];
+                const endDate = event.expiration_at ? new Date(event.expiration_at).toISOString().split('T')[0] : "종료일 없음";
+                document.getElementById('eventDates').innerHTML = `<p><strong>시작일:</strong> ${startDate}</p><p><strong>종료일:</strong> ${endDate}</p>`;
             } catch (error) {
                 console.error('이벤트 상세 정보 불러오기 실패:', error);
                 document.querySelector('.container').innerHTML = `<p>이벤트 정보를 불러오는 중 오류가 발생했습니다: ${error.message}</p>`;

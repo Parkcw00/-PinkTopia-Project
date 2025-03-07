@@ -9,7 +9,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #ffe4f7;
             text-align: center;
             margin: 0;
             padding: 0;
@@ -84,12 +84,6 @@
 
         .status-closed {
             color: red;
-        }
-
-        .event-description {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #555;
         }
 
         /* 🔥 자세히 보기 버튼 스타일 추가 */
@@ -278,7 +272,6 @@
             <a href="/public/store-item.html">아이템샵</a>
             <a href="/public/board.html">게시글 (커뮤니티)</a>
             <a href="/public/ranking.html">랭킹</a>
-            <a href="/public/customer-service.html">문의센터</a>
             <!-- 로그인 시 표시될 메뉴들 -->
             <div id="loggedInMenu" style="display: none;">
                 <a href="/public/chattingrooms.html">채팅</a>
@@ -286,6 +279,7 @@
                 <a href="/public/inventory.html">인벤토리 아이템</a>
                 <a href="/public/achievements.html">업적</a>
                 <a href="/public/mypage.html">마이페이지</a>
+                <a href="/public/customer-service.html">고객 센터</a>
                 <a href="#" onclick="logout()">로그아웃</a>
             </div>
             <!-- 로그인 안 된 경우 표시될 메뉴들 -->
@@ -376,7 +370,6 @@
             <div class="event-status ${event.status === 'active' ? 'status-active' : 'status-closed'}">
                 ${event.status === 'active' ? '진행 중' : '종료됨'}
             </div>
-            <div class="event-description">${event.content}</div>
             <div class="event-dates">
                 <p><strong>시작일:</strong> ${createdAt}</p>
                 <p><strong>종료일:</strong> ${expirationAt}</p>
