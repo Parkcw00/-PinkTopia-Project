@@ -9,7 +9,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #ffe4f7;
             text-align: center;
             margin: 0;
             padding: 0;
@@ -84,12 +84,6 @@
 
         .status-closed {
             color: red;
-        }
-
-        .event-description {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #555;
         }
 
         /* 🔥 자세히 보기 버튼 스타일 추가 */
@@ -376,7 +370,6 @@
             <div class="event-status ${event.status === 'active' ? 'status-active' : 'status-closed'}">
                 ${event.status === 'active' ? '진행 중' : '종료됨'}
             </div>
-            <div class="event-description">${event.content}</div>
             <div class="event-dates">
                 <p><strong>시작일:</strong> ${createdAt}</p>
                 <p><strong>종료일:</strong> ${expirationAt}</p>
