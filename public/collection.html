@@ -460,9 +460,12 @@
         function updatePaginationButtons() {
             const prevBtn = document.getElementById('prev-btn');
             const nextBtn = document.getElementById('next-btn');
+            const pageInfo = document.getElementById('page-info');
 
+            const maxPage = Math.ceil(allPinkmongs.length / itemsPerPage);
             prevBtn.disabled = currentPage === 1;
-            nextBtn.disabled = currentPage >= Math.ceil(allPinkmongs.length / itemsPerPage);
+            nextBtn.disabled = currentPage >= maxPage;
+            pageInfo.textContent = `${currentPage} / ${maxPage}`;
         }
 
         function changePage(delta) {
