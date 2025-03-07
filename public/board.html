@@ -320,7 +320,6 @@
             <a href="/public/store-item.html">아이템샵</a>
             <a href="/public/board.html">게시글 (커뮤니티)</a>
             <a href="/public/ranking.html">랭킹</a>
-            <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
             <a href="/public/customer-service.html">문의센터</a>
             <!-- 로그인 시 표시될 메뉴들 -->
             <div id="loggedInMenu" style="display: none;">
@@ -428,10 +427,11 @@
         });
 
         let currentPage = 1;
-        const itemsPerPage = 10; // 한 페이지당 게시글 수
-        let totalPosts = 1;
+        const itemsPerPage = 10;
         let allPosts = []; // 전체 게시글 저장
+        let totalPages = 1;
 
+        // ✅ 게시글 불러오기
         async function loadPosts() {
             try {
                 const response = await fetch('http://localhost:3000/post', {
@@ -439,23 +439,82 @@
                 });
 
                 allPosts = await response.json();
-                // 🔹 게시글을 최신순(내림차순)으로 정렬 (created_at 기준)
-                allPosts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                totalPages = Math.ceil(allPosts.length / itemsPerPage); // 총 페이지 수 계산
 
+                // ✅ 최신순 정렬 (내림차순)
+                allPosts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+                // ✅ 총 페이지 수 재계산
+                totalPages = Math.max(1, Math.ceil(allPosts.length / itemsPerPage));
+
+                // ✅ 페이지를 첫 페이지로 초기화
+                currentPage = 1;
+
+                // ✅ 게시글 정렬이 확실히 완료된 후 페이지네이션 적용
                 displayPosts();
             } catch (error) {
                 console.error('게시글 로딩 실패:', error);
             }
         }
 
+        // ✅ 게시글 리스트 표시
+        async function displayPosts() {
+            const postList = document.getElementById('postList');
+            postList.innerHTML = '';
+
+            // ✅ 현재 페이지에서 보여줄 게시글 가져오기
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedPosts = allPosts.slice(start, end); // 최신순 정렬된 상태에서 슬라이스 적용
+
+            // ✅ 모든 fetch 요청을 병렬로 실행 후 결과를 한 번에 처리
+            const userRequests = paginatedPosts.map(post =>
+                fetch(`http://localhost:3000/users/${post.user_id}`, {
+                    headers: { Authorization: `${localStorage.getItem('accessToken')}` },
+                }).then(response => response.json())
+            );
+
+            try {
+                const users = await Promise.all(userRequests);
+
+                paginatedPosts.forEach((post, index) => {
+                    const user = users[index];
+
+                    const postElement = document.createElement('div');
+                    postElement.className = 'post-item';
+                    postElement.onclick = () => showPostDetail(post.id);
+                    postElement.innerHTML = `
+                <div class="post-title">${post.title}</div>
+                <div class="post-info">
+                    작성자: ${user.nickname} |
+                    작성일: ${formatKoreanTime(post.created_at)}
+                </div>
+            `;
+                    postList.appendChild(postElement);
+                });
+
+                // ✅ 페이지네이션 버튼 상태 업데이트
+                document.getElementById("page-info").textContent = `${currentPage} / ${totalPages}`;
+                document.getElementById("prev-btn").disabled = currentPage === 1;
+                document.getElementById("next-btn").disabled = currentPage >= totalPages;
+            } catch (error) {
+                console.error("게시글 작성자 정보 불러오기 실패:", error);
+            }
+        }
+
+        // ✅ 페이지 이동
+        function changePage(offset) {
+            if ((currentPage + offset) > 0 && (currentPage + offset) <= totalPages) {
+                currentPage += offset;
+                displayPosts();
+            }
+        }
+
+        // ✅ 시간 형식 변환 (한국 시간)
         function formatKoreanTime(dateString) {
             if (!dateString) return "날짜 없음";
 
             const date = new Date(dateString);
-
-            // UTC 기준 시간에서 9시간 추가하여 KST로 변환
-            date.setHours(date.getHours() + 9);
+            date.setHours(date.getHours() + 9); // UTC -> KST 변환
 
             return date.toLocaleString("ko-KR", {
                 year: "numeric",
@@ -468,50 +527,6 @@
             });
         }
 
-
-        function displayPosts() {
-            const postList = document.getElementById('postList');
-            postList.innerHTML = '';
-
-            const loggedInUserId = localStorage.getItem('user_id'); // 🔹 로그인한 유저 ID 가져오기
-
-            // 현재 페이지에서 보여줄 게시글 가져오기
-            const start = (currentPage - 1) * itemsPerPage;
-            const end = start + itemsPerPage;
-            const paginatedPosts = allPosts.slice(start, end);
-
-            paginatedPosts.forEach(async (post) => {
-                const userResponse = await fetch(`http://localhost:3000/users/${post.user_id}`, {
-                    headers: { Authorization: `${localStorage.getItem('accessToken')}` },
-                });
-                const user = await userResponse.json();
-
-                const postElement = document.createElement('div');
-                postElement.className = 'post-item';
-                postElement.onclick = () => showPostDetail(post.id);
-                postElement.innerHTML = `
-            <div class="post-title">${post.title}</div>
-            <div class="post-info">
-                작성자: ${user.nickname} |
-                작성일:  ${formatKoreanTime(post.created_at)}
-            </div>
-             ${loggedInUserId == post.user_id ? `<button class="delete-btn" onclick="deletePost(event, ${post.id})">삭제</button>` : ''}
-        `;
-                postList.appendChild(postElement);
-            });
-
-            // 페이지네이션 정보 업데이트
-            document.getElementById("page-info").textContent = `${currentPage} / ${totalPages}`;
-            document.getElementById("prev-btn").disabled = currentPage === 1;
-            document.getElementById("next-btn").disabled = currentPage >= totalPages;
-        }
-
-        function changePage(offset) {
-            if ((currentPage + offset) > 0 && (currentPage + offset) <= totalPages) {
-                currentPage += offset;
-                displayPosts();
-            }
-        }
 
         async function showPostDetail(postId) {
             try {
