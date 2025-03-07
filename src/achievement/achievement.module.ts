@@ -6,12 +6,13 @@ import { SubAchievement } from '../sub-achievement/entities/sub-achievement.enti
 import { AchievementService } from './achievement.service';
 import { AchievementController } from './achievement.controller';
 import { AchievementC } from '../achievement-c/entities/achievement-c.entity';
+import { AchievementP } from '../achievement-p/entities/achievement-p.entity';
 import { AchievementRepository } from './achievement.repository';
 import { User } from '../user/entities/user.entity';
 import { ValkeyModule } from '../valkey/valkey.module';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Achievement, SubAchievement, AchievementC, User]),
+    TypeOrmModule.forFeature([Achievement, SubAchievement, AchievementC, AchievementP, User]),
     ValkeyModule,
   ], // ✅ TypeOrmModule에 엔터티 추가
   controllers: [AchievementController],
