@@ -546,10 +546,10 @@
                   }
 
                   const idByEmail = await response.json(); // JSON 응답을 파싱합니다.
-                  console.log('가져온 id : ', idByEmail);
+                  console.log('가져온 id : ', idByEmail.id);
 
                   // 있는 경우 삭제 
-                  if (idByEmail) {
+                  if (idByEmail.id) {
                     console.log('중복된 타이틀 있음');
                     const deleteResponse = await fetch(`/pinkmong-appear-location?id=${encodeURIComponent(idByEmail.id)}`, {
                       method: 'DELETE',
@@ -562,7 +562,7 @@
                       throw new Error('북마커 삭제 실패');
                     }
 
-                    console.log('북마커 id : ', idByEmail.id, ' 삭제');
+                    console.log('삭제할 북마커 id : ', idByEmail.id, ' 삭제');
                   } else {
                     console.log('기존의 북마커 없음');
                   }
