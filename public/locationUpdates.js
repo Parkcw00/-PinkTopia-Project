@@ -103,8 +103,8 @@ async function sendLocation() {
     navigator.geolocation.getCurrentPosition((position) => {
       const data = {
         userId: decodedToken.id,
-        latitude: position.coords.latitude,
         longitude: position.coords.longitude,
+        latitude: position.coords.latitude,
         timestamp: new Date().toISOString(),
       };
       socket.emit('updateLocation', data);
@@ -118,8 +118,8 @@ function sendLocation10() {
     navigator.geolocation.getCurrentPosition((position) => {
       const data = {
         userId: decodedToken.id,
-        latitude: position.coords.latitude,
         longitude: position.coords.longitude,
+        latitude: position.coords.latitude,
         timestamp: new Date().toISOString(),
       };
       socket.emit('updateLocationDB', data);
@@ -195,8 +195,8 @@ function requestLocationHistory() {
     navigator.geolocation.getCurrentPosition((position) => {
       const data = {
         userId: decodedToken.id,
-        latitude: position.coords.latitude,
         longitude: position.coords.longitude,
+        latitude: position.coords.latitude,
         timestamp: new Date().toISOString(),
       };
       // 위치 정보를 포함하여 POST 요청 보내기
@@ -209,8 +209,8 @@ function requestLocationHistory() {
         },
         body: JSON.stringify({
           user_direction: {
-            latitude: data.latitude,
             longitude: data.longitude,
+            latitude: data.latitude,
           },
         }),
       })
