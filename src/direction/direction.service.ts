@@ -58,16 +58,16 @@ export class DirectionService {
 
   async compareBookmark(
     user_id: number,
-    latitude: number,
     longitude: number,
+    latitude: number,
     client: Socket,
   ) {
     // 🏆 서브업적
     try {
       console.log('🔍 keyssS 확인:1');
       const nearBybookmarksS = await this.geoService.getNearbyBookmarksS(
-        latitude,
         longitude,
+        latitude,
       );
       console.log('🔍 keyssS 확인 nearBybookmarksS: ', nearBybookmarksS);
       if (!nearBybookmarksS || nearBybookmarksS.length === 0) {

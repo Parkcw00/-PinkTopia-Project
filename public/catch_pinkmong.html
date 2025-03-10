@@ -492,17 +492,14 @@
           }
 
           // 🔹 서버에 로그아웃 요청 보내기
-          const response = await fetch(
-            'http://localhost:3000/user/auth/logout',
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: accessToken,
-              },
-              credentials: 'include', // 쿠키도 함께 보내기
+          const response = await fetch('/user/auth/logout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: accessToken,
             },
-          );
+            credentials: 'include', // 쿠키도 함께 보내기
+          });
 
           if (!response.ok) {
             throw new Error('서버에서 로그아웃 처리 실패');
