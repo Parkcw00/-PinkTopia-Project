@@ -47,8 +47,8 @@ export class LocationHistoryService {
             const parsedItem =
               typeof item === 'string' ? JSON.parse(item) : item;
             return {
-              latitude: parsedItem.latitude, // ✅ userId를 제외
               longitude: parsedItem.longitude,
+              latitude: parsedItem.latitude, // ✅ userId를 제외
               timestamp:
                 parsedItem.timestamp &&
                 !isNaN(new Date(parsedItem.timestamp).getTime())
@@ -65,21 +65,21 @@ export class LocationHistoryService {
     if (records.length === 0) {
       // ✅ 최초 저장 시 값이 제대로 들어가도록 보장
       records.push({
-        latitude: updateDto.latitude ?? null,
         longitude: updateDto.longitude ?? null,
+        latitude: updateDto.latitude ?? null,
         timestamp: updateDto.timestamp ?? new Date(),
       });
     } else if (records.length < 7) {
       records.push({
-        latitude: updateDto.latitude,
         longitude: updateDto.longitude,
+        latitude: updateDto.latitude,
         timestamp: updateDto.timestamp ?? new Date(),
       });
     } else {
       records.shift();
       records.push({
-        latitude: updateDto.latitude,
         longitude: updateDto.longitude,
+        latitude: updateDto.latitude,
         timestamp: updateDto.timestamp ?? new Date(),
       });
     }
@@ -147,15 +147,15 @@ export class LocationHistoryService {
     let oldestHistory = await this.repository.findOldestByUserId(user_id);
     for (const updateDto of records) {
       if (oldestHistory) {
-        oldestHistory.latitude = updateDto.latitude;
         oldestHistory.longitude = updateDto.longitude;
+        oldestHistory.latitude = updateDto.latitude;
         oldestHistory.timestamp = updateDto.timestamp ?? new Date();
         await this.repository.save(oldestHistory);
       } else {
         oldestHistory = await this.repository.create7(
           user_id,
-          updateDto.latitude,
           updateDto.longitude,
+          updateDto.latitude,
           updateDto.timestamp ?? new Date(),
         );
       }

@@ -34,7 +34,7 @@ export class DirectionController {
     @Request() req,
     @Body()
     compareDirection: {
-      user_direction: { latitude: number; longitude: number };
+      user_direction: { latitude: number, longitude: number };
     },
     @ConnectedSocket() client: Socket,
   ) {

@@ -30,8 +30,8 @@ export class PinkmongAppearLocationService {
       const locationData = {
         id: location.id,
         title: location.title,
-        latitude: location.latitude,
         longitude: location.longitude,
+        latitude: location.latitude,
         region_theme: location.region_theme as RegionTheme,
         created_at: location.created_at?.toISOString() || '',
         updated_at: location.updated_at?.toISOString() || '',
