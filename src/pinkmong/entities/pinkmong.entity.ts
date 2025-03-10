@@ -10,16 +10,10 @@ import {
   DeleteDateColumn,
 } from 'typeorm';
 
-/**
- * Pinkmong 엔티티 정의
- *
- * 핑크몽의 기본 정보, 이미지, 위치 정보, 설명, 지역 테마, 등급, 포인트 등을 포함하는 데이터 모델입니다.
- */
 @Entity({
   name: 'pinkmong',
 })
 export class Pinkmong {
-  /** 기본 키 (자동 증가) */
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -58,7 +52,6 @@ export class Pinkmong {
   @UpdateDateColumn()
   updated_at: Date;
 
-  /** 삭제된 날짜 (소프트 삭제 처리) */
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deleted_at?: Date;
 
