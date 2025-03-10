@@ -66,8 +66,8 @@ export class DirectionService {
     try {
       console.log('🔍 keyssS 확인:1');
       const nearBybookmarksS = await this.geoService.getNearbyBookmarksS(
-        latitude,
         longitude,
+        latitude,
       );
       console.log('🔍 keyssS 확인 nearBybookmarksS: ', nearBybookmarksS);
       if (!nearBybookmarksS || nearBybookmarksS.length === 0) {
