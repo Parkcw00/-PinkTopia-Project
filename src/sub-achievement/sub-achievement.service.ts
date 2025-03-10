@@ -2,23 +2,16 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { CreateSubAchievementDto } from './dto/create-sub-achievement.dto';
 import { UpdateSubAchievementDto } from './dto/update-sub-achievement.dto';
-import { format, parseISO, isValid } from 'date-fns';
+import { parseISO, isValid } from 'date-fns';
 import { SubAchievementRepository } from './sub-achievement.repository';
 import { SubAchievement } from './entities/sub-achievement.entity';
 import { SubAchievementMissionType } from './enums/sub-achievement-mission-type.enum';
-import { fixresArr, fixres } from './utils/format';
-
 import { S3Service } from '../s3/s3.service';
 import { ValkeyService } from '../valkey/valkey.service';
 import { GeoService } from '../geo/geo.service';
-import { getDistance } from 'geolib';
-import { Repository } from 'typeorm'; // TypeORM Repository
-import { InjectRepository } from '@nestjs/typeorm'; // TypeORM 의존성 주입
-import { date } from 'joi';
 
 @Injectable()
 export class SubAchievementService {
@@ -129,23 +122,6 @@ export class SubAchievementService {
     }
 
     const sub_achievement_images = await this.s3Service.uploadFiles(files);
-    /*
-    //  새로운 엔티티 생성
-    const createSub = `achievement_id: ${achievement_id}, // ✅ 관계 매핑
-      expiration_at: expirationAt ?? undefined, // ✅ null → undefined 변환
-      title:${title},content: ${content},
-      sub_achievement_images:${sub_achievement_images},
-      longitude:${longitude},
-      latitude:${latitude},
-      mission_type:${valid_mission_type}`;
-
-    //  const subAchievementV = await this.valkeyService.set(createSub);
-    // Redis 저장할 키 생성 (고유 ID 자동 생성되므로 따로 안 넣음)
-    const key = `sub_achievement:${achievement_id}:${Date.now()}`;
-
-    // Redis에 저장
-    await this.valkeyService.set(key, createSub);
-*/
     const subAchievement = await this.repository.create({
       achievement_id: achievement_id, // ✅ 관계 매핑
       expiration_at: expirationAt ?? undefined, // ✅ null → undefined 변환
@@ -161,7 +137,6 @@ export class SubAchievementService {
     const save = await this.repository.save(subAchievement);
 
     // achievement_id가 일치하는 모든 데이터를 achievement_c 테이블에서 삭제하기
-    // const delete_achievement_c  =
     await this.repository.delete_achievement_c(achievement_id);
 
     const key = `sub-achievement`; //:${save.id}`;
@@ -183,7 +158,6 @@ export class SubAchievementService {
   }
 
   async findOne(id: string) {
-    //: Promise<SubAchievement> {
     const idS = Number(id);
     if (!idS) {
       throw new BadRequestException(

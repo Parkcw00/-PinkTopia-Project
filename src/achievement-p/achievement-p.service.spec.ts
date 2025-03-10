@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AchievementPService } from './achievement-p.service';
 import { AchievementPRepository } from './achievement-p.repository';
 import { ValkeyService } from '../valkey/valkey.service';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { AchievementP } from './entities/achievement-p.entity';
 import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
 import { AchievementC } from '../achievement-c/entities/achievement-c.entity';
