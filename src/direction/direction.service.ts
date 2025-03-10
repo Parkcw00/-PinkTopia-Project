@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ValkeyService } from '../valkey/valkey.service';
 import { AchievementPService } from '../achievement-p/achievement-p.service';
-import { CompareDirection } from './dto/compare-direction.dto';
+
 import { getDistance, isPointWithinRadius } from 'geolib';
 import axios, { all } from 'axios'; // HTTP 요청을 보내기 위한 클라이언트 라이브러리
 import { DirectionGateway } from './/direction.gateway';
@@ -60,14 +60,15 @@ export class DirectionService {
     user_id: number,
     latitude: number,
     longitude: number,
+
     client: Socket,
   ) {
     // 🏆 서브업적
     try {
       console.log('🔍 keyssS 확인:1');
       const nearBybookmarksS = await this.geoService.getNearbyBookmarksS(
-        longitude,
         latitude,
+        longitude,
       );
       console.log('🔍 keyssS 확인 nearBybookmarksS: ', nearBybookmarksS);
       if (!nearBybookmarksS || nearBybookmarksS.length === 0) {
@@ -88,8 +89,8 @@ export class DirectionService {
     /*🎀 핑크몽 */
     try {
       const nearBybookmarkP = await this.geoService.getNearbyBookmarkP(
-        longitude,
         latitude,
+        longitude,
       );
 
       if (nearBybookmarkP) {
