@@ -4,7 +4,7 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CommentRepository } from './comment.repository';
 import { PostRepository } from '../post/post.repository';
 import { ValkeyService } from '../valkey/valkey.service';
-import { format, toZonedTime } from 'date-fns-tz'; // ✅ 한국 시간 변환 라이브러리 추가
+import { toZonedTime } from 'date-fns-tz'; // ✅ 한국 시간 변환 라이브러리 추가
 
 @Injectable()
 export class CommentService {
