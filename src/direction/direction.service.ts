@@ -86,47 +86,47 @@ export class DirectionService {
     }
 
     /*🎀 핑크몽 */
-    try {
-      const nearBybookmarkP = await this.geoService.getNearbyBookmarkP(
-        latitude,
-        longitude,
+    // try {
+    const nearBybookmarkP = await this.geoService.getNearbyBookmarkP(
+      longitude,
+      latitude,
+    );
+
+    if (nearBybookmarkP) {
+      console.log(
+        `이벤트 실행: 유저 ${user_id}가 북마크 [${nearBybookmarkP.title}] 주변에 진입했습니다.`,
+      );
+      // 변경됨: 팝업을 즉시 전송하고, 2분 후에 재전송하는 재귀 함수 사용
+      const sendPopupRecursively = () => {
+        this.directionGateway.sendPopup(
+          client,
+          user_id,
+          `핑크몽 [${nearBybookmarkP.title}]에 접근했습니다!`,
+        );
+        setTimeout(sendPopupRecursively, 120000); // 2분 후에 재호출
+      };
+      sendPopupRecursively();
+      try {
+        const response = await axios.post(
+          'http://localhost:3000/catch-pinkmong/catchpinkmong',
+          {
+            user_id,
+            bookmark: nearBybookmarkP,
+          },
+        );
+        console.log(`핑크몽 API 호출 성공:`, response.data);
+      } catch (error) {}
+
+      return { triggered: true, bookmark: nearBybookmarkP }; // [변경됨]: 단일 북마크 반환
+    } else {
+      console.log(
+        `유저 ${user_id}는 핑크몽 북마크 주변 5m 범위에 진입하지 않았습니다.`,
       );
 
-      if (nearBybookmarkP) {
-        console.log(
-          `이벤트 실행: 유저 ${user_id}가 북마크 [${nearBybookmarkP.title}] 주변에 진입했습니다.`,
-        );
-        // 변경됨: 팝업을 즉시 전송하고, 2분 후에 재전송하는 재귀 함수 사용
-        const sendPopupRecursively = () => {
-          this.directionGateway.sendPopup(
-            client,
-            user_id,
-            `핑크몽 [${nearBybookmarkP.title}]에 접근했습니다!`,
-          );
-          setTimeout(sendPopupRecursively, 120000); // 2분 후에 재호출
-        };
-        sendPopupRecursively();
-        try {
-          const response = await axios.post(
-            'http://localhost:3000/catch-pinkmong/catchpinkmong',
-            {
-              user_id,
-              bookmark: nearBybookmarkP,
-            },
-          );
-          console.log(`핑크몽 API 호출 성공:`, response.data);
-        } catch (error) {}
-
-        return { triggered: true, bookmark: nearBybookmarkP }; // [변경됨]: 단일 북마크 반환
-      } else {
-        console.log(
-          `유저 ${user_id}는 핑크몽 북마크 주변 5m 범위에 진입하지 않았습니다.`,
-        );
-
-        return { triggered: false };
-      }
-    } catch (error) {
-      console.error('❌ 핑크몽 처리 실패:', error);
+      return { triggered: false };
     }
+    //  } catch (error) {
+    //    console.error('❌ 핑크몽 처리 실패:', error);
+    //  }
   }
 }

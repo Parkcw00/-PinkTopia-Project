@@ -519,44 +519,58 @@
 
           // 유저 위치로 핑크몽 출현위치 추가하기
           function pinkmongAppearByUserLocation() {
-            console.log('버튼 클릭됨')
-            const data = {
-              title: decodedToken.id,
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-              region_theme: 'city',
-            };
-            console.log('유저id : ', decodedToken.id)
-            fetch('/pinkmong-appear-location', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                headers: { Authorization: accessToken },
-                body: data,
-              },
-              credentials: 'include', // 쿠키도 함께 보내기
-            })
-              .then((response) => {
-                if (!response.title) {
-                  throw new Error(`HTTP error! Status: ${response.status}`);
+            if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(async function (position) {
+                const accessToken = localStorage.getItem('accessToken');
+                if (!accessToken) {
+                  alert('로그인이 필요한 서비스입니다.');
+                  return;
                 }
-                if (response.title === decodedToken.id) {
-                  console.log('✅ 유저위치로 핑크몽 북마커추가 성공');
-                  return response.json();
-                } console.log('유저위치로 핑크몽 북마커추가 문제 발생');
-              })
-              //  .then((data) => { })  // 필요할까???
-              .catch((error) => { })
 
-            // 발키에 북마커 추가
-            fetch('/pinkmong-appear-location/fill-valkey', {
-              method: 'POST'
-            })
-              .then((response) => { console.log('발키에 북마커 추가'); }).catch(error)
 
-            // 북마커 만들기 <- 새로고침하면 좋을듯.. 물어보러가자
+                try {
+                  const response = await fetch('/pinkmong-appear-location', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `${accessToken}`
+                    },
+                    body: JSON.stringify({
+                      title: new Date(),
+                      latitude: position.coords.latitude,
+                      longitude: position.coords.longitude,
+                      region_theme: 'city'
+                    })
+                  });
+
+                  if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                  }
+
+                  const result = await response.json();
+                  console.log('✅ 핑크몽 출현 위치 추가 성공:', result);
+
+                  // 발키에 북마커 추가
+                  await fetch('/pinkmong-appear-location/fill-valkey', {
+                    method: 'POST'
+                  });
+                  console.log('발키에 북마커 추가 완료');
+
+                  // 북마커 새로고침
+                  geoBookmark();
+
+                } catch (error) {
+                  console.error('핑크몽 출현 위치 추가 실패:', error);
+                  alert('핑크몽 출현 위치 추가에 실패했습니다.');
+                }
+              }, function (error) {
+                console.error('위치 정보를 가져올 수 없습니다:', error);
+                alert('위치 정보를 가져올 수 없습니다. 위치 권한을 확인해주세요.');
+              });
+            } else {
+              alert('이 브라우저에서는 위치 정보를 지원하지 않습니다.');
+            }
           }
-
 
           /////////////////////////////////////////
           // 입력창의 주소를 검색하여 마커 이동 및 좌표 저장
