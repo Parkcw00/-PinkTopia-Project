@@ -21,9 +21,9 @@ export class ChattingRoomRepository {
 
   // 채팅방 만들기
   async createChattingRoom(createChattingRoomDto) {
-      const newChattingRoom = this.chattingRoomrepository.create({
-        ...createChattingRoomDto,
-      });
+    const newChattingRoom = this.chattingRoomrepository.create({
+      ...createChattingRoomDto,
+    });
     console.log(newChattingRoom);
     return await this.chattingRoomrepository.save(newChattingRoom);
   }
@@ -40,11 +40,13 @@ export class ChattingRoomRepository {
   // 채팅방 멤버인지 확인
   async findChatMember(chatting_room_id: number, user_id: number) {
     console.log('멤버 조회 시도:', { chatting_room_id, user_id });
-    
+
     try {
       const member = await this.chatMemberRepository
         .createQueryBuilder('chatmember')
-        .where('chatmember.chatting_room_id = :chatting_room_id', { chatting_room_id })
+        .where('chatmember.chatting_room_id = :chatting_room_id', {
+          chatting_room_id,
+        })
         .andWhere('chatmember.user_id = :user_id', { user_id })
         .leftJoinAndSelect('chatmember.user', 'user')
         .getOne();
@@ -57,6 +59,7 @@ export class ChattingRoomRepository {
     }
   }
 
+  // 유저 Id로 채팅방 멤버인지 확인
   async findChatMemberByUserId(user_id: number) {
     return await this.chatMemberRepository.find({
       where: { user_id },
@@ -67,7 +70,9 @@ export class ChattingRoomRepository {
   async findAllChatMembers(chatting_room_id: number) {
     return await this.chatMemberRepository
       .createQueryBuilder('chatmember')
-      .where('chatmember.chatting_room_id = :chatting_room_id', { chatting_room_id })
+      .where('chatmember.chatting_room_id = :chatting_room_id', {
+        chatting_room_id,
+      })
       .leftJoinAndSelect('chatmember.user', 'user')
       .getMany();
   }
@@ -134,11 +139,9 @@ export class ChattingRoomRepository {
 
   // 닉네임으로 사용자 찾기 메서드 추가
   async findByNickname(nickname: string) {
-    const user = await this.dataSource
-      .getRepository(User)
-      .findOne({
-        where: { nickname }
-      });
+    const user = await this.dataSource.getRepository(User).findOne({
+      where: { nickname },
+    });
     return user;
   }
 }

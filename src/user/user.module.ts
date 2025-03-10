@@ -10,7 +10,6 @@ import { ConfigService } from '@nestjs/config';
 import { UserGuard } from './guards/user-guard';
 import { InventoryModule } from '../inventory/inventory.module';
 import { ValkeyService } from '../valkey/valkey.service';
-import { AchievementCRepository } from 'src/achievement-c/achievement-c.repository';
 import { ValkeyModule } from '../valkey/valkey.module';
 import { S3Module } from '../s3/s3.module';
 

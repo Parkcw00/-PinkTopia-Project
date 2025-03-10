@@ -2,8 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-// import { Chatting } from 'src/chatting/entities/chatting.entity';
-import { AchievementC } from '../achievement-c/entities/achievement-c.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
@@ -11,11 +9,6 @@ export class UserRepository {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    // @InjectRepository(Chatting)
-    // private chattingRepository: Repository<Chatting>,
-    // @InjectRepository(AchievementC)
-    // private achievementCRepository: Repository<AchievementC>,
-    // 필요할 것 같은 레포지토리들
   ) {}
 
   //랭킹조회

@@ -151,7 +151,6 @@ export class UsersController {
 
   // 유저조회
   @ApiOperation({ summary: '유저 조회' })
-  // @UseGuards(UserGuard)
   @Get('/:userId')
   async getUserInfo(@Param('userId') userId: number) {
     return await this.userService.getUserInfo(userId);
