@@ -21,10 +21,6 @@ import { UpdatePinkmongDto } from './dto/update-pinkmong.dto';
 export class PinkmongController {
   constructor(private readonly pinkmongService: PinkmongService) {}
 
-  /**
-   * 핑크몽 생성 API
-   * [POST] /pinkmong
-   */
   @Post()
   @UseGuards(UserGuard, AdminGuard)
   @UseInterceptors(FileInterceptor('file'))
@@ -35,28 +31,16 @@ export class PinkmongController {
     return this.pinkmongService.createPinkmong(createPinkmongDto, file);
   }
 
-  /**
-   * 모든 핑크몽 조회 API
-   * [GET] /pinkmong/pinkmongs
-   */
   @Get('pinkmongs')
   getAllPinkmongs() {
     return this.pinkmongService.getAllPinkmongs();
   }
 
-  /**
-   * 특정 핑크몽 조회 API
-   * [GET] /pinkmong/:pinkmongId
-   */
   @Get(':pinkmongId')
   getPinkmong(@Param('pinkmongId') pinkmongId: number) {
     return this.pinkmongService.getPinkmong(pinkmongId);
   }
 
-  /**
-   * 핑크몽 수정 API
-   * [PATCH] /pinkmong/:pinkmongId
-   */
   @Patch(':pinkmongId')
   @UseGuards(UserGuard, AdminGuard)
   @UseInterceptors(FileInterceptor('file')) // 🔹 파일 업로드 지원
@@ -72,10 +56,6 @@ export class PinkmongController {
     );
   }
 
-  /**
-   * 핑크몽 삭제 API
-   * [DELETE] /pinkmong/:pinkmongId
-   */
   @Delete(':pinkmongId')
   @UseGuards(UserGuard, AdminGuard)
   deletePinkmong(@Param('pinkmongId') pinkmongId: number) {
