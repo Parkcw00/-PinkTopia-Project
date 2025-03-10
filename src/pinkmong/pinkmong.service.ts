@@ -6,10 +6,6 @@ import { UpdatePinkmongDto } from './dto/update-pinkmong.dto';
 import { S3Service } from '../s3/s3.service';
 import { ValkeyService } from '../valkey/valkey.service';
 
-/**
- * PinkmongService
- * 핑크몽의 생성, 조회, 수정, 삭제 등의 비즈니스 로직을 처리하는 서비스 클래스
- */
 @Injectable()
 export class PinkmongService {
   constructor(
@@ -20,7 +16,6 @@ export class PinkmongService {
 
   /**
    * 모든 핑크몽 조회
-   * returns 데이터베이스에 저장된 모든 핑크몽 목록을 반환
    */
   async getAllPinkmongs(): Promise<{ message: string; pinkmongs: Pinkmong[] }> {
     const cacheKey = `pinkmong:all`;
@@ -41,8 +36,6 @@ export class PinkmongService {
 
   /**
    * 특정 핑크몽 조회
-   * returns 해당 핑크몽 정보 반환
-   * throws NotFoundException - 핑크몽이 존재하지 않을 경우 예외 발생
    */
   async getPinkmong(pinkmongId: number): Promise<Pinkmong> {
     const cacheKey = `pinkmong:${pinkmongId}`;
@@ -64,9 +57,6 @@ export class PinkmongService {
 
   /**
    * 핑크몽 생성
-   * param body - 생성할 핑크몽 데이터
-   * param file - 업로드된 파일
-   * returns 생성 완료 메시지 반환
    */
   async createPinkmong(
     createPinkmongDto: CreatePinkmongDto,
@@ -84,10 +74,6 @@ export class PinkmongService {
 
   /**
    * 핑크몽 수정
-   * param pinkmongId - 수정할 핑크몽의 ID
-   * param data - 수정할 데이터
-   * returns 수정 완료 메시지 반환
-   * throws NotFoundException - 핑크몽이 존재하지 않을 경우 예외 발생
    */
   async updatePinkmong(
     pinkmongId: number,
@@ -116,9 +102,6 @@ export class PinkmongService {
 
   /**
    * 핑크몽 삭제
-   * param pinkmongId - 삭제할 핑크몽의 ID
-   * returns 삭제 완료 메시지 반환
-   * throws NotFoundException - 핑크몽이 존재하지 않을 경우 예외 발생
    */
   async deletePinkmong(pinkmongId: number): Promise<{ message: string }> {
     const pinkmong = await this.pinkmongRepository.findById(pinkmongId);
