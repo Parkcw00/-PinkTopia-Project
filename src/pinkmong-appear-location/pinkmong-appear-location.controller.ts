@@ -38,9 +38,10 @@ export class PinkmongAppearLocationController {
 
   @Get('getOne')
   async getOne(
-    @Body('user_id') user_email: string,
+    @Body('user_email') user_email: string,
   ): Promise<{ id: number } | undefined> {
-    return this.service.findOne(user_email);
+    console.log('C - 타이틀로 id 가져오기');
+    return this.service.findOneByEmail(user_email);
   }
 
   @Patch(':id')

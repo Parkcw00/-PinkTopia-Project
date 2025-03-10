@@ -59,7 +59,10 @@ export class PinkmongAppearLocationService {
     return this.repository.createLocation(dto);
   }
 
-  async findOne(user_email: string): Promise<{ id: number } | undefined> {
+  async findOneByEmail(
+    user_email: string,
+  ): Promise<{ id: number } | undefined> {
+    console.log('S - 타이틀로 id 가져오기');
     const id = await this.repository.findOneByEmail(user_email);
     return id ?? undefined;
   }

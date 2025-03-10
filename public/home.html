@@ -528,32 +528,38 @@
                 }
                 // 토큰 풀기
                 const decodedToken = parseJwt(accessToken);
+                console.log('토큰 : ', { decodedToken })
 
 
                 try {
+                  console.log('유저 이메일 : ', decodedToken.email)
 
                   // 유저 이메일로 검색-동일한 북마커가 이미 있는 지 확인 
                   const id = await fetch('/pinkmong-appear-location/getOne', {
-                    method: 'get',
-                    headers: {
+                    method: 'get', headers: {
                       'Content-Type': 'application/json'
                     },
-                    body: decodedToken.email
+                    body: JSON.stringify({
+                      user_email: decodedToken.email
+                    })
                   });
+
                 } catch (error) { console.log('id 가져오는데 실패') }
-                try { // 있는경우 삭제
+
+                try { // 있는경우 삭제 
+                  console.log('북마커 id : ', id)
                   if (id > 0) {
                     console.log('중복된 타이틀 있음')
                     await fetch('/pinkmong-appear-location/getOne', {
-                      method: 'delete',
-                      headers: {
-                        'Content-Type': 'application/json',
+                      method: 'delete', headers: {
+                        'Content-Type': 'application/json'
                       },
-                      body: id
-                    });
+                      body: JSON.stringify({ id })
+                    })
                   }
+                  console.log('북마커 id : ', id, ' 삭제')
                 } catch (error) { console.log('중복 제거 실패') }
-
+                console.log('기존의 북마커 없음')
                 try { // 북마커 추가. 이 아래는 정상작동 획인함.
                   const response = await fetch('/pinkmong-appear-location', {
                     method: 'POST',

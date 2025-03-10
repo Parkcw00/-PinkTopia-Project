@@ -44,10 +44,12 @@ export class PinkmongAppearLocationRepository {
   async findOneByEmail(
     user_email: string,
   ): Promise<{ id: number } | undefined> {
+    console.log('R - 타이틀로 id 가져오기');
     const id = await this.repo.findOne({
       where: { title: user_email },
       select: { id: true },
     });
+    console.log('있는 id : ', id);
     return id ?? undefined;
   }
 
