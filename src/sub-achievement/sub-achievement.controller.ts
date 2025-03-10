@@ -31,7 +31,7 @@ export class SubAchievementController {
   //@UseGuards(UserGuard, AdminGuard)
   @Post('fill-valkey')
   async fillValkey() {
-    return await await this.service.fillValkey();
+    return await await this.service.fillGeo();
   }
 
   // 생성
@@ -55,7 +55,6 @@ export class SubAchievementController {
   @Get('/:subAchievementId')
   async findOne(@Param('subAchievementId') subAchievementId: string) {
     return await this.service.findOne(subAchievementId);
-    return await this.service.findOne(subAchievementId);
   }
 
   // 전체조회 <- 없애고 업적에서 전체조회+업적별정렬, 업적별 조회 만들기
@@ -70,7 +69,6 @@ export class SubAchievementController {
     @Body() updateSubAchievementDto: UpdateSubAchievementDto,
   ) {
     return await this.service.update(subAchievementId, updateSubAchievementDto);
-    return await this.service.update(subAchievementId, updateSubAchievementDto);
   }
 
   // 삭제
@@ -78,7 +76,6 @@ export class SubAchievementController {
   @UseGuards(UserGuard, AdminGuard)
   @Delete('/:subAchievementId')
   async remove(@Param('subAchievementId') subAchievementId: string) {
-    return await this.service.softDelete(subAchievementId);
     return await this.service.softDelete(subAchievementId);
   }
 }

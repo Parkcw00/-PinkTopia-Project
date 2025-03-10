@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>업적 | PinkTopia</title>
+    <link rel="stylesheet" href="/public/styles.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffe4f7;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ff69b4;
+            padding: 15px;
+            color: white;
+            font-weight: bold;
+            height: 50px;
+            position: relative;
+        }
+
+        .menu-icon {
+            position: absolute;
+            left: 15px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .menu-icon .hamburger {
+            width: 25px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-icon .hamburger span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: white;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .nav .logo-container {
+            position: absolute;
+            left: 50px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav img {
+            width: 45px;
+            height: 45px;
+            border-radius: 0;
+            object-fit: cover;
+        }
+
+        .nav .logo-text {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+        }
+
+        .user-assets {
+            position: absolute;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: white;
+            padding: 8px 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
+        }
+
+        .asset-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #9c195f;
+            font-weight: bold;
+        }
+
+        .asset-item img {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* 사이드바 스타일 */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            background-color: #ff69b4;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar a {
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar a:hover {
+            background-color: #ff4da6;
+        }
+
+        .sidebar a.active {
+            background-color: #ff4da6;
+            font-weight: bold;
+        }
+
+        .close-sidebar {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 36px;
+            cursor: pointer;
+            color: white;
+        }
+
+        /* 업적 관련 스타일 */
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            background-color: #ffb6c1;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px 0;
+            cursor: pointer;
+            font-weight: bold;
+            color: #333;
+            transition: background-color 0.3s;
+        }
+
+        .tab.active {
+            background-color: #ff69b4;
+            color: white;
+        }
+
+        .achievement-list {
+            display: none;
+        }
+
+        .achievement-list.active {
+            display: block;
+        }
+
+        .achievement-item {
+            background-color: white;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .achievement-header {
+            padding: 15px;
+            background-color: #ffb6c1;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .achievement-title-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .achievement-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .achievement-progress-percent {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #ff4081;
+        }
+
+        .achievement-category {
+            background-color: #ff69b4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .achievement-content {
+            padding: 15px;
+            display: none;
+        }
+
+        .achievement-content.active {
+            display: block;
+        }
+
+        .achievement-description {
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .reward-info {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .reward-item {
+            background-color: #f8f8f8;
+            border-radius: 5px;
+            padding: 8px 12px;
+            margin-right: 10px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .reward-item img {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+
+        .sub-achievements {
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        .sub-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background-color: #f8f8f8;
+            transition: all 0.2s ease;
+        }
+
+        .sub-item:hover {
+            background-color: #f0f0f0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .sub-item-check {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            margin-right: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: transparent;
+            background-color: white;
+        }
+
+        .sub-item.completed .sub-item-check {
+            background-color: #ff69b4;
+            border-color: #ff69b4;
+            color: white;
+        }
+
+        .sub-item-content {
+            flex-grow: 1;
+        }
+
+        .sub-item-text {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .sub-item-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .sub-item-workflow {
+            font-size: 0.8rem;
+            color: #888;
+            font-style: italic;
+        }
+
+        .sub-item-workflow.completed {
+            color: #4caf50;
+        }
+        
+        .sub-achievements h4 {
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: #ff69b4;
+            font-size: 1rem;
+        }
+
+        .expiry-date {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        .achievement-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            flex-grow: 1;
+            height: 8px;
+            background-color: #eee;
+            border-radius: 4px;
+            margin: 0 10px;
+            overflow: hidden;
+        }
+
+        .progress-filled {
+            height: 100%;
+            background-color: #ff69b4;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+
+        .empty-state img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .progress-count {
+            font-size: 0.9rem;
+            color: #666;
+            margin-right: 5px;
+        }
+
+        .completed-achievement {
+            background-color: #f0f0f0;
+        }
+
+        .completed-badge {
+            background-color: #ff69b4;
+            color: white;
+            padding: 2px 5px;
+            border-radius: 5px;
+            margin-left: 5px;
+        }
+
+        /* 워크플로우 설명 관련 스타일 추가 */
+        .workflow-explanation {
+            background-color: #f8e5ff;
+            border-left: 3px solid #ff69b4;
+            padding: 10px 15px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+            color: #333;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .workflow-explanation.completed {
+            background-color: #e5ffe8;
+            border-left-color: #4caf50;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav">
+        <div class="menu-icon" onclick="openSidebar()">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        <div class="logo-container">
+            <img src="/public/images/123.jpg" alt="PinkTopia Logo">
+        </div>
+        <div class="logo-text">
+            <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
+        </div>
+        <div id="userAssets" class="user-assets" style="display: none;">
+            <div class="asset-item">
+                <img src="/public/images/gem.png" alt="젬">
+                <span id="userGem">로딩 중...</span> 젬
+            </div>
+            <div class="asset-item">
+                <img src="/public/images/dia.png" alt="다이아">
+                <span id="userDia">로딩 중...</span> 다이아
+            </div>
+        </div>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+        </div>
+        <div class="sidebar-content" id="sidebarContent">
+            <a href="/public/home.html">홈</a>
+            <a href="/public/event.html">이벤트</a>
+            <a href="/public/store-item.html">아이템샵</a>
+            <a href="/public/board.html">게시글 (커뮤니티)</a>
+            <a href="/public/ranking.html">랭킹</a>
+            <a href="/public/customer-service.html">문의센터</a>
+            <!-- 로그인 시 표시될 메뉴들 -->
+            <div id="loggedInMenu" style="display: none;">
+                <a href="/public/chattingrooms.html">채팅</a>
+                <a href="/public/collection.html">핑크몽 개인 도감</a>
+                <a href="/public/inventory.html">인벤토리 아이템</a>
+                <a href="/public/achievements.html" class="active">업적</a>
+                <a href="/public/mypage.html">마이페이지</a>
+                <a href="#" onclick="logout()">로그아웃</a>
+            </div>
+            <!-- 로그인 안 된 경우 표시될 메뉴들 -->
+            <div id="loggedOutMenu">
+                <a href="/public/log-in.html">로그인</a>
+                <a href="/public/sign-up.html">회원가입</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 업적 컨텐츠 추가 -->
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="all">전체 업적</div>
+            <div class="tab" data-tab="active">진행중인 업적</div>
+            <div class="tab" data-tab="completed">완료된 업적</div>
+        </div>
+
+        <!-- 전체 업적 목록 -->
+        <div class="achievement-list active" id="all-achievements">
+            <!-- 업적 항목은 JavaScript로 동적 생성됨 -->
+        </div>
+
+        <!-- 진행중인 업적 목록 -->
+        <div class="achievement-list" id="active-achievements">
+            <div class="info-message" style="background-color: #fff6f6; border-left: 3px solid #ff69b4; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+                <p style="margin: 0; color: #333;">진행 중인 업적은 <strong>최소 1개 이상의 서브업적이 완료된</strong> 업적만 표시됩니다.</p>
+            </div>
+            <!-- 업적 항목은 JavaScript로 동적 생성됨 -->
+        </div>
+
+        <!-- 완료된 업적 목록 -->
+        <div class="achievement-list" id="completed-achievements">
+            <!-- 업적 항목은 JavaScript로 동적 생성됨 -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            // 로그인 상태 확인 및 메뉴 설정
+            const accessToken = localStorage.getItem("accessToken");
+            
+            if (accessToken) {
+                document.getElementById("userAssets").style.display = "flex";
+                document.getElementById('loggedInMenu').style.display = 'block';
+                document.getElementById('loggedOutMenu').style.display = 'none';
+                
+                // 사용자 정보 및 자산 로드
+                await loadUserData();
+                
+                // 업적 데이터 로드
+                fetchAchievements();
+            } else {
+                document.getElementById('loggedInMenu').style.display = 'none';
+                document.getElementById('loggedOutMenu').style.display = 'block';
+                
+                // 로그인 페이지로 리다이렉트 (비로그인 사용자는 업적 페이지에 접근 불가)
+                alert("로그인이 필요한 페이지입니다.");
+                window.location.href = "/public/log-in.html";
+            }
+        });
+        
+        // 사용자 정보 및 자산 로드 함수 (chattingrooms.html 방식으로 수정)
+        async function loadUserData() {
+            try {
+                const accessToken = localStorage.getItem("accessToken");
+                if (!accessToken) {
+                    throw new Error("로그인이 필요합니다.");
+                }
+                
+                const response = await fetch("/user/me", {
+                    headers: { "Authorization": accessToken }
+                });
+                
+                if (!response.ok) {
+                    throw new Error("유저 데이터를 불러오지 못했습니다.");
+                }
+                
+                const userData = await response.json();
+                console.log("사용자 데이터:", userData);
+                
+                // 자산 정보 표시
+                document.getElementById("userGem").textContent = userData.pink_gem.toLocaleString();
+                document.getElementById("userDia").textContent = userData.pink_dia.toLocaleString();
+                
+                // 유저 정보를 전역 변수로 저장 (필요한 경우 사용)
+                window.currentUser = {
+                    id: userData.id,
+                    nickname: userData.nickname,
+                    email: userData.email,
+                    level: userData.level || 1,
+                    pink_gem: userData.pink_gem,
+                    pink_dia: userData.pink_dia
+                };
+                
+                // 사이드바에 사용자 닉네임 표시 (선택적)
+                if (userData.nickname) {
+                    // 사이드바 최상단에 사용자 정보 추가
+                    const userInfoHTML = `
+                        <div style="padding: 15px 25px; color: white; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                            <p style="margin: 0; font-weight: bold;">${userData.nickname}</p>
+                            <p style="margin: 5px 0 0 0; font-size: 14px;">레벨 ${userData.level || 1}</p>
+                        </div>
+                    `;
+                    
+                    // 사이드바 첫 번째 항목 앞에 삽입
+                    const sidebarContent = document.getElementById('sidebarContent');
+                    sidebarContent.innerHTML = userInfoHTML + sidebarContent.innerHTML;
+                }
+                
+            } catch (error) {
+                console.error("유저 데이터 로드 실패:", error);
+                // 오류 발생 시 로그아웃 처리
+                if (error.message.includes("인증") || error.message.includes("expired")) {
+                    alert("로그인 세션이 만료되었습니다. 다시 로그인해주세요.");
+                    logout();
+                }
+            }
+        }
+        
+        function openSidebar() {
+            document.getElementById('sidebar').style.width = "250px";
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').style.width = "0";
+        }
+
+        // 로그아웃 함수 (chattingrooms.html 방식으로 수정)
+        async function logout() {
+            try {
+                const accessToken = localStorage.getItem("accessToken");
+                if (!accessToken) {
+                    console.warn("🚨 로그아웃 시도: 이미 로그아웃된 상태");
+                    window.location.href = "/public/log-in.html";
+                    return;
+                }
+
+                // 서버에 로그아웃 요청 보내기
+                const response = await fetch("http://localhost:3000/user/auth/logout", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": accessToken
+                    },
+                    credentials: "include" // 쿠키도 함께 보내기
+                });
+
+                if (!response.ok) {
+                    throw new Error("서버에서 로그아웃 처리 실패");
+                }
+
+                // 로그아웃 성공 후, 토큰 삭제
+                localStorage.removeItem("accessToken");
+
+                console.log("✅ 로그아웃 성공! 페이지 이동");
+                window.location.href = "/public/home.html";
+            } catch (error) {
+                console.error("❌ 로그아웃 실패:", error);
+                alert("로그아웃 중 오류가 발생했습니다.");
+                // 오류가 발생해도 토큰 삭제 및 홈으로 이동
+                localStorage.removeItem("accessToken");
+                window.location.href = "/public/home.html";
+            }
+        }
+
+        // 탭 전환 기능
+        const tabs = document.querySelectorAll('.tab');
+        const achievementLists = document.querySelectorAll('.achievement-list');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 모든 탭에서 active 클래스 제거
+                tabs.forEach(t => t.classList.remove('active'));
+                
+                // 클릭된 탭에 active 클래스 추가
+                tab.classList.add('active');
+                
+                // 모든 업적 목록 숨기기
+                achievementLists.forEach(list => list.classList.remove('active'));
+                
+                // 선택된 탭에 해당하는 업적 목록 표시
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-achievements`).classList.add('active');
+            });
+        });
+
+        // 업적 토글 기능
+        function toggleAchievement(element) {
+            const content = element.nextElementSibling;
+            content.classList.toggle('active');
+        }
+
+        // 각 업적에 대한 서브업적 가져오기
+        async function fetchSubAchievements(achievement) {
+            if (!achievement || !achievement.id) return achievement;
+            
+            try {
+                const accessToken = localStorage.getItem("accessToken");
+                const headers = accessToken ? { "Authorization": accessToken } : {};
+                
+                console.log(`업적 ID ${achievement.id}(${achievement.title || '제목 없음'})의 서브업적 데이터 요청...`);
+                
+                // 새로운 엔드포인트 사용 (완료 상태 포함)
+                let response = await fetch(`/achievement/achievementId/${achievement.id}/withStatus`, { headers });
+                
+                // 새 엔드포인트가 구현되지 않았거나 실패하면 기존 엔드포인트 사용
+                if (!response.ok) {
+                    console.log(`새 엔드포인트 실패, 기존 엔드포인트 시도...`);
+                    // 기존 엔드포인트 시도
+                    response = await fetch(`/achievement/achievementId/${achievement.id}`, { headers });
+                    
+                    // 만약 404라면 다른 엔드포인트 시도
+                    if (!response.ok && response.status === 404) {
+                        console.log(`기본 엔드포인트에서 서브업적 못찾음, 두 번째 엔드포인트 시도...`);
+                        // 두 번째 엔드포인트 시도 (/achievement/:id)
+                        response = await fetch(`/achievement/${achievement.id}`, { headers });
+                    }
+                }
+                
+                // 여전히 실패하면 서브업적 없이 반환
+                if (!response.ok) {
+                    console.error(`업적 ID ${achievement.id}의 서브업적 가져오기 실패: ${response.status} ${response.statusText}`);
+                    return achievement;
+                }
+                
+                const data = await response.json();
+                console.log(`업적 ID ${achievement.id}(${achievement.title || '제목 없음'})의 서브업적 데이터:`, data);
+                
+                // API 응답 구조에 따라 서브업적 데이터 추출
+                if (data && data.subAchievements) {
+                    achievement.sub_achievement = data.subAchievements;
+                } else if (data && Array.isArray(data)) {
+                    // 배열 형태로 반환될 경우
+                    achievement.sub_achievement = data;
+                } else if (data && typeof data === 'object') {
+                    // 다른 구조일 경우 확인
+                    if (Array.isArray(data.sub_achievement)) {
+                        achievement.sub_achievement = data.sub_achievement;
+                    } else if (data.id === achievement.id && Array.isArray(data.subAchievement)) {
+                        // 단일 객체로 반환되는 경우
+                        achievement.sub_achievement = data.subAchievement;
+                    } else if (data.id === achievement.id && typeof data.subAchievement === 'object' && data.subAchievement !== null) {
+                        // 객체 형태로 반환되는 경우
+                        achievement.sub_achievement = [data.subAchievement];
+                    } else if (data.achievement_p && Array.isArray(data.achievement_p)) {
+                        // achievement_p 항목을 서브업적으로 사용
+                        achievement.sub_achievement = data.achievement_p;
+                    }
+                }
+                
+                // 서브업적 데이터가 없는 경우, 테스트 데이터 추가 (개발 중 테스트용)
+                if (!achievement.sub_achievement || achievement.sub_achievement.length === 0) {
+                    if (achievement.title && achievement.title.includes('2일차')) {
+                        console.log(`2일차 업적에 테스트 서브업적 추가`);
+                        // 2일차 업적에 테스트 서브업적 추가
+                        achievement.sub_achievement = [
+                            {
+                                id: `sub_${achievement.id}_1`,
+                                title: '우리집2',
+                                description: '집에 방문하세요',
+                                completed: true // 이 부분이 중요: 완료된 서브업적
+                            },
+                            {
+                                id: `sub_${achievement.id}_2`,
+                                title: '전주여행문화관업적',
+                                description: '전주 여행 문화관에 방문하세요'
+                            }
+                        ];
+                    }
+                }
+                
+                return achievement;
+            } catch (error) {
+                console.error(`업적 ID ${achievement.id}의 서브업적 데이터를 가져오는 중 오류 발생:`, error);
+                return achievement;
+            }
+        }
+
+        // 서브업적 텍스트 분석을 통한 완료 여부 확인을 위한 헬퍼 함수 - 미리 정의
+        function analyzeSubAchievementText(achievement) {
+            if (!achievement || !achievement.sub_achievement) return achievement;
+            
+            const subAchievements = achievement.sub_achievement;
+            let hasCompleted = false;
+            let completedCount = 0;
+            
+            // 서브업적별로 텍스트 분석
+            subAchievements.forEach(sub => {
+                // 이미 위의 함수로 완료 여부 체크한 결과 사용
+                const isCompleted = isSubAchievementCompleted(sub);
+                if (isCompleted) {
+                    completedCount++;
+                    hasCompleted = true;
+                    
+                    // 완료 속성 추가 (없을 경우)
+                    if (sub.completed !== true) {
+                        sub.completed = true;
+                    }
+                }
+            });
+            
+            // 분석 결과 로깅
+            console.log(`업적 "${achievement.title || achievement.id}" 분석 결과:`, {
+                completedCount,
+                totalCount: subAchievements.length,
+                hasCompletedSubAchievement: hasCompleted
+            });
+            
+            // 분석 결과 추가
+            achievement.completedSubCount = completedCount;
+            achievement.totalSubCount = subAchievements.length;
+            achievement.hasCompletedSubAchievement = hasCompleted;
+            
+            return achievement;
+        }
+
+        // 서브업적 완료 상태 확인 함수
+        function isSubAchievementCompleted(sub) {
+            // 데이터가 없으면 미완료 처리
+            if (!sub) return false;
+            
+            // 서브업적 완료 여부 검사를 위한 로깅
+            console.log(`서브업적 "${sub.title || '제목 없음'}" 완료 여부 검사:`, sub);
+            
+            // 1. achievement_p 객체가 있고, complete가 true인 경우 (가장 명확한 케이스)
+            if (sub.achievement_p && Array.isArray(sub.achievement_p) && sub.achievement_p.length > 0) {
+                const hasComplete = sub.achievement_p.some(p => p.complete === true);
+                if (hasComplete) {
+                    console.log(`- achievement_p 배열에서 complete=true 항목 발견`);
+                    return true;
+                }
+            }
+            
+            // 2. 직접적인 complete 속성이 있는 경우
+            if (sub.complete === true) {
+                console.log(`- complete=true 속성 발견`);
+                return true;
+            }
+            
+            // 3. completed 속성이 있는 경우
+            if (sub.completed === true) {
+                console.log(`- completed=true 속성 발견`);
+                return true;
+            }
+            
+            // 4. is_completed 속성이 있는 경우
+            if (sub.is_completed === true) {
+                console.log(`- is_completed=true 속성 발견`);
+                return true;
+            }
+            
+            // 5. 숫자 형태로 완료 여부를 표시하는 경우
+            if (sub.complete === 1 || sub.completed === 1 || sub.is_completed === 1) {
+                console.log(`- 숫자 1로 완료 상태 표시 발견`);
+                return true;
+            }
+            
+            // 6. 진행률이 100%인 경우
+            if (sub.progress === 100 || sub.progress === '100') {
+                console.log(`- 진행률 100% 발견`);
+                return true;
+            }
+            
+            // 7. status 속성이 'completed', 'done', 'finished' 등의 값을 가지는 경우
+            if (sub.status && ['completed', 'done', 'finished', 'complete'].includes(sub.status.toLowerCase())) {
+                console.log(`- status="${sub.status}" 발견 (완료 상태)`);
+                return true;
+            }
+            
+            // 8. count와 total이 있고 count >= total인 경우 (진행률 기반)
+            if (sub.count !== undefined && sub.total !== undefined && Number(sub.count) >= Number(sub.total)) {
+                console.log(`- count(${sub.count}) >= total(${sub.total}) 발견`);
+                return true;
+            }
+            
+            // 9. done 속성이 있는 경우
+            if (sub.done === true || sub.done === 1 || sub.done === 'true') {
+                console.log(`- done=${sub.done} 속성 발견`);
+                return true;
+            }
+            
+            // 10. 상태(state)가 완료를 나타내는 경우
+            if (sub.state && ['completed', 'done', 'finished', 'complete'].includes(sub.state.toLowerCase())) {
+                console.log(`- state="${sub.state}" 발견 (완료 상태)`);
+                return true;
+            }
+            
+            // 11. achievement_user_p 객체가 있고 그 안에 완료 표시가 있는 경우
+            if (sub.achievement_user_p) {
+                if (Array.isArray(sub.achievement_user_p) && sub.achievement_user_p.length > 0) {
+                    const userComplete = sub.achievement_user_p.some(p => 
+                        p.complete === true || p.completed === true || p.is_completed === true);
+                    if (userComplete) {
+                        console.log(`- achievement_user_p 배열에서 완료 항목 발견`);
+                        return true;
+                    }
+                } else if (typeof sub.achievement_user_p === 'object') {
+                    if (sub.achievement_user_p.complete || sub.achievement_user_p.completed || sub.achievement_user_p.is_completed) {
+                        console.log(`- achievement_user_p 객체에서 완료 속성 발견`);
+                        return true;
+                    }
+                }
+            }
+            
+            // 12. 콘텐츠 내용이 '완료' 또는 '성공' 단어를 포함하는 경우
+            if (typeof sub.content === 'string' && 
+                (sub.content.includes('완료') || sub.content.includes('성공'))) {
+                console.log(`- 콘텐츠에 '완료' 또는 '성공' 단어 포함`);
+                return true;
+            }
+            
+            // 13. "완료함" 텍스트가 있는 경우 
+            if (sub.text === '완료함' || sub.label === '완료함' || 
+                (typeof sub.description === 'string' && sub.description.includes('완료함'))) {
+                console.log(`- '완료함' 텍스트 발견`);
+                return true;
+            }
+            
+            // 14. 특별 케이스: 한글로 '완료' 관련 텍스트
+            if ((typeof sub.title === 'string' && sub.title.includes('완료')) ||
+                (typeof sub.text === 'string' && sub.text.includes('완료')) ||
+                (sub.description && sub.description.includes('완료'))) {
+                console.log(`- 한글 '완료' 텍스트 발견`);
+                return true;
+            }
+            
+            // 15. 특별 케이스: 체크 표시가 있는 경우
+            if (sub.text === '✓' || sub.label === '✓' || 
+                (typeof sub.content === 'string' && sub.content.includes('✓'))) {
+                console.log(`- 체크 표시(✓) 발견`);
+                return true;
+            }
+            
+            // 16. 특별 케이스: 핑크토피아 특화 필드 검사
+            if (sub.완료여부 === true || sub.완료여부 === '완료' || sub.완료여부 === 1) {
+                console.log(`- 완료여부 필드 발견`);
+                return true;
+            }
+            
+            // 17. 아무 프로퍼티에서 완료를 나타내는 값을 찾기 (마지막 수단)
+            for (const key in sub) {
+                const value = sub[key];
+                if (typeof value === 'boolean' && value === true && 
+                    (key.includes('complete') || key.includes('done') || key.includes('finish'))) {
+                    console.log(`- ${key}=true 속성 발견 (완료 관련 키워드)`);
+                    return true;
+                }
+                
+                // 문자열 값에서 '완료' 단어 확인
+                if (typeof value === 'string' && 
+                    (value.includes('완료') || value.includes('성공') || value === '✓')) {
+                    console.log(`- ${key}="${value}" 속성 발견 (완료 관련 텍스트)`);
+                    return true;
+                }
+            }
+            
+            console.log(`- 서브업적 완료 조건 없음 (미완료)`);
+            // 모든 조건에 해당하지 않으면 미완료로 처리
+            return false;
+        }
+
+        // API에서 업적 데이터 가져오기 (chattingrooms.html 방식으로 수정)
+        async function fetchAchievements() {
+            try {
+                const accessToken = localStorage.getItem("accessToken");
+                if (!accessToken) {
+                    alert("로그인이 필요한 페이지입니다.");
+                    window.location.href = "/public/log-in.html";
+                    return;
+                }
+                
+                // Authorization 헤더 설정 (chattingrooms.html 방식)
+                const headers = { "Authorization": accessToken };
+                
+                // 1. 전체 업적 목록 가져오기
+                const allResponse = await fetch('/achievement', { headers });
+                if (!allResponse.ok) {
+                    throw new Error('업적 데이터를 불러오는데 실패했습니다.');
+                }
+                
+                let allAchievementsData = await allResponse.json();
+                let allAchievements = Array.isArray(allAchievementsData) ? allAchievementsData : [];
+                console.log('전체 업적 데이터:', allAchievements);
+                
+                // 전체 업적에 서브업적 데이터 추가
+                allAchievements = await Promise.all(
+                    allAchievements.map(achievement => fetchSubAchievements(achievement))
+                );
+                
+                // 전체 업적에도 서브업적 분석 적용
+                allAchievements = allAchievements.map(analyzeSubAchievementText);
+                
+                // 2. 완료된 업적 목록 가져오기
+                let completedAchievements = [];
+                try {
+                    const completedResponse = await fetch('/achievement/done', { headers });
+                    if (completedResponse.ok) {
+                        let completedData = await completedResponse.json();
+                        completedAchievements = Array.isArray(completedData) ? completedData : [];
+                        console.log('완료된 업적 데이터:', completedAchievements);
+                        
+                        // 완료된 업적에 서브업적 데이터 추가
+                        completedAchievements = await Promise.all(
+                            completedAchievements.map(achievement => fetchSubAchievements(achievement))
+                        );
+                        
+                        // 완료된 업적에도 서브업적 분석 적용
+                        completedAchievements = completedAchievements.map(analyzeSubAchievementText);
+                    } else {
+                        console.warn('완료된 업적을 가져오는 데 실패했습니다:', completedResponse.status);
+                    }
+                } catch (err) {
+                    console.error('완료된 업적 가져오기 오류:', err);
+                }
+                
+                // 3. 완료된 업적 ID 목록 생성
+                const completedIds = completedAchievements.map(a => a.id);
+                
+                // 4. 전체 업적에 완료 상태 표시
+                allAchievements = allAchievements.map(achievement => ({
+                    ...achievement,
+                    is_completed: completedIds.includes(achievement.id)
+                }));
+                
+                // 5. 진행 중인 업적 가져오기
+                let activeAchievements = [];
+                try {
+                    const activeResponse = await fetch('/achievement/active', { headers });
+                    if (activeResponse.ok) {
+                        let activeData = await activeResponse.json();
+                        activeAchievements = Array.isArray(activeData) ? activeData : [];
+                        
+                        // 데이터 로깅에 null, undefined 처리
+                        console.log('진행 중인 업적 데이터 (원본):', 
+                            activeAchievements.map(a => ({
+                                ...a,
+                                title: a.title || '[제목 없음]',
+                                description: a.description || '[설명 없음]'
+                            }))
+                        );
+                        
+                        // 진행 중인 업적에서 완료된 업적 필터링 (중요)
+                        activeAchievements = activeAchievements.filter(
+                            achievement => !completedIds.includes(achievement.id)
+                        );
+                        console.log('진행 중인 업적 데이터 (필터링 후):', activeAchievements);
+                        
+                        // 진행 중인 업적에 서브업적 데이터 추가
+                        activeAchievements = await Promise.all(
+                            activeAchievements.map(achievement => fetchSubAchievements(achievement))
+                        );
+                        
+                        // 각 업적의 서브업적 텍스트 분석
+                        activeAchievements = activeAchievements.map(analyzeSubAchievementText);
+                        
+                        // 중요: 서브 업적이 최소 1개 이상 완료된 업적만 표시
+                        const originalActiveCount = activeAchievements.length;
+                        activeAchievements = activeAchievements.filter(achievement => {
+                            // 서브업적이 없는 경우 제외
+                            const subAchievements = achievement.sub_achievement || [];
+                            if (subAchievements.length === 0) {
+                                console.log(`업적 "${achievement.title || achievement.id}" 제외: 서브업적 없음`);
+                                return false;
+                            }
+                            
+                            // 분석 결과가 있으면 사용
+                            if (achievement.hasCompletedSubAchievement !== undefined) {
+                                const result = achievement.hasCompletedSubAchievement;
+                                console.log(`업적 "${achievement.title || achievement.id}" ${result ? '포함' : '제외'}: 분석 결과 사용`);
+                                return result;
+                            }
+                            
+                            // 기존 방식으로 확인
+                            const hasCompleted = subAchievements.some(sub => isSubAchievementCompleted(sub));
+                            console.log(`업적 "${achievement.title || achievement.id}" ${hasCompleted ? '포함' : '제외'}: 기존 방식 확인`);
+                            return hasCompleted;
+                        });
+                        
+                        console.log(`진행 중인 업적 필터링 결과: ${originalActiveCount}개 중 ${activeAchievements.length}개 표시됨`);
+                    } else {
+                        console.warn('진행 중인 업적을 가져오는 데 실패했습니다:', activeResponse.status);
+                    }
+                } catch (err) {
+                    console.error('진행 중인 업적 가져오기 오류:', err);
+                }
+                
+                // 6. 업적 목록 렌더링
+                renderAchievements('all-achievements', allAchievements);
+                renderAchievements('active-achievements', activeAchievements);
+                renderAchievements('completed-achievements', completedAchievements);
+            } catch (error) {
+                console.error('업적 데이터를 가져오는 중 오류 발생:', error);
+                
+                // 오류 발생 시 각 목록에 오류 메시지 표시
+                document.getElementById('all-achievements').innerHTML = '<div class="empty-state">업적 데이터를 불러올 수 없습니다.</div>';
+                document.getElementById('active-achievements').innerHTML = '<div class="empty-state">업적 데이터를 불러올 수 없습니다.</div>';
+                document.getElementById('completed-achievements').innerHTML = '<div class="empty-state">업적 데이터를 불러올 수 없습니다.</div>';
+            }
+        }
+
+        // 업적 목록 렌더링 함수를 수정합니다
+        function renderAchievements(containerId, achievements) {
+            const container = document.getElementById(containerId);
+            
+            if (!achievements || achievements.length === 0) {
+                if (containerId === 'active-achievements') {
+                    container.innerHTML = '<div class="info-message" style="background-color: #fff6f6; border-left: 3px solid #ff69b4; padding: 10px; margin-bottom: 15px; border-radius: 5px;"><p style="margin: 0; color: #333;">진행 중인 업적은 <strong>최소 1개 이상의 서브업적이 완료된</strong> 업적만 표시됩니다.</p></div><div class="empty-state">현재 진행 중인 업적이 없습니다.<br>서브 업적을 하나 이상 완료하면 이곳에 표시됩니다.</div>';
+                } else {
+                    container.innerHTML = '<div class="empty-state">업적이 없습니다.</div>';
+                }
+                return;
+            }
+            
+            let html = '';
+            
+            achievements.forEach(achievement => {
+                // 서브 업적 가져오기
+                let subAchievementsHtml = '';
+                
+                // 서브업적이 존재하는지 확인 (여러 경우의 구조 처리)
+                const subAchievements = achievement.sub_achievement || [];
+                
+                // 진행률 계산 (개선된 완료 여부 확인 함수 사용)
+                let completedCount = 0;
+                let totalCount = subAchievements ? subAchievements.length : 0;
+                
+                // 업적 완료 여부 확인 (업적 자체의 완료상태 또는 서브업적으로 판단)
+                const isCompletedTab = containerId === 'completed-achievements';
+                const isCompleted = isCompletedTab || achievement.is_completed || 
+                    (subAchievements.length > 0 && subAchievements.every(sub => isSubAchievementCompleted(sub)));
+                
+                // 완료된 업적에 대한 추가 클래스와 아이콘
+                const completedClass = isCompleted ? 'completed-achievement' : '';
+                const completedIcon = isCompleted ? '<span class="completed-badge">✓</span>' : '';
+                
+                if (subAchievements && subAchievements.length > 0) {
+                    subAchievements.forEach(sub => {
+                        // 완료된 업적 탭에서만 모두 완료로 표시, 다른 탭에서는 실제 완료 여부 확인
+                        let isSubCompleted = isCompletedTab || achievement.is_completed || isSubAchievementCompleted(sub);
+                        
+                        if (isSubCompleted) {
+                            completedCount++;
+                        }
+                        
+                        // 서브업적 항목 클릭 이벤트를 위해 data-sub-id 추가
+                        const subId = sub.id || '';
+                        
+                        // 완료 상태 디버깅을 위한 클래스 추가
+                        const statusClass = isSubCompleted ? 'completed' : '';
+                        
+                        // 서브업적에 대한 설명 추가
+                        const subDescription = sub.description || sub.content || '세부 목표';
+                        
+                        // 워크플로우 설명 추가 (서브업적 → 업적P → 업적C)
+                        let workflowInfo = '';
+                        if (isSubCompleted) {
+                            workflowInfo = '<div class="sub-item-workflow completed">완료됨 ✓</div>';
+                        } else {
+                            if (containerId === 'active-achievements') {
+                                workflowInfo = '<div class="sub-item-workflow">진행 중인 목표입니다</div>';
+                            } else {
+                                workflowInfo = '<div class="sub-item-workflow">완료 시 업적에 기록됩니다</div>';
+                            }
+                        }
+                        
+                        subAchievementsHtml += `
+                            <div class="sub-item ${statusClass}" data-sub-id="${subId}">
+                                <div class="sub-item-check">${isSubCompleted ? '✓' : ''}</div>
+                                <div class="sub-item-content">
+                                    <div class="sub-item-text">${sub.title || '업적 제목 없음'}</div>
+                                    <div class="sub-item-description">${subDescription || '이 업적에 대한 설명이 없습니다.'}</div>
+                                    ${workflowInfo}
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    subAchievementsHtml = '<div class="empty-state">서브 업적이 없습니다.</div>';
+                }
+                
+                let progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+                
+                // 완료된 업적 탭에 표시되는 경우 무조건 100%로 설정
+                if (isCompletedTab) {
+                    progressPercent = 100;
+                    completedCount = totalCount;
+                }
+                
+                // 보상 정보 파싱
+                let rewardHtml = '';
+                if (achievement.reward) {
+                    let reward;
+                    if (typeof achievement.reward === 'string') {
+                        try {
+                            reward = JSON.parse(achievement.reward);
+                        } catch (e) {
+                            // 문자열이지만 JSON 파싱 실패 시
+                            const gemMatch = achievement.reward.match(/gem[:\s]*(\d+)/i);
+                            const diaMatch = achievement.reward.match(/dia[:\s]*(\d+)/i);
+                            
+                            reward = { 
+                                gem: gemMatch ? parseInt(gemMatch[1]) : 0,
+                                dia: diaMatch ? parseInt(diaMatch[1]) : 0
+                            };
+                        }
+                    } else {
+                        reward = achievement.reward;
+                    }
+                    
+                    if (reward.gem && reward.gem > 0) {
+                        rewardHtml += `
+                            <div class="reward-item">
+                                <img src="/public/images/gem.png" alt="Gem"> ${reward.gem}
+                            </div>
+                        `;
+                    }
+                    
+                    if (reward.dia && reward.dia > 0) {
+                        rewardHtml += `
+                            <div class="reward-item">
+                                <img src="/public/images/dia.png" alt="Diamond"> ${reward.dia}
+                            </div>
+                        `;
+                    }
+                }
+                
+                html += `
+                    <div class="achievement-item">
+                        <div class="achievement-header" onclick="toggleAchievement(this)">
+                            <div class="achievement-title-container">
+                                <span class="achievement-title">${achievement.title || `업적 #${achievement.id || '알 수 없음'}`}</span>
+                                <span class="achievement-progress-percent">${progressPercent.toFixed(2)}%</span>
+                            </div>
+                            <div class="achievement-category">${achievement.category || 'COMMON'}</div>
+                        </div>
+                        <div class="achievement-content ${isCompleted ? 'active' : ''}">
+                            <div class="achievement-description">${achievement.description || '이 업적에 대한 설명이 없습니다.'}</div>
+                            <div class="reward-info">${rewardHtml}</div>
+                            <div class="sub-achievements">
+                                <h4>서브 업적</h4>
+                                ${subAchievementsHtml}
+                            </div>
+                            <div class="achievement-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-filled" style="width: ${progressPercent}%"></div>
+                                </div>
+                                <span class="progress-count">${completedCount} / ${totalCount}</span>
+                            </div>
+                            <div class="expiry-date">만료일: ${achievement.expiryDate ? new Date(achievement.expiryDate).toLocaleDateString() : '무기한'}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

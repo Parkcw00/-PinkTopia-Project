@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>마이페이지 | PinkTopia</title>
+    <link rel="stylesheet" href="/public/styles.css">
     <style>
         /* 네비게이션 바 스타일 */
         .nav {
@@ -270,34 +271,34 @@
 
         .user-assets {
             position: absolute;
-            top: 20px;
-            right: 20px;
             display: flex;
-            gap: 20px;
+            align-items: center;
+            gap: 10px;
             background: white;
-            padding: 10px 20px;
+            padding: 8px 15px;
             border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(255, 113, 189, 0.733);
+            box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
             z-index: 100;
+            right: 20px;
         }
 
         .asset-item {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
             color: #9c195f;
             font-weight: bold;
         }
 
         .asset-item img {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
         }
 
         .nickname-box {
             background-color: white;
             /* ✅ 박스 배경색 */
-            border: 2px solid #fdbade;
+            border: 2px solid #ffffff;
             /* ✅ 핑크색 테두리 */
             border-radius: 20px;
             /* ✅ 둥근 모서리 */
@@ -307,7 +308,7 @@
             /* ✅ 글자 크기에 맞춰 박스 크기 조절 */
             margin-top: 10px;
             /* ✅ 위쪽 간격 */
-            box-shadow: 0 4px 6px rgba(255, 98, 182, 0.3);
+            box-shadow: 0 4px 6px rgba(255, 78, 173, 0.3);
             /* ✅ 부드러운 그림자 효과 */
         }
 
@@ -350,7 +351,6 @@
                 <span id="userDia">로딩 중...</span> 다이아
             </div>
         </div>
-
     </div>
 
     <!-- 사이드바 -->
@@ -364,7 +364,6 @@
             <a href="/public/store-item.html">아이템샵</a>
             <a href="/public/board.html">게시글 (커뮤니티)</a>
             <a href="/public/ranking.html">랭킹</a>
-            <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
             <!-- 로그인 시 표시될 메뉴들 -->
             <div id="loggedInMenu" style="display: none;">
                 <a href="/public/chattingrooms.html">채팅</a>
@@ -372,6 +371,7 @@
                 <a href="/public/inventory.html">인벤토리 아이템</a>
                 <a href="/public/achievements.html">업적</a>
                 <a href="/public/mypage.html">마이페이지</a>
+                <a href="/public/customer-service.html">고객 센터</a>
                 <a href="#" onclick="logout()">로그아웃</a>
             </div>
             <!-- 로그인 안 된 경우 표시될 메뉴들 -->

@@ -366,6 +366,7 @@ export class UserService {
         pink_dia: myInfo.pink_dia,
         appearance: myInfo.appearance,
         birthday: myInfo.birthday,
+        role: myInfo.role === true ? 1 : 0
       };
       return filteredInfo;
     } catch (err) {
@@ -488,7 +489,7 @@ export class UserService {
       }
 
       const updateData: UpdateUserDto = {
-        pink_dia: user.pink_dia + amount
+        pink_dia: user.pink_dia + amount,
       };
       await this.userRepository.updateUser(userId, updateData);
 
@@ -502,10 +503,75 @@ export class UserService {
       return {
         success: true,
         message: `${amount} 다이아가 충전되었습니다.`,
-        currentDiamond: user.pink_dia + amount
+        currentDiamond: user.pink_dia + amount,
       };
     } catch (error) {
-      throw new InternalServerErrorException('다이아 충전 중 오류가 발생했습니다.');
+      throw new InternalServerErrorException(
+        '다이아 충전 중 오류가 발생했습니다.',
+      );
     }
+  }
+
+  // 다이아 차감
+  async deductDiamond(userId: number, amount: number) {
+    try {
+      const user = await this.userRepository.findId(userId);
+      if (!user) {
+        throw new NotFoundException('사용자를 찾을 수 없습니다.');
+      }
+
+      if (user.pink_dia < amount) {
+        throw new BadRequestException('보유한 다이아가 부족합니다.');
+      }
+
+      const updateData: UpdateUserDto = {
+        pink_dia: user.pink_dia - amount
+      };
+      await this.userRepository.updateUser(userId, updateData);
+
+      // 캐시 업데이트
+      const cacheKey = `user:${user.email}`;
+      const cachedUser = await this.valkeyService.get<CachedUser>(cacheKey);
+      if (cachedUser) {
+        cachedUser.pink_dia = user.pink_dia - amount;
+        await this.valkeyService.set(cacheKey, cachedUser, 60 * 60 * 12);
+      }
+
+      return {
+        success: true,
+        message: `${amount} 다이아가 차감되었습니다.`,
+        currentDiamond: user.pink_dia - amount
+      };
+    } catch (error) {
+      throw new InternalServerErrorException('다이아 차감 중 오류가 발생했습니다.');
+    }
+  }
+
+  // 🔹 엑세스 토큰 갱신
+  async refreshAccessToken(refreshToken: string, @Res() res: Response) {
+    if (!refreshToken) {
+      throw new BadRequestException('리프레시 토큰이 필요합니다.');
+    }
+
+    let user;
+    try {
+      user = this.jwtService.verify(refreshToken, {
+        secret: this.configService.get<string>('REFRESH_TOKEN_SECRET_KEY'),
+      });
+    } catch (error) {
+      throw new BadRequestException('유효하지 않은 리프레시 토큰입니다.');
+    }
+
+    const newAccessToken = this.jwtService.sign(
+      { id: user.id, email: user.email, role: user.role },
+      {
+        secret: this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY'),
+        expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRES_IN'),
+      },
+    );
+
+    res.setHeader('Access-Control-Expose-Headers', 'Authorization');
+    res.setHeader('Authorization', `Bearer ${newAccessToken}`);
+    return res.status(200).json({ message: '엑세스 토큰이 갱신되었습니다.' });
   }
 }

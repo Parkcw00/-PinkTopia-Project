@@ -23,7 +23,7 @@ export class DirectionController {
   constructor(private readonly directionService: DirectionService) {}
 
   // 북마크 만들기
-  @Get('bookmarke')
+  @Get('bookmark')
   async getAllSubAchievements() {
     return this.directionService.createBookmarks();
   }
@@ -32,12 +32,17 @@ export class DirectionController {
   @Patch('compare-bookmark')
   async compareBookmark(
     @Request() req,
-    @Body() compareDirection: CompareDirection,
+    @Body()
+    compareDirection: {
+      user_direction: { latitude: number; longitude: number };
+    },
     @ConnectedSocket() client: Socket,
   ) {
+    console.log(compareDirection);
     return this.directionService.compareBookmark(
       req.user.id,
-      compareDirection,
+      compareDirection.user_direction.latitude,
+      compareDirection.user_direction.longitude,
       client,
     );
   }

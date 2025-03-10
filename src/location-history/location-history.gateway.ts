@@ -49,16 +49,17 @@ export class LocationHistoryGateway {
       longitude: data.longitude,
     };
     // [추가됨]: CompareDirection 객체 생성 (CoordinatesDto 포함)
-    const compareDirection: CompareDirection = {
+    /* const compareDirection: CompareDirection = {
       user_direction: {
         latitude: data.latitude,
         longitude: data.longitude,
       },
-    };
+    };*/
     await this.locationHistoryService.updateValkey(data.userId, updateDto);
     await this.directionService.compareBookmark(
       data.userId,
-      compareDirection,
+      updateDto.latitude,
+      updateDto.longitude,
       client,
     );
 

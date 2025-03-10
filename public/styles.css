@@ -1,0 +1,390 @@
+/* 기본 스타일 */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
+}
+
+/* 네비게이션 스타일 */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ff69b4;
+  padding: 15px;
+  color: white;
+  font-weight: bold;
+  position: relative;
+  height: 50px;
+}
+
+/* 로그인 & 회원가입 메뉴 스타일 (PC에서는 원래 크기 유지) */
+#authMenu {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  right: 20px;
+  font-size: 14px; /* PC에서는 원래 크기 유지 */
+  gap: 10px;
+}
+
+/* 로그인/회원가입 링크 스타일 */
+#authMenu a {
+  color: white;
+  text-decoration: none;
+  font-size: 14px; /* PC에서는 유지 */
+  padding: 6px 10px;
+  border-radius: 5px;
+}
+
+#authMenu a:hover {
+  text-decoration: underline;
+}
+
+/* 📌 로그인 & 회원가입 버튼 스타일 */
+.nav .login-links {
+  font-size: 14px; /* 폰트 크기 줄이기 */
+  display: flex;
+  align-items: center;
+  gap: 5px; /* 로그인과 회원가입 사이 간격 */
+  position: absolute;
+  right: 20px; /* 오른쪽 정렬 */
+}
+
+/* 로그인 & 회원가입 링크 스타일 */
+.nav .login-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 12px; /* 모바일에서 글자 크기 줄이기 */
+  padding: 5px 8px;
+  border-radius: 5px;
+}
+
+.nav .login-links a:hover {
+  text-decoration: underline;
+}
+
+/* 아이템 컨테이너 */
+.store-container,
+.inventory-grid {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 10px !important;
+}
+
+/* 아이템 카드 */
+.store-item,
+.inventory-item {
+  flex: 0 1 calc(50% - 10px) !important;
+  max-width: 180px !important;
+  background: white !important;
+  padding: 15px !important;
+  border-radius: 15px !important;
+  box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3) !important;
+  text-align: center !important;
+  transition: transform 0.2s !important;
+}
+
+/* 이미지 크기 조정 */
+.store-item img,
+.inventory-item img {
+  width: 100% !important;
+  height: auto !important;
+  object-fit: contain !important;
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+/* 버튼 크기 */
+.store-item button,
+.inventory-item button {
+  width: 100% !important;
+  padding: 8px !important;
+  font-size: 18px !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+}
+
+/* 기본 PC 스타일 - 변경 없음 */
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(250px, 1fr)
+  ); /* PC에서는 1개씩 */
+  gap: 15px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 📌 모바일 (768px 이하)에서는 2개씩 정렬 */
+@media (max-width: 768px) {
+  .collection-grid {
+    grid-template-columns: repeat(2, minmax(140px, 1fr)); /* 2개씩 배치 */
+    gap: 10px; /* 카드 사이 간격 */
+    padding: 10px;
+    max-width: 600px;
+  }
+
+  .pinkmong-image {
+    width: 100px !important;
+    height: 80px !important;
+    object-fit: contain; /* 잘리는 문제 해결 */
+  }
+
+  .pinkmong-card {
+    max-width: 160px; /* 카드 크기 제한 */
+    overflow: visible !important; /* 잘리는 문제 방지 */
+  }
+
+  .pinkmong-info {
+    font-size: 14px; /* 글씨 크기 조정 */
+  }
+}
+
+/* 📌 더 작은 모바일 화면 (480px 이하)에서는 더 작게 2개 */
+@media (max-width: 480px) {
+  .collection-grid {
+    grid-template-columns: repeat(
+      2,
+      minmax(120px, 1fr)
+    ) !important; /* 더 작게 2개 */
+  }
+
+  .pinkmong-card {
+    padding: 6px;
+  }
+
+  .pinkmong-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .pinkmong-info {
+    font-size: 12px;
+  }
+}
+
+/* 📌 모바일에서도 2개씩 정렬 유지 */
+@media (max-width: 600px) {
+  .store-item,
+  .inventory-item {
+    flex: 0 1 calc(50% - 10px) !important;
+    max-width: 150px !important;
+    font-size: 14px !important; /* 스마트폰에서 폰트 줄이기 */
+  }
+
+  .store-item h3,
+  .inventory-item h3 {
+    font-size: 14px !important; /* 제목 크기 줄이기 */
+  }
+
+  .store-item p,
+  .inventory-item p {
+    font-size: 12px !important; /* 설명 폰트 크기 줄이기 */
+  }
+
+  .store-item button,
+  .inventory-item button {
+    width: 100% !important;
+    padding: 8px !important;
+    font-size: 14px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+  }
+}
+
+/* 📌 태블릿(768px 이하)에서도 유지 */
+@media (max-width: 768px) {
+  .store-item,
+  .inventory-item {
+    flex: 0 1 calc(50% - 10px) !important;
+    max-width: 180px !important;
+    font-size: 15px !important; /* 태블릿에서 폰트 약간 줄이기 */
+  }
+
+  .store-item h3,
+  .inventory-item h3 {
+    font-size: 16px !important; /* 제목 크기 줄이기 */
+  }
+
+  .store-item p,
+  .inventory-item p {
+    font-size: 13px !important; /* 설명 폰트 크기 줄이기 */
+  }
+
+  .store-item button,
+  .inventory-item button {
+    font-size: 17px !important; /* 태블릿에서 버튼 폰트 크기 조정 */
+    padding: 8px !important;
+  }
+}
+
+/* 📌 모바일에서 로그인/회원가입 크기 더 줄이기 */
+@media (max-width: 500px) {
+  .nav .login-links {
+    font-size: 12px; /* 모바일에서 폰트 크기 더 줄이기 */
+    right: 10px; /* 더 오른쪽으로 정렬 */
+  }
+
+  .nav .login-links a {
+    font-size: 11px; /* 모바일에서 더 작은 글씨 */
+    padding: 4px 6px;
+  }
+}
+/* 📌 모바일 스타일 (768px 이하일 때 적용) */
+@media (max-width: 768px) {
+  .nav {
+    flex-direction: row;
+    height: auto;
+    padding: 10px;
+  }
+
+  .menu-icon {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .menu {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .menu a {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .map-section {
+    display: flex;
+    flex-direction: column; /* 📌 모바일에서 세로 정렬 */
+    align-items: center; /* 가운데 정렬 */
+    width: 100%;
+  }
+
+  .route-finder {
+    width: 100%;
+  }
+
+  #authMenu {
+    font-size: 12px; /* 모바일에서 폰트 크기 축소 */
+    right: 1px; /* 위치 조정 */
+    gap: 3px; /* 간격 줄이기 */
+  }
+
+  #authMenu a {
+    font-size: 12px; /* 모바일에서 폰트 크기 줄이기 */
+    padding: 4px 6px; /* 버튼 크기 축소 */
+  }
+
+  #map {
+    width: 100%;
+    min-height: 300px !important; /* 📌 모바일에서도 높이 유지 */
+  }
+
+  #userProfileBox {
+    position: absolute; /* ✅ 네비게이션 바 내부에서만 움직이도록 설정 */
+    right: 10px; /* ✅ 네비게이션 바의 오른쪽 끝에 정렬 */
+    top: 75px; /* ✅ 네비게이션 바의 중간 정렬 */
+    transform: translateY(-50%); /* ✅ 세로 정렬 조정 */
+
+    max-width: 140px !important; /* ✅ 강제 적용 */
+    font-size: 12px !important; /* ✅ 글자 크기 더 줄이기 */
+    padding: 4px 6px !important;
+    display: flex;
+    align-items: center;
+    white-space: nowrap; /* ✅ 텍스트 줄바꿈 방지 */
+  }
+
+  #userProfileBox img {
+    width: 25px !important; /* ✅ 더 작은 크기 */
+    height: 25px !important;
+    margin-right: 5px;
+  }
+
+  .nav .logo-text {
+    font-size: 16px !important; /* ✅ 로고 텍스트도 더 작게 */
+  }
+  .sidebar {
+    width: 0; /* ✅ 기본적으로 숨김 */
+    height: 100vh;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    background-color: #ff69b4;
+    transition: width 0.3s ease; /* ✅ 부드러운 애니메이션 효과 */
+    padding-top: 40px;
+    box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+    overflow-x: hidden; /* ✅ 스크롤 바 없애기 */
+  }
+
+  /* 사이드바 내부 메뉴 스타일 */
+  .sidebar a {
+    font-size: 14px !important; /* ✅ 글자 크기 줄이기 */
+    padding: 10px 15px !important; /* ✅ 메뉴 간격 줄이기 */
+    text-align: left !important; /* ✅ 왼쪽 정렬 적용 */
+    display: block; /* ✅ a 태그가 블록 요소로 정렬 */
+    padding-left: 20px !important; /* ✅ 왼쪽 여백 추가 */
+  }
+
+  /* 사이드바가 열릴 때 */
+  .sidebar.open {
+    width: 220px !important; /* ✅ 사이드바가 열릴 때 너비 설정 */
+  }
+
+  .user-assets {
+    font-size: 16px !important; /* ✅ 글자 크기 줄이기 */
+    display: flex !important;
+    align-items: center;
+    gap: 5px !important; /* ✅ 간격 줄이기 */
+    padding: 4px 8px !important; /* ✅ 패딩 줄이기 */
+    border-radius: 10px !important; /* ✅ 둥글기 줄이기 */
+    box-shadow: 0 2px 5px rgba(255, 98, 182, 0.2);
+    position: absolute !important;
+    right: 10px !important; /* ✅ 오른쪽 정렬 */
+    top: 53px !important; /* ✅ 네비게이션 바와 간격 조정 */
+  }
+
+  .user-assets .asset-item {
+    font-size: 12px !important; /* ✅ 더 작은 글자 크기 */
+    display: flex !important;
+    align-items: center !important;
+    gap: 3px !important; /* ✅ 아이콘과 숫자 간격 줄이기 */
+  }
+
+  .user-assets .asset-item img {
+    width: 14px !important; /* ✅ 아이콘 크기 줄이기 */
+    height: 14px !important;
+  }
+
+  .user-assets span {
+    font-size: 12px !important; /* ✅ 숫자 크기 줄이기 */
+  }
+}
+
+/* 📌 600px 이상에서는 가로 정렬 유지 */
+@media (min-width: 600px) {
+  .map-section {
+    display: flex !important;
+    flex-direction: row !important; /* 가로 정렬 강제 */
+    justify-content: space-between; /* 양쪽 정렬 */
+    gap: 20px;
+    width: 100%;
+  }
+
+  .route-finder {
+    flex: 1;
+  }
+
+  #map {
+    flex: 2;
+    width: 100%;
+    min-height: 400px !important; /* 📌 최소 높이 지정 */
+    background: #f0f0f0; /* 테스트용 배경 추가 */
+  }
+}

@@ -7,8 +7,7 @@ const socket = io('/location', {
 function checkAccessToken() {
   const accessToken = localStorage.getItem('accessToken');
   if (!accessToken) {
-    console.error(':x: Access Token이 없습니다. 로그인 페이지로 이동합니다.');
-    window.location.href = '/';
+    console.error(':x: 로그인이 필요합니다.');
   }
   return accessToken; // accessToken을 반환
 }
@@ -19,31 +18,78 @@ function parseJwt(token) {
   return JSON.parse(window.atob(base64));
 }
 const decodedToken = parseJwt(accessToken);
-function isTokenExpired(token) {
+async function checkAndRefreshToken() {
+  const accessToken = localStorage.getItem('accessToken');
+  if (!accessToken) {
+    console.error(':x: 로그인이 필요합니다.');
+    return;
+  }
+
+  const decodedToken = parseJwt(accessToken); // 토큰을 파싱하여 만료 시간 확인
   const exp = decodedToken.exp * 1000; // 만료 시간을 밀리초로 변환
-  return Date.now() >= exp; // 현재 시간이 만료 시간보다 크면 true
+  const now = Date.now();
+
+  // 만료 시간의 1분(60000ms) 전이면 갱신 요청
+  if (exp - now < 60000) {
+    const refreshed = await refreshAccessToken(); // 갱신 요청
+    if (!refreshed) {
+      // 갱신이 성공하면 새로운 토큰으로 decodedToken 업데이트
+      const newAccessToken = localStorage.getItem('accessToken');
+      return parseJwt(newAccessToken); // 업데이트된 decodedToken 반환
+    }
+  }
+
+  return decodedToken; // 갱신할 필요 없음
 }
+
+async function refreshAccessToken() {
+  const refreshToken = getCookie('refreshToken'); // 리프레시 토큰을 쿠키에서 가져오는 함수
+  if (!refreshToken) {
+    console.error(':x: 리프레시 토큰이 없습니다. 다시 로그인 해주세요.');
+    return;
+  }
+  try {
+    const response = await fetch('/user/auth/refresh', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token: refreshToken }),
+      credentials: 'include',
+    });
+    const data = await response.json();
+    if (response.ok) {
+      const newToken = response.headers.get('Authorization');
+      if (newToken) {
+        localStorage.setItem('accessToken', newToken);
+        return false;
+      }
+    } else {
+      console.error(':x: 엑세스 토큰 갱신 실패:', data);
+      return true;
+    }
+  } catch (error) {
+    console.error(':x: 토큰 갱신 중 오류 발생:', error);
+  }
+}
+
+// 쿠키에서 리프레시 토큰을 가져오는 함수
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
 function startLocationUpdates() {
-  if (accessToken && !isTokenExpired()) {
-    setInterval(() => {
-      if (isTokenExpired()) {
-        socket.disconnect(); // 소켓 연결 종료
-        alert('엑세스 토큰이 만료되었습니다. 다시 로그인하세요.');
-        window.location.href = '/'; // 로그인 페이지로 리다이렉트
-      } else {
-        sendLocation();
-      }
+  if (accessToken) {
+    setInterval(async () => {
+      await sendLocation(); // 위치 전송
+      requestLocationHistory();
     }, 10000); // 10초마다 위치 전송
+
     setInterval(() => {
-      if (isTokenExpired()) {
-        socket.disconnect();
-        alert('엑세스 토큰이 만료되었습니다. 다시 로그인하세요.');
-        window.location.href = '/';
-      } else {
-        sendLocation10(); // :흰색_확인_표시: 1분마다 실행되는 함수 수정
-      }
+      sendLocation10(); // 1분마다 위치 저장
     }, 60000); // 1분마다 실행
-    requestLocationHistory();
   } else {
     socket.disconnect(); // 소켓 연결 종료
     alert('엑세스 토큰이 만료되었습니다. 다시 로그인하세요.');
@@ -51,7 +97,8 @@ function startLocationUpdates() {
   }
 }
 startLocationUpdates();
-function sendLocation() {
+async function sendLocation() {
+  const tokenRefreshed = await checkAndRefreshToken();
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition((position) => {
       const data = {
@@ -175,34 +222,5 @@ function requestLocationHistory() {
     });
   } else {
     alert('Geolocation을 지원하지 않는 브라우저입니다.');
-  }
-  async function logout() {
-    try {
-      const accessToken = localStorage.getItem('accessToken');
-      if (!accessToken) {
-        console.warn(':경광등: 로그아웃 시도: 이미 로그아웃된 상태');
-        window.location.href = '/public/log-in.html';
-        return;
-      }
-      // :작은_파란색_다이아몬드: 서버에 로그아웃 요청 보내기
-      const response = await fetch('http://localhost:3000/user/auth/logout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: accessToken,
-        },
-        credentials: 'include', // 쿠키도 함께 보내기
-      });
-      if (!response.ok) {
-        throw new Error('서버에서 로그아웃 처리 실패');
-      }
-      // :흰색_확인_표시: 로그아웃 성공 후, 토큰 삭제
-      localStorage.removeItem('accessToken');
-      console.log(':흰색_확인_표시: 로그아웃 성공! 페이지 이동');
-      window.location.href = '/public/log-in.html'; // 로그인 페이지로 이동
-    } catch (error) {
-      console.error(':x: 로그아웃 실패:', error);
-      alert('로그아웃 중 오류가 발생했습니다.');
-    }
   }
 }

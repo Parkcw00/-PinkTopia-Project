@@ -1,50 +1,36 @@
-let geocoder = new kakao.maps.services.Geocoder();
+// import { Transactional } from 'typeorm-transactional-cls-hooked';
 
-// 출발지 및 도착지 마커 객체 저장
-let start = markers.find((m) => m.key === 'start').marker;
-let end = markers.find((m) => m.key === 'end').marker;
+// @Transactional()
+// async post(user_id: number, subId: number): Promise<AchievementP> {
+//   if (!subId) {
+//     throw new BadRequestException('subAchievementId 값이 없거나 형식이 맞지 않습니다');
+//   }
 
-// 입력창과 마커 연동 기능 추가
-function setMarkerPosition(marker, addressInputId) {
-  let inputElement = document.getElementById(addressInputId);
+//   const isSubId = await this.repository.findSub(subId);
+//   if (!isSubId) {
+//     throw new NotFoundException('해당 서브업적이 존재하지 않습니다.');
+//   }
 
-  geocoder.addressSearch(inputElement.value, function (result, status) {
-    if (status === kakao.maps.services.Status.OK) {
-      let coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-      marker.setPosition(coords);
-      map.setCenter(coords);
-      localStorage.setItem(
-        addressInputId + 'Location',
-        JSON.stringify({ lat: result[0].y, lng: result[0].x }),
-      );
-    } else {
-      alert('검색 결과가 없습니다.');
-    }
-  });
-}
+//   // 중복 검사
+//   const alreadyP = await this.repository.findPByUserNSub(user_id, subId);
+//   if (alreadyP) {
+//     throw new BadRequestException('이미 달성한 서브업적 입니다.');
+//   }
 
-// 마커 드래그 시 입력창 값 변경
-function updateInputValue(marker, addressInputId) {
-  let inputElement = document.getElementById(addressInputId);
-  let position = marker.getPosition();
-  inputElement.value = `${position.getLat()}, ${position.getLng()}`;
-}
+//   // 데이터 생성 및 저장
+//   const dataP = {
+//     user_id,
+//     sub_achievement_id: subId,
+//     achievement_id: isSubId?.achievement_id ?? null,
+//     complete: true,
+//   };
 
-// 출발지 입력 이벤트
-document.getElementById('start').addEventListener('change', function () {
-  setMarkerPosition(start, 'start');
-});
+//   const createP = await this.repository.createP(dataP);
+//   const save = await this.repository.save(createP);
 
-// 도착지 입력 이벤트
-document.getElementById('end').addEventListener('change', function () {
-  setMarkerPosition(end, 'end');
-});
+//   if (!save) {
+//     throw new BadRequestException('저장 실패했습니다.');
+//   }
 
-// 마커 드래그 후 좌표 업데이트
-kakao.maps.event.addListener(start, 'dragend', function () {
-  updateInputValue(start, 'start');
-});
-
-kakao.maps.event.addListener(end, 'dragend', function () {
-  updateInputValue(end, 'end');
-});
+//   return save;
+// }
