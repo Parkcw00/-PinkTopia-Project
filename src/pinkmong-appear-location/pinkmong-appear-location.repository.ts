@@ -55,6 +55,7 @@ export class PinkmongAppearLocationRepository {
 
   // 위치 삭제
   async deleteLocation(id: number): Promise<void> {
+    console.log(`${id}번 삭제`);
     await this.repo.delete(id);
   }
 
