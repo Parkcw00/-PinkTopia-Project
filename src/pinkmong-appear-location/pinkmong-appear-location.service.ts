@@ -3,7 +3,6 @@ import { PinkmongAppearLocationRepository } from 'src/pinkmong-appear-location/p
 import { CreatePinkmongAppearLocationDto } from 'src/pinkmong-appear-location/dto/create-pinkmong-appear-location.dto';
 import { PinkmongAppearLocation } from 'src/pinkmong-appear-location/entities/pinkmong-appear-location.entity';
 import { UpdatePinkmongAppearLocationDto } from './dto/update-pinkmong-appear-location.dto';
-import { ValkeyService } from 'src/valkey/valkey.service';
 import { GeoService } from '../geo/geo.service';
 import { RegionTheme } from '../pinkmong-appear-location/entities/pinkmong-appear-location.entity';
 
@@ -11,7 +10,6 @@ import { RegionTheme } from '../pinkmong-appear-location/entities/pinkmong-appea
 export class PinkmongAppearLocationService {
   constructor(
     private readonly repository: PinkmongAppearLocationRepository,
-    private readonly valkeyService: ValkeyService, // 🛠️ ValkeyService 추가
     private readonly geoService: GeoService,
   ) {}
 
