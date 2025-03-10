@@ -54,7 +54,7 @@ describe('PinkmongService', () => {
     expect(pinkmongService).toBeDefined();
   });
 
-  // 1️⃣ **핑크몽 전체 조회**
+  // **핑크몽 전체 조회**
   describe('getAllPinkmongs(전체 핑크몽 조회)', () => {
     it('Valkey 캐시에 데이터가 있는 경우, 캐시된 데이터를 반환해야 한다.', async () => {
       const cachedPinkmongs: Pinkmong[] = [
@@ -118,7 +118,7 @@ describe('PinkmongService', () => {
     });
   });
 
-  // 2️⃣ **특정 핑크몽 조회**
+  // **특정 핑크몽 조회**
   describe('getPinkmong', () => {
     it('Valkey 캐시에 핑크몽이 있는 경우, 캐시된 데이터를 반환해야 한다.', async () => {
       const pinkmong: Pinkmong = {
@@ -153,7 +153,7 @@ describe('PinkmongService', () => {
     });
   });
 
-  // 3️⃣ **핑크몽 생성**
+  // **핑크몽 생성**
   describe('createPinkmong(핑크몽 생성)', () => {
     it('should create a pinkmong', async () => {
       const createPinkmongDto: CreatePinkmongDto = {
@@ -195,17 +195,17 @@ describe('PinkmongService', () => {
         region_theme: createPinkmongDto.region_theme,
         grade: createPinkmongDto.grade,
         point: createPinkmongDto.point,
-        created_at: expect.any(Date), // ✅ Date 타입이면 통과
-        updated_at: expect.any(Date), // ✅ Date 타입이면 통과
+        created_at: expect.any(Date),
+        updated_at: expect.any(Date),
         deleted_at: undefined,
-        catch_pinkmong: expect.any(Array), // ✅ 배열 검증
+        catch_pinkmong: expect.any(Array),
         collection: expect.any(Array),
       });
       expect(s3Service.uploadFile).toHaveBeenCalledWith(file);
     });
   });
 
-  // 4️⃣ **핑크몽 삭제**
+  // **핑크몽 삭제**
   describe('deletePinkmong(핑크몽 삭제제)', () => {
     it('should delete a pinkmong', async () => {
       const pinkmong: Pinkmong = {
