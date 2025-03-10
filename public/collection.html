@@ -415,24 +415,23 @@
             if (type === 'all') {
                 filteredPinkmongs = [...allPinkmongs]; // 전체 핑크몽
             } else if (type === 'owned') {
-                filteredPinkmongs = allPinkmongs.filter(pinkmong => {
-                    const isOwned = userCollections.has(String(pinkmong.id));
-                    console.log(`✔ ID ${pinkmong.id} - 발견됨:`, isOwned); // 🔍 디버깅용 로그
-                    return isOwned;
-                }); // 보유한 핑크몽
+                filteredPinkmongs = allPinkmongs.filter(pinkmong => userCollections.has(String(pinkmong.id))); // 보유한 핑크몽
             } else if (type === 'unowned') {
                 filteredPinkmongs = allPinkmongs.filter(pinkmong => !userCollections.has(String(pinkmong.id))); // 미보유 핑크몽
             }
 
+            // ✅ 정렬 추가 (등급 순서: 레전더리 → 에픽 → 레어 → 커먼)
+            const gradeOrder = { "legendary": 1, "epic": 2, "rare": 3, "common": 4 };
+
+            filteredPinkmongs.sort((a, b) => {
+                const gradeA = gradeOrder[a.grade?.toLowerCase()] || 99;
+                const gradeB = gradeOrder[b.grade?.toLowerCase()] || 99;
+                return gradeA - gradeB;
+            });
+
             // 🔹 버튼 스타일 업데이트
-            document
-                .querySelectorAll('.filter-buttons .tab')
-                .forEach((tab) => tab.classList.remove('active'));
-            document
-                .querySelector(
-                    `.filter-buttons .tab[onclick="filterCollection('${type}')"]`,
-                )
-                .classList.add('active');
+            document.querySelectorAll('.filter-buttons .tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`.filter-buttons .tab[onclick="filterCollection('${type}')"]`).classList.add('active');
 
             currentPage = 1;
             displayPinkmongs();
@@ -471,7 +470,7 @@
                 const collectionResult = await collectionResponse.json();
                 // 🛠 유저가 보유한 핑크몽 ID를 확인 (String 변환)
                 userCollections = new Set(collectionResult.map(col => String(col.id)));
-                filteredPinkmongs = [...allPinkmongs];
+                filterCollection('all');
                 displayPinkmongs();
                 updatePaginationButtons();
             } catch (error) {
