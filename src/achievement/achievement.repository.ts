@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { IsNull, Repository, MoreThan, LessThan} from 'typeorm';
+import { IsNull, Repository, MoreThan, LessThan } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Achievement } from './entities/achievement.entity';
 import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
-import { CreateAchievementDto } from './dto/create-achievement.dto';
-import { UpdateAchievementDto } from './dto/update-achievement.dto';
 import { AchievementCategory } from './enums/achievement-category.enum';
 import { AchievementP } from '../achievement-p/entities/achievement-p.entity';
 
@@ -122,14 +120,17 @@ export class AchievementRepository {
   }
 
   // 사용자가 완료한 서브업적 조회 (새로 추가)
-  async findCompletedSubAchievements(userId: number, achievementId: number): Promise<AchievementP[]> {
+  async findCompletedSubAchievements(
+    userId: number,
+    achievementId: number,
+  ): Promise<AchievementP[]> {
     return await this.achievementPEntity.find({
       where: {
         user_id: userId,
         achievement_id: achievementId,
-        complete: true
+        complete: true,
       },
-      select: ['id', 'sub_achievement_id']
+      select: ['id', 'sub_achievement_id'],
     });
   }
 }

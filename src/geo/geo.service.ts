@@ -11,23 +11,17 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
     this.client = new Redis(); // Redis 클라이언트 초기화
   }
 
-  /**
-   * 모듈이 초기화될 때 실행됩니다.
-   */
+  //모듈이 초기화될 때 실행.
   onModuleInit() {
     // 필요 시 초기화 로직 추가
   }
 
-  /**
-   * 모듈이 종료될 때 실행됩니다.
-   */
+  // 모듈이 종료될 때 실행.
   onModuleDestroy() {
     this.client.quit(); // Redis 연결 종료
   }
 
-  /**
-   * Redis에 여러 작업을 일괄 처리하는 파이프라인 생성
-   */
+  // Redis에 여러 작업을 일괄 처리하는 파이프라인 생성
   multi() {
     return this.client.multi(); // multi()는 Redis의 파이프라인 메서드
   }
@@ -100,7 +94,6 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
       region_theme: data.region_theme,
     });
   }
-  //////////////////////////////
 
   // geo 읽어서 맵에 북마커 추가하기
   // 🔹 특정 키의 모든 Geo 데이터를 조회

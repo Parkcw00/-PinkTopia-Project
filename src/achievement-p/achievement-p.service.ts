@@ -3,17 +3,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateAchievementPDto } from './dto/create-achievement-p.dto';
-import { UpdateAchievementPDto } from './dto/update-achievement-p.dto';
-import { FilesInterceptor } from '@nestjs/platform-express';
 import { AchievementP } from './entities/achievement-p.entity';
 import { AchievementPRepository } from './achievement-p.repository';
-import { number } from 'joi';
-import { Achievement } from '../achievement/entities/achievement.entity';
-import { IsDate } from 'class-validator';
-
 import { ValkeyService } from '../valkey/valkey.service';
-import { QueryRunner, Repository } from 'typeorm'; // TypeORM Repository
+
 @Injectable()
 export class AchievementPService {
   constructor(
