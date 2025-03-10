@@ -256,6 +256,17 @@
       let inventoryItems = [];
 
       document.addEventListener('DOMContentLoaded', async function () {
+        // 핑크몽 인카운터 인증 확인
+        const encounterAuth = localStorage.getItem('pinkmongEncounterAuth');
+        const now = new Date().getTime();
+
+        // 인증 토큰이 없거나 만료된 경우 (2분 제한)
+        if (!encounterAuth || now - parseInt(encounterAuth) >= 120000) {
+          alert('핑크몽을 만나야 포획할 수 있습니다! 홈으로 돌아갑니다.');
+          window.location.href = '/public/home.html';
+          return;
+        }
+
         const accessToken = localStorage.getItem('accessToken');
         const authMenu = document.getElementById('authMenu');
 
@@ -430,6 +441,8 @@
           if (result.success) {
             // 포획 성공 시 2초 후 핑크몽 목록 페이지로 이동
             alert(result.message);
+            // 인증 토큰 사용 완료 (한 번만 사용 가능하도록)
+            localStorage.removeItem('pinkmongEncounterAuth');
             setTimeout(() => {
               window.location.href = '/public/home.html';
             }, 1000);
@@ -438,6 +451,8 @@
           if (result.message === '핑크몽이 도망갔습니다!') {
             // 포획 실패 시 2초 후 홈페이지로 이동
             alert(result.message);
+            // 인증 토큰 사용 완료 (한 번만 사용 가능하도록)
+            localStorage.removeItem('pinkmongEncounterAuth');
             setTimeout(() => {
               window.location.href = '/public/home.html';
             }, 1000);
@@ -456,6 +471,10 @@
           window.location.href = '/';
           return;
         }
+
+        // 인증 토큰 사용 완료 (한 번만 사용 가능하도록)
+        localStorage.removeItem('pinkmongEncounterAuth');
+        // 포획 시도 시간 저장
         localStorage.setItem('lastCatchAttempt', new Date().getTime());
         try {
           const response = await fetch('/catch-pinkmong/giveup', {
