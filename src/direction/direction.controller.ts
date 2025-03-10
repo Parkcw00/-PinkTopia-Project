@@ -41,8 +41,8 @@ export class DirectionController {
     console.log(compareDirection);
     return this.directionService.compareBookmark(
       req.user.id,
-      compareDirection.user_direction.longitude,
       compareDirection.user_direction.latitude,
+      compareDirection.user_direction.longitude,
       client,
     );
   }
