@@ -551,7 +551,7 @@
                   // 있는 경우 삭제 
                   if (idByEmail) {
                     console.log('중복된 타이틀 있음');
-                    const deleteResponse = await fetch(`/pinkmong-appear-location?id=${encodeURIComponent(idByEmail)}`, {
+                    const deleteResponse = await fetch(`/pinkmong-appear-location?id=${encodeURIComponent(idByEmail.id)}`, {
                       method: 'DELETE',
                       headers: {
                         'Content-Type': 'application/json'
