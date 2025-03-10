@@ -59,6 +59,11 @@ export class PinkmongAppearLocationService {
     return this.repository.createLocation(dto);
   }
 
+  async findOne(user_email: string): Promise<{ id: number } | undefined> {
+    const id = await this.repository.findOneByEmail(user_email);
+    return id ?? undefined;
+  }
+
   async getAllLocations(): Promise<PinkmongAppearLocation[]> {
     return this.repository.findAll();
   }

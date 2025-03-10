@@ -526,9 +526,35 @@
                   alert('로그인이 필요한 서비스입니다.');
                   return;
                 }
+                // 토큰 풀기
+                const decodedToken = parseJwt(accessToken);
 
 
                 try {
+
+                  // 유저 이메일로 검색-동일한 북마커가 이미 있는 지 확인 
+                  const id = await fetch('/pinkmong-appear-location/getOne', {
+                    method: 'get',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: decodedToken.email
+                  });
+                } catch (error) { console.log('id 가져오는데 실패') }
+                try { // 있는경우 삭제
+                  if (id > 0) {
+                    console.log('중복된 타이틀 있음')
+                    await fetch('/pinkmong-appear-location/getOne', {
+                      method: 'delete',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: id
+                    });
+                  }
+                } catch (error) { console.log('중복 제거 실패') }
+
+                try { // 북마커 추가. 이 아래는 정상작동 획인함.
                   const response = await fetch('/pinkmong-appear-location', {
                     method: 'POST',
                     headers: {
@@ -536,7 +562,7 @@
                       'Authorization': `${accessToken}`
                     },
                     body: JSON.stringify({
-                      title: new Date(),
+                      title: decodedToken.email,
                       latitude: position.coords.latitude,
                       longitude: position.coords.longitude,
                       region_theme: 'city'

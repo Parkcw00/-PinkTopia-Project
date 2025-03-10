@@ -36,6 +36,13 @@ export class PinkmongAppearLocationController {
     return this.service.getAllLocations();
   }
 
+  @Get('getOne')
+  async getOne(
+    @Body('user_id') user_email: string,
+  ): Promise<{ id: number } | undefined> {
+    return this.service.findOne(user_email);
+  }
+
   @Patch(':id')
   async updateLocation(
     @Param('id', ParseIntPipe) id: number,
