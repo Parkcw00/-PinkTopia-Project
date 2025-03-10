@@ -88,8 +88,8 @@ export class DirectionService {
     /*🎀 핑크몽 */
     try {
       const nearBybookmarkP = await this.geoService.getNearbyBookmarkP(
-        latitude,
         longitude,
+        latitude,
       );
 
       if (nearBybookmarkP) {

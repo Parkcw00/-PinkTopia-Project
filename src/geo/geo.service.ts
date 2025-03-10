@@ -1,5 +1,7 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import Redis from 'ioredis';
+import { IsEmail } from 'class-validator';
+import { title } from 'process';
 
 @Injectable()
 export class GeoService implements OnModuleInit, OnModuleDestroy {
@@ -289,4 +291,9 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
       ? { id: nearestId, ...details }
       : null;
   }
+
+  // async findOneByBookmark(user_email:string){
+  //   const data = await this.client.get(where:{title:user_email});
+  //   return data.key
+  // }
 }

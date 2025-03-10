@@ -5,6 +5,7 @@ import {
   Delete,
   Param,
   Body,
+  Query,
   ParseIntPipe,
   Patch,
 } from '@nestjs/common';
@@ -36,6 +37,14 @@ export class PinkmongAppearLocationController {
     return this.service.getAllLocations();
   }
 
+  @Get('getOne')
+  async getOne(
+    @Query('user_email') user_email: string, // 쿼리 파라미터에서 이메일 받기
+  ): Promise<{ id: number } | undefined> {
+    console.log(`C - 이메일(${user_email})로 북마커 ID 가져오기`);
+    return this.service.findOneByEmail(user_email);
+  }
+
   @Patch(':id')
   async updateLocation(
     @Param('id', ParseIntPipe) id: number,
@@ -44,8 +53,9 @@ export class PinkmongAppearLocationController {
     return this.service.updateLocation(id, updateDto);
   }
 
-  @Delete(':id')
-  async deleteLocation(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  @Delete()
+  async deleteLocation(@Query('id') id: number): Promise<void> {
+    console.log('삭제!!!');
     return this.service.deleteLocation(id);
   }
 }

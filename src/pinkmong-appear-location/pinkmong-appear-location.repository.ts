@@ -4,6 +4,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PinkmongAppearLocation } from 'src/pinkmong-appear-location/entities/pinkmong-appear-location.entity';
 import { CreatePinkmongAppearLocationDto } from './dto/create-pinkmong-appear-location.dto';
 import { UpdatePinkmongAppearLocationDto } from './dto/update-pinkmong-appear-location.dto';
+import { IsEmail } from 'class-validator';
+import { number } from 'joi';
+import { id } from 'aws-sdk/clients/datapipeline';
 
 @Injectable()
 export class PinkmongAppearLocationRepository {
@@ -37,9 +40,22 @@ export class PinkmongAppearLocationRepository {
   async findById(id: number): Promise<PinkmongAppearLocation | null> {
     return await this.repo.findOne({ where: { id } });
   }
+  // 이메일로 타이틀 조회 -> id반환
+  async findOneByEmail(
+    user_email: string,
+  ): Promise<{ id: number } | undefined> {
+    console.log('R - 타이틀로 id 가져오기');
+    const id = await this.repo.findOne({
+      where: { title: user_email },
+      select: { id: true },
+    });
+    console.log('있는 id : ', id);
+    return id ?? undefined;
+  }
 
   // 위치 삭제
   async deleteLocation(id: number): Promise<void> {
+    console.log(`${id}번 삭제`);
     await this.repo.delete(id);
   }
 
