@@ -63,4 +63,10 @@ export class ChattingController {
   findAll(@Request() req, @Param('chattingroomId') chatting_room_id: string) {
     return this.chattingService.findAll(req.user, chatting_room_id);
   }
+
+  @ApiOperation({ summary: 'Sentry 에러 테스트' })
+  @Get('test-sentry')
+  testSentryError() {
+    throw new Error('This is a test error for Sentry monitoring');
+  }
 }
