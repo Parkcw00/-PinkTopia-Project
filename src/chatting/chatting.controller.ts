@@ -20,6 +20,16 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class ChattingController {
   constructor(private readonly chattingService: ChattingService) {}
 
+  @Get('debug-sentry')
+  getError() {
+    throw new Error('My first Sentry error!');
+  }
+
+  @Get('hi')
+  getError2() {
+    throw new Error('hello, world!');
+  }
+
   // 조회랑 채팅 생성 전부 유 인증이 필요함
   @ApiOperation({ summary: '채팅 생성' })
   @UseGuards(UserGuard)
@@ -52,5 +62,11 @@ export class ChattingController {
   @Get('chattings')
   findAll(@Request() req, @Param('chattingroomId') chatting_room_id: string) {
     return this.chattingService.findAll(req.user, chatting_room_id);
+  }
+
+  @ApiOperation({ summary: 'Sentry 에러 테스트' })
+  @Get('test-sentry')
+  testSentryError() {
+    throw new Error('This is a test error for Sentry monitoring');
   }
 }
