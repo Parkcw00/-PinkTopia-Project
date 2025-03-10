@@ -5,7 +5,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>핑크몽 포획 | PinkTopia</title>
-    <link rel="stylesheet" href="/public/styles.css" />
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,6 +17,7 @@
         .nav {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             background-color: #ff69b4;
             padding: 15px;
             color: white;
@@ -26,6 +26,7 @@
             width: 100%;
             top: 0;
             z-index: 1000;
+            box-sizing: border-box;
         }
 
         .nav a {
@@ -62,10 +63,7 @@
 
         @media (max-width: 480px) {
             .inventory-grid {
-                grid-template-columns: repeat(2, minmax(85px, 1fr));
-                /* ✅ 모바일에서는 2개 정렬 */
-                max-width: 280px;
-                /* 📌 모바일에서 너무 넓어지지 않도록 */
+                grid-template-columns: repeat(1, 1fr) !important;
             }
 
             .inventory-item {
@@ -79,6 +77,51 @@
                 width: 180px;
                 /* 📌 필요하면 크기도 조정 */
                 height: 180px;
+            }
+
+            .nav {
+                padding: 15px 10px;
+            }
+            
+            .nav > div:first-child {
+                font-size: 0.9em;
+            }
+            
+            #authMenu {
+                text-align: right;
+            }
+            
+            #authMenu a {
+                margin-left: 5px;
+                font-size: 0.9em;
+                padding: 5px 10px;
+                background-color: rgba(255, 255, 255, 0.2);
+                border-radius: 15px;
+                display: inline-block;
+            }
+        }
+
+        /* 아주 작은 화면을 위한 추가 스타일 */
+        @media (max-width: 360px) {
+            .inventory-grid {
+                grid-template-columns: repeat(1, 1fr);
+                margin: 0 auto;
+            }
+            
+            .inventory-item {
+                width: 70px !important;
+                height: 85px !important;
+                justify-content: center;
+            }
+            
+            .inventory-item img {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .inventory-item-name {
+                font-size: 0.7em;
+                max-width: 65px;
             }
         }
 
@@ -109,12 +152,11 @@
 
         .controls {
             background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
+            padding: 15px;
             border-radius: 15px;
-            width: 100%;
-            max-width: 550px;
-            /* 🔥 최대 너비를 줄여서 정렬 맞추기 */
-            margin-bottom: 25px;
+            width: 90%;
+            max-width: 400px;
+            margin-bottom: 20px;
             position: relative;
             z-index: 3;
             display: flex;
@@ -127,27 +169,22 @@
         }
 
         .inventory-grid {
-            display: grid !important;
-            /* 🔥 flex가 적용되지 않도록 grid로 강제 설정 */
-            grid-template-columns: repeat(3, 1fr) !important;
-            /* 한 줄에 3개 정렬 */
-            gap: 15px !important;
-            /* 간격 조정 */
-            justify-items: center;
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            gap: 10px !important;
+            overflow-x: auto !important;
             width: 100%;
-            max-width: 500px !important;
-            /* 부모 컨테이너 크기 조정 */
+            max-width: 100% !important;
+            padding: 10px 5px;
+            justify-content: flex-start;
         }
 
         .inventory-item {
-            flex: unset !important;
-            /* 기존의 flex 적용 제거 */
-            max-width: unset !important;
-            /* 강제 max-width 해제 */
+            flex: 0 0 auto !important;
             width: 100px !important;
-            /* 올바른 크기로 강제 지정 */
             height: 120px !important;
-            padding: 5px;
+            padding: 10px;
             border: 2px solid #ff69b4;
             border-radius: 8px;
             background-color: white;
@@ -157,34 +194,38 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            margin-right: 20px;
         }
 
         .inventory-item img {
             width: 50px;
             height: 50px;
             border-radius: 5px;
+            margin-bottom: 10px;
         }
 
         .inventory-item-info {
-            font-size: 1em;
             text-align: center;
         }
 
         .inventory-item-name {
-            font-size: 1em;
-            margin-bottom: 5px;
+            font-size: 0.8em;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80px;
+            text-align: center;
         }
 
         .inventory-item-count {
             font-size: 0.7em;
-            color: #666;
         }
 
-        /* 선택된 아이템 효과 */
-        .inventory-item.selected {
-            background-color: #ffe6f2;
-            transform: scale(1.05);
-            box-shadow: 0 0 8px rgba(255, 105, 180, 0.5);
+        .status {
+            color: #333;
+            text-shadow: none;
+            margin-bottom: 15px;
         }
 
         .catch-button {
@@ -229,12 +270,36 @@
             transform: scale(0.95);
         }
 
-        .status {
-            text-align: center;
-            color: white;
-            font-size: 1.2em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        /* 모바일 화면용 스타일을 더 강화 */
+        @media (max-width: 480px) {
+            .controls {
+                padding: 12px;
+                width: 95%;
+                max-width: 330px;
+            }
+            
+            .inventory-grid {
+                gap: 5px !important;
+            }
+            
+            .inventory-item {
+                width: 70px !important;
+                height: 90px !important;
+            }
+            
+            .inventory-item img {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .button-container {
+                margin-top: 10px;
+            }
+            
+            .catch-button, .escape-button {
+                padding: 10px 15px;
+                font-size: 0.9em;
+            }
         }
     </style>
 </head>
