@@ -3,8 +3,6 @@ import { EventRepository } from './event.repository';
 import { Repository } from 'typeorm';
 import { Event } from './entities/event.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { CreateEventDto } from './dto/create-event.dto';
-import { UpdateEventDto } from './dto/update-event.dto';
 
 const mockRepository = {
   findOne: jest.fn(), // 특정 이벤트 조회
