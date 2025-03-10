@@ -59,6 +59,14 @@ export class PinkmongAppearLocationService {
     return this.repository.createLocation(dto);
   }
 
+  async findOneByEmail(
+    user_email: string,
+  ): Promise<{ id: number } | undefined> {
+    console.log('S - 타이틀로 id 가져오기');
+    const id = await this.repository.findOneByEmail(user_email);
+    return id ?? undefined;
+  }
+
   async getAllLocations(): Promise<PinkmongAppearLocation[]> {
     return this.repository.findAll();
   }
@@ -75,6 +83,7 @@ export class PinkmongAppearLocationService {
     return updatedLocation;
   }
   async deleteLocation(id: number): Promise<void> {
+    console.log('S - 삭제!!!', id);
     return this.repository.deleteLocation(id);
   }
 }

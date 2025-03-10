@@ -24,6 +24,6 @@ export class Inventory {
   @OneToOne(() => CatchPinkmong, (catch_pinkmong) => catch_pinkmong.inventory)
   catch_pinkmong: CatchPinkmong;
 
-  @OneToMany(() => Item, (item) => item.inventory) // 카드 엔티티와 1:n 관계 설정
+  @OneToMany(() => Item, (item) => item.inventory)
   item: Item[];
 }

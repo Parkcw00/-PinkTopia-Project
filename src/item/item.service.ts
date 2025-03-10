@@ -142,15 +142,10 @@ export class ItemService {
       }
 
       item.count -= sellCount;
-      // console.log(`✅ [판매 후 아이템 수량] 남은 개수: ${item.count}`);
 
       if (item.count === 0) {
-        // console.log(`🗑️ [삭제] 아이템ID: ${id} 인벤토리에서 삭제`);
         await this.itemRepository.deleteItem(id);
       } else {
-        // console.log(
-        //   `💾 [업데이트] 아이템ID: ${id} -> 새로운 개수: ${item.count}`,
-        // );
         await this.itemRepository.updateItem(id, { count: item.count });
       }
 
@@ -166,14 +161,10 @@ export class ItemService {
         throw new NotFoundException('❌ 유저가 존재하지 않습니다.');
       }
 
-      // 📌 **여기서 캐시 삭제 및 최신 인벤토리 데이터 조회**
-      // console.log(`🗑️ [캐시 삭제 실행]`);
       await this.valkeyService.del(`invenItems:`);
 
-      // ✅ **DB에서 최신 인벤토리 데이터 가져와서 확인**
       const updatedInventory =
         await this.inventoryRepository.findOneByUserId(userId);
-      // console.log(`📦 [캐시 삭제 후 DB 데이터]`, updatedInventory);
 
       return {
         message: `${storeItem.name} ${sellCount}개를 판매하였습니다. 젬 ${refundGem}개를 환불 받았습니다.`,
