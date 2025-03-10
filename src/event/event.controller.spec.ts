@@ -123,10 +123,25 @@ describe('EventController', () => {
         title: '수정된 이벤트',
         expiration_at: new Date().toISOString(),
       };
-      await controller.updateEvent(1, updateEventDto);
+
+      const file: Express.Multer.File = {
+        originalname: 'test.png',
+        buffer: Buffer.from('file'),
+        fieldname: 'file',
+        encoding: '7bit',
+        mimetype: 'image/png',
+        size: 1024,
+        stream: Readable.from(Buffer.from('file')),
+        destination: '',
+        filename: 'test.png',
+        path: '',
+      };
+
+      await controller.updateEvent(1, updateEventDto, file);
       expect(mockEventService.updateEvent).toHaveBeenCalledWith(
         1,
         updateEventDto,
+        file,
       );
     });
   });
