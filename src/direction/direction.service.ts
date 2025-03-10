@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ValkeyService } from '../valkey/valkey.service';
 import { AchievementPService } from '../achievement-p/achievement-p.service';
-import { CompareDirection } from './dto/compare-direction.dto';
+
 import { getDistance, isPointWithinRadius } from 'geolib';
 import axios, { all } from 'axios'; // HTTP 요청을 보내기 위한 클라이언트 라이브러리
 import { DirectionGateway } from './/direction.gateway';
@@ -58,8 +58,9 @@ export class DirectionService {
 
   async compareBookmark(
     user_id: number,
-    longitude: number,
     latitude: number,
+    longitude: number,
+
     client: Socket,
   ) {
     // 🏆 서브업적

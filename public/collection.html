@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>핑크몽 도감</title>
-    <link rel="stylesheet" href="/public/styles.css">
+    <link rel="stylesheet" href="/public/styles.css" />
     <style>
         body {
             background-color: #fdf1f1;
@@ -313,10 +313,10 @@
             </div>
         </div>
         <div class="logo-container">
-            <img src="/public/images/123.jpg" alt="PinkTopia Logo">
+            <img src="/public/images/123.jpg" alt="PinkTopia Logo" />
         </div>
         <div class="logo-text">
-            <a href="/public/home.html" style="text-decoration: none; color: white;">PinkTopia</a>
+            <a href="/public/home.html" style="text-decoration: none; color: white">PinkTopia</a>
         </div>
     </div>
 
@@ -332,7 +332,7 @@
             <a href="/public/board.html">게시글 (커뮤니티)</a>
             <a href="/public/ranking.html">랭킹</a>
             <!-- 로그인 시 표시될 메뉴들 -->
-            <div id="loggedInMenu" style="display: none;">
+            <div id="loggedInMenu" style="display: none">
                 <a href="/public/chattingrooms.html">채팅</a>
                 <a href="/public/collection.html">핑크몽 개인 도감</a>
                 <a href="/public/inventory.html">인벤토리 아이템</a>
@@ -354,15 +354,15 @@
     </div>
 
     <div class="filter-buttons">
-        <button class="tab active" onclick="filterCollection('all')">전체조회</button>
+        <button class="tab active" onclick="filterCollection('all')">
+            전체조회
+        </button>
         <button class="tab" onclick="filterCollection('owned')">발견</button>
         <button class="tab" onclick="filterCollection('unowned')">미발견</button>
     </div>
 
-
-
     <div class="collection-grid" id="collectionGrid"></div>
-    <div class="pagination" style="text-align: center; margin: 20px 0;">
+    <div class="pagination" style="text-align: center; margin: 20px 0">
         <button id="prev-btn" onclick="changePage(-1)" disabled>이전</button>
         <span id="page-info">1</span>
         <button id="next-btn" onclick="changePage(1)">다음</button>
@@ -376,15 +376,15 @@
         let filteredPinkmongs = [];
 
         function openSidebar() {
-            document.getElementById('sidebar').style.width = "250px";
+            document.getElementById('sidebar').style.width = '250px';
         }
 
         function closeSidebar() {
-            document.getElementById('sidebar').style.width = "0";
+            document.getElementById('sidebar').style.width = '0';
         }
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const accessToken = localStorage.getItem("accessToken");
+        document.addEventListener('DOMContentLoaded', function () {
+            const accessToken = localStorage.getItem('accessToken');
 
             if (accessToken) {
                 document.getElementById('loggedInMenu').style.display = 'block';
@@ -396,7 +396,7 @@
         });
 
         function logout() {
-            localStorage.removeItem("accessToken");
+            localStorage.removeItem('accessToken');
             window.location.reload();
         }
 
@@ -425,8 +425,14 @@
             }
 
             // 🔹 버튼 스타일 업데이트
-            document.querySelectorAll('.filter-buttons .tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelector(`.filter-buttons .tab[onclick="filterCollection('${type}')"]`).classList.add('active');
+            document
+                .querySelectorAll('.filter-buttons .tab')
+                .forEach((tab) => tab.classList.remove('active'));
+            document
+                .querySelector(
+                    `.filter-buttons .tab[onclick="filterCollection('${type}')"]`,
+                )
+                .classList.add('active');
 
             currentPage = 1;
             displayPinkmongs();
@@ -437,15 +443,17 @@
             if (!checkLogin()) return;
 
             try {
-                const pinkmongResponse = await fetch('http://localhost:3000/pinkmong/pinkmongs', {
+                const pinkmongResponse = await fetch('/pinkmong/pinkmongs', {
                     credentials: 'include',
                     headers: {
-                        'Authorization': localStorage.getItem('accessToken')
-                    }
+                        Authorization: localStorage.getItem('accessToken'),
+                    },
                 });
 
                 if (!pinkmongResponse.ok) {
-                    throw new Error('핑크몽 데이터 요청 실패: ' + pinkmongResponse.status);
+                    throw new Error(
+                        '핑크몽 데이터 요청 실패: ' + pinkmongResponse.status,
+                    );
                 }
 
                 const pinkmongResult = await pinkmongResponse.json();
@@ -497,12 +505,11 @@
             document.getElementById('next-btn').style.display = 'inline-block';
             document.getElementById('page-info').style.display = 'inline-block';
 
-
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
             const currentPinkmongs = filteredPinkmongs.slice(startIndex, endIndex); // ✅ `filteredPinkmongs` 사용
 
-            currentPinkmongs.forEach(pinkmong => {
+            currentPinkmongs.forEach((pinkmong) => {
                 const isCollected = userCollections.has(String(pinkmong.id));
                 const card = document.createElement('div');
                 card.className = `pinkmong-card ${!isCollected ? 'not-collected' : ''} grade-${pinkmong.grade?.toLowerCase() || 'unknown'}`;
@@ -554,41 +561,39 @@
             loadCollection();
         };
 
-
         async function logout() {
             try {
-                const accessToken = localStorage.getItem("accessToken");
+                const accessToken = localStorage.getItem('accessToken');
                 if (!accessToken) {
-                    console.warn("🚨 로그아웃 시도: 이미 로그아웃된 상태");
-                    window.location.href = "/public/log-in.html";
+                    console.warn('🚨 로그아웃 시도: 이미 로그아웃된 상태');
+                    window.location.href = '/public/log-in.html';
                     return;
                 }
 
                 // 🔹 서버에 로그아웃 요청 보내기
-                const response = await fetch("http://localhost:3000/user/auth/logout", {
-                    method: "POST",
+                const response = await fetch('/user/auth/logout', {
+                    method: 'POST',
                     headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": accessToken
+                        'Content-Type': 'application/json',
+                        Authorization: accessToken,
                     },
-                    credentials: "include" // 쿠키도 함께 보내기
+                    credentials: 'include', // 쿠키도 함께 보내기
                 });
 
                 if (!response.ok) {
-                    throw new Error("서버에서 로그아웃 처리 실패");
+                    throw new Error('서버에서 로그아웃 처리 실패');
                 }
 
                 // ✅ 로그아웃 성공 후, 토큰 삭제
-                localStorage.removeItem("accessToken");
+                localStorage.removeItem('accessToken');
 
-                console.log("✅ 로그아웃 성공! 페이지 이동");
-                window.location.href = "/"; // 
+                console.log('✅ 로그아웃 성공! 페이지 이동');
+                window.location.href = '/'; //
             } catch (error) {
-                console.error("❌ 로그아웃 실패:", error);
-                alert("로그아웃 중 오류가 발생했습니다.");
+                console.error('❌ 로그아웃 실패:', error);
+                alert('로그아웃 중 오류가 발생했습니다.');
             }
         }
-
     </script>
 </body>
 

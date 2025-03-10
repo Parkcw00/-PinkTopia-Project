@@ -21,12 +21,12 @@ export class StoreItemService {
     // Valkey에서 먼저 조회
     const cachedData = await this.valkeyService.get<StoreItem[]>(cacheKey);
     if (cachedData !== null) {
-      return cachedData as StoreItem[]; // 👈 강제 타입 지정
+      return cachedData as StoreItem[];   
     }
 
     // Valkey에 데이터가 없으면 DB에서 조회 후 캐싱
     const storeItems = await this.storeItemRepository.findAll();
-    await this.valkeyService.set(cacheKey, storeItems, 300); // 5분 캐싱
+    await this.valkeyService.set(cacheKey, storeItems, 300);
 
     return storeItems;
   }
@@ -38,7 +38,7 @@ export class StoreItemService {
     // Valkey에서 먼저 조회
     const cachedData = await this.valkeyService.get<StoreItem>(cacheKey);
     if (cachedData !== null) {
-      return cachedData as StoreItem; // 👈 강제 타입 지정
+      return cachedData as StoreItem;
     }
 
     // Valkey에 데이터가 없으면 DB에서 조회 후 캐싱
@@ -47,7 +47,7 @@ export class StoreItemService {
       throw new NotFoundException('존재하지 않는 상점 아이템입니다.');
     }
 
-    await this.valkeyService.set(cacheKey, storeItem, 300); // 5분 캐싱
+    await this.valkeyService.set(cacheKey, storeItem, 300);
     return storeItem;
   }
 
@@ -72,21 +72,21 @@ export class StoreItemService {
     req: Request,
     id: number,
     updateStoreItemDto: UpdateStoreItemDto,
-    file?: Express.Multer.File, // 🔹 파일을 받을 수 있도록 추가
+    file?: Express.Multer.File,
   ): Promise<StoreItem | null> {
     const storeItem = await this.storeItemRepository.storeItemFindOne(id);
     if (!storeItem) {
       throw new NotFoundException('존재하지 않는 상점 아이템입니다.');
     }
     // 🔹 파일이 존재하면 S3에 업로드 후 URL 업데이트
-    let item_image = storeItem.item_image; // 기존 이미지 유지
+    let item_image = storeItem.item_image;
     if (file) {
       item_image = await this.s3Service.uploadFile(file);
     }
 
     const updatedData = {
       ...updateStoreItemDto,
-      item_image, // 🔹 새 이미지가 있으면 업데이트
+      item_image, 
     };
 
     const updatedItem = await this.storeItemRepository.updateStoreItem(

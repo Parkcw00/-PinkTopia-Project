@@ -41,6 +41,6 @@ export class StoreItem {
   @DeleteDateColumn()
   deleted_at: Date;
 
-  @OneToMany(() => Item, (item) => item.store_item) // 카드 엔티티와 1:n 관계 설정
+  @OneToMany(() => Item, (item) => item.store_item) 
   item: Item[];
 }

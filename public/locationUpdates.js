@@ -103,8 +103,8 @@ async function sendLocation() {
     navigator.geolocation.getCurrentPosition((position) => {
       const data = {
         userId: decodedToken.id,
-        longitude: position.coords.longitude,
         latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
         timestamp: new Date().toISOString(),
       };
       socket.emit('updateLocation', data);
@@ -118,8 +118,8 @@ function sendLocation10() {
     navigator.geolocation.getCurrentPosition((position) => {
       const data = {
         userId: decodedToken.id,
-        longitude: position.coords.longitude,
         latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
         timestamp: new Date().toISOString(),
       };
       socket.emit('updateLocationDB', data);
