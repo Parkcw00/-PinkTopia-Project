@@ -39,16 +39,13 @@ export class ChattingRoomService {
 
   // 채팅방 조회
   async getChattingRoom(user: any) {
-    // Fetch all chat member entries for the user
     const chatMembers =
       await this.chattingRoomRepository.findChatMemberByUserId(user.id);
 
-    // Extract chat room IDs from the chat member entries
     const chattingRoomIds = chatMembers.map(
       (member) => member.chatting_room_id,
     );
 
-    // Fetch chat rooms and their members' nicknames
     const chattingRooms = await Promise.all(
       chattingRoomIds.map(async (id) => {
         const room = await this.chattingRoomRepository.findChattingRoomById(id);
@@ -65,7 +62,6 @@ export class ChattingRoomService {
           }),
         );
 
-        // Include the title in the returned object
         return {
           id: room.id,
           title: room.title,
@@ -91,8 +87,7 @@ export class ChattingRoomService {
     // 관리자인 경우에만 관리자 위임 처리
     if (isMember.admin === true) {
       const members = await this.chattingRoomRepository.findAllChatMembers(chattingRoomId);
-      if (members.length > 1) {  // 자신을 제외한 다른 멤버가 있는 경우
-        // 자신을 제외한 다른 멤버 중에서 새로운 관리자 선택
+      if (members.length > 1) {  
         const otherMembers = members.filter(member => member.user_id !== user.id);
         const randomNumber = Math.floor(Math.random() * otherMembers.length);
         const newAdmin = otherMembers[randomNumber].user_id;
