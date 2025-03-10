@@ -4,9 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PinkmongAppearLocation } from 'src/pinkmong-appear-location/entities/pinkmong-appear-location.entity';
 import { CreatePinkmongAppearLocationDto } from './dto/create-pinkmong-appear-location.dto';
 import { UpdatePinkmongAppearLocationDto } from './dto/update-pinkmong-appear-location.dto';
-import { IsEmail } from 'class-validator';
-import { number } from 'joi';
-import { id } from 'aws-sdk/clients/datapipeline';
 
 @Injectable()
 export class PinkmongAppearLocationRepository {
