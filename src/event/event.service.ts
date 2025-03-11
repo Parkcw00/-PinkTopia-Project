@@ -1,15 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EventRepository } from './event.repository';
-import { Event } from './entities/event.entity';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { S3Service } from '../s3/s3.service'; // S3Service 추가
 
-/**
- * EventService
- *
- * 이벤트의 생성, 조회, 수정, 삭제 등의 비즈니스 로직을 처리하는 서비스 클래스
- */
 @Injectable()
 export class EventService {
   constructor(
@@ -19,10 +13,6 @@ export class EventService {
 
   /**
    * 이벤트 생성 (파일 업로드 포함)
-   *
-   * @param createEventDto - 이벤트 생성 DTO
-   * @param file - 업로드된 파일
-   * @returns 생성 완료 메시지 반환
    */
   async createEvent(
     createEventDto: CreateEventDto,
@@ -53,8 +43,6 @@ export class EventService {
 
   /**
    * 전체 이벤트 조회
-   *
-   * @returns 데이터베이스에 저장된 모든 이벤트 목록 반환
    */
   async getAllEvents() {
     const events = await this.eventRepository.findAll();
@@ -63,9 +51,6 @@ export class EventService {
 
   /**
    * 특정 이벤트 조회
-   *
-   * @param eventId - 조회할 이벤트의 ID
-   * @returns 해당 이벤트 정보 반환
    */
   async getEvent(eventId: number) {
     console.log(`🔍 이벤트 조회: ${eventId}`);
@@ -82,11 +67,6 @@ export class EventService {
 
   /**
    * 이벤트 수정 (파일 업로드 포함)
-   *
-   * @param eventId - 수정할 이벤트의 ID
-   * @param updateEventDto - 수정할 데이터
-   * @param file - 업로드된 파일 (선택사항)
-   * @returns 수정 완료 메시지 반환
    */
   async updateEvent(
     eventId: number,
@@ -127,9 +107,6 @@ export class EventService {
 
   /**
    * 이벤트 삭제
-   *
-   * @param eventId - 삭제할 이벤트의 ID
-   * @returns 삭제 완료 메시지 반환
    */
   async deleteEvent(eventId: number) {
     const event = await this.eventRepository.findById(eventId);
@@ -142,8 +119,6 @@ export class EventService {
 
   /**
    * 종료된 이벤트 조회
-   *
-   * @returns 상태가 'closed'인 이벤트 목록 반환
    */
   async getClosedEvents() {
     const events = await this.eventRepository.findClosedEvents();
@@ -152,8 +127,6 @@ export class EventService {
 
   /**
    * 진행 중인 이벤트 조회
-   *
-   * @returns 상태가 'active'인 이벤트 목록 반환
    */
   async getActiveEvents() {
     const events = await this.eventRepository.findActiveEvents();
@@ -162,9 +135,6 @@ export class EventService {
 
   /**
    * 이벤트 종료 (상태 변경)
-   *
-   * @param eventId - 종료할 이벤트의 ID
-   * @returns 종료 완료 메시지 반환
    */
   async closeEvent(eventId: number) {
     const event = await this.eventRepository.findById(eventId);

@@ -1,88 +1,126 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AchievementPController } from './achievement-p.controller';
 import { AchievementPService } from './achievement-p.service';
+import { AchievementP } from './entities/achievement-p.entity';
+import { UserService } from '../user/user.service';
+import { UserRepository } from '../user/user.repository';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { ValkeyService } from '../valkey/valkey.service';
 
 describe('AchievementPController', () => {
   let controller: AchievementPController;
-  let service: AchievementPService;
+  let service: jest.Mocked<AchievementPService>;
 
-  // 서비스의 메소드를 모의하여 컨트롤러의 동작만 검증합니다.
-  const mockService = {
-    fillValkey: jest.fn(),
-    post: jest.fn(),
-    deleteByUserNSub: jest.fn(),
-    deleteByPId: jest.fn(),
-  };
-
+  // 각 테스트 케이스 실행 전 모듈 설정
   beforeEach(async () => {
-    // 테스트 모듈 생성 시 컨트롤러와 모의 서비스를 주입합니다.
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AchievementPController],
       providers: [
-        { provide: AchievementPService, useValue: mockService },
+        {
+          provide: AchievementPService,
+          useValue: {
+            post: jest.fn(),
+            deleteByUserNSub: jest.fn(),
+            deleteByPId: jest.fn(),
+          },
+        },
+        {
+          provide: UserService,
+          useValue: {
+            findOne: jest.fn().mockResolvedValue({ id: 1 }), // 필요한 메서드 모킹
+          },
+        },
+        {
+          provide: UserRepository,
+          useValue: {
+            findOne: jest.fn().mockResolvedValue({ id: 1 }), // 필요한 메서드 모킹
+          },
+        },
+        {
+          provide: JwtService,
+          useValue: {
+            sign: jest.fn().mockReturnValue('mock-jwt-token'), // 필요한 메서드 모킹
+          },
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn().mockReturnValue('mock-config-value'), // 필요한 메서드 모킹
+          },
+        },
+        {
+          provide: ValkeyService,
+          useValue: {
+            get: jest.fn().mockResolvedValue('mock-valkey-value'), // 필요한 메서드 모킹
+          },
+        },
       ],
     }).compile();
 
     controller = module.get<AchievementPController>(AchievementPController);
-    service = module.get<AchievementPService>(AchievementPService);
+    service = module.get<AchievementPService>(
+      AchievementPService,
+    ) as jest.Mocked<AchievementPService>;
   });
 
+  // 각 테스트 후 목업 초기화
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  // fillValkey 엔드포인트에 대한 테스트
-  describe('fillValkey', () => {
-    it('req.user.id를 전달하여 service.fillValkey가 호출되어야 함', async () => {
-      const req = { user: { id: 1 } };
-      const expected = { message: '테스트 메시지' };
-      mockService.fillValkey.mockResolvedValue(expected);
-
-      const result = await controller.fillValkey(req);
-      expect(service.fillValkey).toHaveBeenCalledWith(1);
-      expect(result).toEqual(expected);
-    });
-  });
-
-  // post 엔드포인트에 대한 테스트
+  // post 메서드 테스트
   describe('post', () => {
-    it('req.user.id와 subAchievementId를 전달하여 service.post가 호출되어야 함', async () => {
+    it('AchievementP를 생성해야 한다', async () => {
       const req = { user: { id: 1 } };
-      const subAchievementId = '101';
-      const expected = { id: 1 };
-      mockService.post.mockResolvedValue(expected);
+      const subAchievementId = 1;
+      const mockAchievementP = {
+        id: 1,
+        user_id: 1,
+        sub_achievement_id: subAchievementId,
+      } as AchievementP;
+
+      service.post.mockResolvedValue(mockAchievementP);
 
       const result = await controller.post(req, subAchievementId);
-      expect(service.post).toHaveBeenCalledWith(1, subAchievementId);
-      expect(result).toEqual(expected);
+
+      expect(service.post).toHaveBeenCalledWith(req.user.id, subAchievementId);
+      expect(result).toEqual(mockAchievementP);
     });
   });
 
-  // deleteByUserNSub 엔드포인트에 대한 테스트
+  // deleteByUserNSub 메서드 테스트
   describe('deleteByUserNSub', () => {
-    it('req.user.id와 subAchievementId를 전달하여 service.deleteByUserNSub가 호출되어야 함', async () => {
+    it('사용자와 서브 ID로 AchievementP를 삭제해야 한다', async () => {
       const req = { user: { id: 1 } };
-      const subAchievementId = '101';
-      const expected = { message: '삭제 완료' };
-      mockService.deleteByUserNSub.mockResolvedValue(expected);
+      const subAchievementId = 1;
+      const mockResponse = { message: '삭제 완료' };
+
+      service.deleteByUserNSub.mockResolvedValue(mockResponse);
 
       const result = await controller.deleteByUserNSub(req, subAchievementId);
-      expect(service.deleteByUserNSub).toHaveBeenCalledWith(1, subAchievementId);
-      expect(result).toEqual(expected);
+
+      expect(service.deleteByUserNSub).toHaveBeenCalledWith(
+        req.user.id,
+        subAchievementId,
+      );
+      expect(result).toEqual(mockResponse);
     });
   });
 
-  // deleteByPId 엔드포인트에 대한 테스트
+  // deleteByPId 메서드 테스트
   describe('deleteByPId', () => {
-    it('achievementPId를 전달하여 service.deleteByPId가 호출되어야 함', async () => {
-      const req = { user: { id: 1 } }; // req는 사용되지 않음
+    it('ID로 AchievementP를 삭제해야 한다', async () => {
+      const req = { user: { id: 1 } };
       const achievementPId = '1';
-      const expected = { message: '삭제 완료' };
-      mockService.deleteByPId.mockResolvedValue(expected);
+      const mockResponse = { message: '삭제 완료' };
+
+      service.deleteByPId.mockResolvedValue(mockResponse);
 
       const result = await controller.deleteByPId(req, achievementPId);
+
       expect(service.deleteByPId).toHaveBeenCalledWith(achievementPId);
-      expect(result).toEqual(expected);
+      expect(result).toEqual(mockResponse);
     });
   });
 });

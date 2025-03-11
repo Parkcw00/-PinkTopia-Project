@@ -3,13 +3,9 @@ import {
   NotFoundException,
   BadRequestException,
   ConflictException,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { format } from 'date-fns'; // npm install date-fns
-import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository, DeleteResult, MoreThan } from 'typeorm';
 import { S3Service } from '../s3/s3.service';
-import { parseISO } from 'date-fns';
 import { AchievementCategory } from './enums/achievement-category.enum'; // ENUM 경로 확인
 import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
 import { CreateAchievementDto } from './dto/create-achievement.dto';
@@ -60,7 +56,9 @@ export class AchievementService {
     }
 
     // expiration_date를 Date 객체로 변환
-    const expirationAt = format(expiration_at, 'yyyy-MM-dd HH:mm:ss');
+    const expirationAt = expiration_at
+      ? format(expiration_at, 'yyyy-MM-dd HH:mm:ss')
+      : undefined;
 
     const achievement = await this.repository.create({
       title,
@@ -93,13 +91,13 @@ export class AchievementService {
   }
 
   // 만료목록
-  async findAllDone(): Promise<Achievement[]> {
+  async findAllDone(userId: number): Promise<Achievement[]> {
     // 현재 UTC 기준 시간 가져오기
-    const now = new Date();
-    console.log('날짜', now);
+    // const now = new Date();
+    // console.log('날짜', now);
 
     // 활성화된 업적 조회
-    const data = await this.repository.findAllDone(now);
+    const data = await this.repository.findAllDone(userId);
 
     // 결과가 없을 경우 예외 처리
     if (data.length === 0) {
@@ -121,7 +119,6 @@ export class AchievementService {
     if (data.length === 0) {
       throw new NotFoundException('활성화된 업적이 없습니다.');
     }
-
     return data;
   }
 
@@ -171,7 +168,6 @@ export class AchievementService {
     console.log('업적 : ', achievement);
 
     // 서브업적 조회
-
     const subAchievement = await this.repository.findByAId(idA);
     if (!subAchievement) {
       throw new NotFoundException(
@@ -183,6 +179,59 @@ export class AchievementService {
     return {
       title: achievement.title,
       subAchievements: subAchievement ?? [], // null이면 빈 배열 반환
+    };
+  }
+
+  // userId를 받아 서브업적의 완료 상태를 포함한 업적 정보를 반환하는 새로운 메서드
+  async getAchievementWithSubAchievements(
+    id: string,
+    userId: number,
+  ): Promise<{ title: string; subAchievements: any[] }> {
+    console.log('id : ', id);
+    const idA = Number(id);
+    if (!idA) {
+      throw new BadRequestException(
+        'achievementId 값이 없거나 형식이 맞지 않습니다',
+      );
+    }
+
+    // 업적 조회 - 타이틀 가져오기
+    const achievement = await this.repository.findOne(idA);
+    if (!achievement) {
+      throw new NotFoundException(
+        `ID ${id}에 해당하는 업적을 찾을 수 없습니다.`,
+      );
+    }
+
+    // 서브업적 조회
+    const subAchievements = await this.repository.findByAId(idA);
+    if (!subAchievements) {
+      throw new NotFoundException(
+        `ID ${id}에 해당하는 서브업적을 찾을 수 없습니다.`,
+      );
+    }
+
+    // 사용자가 완료한 서브업적 목록 조회
+    // achievement_p 테이블에서 user_id와 achievement_id가 일치하고 complete=1인 항목을 조회
+    const completedSubAchievements =
+      await this.repository.findCompletedSubAchievements(userId, idA);
+
+    // 완료된 서브업적 ID 목록 생성
+    const completedSubIds = completedSubAchievements.map(
+      (item) => item.sub_achievement_id,
+    );
+
+    // 완료 상태를 포함한 서브업적 목록 생성
+    const subAchievementsWithStatus = subAchievements.map((sub) => ({
+      ...sub,
+      completed: completedSubIds.includes(sub.id), // completed 속성 추가
+    }));
+
+    console.log('서브 업적 (완료 상태 포함): ', subAchievementsWithStatus);
+
+    return {
+      title: achievement.title,
+      subAchievements: subAchievementsWithStatus,
     };
   }
 

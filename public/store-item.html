@@ -81,10 +81,15 @@
 
       .store-item img {
         width: 100%;
-        height: 200px;
-        object-fit: cover;
-        border-radius: 15px;
-        border: 3px solid #f38fc5;
+        /* 부모 박스 너비에 맞춤 */
+        height: auto;
+        /* 비율 유지 */
+        object-fit: contain;
+        /* 기존 cover → contain 으로 변경 */
+        display: block;
+        /* 박스 내 중앙 정렬 문제 해결 */
+        margin: 0 auto;
+        /* 가운데 정렬 */
       }
 
       .store-item h3 {
@@ -228,28 +233,28 @@
 
       .user-assets {
         position: absolute;
-        top: 20px;
-        right: 20px;
         display: flex;
-        gap: 20px;
+        align-items: center;
+        gap: 10px;
         background: white;
-        padding: 10px 20px;
+        padding: 8px 15px;
         border-radius: 15px;
         box-shadow: 0 4px 10px rgba(255, 98, 182, 0.3);
         z-index: 100;
+        right: 20px;
       }
 
       .asset-item {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 5px;
         color: #9c195f;
         font-weight: bold;
       }
 
       .asset-item img {
-        width: 24px;
-        height: 24px;
+        width: 20px;
+        height: 20px;
       }
 
       /* 구매 버튼 스타일 수정 */
@@ -343,6 +348,22 @@
         font-size: 1.1em;
         margin-bottom: 10px;
       }
+
+      .refund-button {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-left: 10px;
+        font-size: 0.8em;
+        text-decoration: none;
+      }
+
+      .refund-button:hover {
+        background-color: #c82333;
+      }
     </style>
   </head>
 
@@ -385,7 +406,6 @@
         <a href="/public/store-item.html">아이템샵</a>
         <a href="/public/board.html">게시글 (커뮤니티)</a>
         <a href="/public/ranking.html">랭킹</a>
-        <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
         <!-- 로그인 시 표시될 메뉴들 -->
         <div id="loggedInMenu" style="display: none">
           <a href="/public/chattingrooms.html">채팅</a>
@@ -393,6 +413,7 @@
           <a href="/public/inventory.html">인벤토리 아이템</a>
           <a href="/public/achievements.html">업적</a>
           <a href="/public/mypage.html">마이페이지</a>
+          <a href="/public/customer-service.html">고객 센터</a>
           <a href="#" onclick="logout()">로그아웃</a>
         </div>
         <!-- 로그인 안 된 경우 표시될 메뉴들 -->

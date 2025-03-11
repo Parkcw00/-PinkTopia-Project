@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>홈 | PinkTopia</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="/public/styles.css" />
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -289,8 +289,19 @@
         </div>
       </div>
       <div class="logo-container">
-        <img src="./images/123.jpg" alt="PinkTopia Logo" />
+        <img src="/public/images/123.jpg" alt="PinkTopia Logo" />
       </div>
+      <div class="logo-text">
+        <a href="/public/home.html" style="text-decoration: none; color: white"
+          >PinkTopia</a
+        >
+      </div>
+      <!-- 로그인 상태에 따라 변경될 영역 -->
+      <div
+        id="authMenu"
+        style="margin-left: auto; display: flex; align-items: center"
+      ></div>
+
       <div class="logo-text">
         <a href="/public/home.html" style="text-decoration: none; color: white"
           >PinkTopia</a
@@ -354,6 +365,26 @@
             >
               길찾기
             </button>
+            <div class="mb-3" , style="margin-top: 30px">
+              <label for="start" class="form-label"
+                >유저 위치로 핑크몽출현</label
+              >
+              <button
+                class="route-button"
+                onclick="pinkmongAppearByUserLocation()"
+                style="
+                  width: 30%;
+                  padding: 10px;
+                  background: #ff69b4;
+                  color: white;
+                  border: none;
+                  border-radius: 5px;
+                  cursor: pointer;
+                "
+              >
+                출현
+              </button>
+            </div>
           </div>
           <div id="route-result" style="margin-top: 20px">
             <!-- 길찾기 결과가 여기에 표시됩니다 -->
@@ -373,32 +404,51 @@
               };
             let map = new kakao.maps.Map(mapContainer, mapOption);
 
-            // 현재 위치 표시
-            if (navigator.geolocation) {
-              navigator.geolocation.getCurrentPosition(function (position) {
-                let lat = position.coords.latitude,
-                  lon = position.coords.longitude;
-                let locPosition = new kakao.maps.LatLng(lat, lon),
-                  message = '<div style="padding:5px;">현재 위치</div>';
-                displayMarker(locPosition, message);
-              });
-            } else {
-              let locPosition = new kakao.maps.LatLng(0, 0),
-                message = 'geolocation을 사용할 수 없어요..';
-              displayMarker(locPosition, message);
-            }
+            // 전역 변수로 현재 위치 마커와 정보창 선언
+            let currentLocationMarker = null;
+            let currentInfoWindow = null;
+
+            // 현재 위치 표시 함수 수정
             function displayMarker(locPosition, message) {
-              let marker = new kakao.maps.Marker({
+              // 기존 마커와 정보창이 있다면 제거
+              if (currentLocationMarker) {
+                currentLocationMarker.setMap(null);
+              }
+              if (currentInfoWindow) {
+                currentInfoWindow.close();
+              }
+
+              // 새 마커 생성
+              currentLocationMarker = new kakao.maps.Marker({
                 map: map,
                 position: locPosition,
               });
-              let infowindow = new kakao.maps.InfoWindow({
+
+              // 새 정보창 생성
+              currentInfoWindow = new kakao.maps.InfoWindow({
                 content: message,
-                removable: true,
               });
-              infowindow.open(map, marker);
+
+              currentInfoWindow.open(map, currentLocationMarker);
               map.setCenter(locPosition);
             }
+
+            // 주기적으로 위치 업데이트
+            function updateCurrentLocation() {
+              if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                  let lat = position.coords.latitude,
+                    lon = position.coords.longitude;
+                  let locPosition = new kakao.maps.LatLng(lat, lon),
+                    message = '<div style="padding:5px;">현재 위치</div>';
+                  displayMarker(locPosition, message);
+                });
+              }
+            }
+
+            // 초기 위치 표시 및 주기적 업데이트 설정
+            updateCurrentLocation();
+            setInterval(updateCurrentLocation, 10000); // 10초마다 위치 업데이트
 
             let geocoder = new kakao.maps.services.Geocoder();
 
@@ -496,6 +546,118 @@
               window.open(url, '_blank');
             }
 
+            // 유저 위치로 핑크몽 출현위치 추가하기
+            function pinkmongAppearByUserLocation() {
+              if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                  async function (position) {
+                    const accessToken = localStorage.getItem('accessToken');
+                    if (!accessToken) {
+                      alert('로그인이 필요한 서비스입니다.');
+                      return;
+                    }
+                    // 토큰 풀기
+                    const decodedToken = parseJwt(accessToken);
+                    console.log('토큰 : ', { decodedToken });
+
+                    try {
+                      console.log('유저 이메일 : ', decodedToken.email);
+
+                      // 유저 이메일로 검색 - 동일한 북마커가 이미 있는 지 확인
+                      const response = await fetch(
+                        `/pinkmong-appear-location/getOne/?user_email=${encodeURIComponent(decodedToken.email)}`,
+                        {
+                          method: 'GET',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                        },
+                      );
+
+                      if (!response.ok) {
+                        throw new Error('유저 이메일로 북마커 검색 실패');
+                      }
+
+                      const idByEmail = await response.json(); // JSON 응답을 파싱합니다.
+                      console.log('가져온 id : ', idByEmail.id);
+
+                      // 있는 경우 삭제
+                      if (idByEmail.id) {
+                        console.log('중복된 타이틀 있음');
+                        const deleteResponse = await fetch(
+                          `/pinkmong-appear-location?id=${encodeURIComponent(idByEmail.id)}`,
+                          {
+                            method: 'DELETE',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                          },
+                        );
+
+                        if (!deleteResponse.ok) {
+                          throw new Error('북마커 삭제 실패');
+                        }
+
+                        console.log(
+                          '삭제할 북마커 id : ',
+                          idByEmail.id,
+                          ' 삭제',
+                        );
+                      } else {
+                        console.log('기존의 북마커 없음');
+                      }
+                    } catch (error) {
+                      console.log(error);
+                    }
+
+                    try {
+                      // 북마커 추가. 이 아래는 정상작동 확인함.
+                      const response = await fetch(
+                        '/pinkmong-appear-location',
+                        {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `${accessToken}`, // 백틱을 사용하여 문자열 템플릿으로 수정
+                          },
+                          body: JSON.stringify({
+                            title: decodedToken.email,
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            region_theme: 'city',
+                          }),
+                        },
+                      );
+
+                      if (!response.ok) {
+                        throw new Error(
+                          `HTTP error! Status: ${response.status}`,
+                        ); // 백틱을 사용하여 문자열 템플릿으로 수정
+                      }
+
+                      const result = await response.json();
+                      console.log('✅ 핑크몽 출현 위치 추가 성공:', result);
+
+                      // 발키에 북마커 추가
+                      await fetch('/pinkmong-appear-location/fill-valkey', {
+                        method: 'POST',
+                      });
+                      console.log('발키에 북마커 추가 완료');
+
+                      // 북마커 새로고침
+                      geoBookmark();
+                    } catch (error) {
+                      console.error('핑크몽 출현 위치 추가 실패:', error);
+                      alert('핑크몽 출현 위치 추가에 실패했습니다.');
+                    } // try 블록의 끝
+                  },
+                );
+              } else {
+                alert('이 브라우저에서는 위치 정보를 지원하지 않습니다.');
+              } // 522번줄의 if 블록의 끝
+            }
+
+            /////////////////////////////////////////
             // 입력창의 주소를 검색하여 마커 이동 및 좌표 저장
             function setMarkerPosition(marker, addressInputId) {
               let inputElement = document.getElementById(addressInputId);
@@ -635,7 +797,6 @@
                 console.warn('📢 북마커 데이터 없음');
                 return;
               }
-              console.log('다와간다 북마커 : ', markerData);
               var bounds = new kakao.maps.LatLngBounds();
 
               markerData.forEach(function (data) {
@@ -649,8 +810,6 @@
                   map: map,
                   draggable: data.draggable,
                 });
-                console.log('다와간다2 마커 : ', marker);
-                // marker.setMap(map); // ✅ **이 부분이 핵심**
                 var infowindow = new kakao.maps.InfoWindow({
                   content: `<div style="padding:5px;">${data.info} <br>
                                       <a href="https://map.kakao.com/link/map/${data.info},${data.position.getLat()},${data.position.getLng()}" target="_blank" style="color:skyblue">큰지도보기</a> 
@@ -828,7 +987,6 @@
         <a href="/public/store-item.html">아이템샵</a>
         <a href="/public/board.html">게시글 (커뮤니티)</a>
         <a href="/public/ranking.html">랭킹</a>
-        <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
         <!-- 로그인 시 표시될 메뉴들 -->
         <div id="loggedInMenu" style="display: none">
           <a href="/public/chattingrooms.html">채팅</a>
@@ -836,6 +994,7 @@
           <a href="/public/inventory.html">인벤토리 아이템</a>
           <a href="/public/achievements.html">업적</a>
           <a href="/public/mypage.html">마이페이지</a>
+          <a href="/public/customer-service.html">고객 센터</a>
           <a href="#" onclick="logout()">로그아웃</a>
         </div>
         <!-- 로그인 안 된 경우 표시될 메뉴들 -->
@@ -845,7 +1004,7 @@
         </div>
       </div>
     </div>
-    <script src="./locationUpdates.js"></script>
+    <script src="/public/locationUpdates.js"></script>
     <!-- public\locationUpdates.js -->
   </body>
 </html>

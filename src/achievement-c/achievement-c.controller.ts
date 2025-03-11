@@ -1,24 +1,17 @@
 import {
   Controller,
   Get,
-  Res,
   Request,
   Post,
   Body,
-  Patch,
   Param,
   UseGuards,
   Delete,
-  Query,
-  BadRequestException,
-  NotFoundException,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { UserGuard } from '../user/guards/user-guard';
 import { AdminGuard } from '../user/guards/admin.guard';
 import { AchievementCService } from './achievement-c.service';
 import { CreateAchievementCDto } from './dto/create-achievement-c.dto';
-import { UpdateAchievementCDto } from './dto/update-achievement-c.dto';
 
 @Controller('achievementC')
 export class AchievementCController {

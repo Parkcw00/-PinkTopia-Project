@@ -210,7 +210,6 @@
         <a href="/public/store-item.html">아이템샵</a>
         <a href="/public/board.html">게시글 (커뮤니티)</a>
         <a href="/public/ranking.html">랭킹</a>
-        <a href="/public/pinkmonglist.html">핑크몽 전체 조회</a>
         <!-- 로그인 시 표시될 메뉴들 -->
         <div id="loggedInMenu" style="display: none">
           <a href="/public/chattingrooms.html">채팅</a>
@@ -234,6 +233,7 @@
       <div id="eventTitle" class="event-title"></div>
       <div id="eventStatus" class="event-status"></div>
       <div id="eventDescription" class="event-description"></div>
+      <div id="eventDates" class="event-dates"></div>
       <button class="back-button" onclick="goBack()">목록으로 돌아가기</button>
     </div>
 
@@ -267,12 +267,20 @@
             `event-status ${event.status === 'active' ? 'status-active' : 'status-closed'}`;
           document.getElementById('eventDescription').textContent =
             event.content;
-
           if (event.image) {
             document.getElementById('eventImage').src = event.image;
           } else {
             document.getElementById('eventImage').style.display = 'none';
           }
+
+          const startDate = new Date(event.created_at)
+            .toISOString()
+            .split('T')[0];
+          const endDate = event.expiration_at
+            ? new Date(event.expiration_at).toISOString().split('T')[0]
+            : '종료일 없음';
+          document.getElementById('eventDates').innerHTML =
+            `<p><strong>시작일:</strong> ${startDate}</p><p><strong>종료일:</strong> ${endDate}</p>`;
         } catch (error) {
           console.error('이벤트 상세 정보 불러오기 실패:', error);
           document.querySelector('.container').innerHTML =

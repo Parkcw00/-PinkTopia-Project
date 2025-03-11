@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고객 센터 | PinkTopia</title>
+    <link rel="stylesheet" href="/public/styles.css" />
+    <style>
+        /* 전체 레이아웃 스타일 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffe4f7;
+        }
+
+        /* 네비게이션 바 스타일 */
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #ff69b4;
+            padding: 15px;
+            color: white;
+            font-weight: bold;
+            position: relative;
+            height: 50px;
+        }
+
+        /* 햄버거 메뉴 아이콘 스타일 */
+        .menu-icon {
+            position: absolute;
+            left: 15px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .menu-icon .hamburger {
+            width: 25px;
+            height: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .menu-icon .hamburger span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: white;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        /* 로고 스타일 */
+        .nav .logo-container {
+            position: absolute;
+            left: 50px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav img {
+            width: 45px;
+            height: 45px;
+            object-fit: cover;
+        }
+
+        .logo-text {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+        }
+
+        #authMenu {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 네비게이션 바 링크 스타일 */
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        /* 사이드바 스타일 */
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            background-color: #ff69b4;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar a {
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar a:hover {
+            background-color: #ff4da6;
+        }
+
+        .close-sidebar {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 36px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .inquiry-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group select,
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .form-group textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        .submit-button {
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .submit-button:hover {
+            background-color: #ff4da6;
+        }
+
+        .inquiry-history {
+            margin-top: 40px;
+        }
+
+        .inquiry-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .inquiry-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .status-pending {
+            background-color: #ffd700;
+            color: #000;
+        }
+
+        .status-completed {
+            background-color: #90ee90;
+            color: #000;
+        }
+
+        /* 모달 스타일 추가 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: white;
+            margin: 50px auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 8px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close-button {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .detail-button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .detail-button:hover {
+            background-color: #357abd;
+        }
+
+        #userProfileBox {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #ff5faf;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        #userProfileBox img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+            border: 2px solid #ff7fbf;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 상단 네비게이션 바 -->
+    <div class="nav">
+        <div class="menu-icon" onclick="openSidebar()">
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        <div class="logo-container">
+            <img src="./images/123.jpg" alt="PinkTopia Logo" />
+        </div>
+        <div class="logo-text">
+            <a href="/public/home.html" style="text-decoration: none; color: white">PinkTopia</a>
+        </div>
+        <div id="authMenu" style="margin-left: auto; display: flex; align-items: center"></div>
+    </div>
+
+    <!-- 사이드바 -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+        </div>
+        <div class="sidebar-content">
+            <a href="/public/home.html">홈</a>
+            <a href="/public/event.html">이벤트</a>
+            <a href="/public/store-item.html">아이템샵</a>
+            <a href="/public/board.html">게시글 (커뮤니티)</a>
+            <a href="/public/ranking.html">랭킹</a>
+            <div id="loggedInMenu" style="display: none">
+                <a href="/public/chattingrooms.html">채팅</a>
+                <a href="/public/collection.html">핑크몽 개인 도감</a>
+                <a href="/public/inventory.html">인벤토리 아이템</a>
+                <a href="/public/achievements.html">업적</a>
+                <a href="/public/mypage.html">마이페이지</a>
+                <a href="/public/customer-service.html">고객 센터</a>
+                <a href="#" onclick="logout()">로그아웃</a>
+            </div>
+            <div id="loggedOutMenu">
+                <a href="/public/log-in.html">로그인</a>
+                <a href="/public/sign-up.html">회원가입</a>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <h1>고객 센터</h1>
+
+        <!-- 문의하기 폼 -->
+        <div class="inquiry-form">
+            <h2>문의하기</h2>
+            <form id="inquiryForm">
+                <div class="form-group">
+                    <label for="inquiryType">문의 유형</label>
+                    <select id="inquiryType" name="inquiryType" required>
+                        <option value="">선택해주세요</option>
+                        <option value="refund">환불 요청</option>
+                        <option value="payment">결제 문의</option>
+                        <option value="bug">버그 신고</option>
+                        <option value="suggestion">기능 제안</option>
+                        <option value="other">기타 문의</option>
+                    </select>
+                </div>
+
+                <!-- 환불 요청 시에만 표시되는 필드들 -->
+                <div id="refundFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="purchaseHistory">구매 내역</label>
+                        <select id="purchaseHistory" name="purchaseHistory" required>
+                            <option value="">구매 내역을 선택해주세요</option>
+                        </select>
+                        <small style="color: #666; display: block; margin-top: 5px;">
+                            * 환불하고 싶은 결제 내역을 선택해주세요.
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="refundReason">환불 사유</label>
+                        <select id="refundReason" name="refundReason" required>
+                            <option value="">환불 사유를 선택해주세요</option>
+                            <option value="실수로 구매">실수로 구매</option>
+                            <option value="상품 불만족">상품 불만족</option>
+                            <option value="서비스 이용 불가">서비스 이용 불가</option>
+                            <option value="기타">기타</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="title">제목</label>
+                    <input type="text" id="title" name="title" required placeholder="문의 제목을 입력해주세요">
+                </div>
+
+                <div class="form-group">
+                    <label for="content">내용</label>
+                    <textarea id="content" name="content" required placeholder="자세한 내용을 입력해주세요"></textarea>
+                </div>
+
+                <div class="form-group" id="attachmentField">
+                    <label for="attachment">첨부파일 (선택)</label>
+                    <input type="file" id="attachment" name="attachment" accept="image/*">
+                </div>
+
+                <button type="submit" class="submit-button">문의하기</button>
+            </form>
+        </div>
+
+        <!-- 문의 내역 -->
+        <div class="inquiry-history">
+            <h2>나의 문의 내역</h2>
+            <div id="inquiryList">
+                <!-- 문의 내역이 여기에 동적으로 추가됨 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 모달 추가 -->
+    <div id="inquiryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // 사이드바 열기 함수
+        function openSidebar() {
+            document.getElementById('sidebar').style.width = '250px';
+        }
+
+        // 사이드바 닫기 함수
+        function closeSidebar() {
+            document.getElementById('sidebar').style.width = '0';
+        }
+
+        // 페이지 로드 시 로그인 상태에 따라 메뉴 표시
+        document.addEventListener('DOMContentLoaded', function () {
+            const accessToken = localStorage.getItem('accessToken');
+            const authMenu = document.getElementById('authMenu');
+
+            if (accessToken) {
+                // 사이드바 메뉴 업데이트
+                document.getElementById('loggedInMenu').style.display = 'block';
+                document.getElementById('loggedOutMenu').style.display = 'none';
+
+                // 상단 네비게이션 바 메뉴 업데이트
+                authMenu.innerHTML = `
+                    <a href="/public/mypage.html">마이페이지</a>
+                    <a href="#" onclick="logout()">로그아웃</a>
+                `;
+
+                // 메인 메뉴에 로그인 상태에서만 보이는 메뉴 추가
+                const menuList = document.getElementById('menuList');
+                if (menuList.querySelectorAll('a').length === 5) {
+                    // 기본 메뉴만 있는 경우
+                    menuList.innerHTML += `
+                        <a href="/public/chattingrooms.html">채팅</a>
+                        <a href="/public/collection.html">핑크몽 개인 도감</a>
+                        <a href="/public/inventory.html">인벤토리 아이템</a>
+                        <a href="/public/achievements.html">업적</a>
+                    `;
+                }
+            } else {
+                // 사이드바 메뉴 업데이트
+                document.getElementById('loggedInMenu').style.display = 'none';
+                document.getElementById('loggedOutMenu').style.display = 'block';
+
+                // 상단 네비게이션 바 메뉴 업데이트
+                authMenu.innerHTML = `
+                    <a href="/public/log-in.html">로그인</a>
+                    <a href="/public/sign-up.html">회원가입</a>
+                `;
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            checkLoginStatus();
+        });
+
+        function checkLoginStatus() {
+            const accessToken = localStorage.getItem('accessToken');
+            const authMenu = document.getElementById('authMenu');
+
+            if (accessToken) {
+                fetch('/user/me', {
+                    headers: { Authorization: accessToken },
+                })
+                    .then((response) => response.json())
+                    .then((userData) => {
+                        const profileImage =
+                            userData.profile_image || './images/default-profile.png'; // 기본 이미지
+
+                        authMenu.innerHTML = `
+                    <div id="userProfileBox" onclick="goToProfile()" style="cursor: pointer;">
+                    <img src="${profileImage}" alt="프로필 사진">
+                    <span><span class="welcome-text">환영합니다!</span> <strong>${userData.nickname}</strong>님!</span>
+                    </div>
+                    <a href="#" onclick="logout()" style="margin-left: 15px; color: white; text-decoration: none;">로그아웃</a>
+                `;
+                    })
+                    .catch((error) => {
+                        console.error('유저 정보 불러오기 실패:', error);
+                        authMenu.innerHTML = `<a href="/public/log-in.html" style="color: white;">로그인</a> / <a href="/public/sign-up.html" style="color: white;">회원가입</a>`;
+                    });
+            } else {
+                authMenu.innerHTML = `<a href="/public/log-in.html" style="color: white;">로그인</a> / <a href="/public/sign-up.html" style="color: white;">회원가입</a>`;
+            }
+        }
+
+        function goToProfile() {
+            window.location.href = '/public/mypage.html';
+        }
+
+        async function logout() {
+            try {
+                const accessToken = localStorage.getItem('accessToken');
+                if (!accessToken) {
+                    console.warn('🚨 로그아웃 시도: 이미 로그아웃된 상태');
+                    window.location.href = '/public/home.html';
+                    return;
+                }
+
+                // 🔹 서버에 로그아웃 요청 보내기
+                const response = await fetch('/user/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: accessToken,
+                    },
+                    credentials: 'include', // 쿠키도 함께 보내기
+                });
+
+                if (!response.ok) {
+                    throw new Error('서버에서 로그아웃 처리 실패');
+                }
+                localStorage.removeItem('accessToken');
+                console.log('✅ 로그아웃 성공! 페이지 이동');
+                window.location.href = '/public/home.html';
+            } catch (error) {
+                console.error('❌ 로그아웃 실패:', error);
+                alert('로그아웃 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 모달 관련 함수들을 전역 스코프로 이동
+        function openModal(inquiry) {
+            const modal = document.getElementById('inquiryModal');
+            const modalContent = document.getElementById('modalContent');
+
+            modalContent.innerHTML = `
+    <h2>${inquiry.title}</h2>
+    <div style="margin: 10px 0;">
+        <span class="inquiry-status ${inquiry.status === 'pending' ? 'status-pending' : 'status-completed'}">
+            ${inquiry.status === 'pending' ? '처리중' : '답변완료'}
+        </span>
+        <small style="margin-left: 10px;">${new Date(inquiry.createdAt).toLocaleString()}</small>
+    </div>
+    <div style="margin: 20px 0;">
+        <strong>문의 유형:</strong> ${inquiry.type === 'refund' ? '환불 요청' :
+                    inquiry.type === 'payment' ? '결제 문의' :
+                        inquiry.type === 'bug' ? '버그 신고' :
+                            inquiry.type === 'suggestion' ? '기능 제안' : '기타 문의'
+                }
+    </div>
+    <div style="margin: 20px 0;">
+        <strong>문의 내용:</strong>
+        <p style="white-space: pre-wrap;">${inquiry.content}</p>
+    </div>
+    ${inquiry.attachmentUrl ? `
+    <div style="margin: 20px 0;">
+        <strong>첨부파일:</strong><br>
+        <img src="${inquiry.attachmentUrl}" alt="첨부 이미지" style="max-width: 100%; margin-top: 10px; border-radius: 4px;">
+    </div>
+    ` : ''}
+    ${inquiry.type === 'refund' ? `
+    <div style="margin: 20px 0;">
+        <strong>환불 정보:</strong>
+        <p>결제 키: ${inquiry.paymentKey}</p>
+        <p>환불 사유: ${inquiry.refundReason}</p>
+        <p>환불 금액: ${inquiry.amount?.toLocaleString()}원</p>
+    </div>
+    ` : ''}
+    ${inquiry.answer ? `
+    <div style="margin: 20px 0; padding-top: 20px; border-top: 1px solid #eee;">
+        <strong>답변:</strong>
+        <p style="white-space: pre-wrap;">${inquiry.answer}</p>
+    </div>
+    ` : ''}
+    `;
+
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('inquiryModal');
+            modal.style.display = 'none';
+        }
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function (event) {
+            const modal = document.getElementById('inquiryModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                alert('로그인이 필요한 서비스입니다.');
+                window.location.href = '/public/log-in.html';
+                return;
+            }
+
+            // 문의 유형 선택에 따른 필드 표시/숨김
+            const inquiryType = document.getElementById('inquiryType');
+            const refundFields = document.getElementById('refundFields');
+
+            // 결제 내역 로드
+            async function loadPurchaseHistory() {
+                try {
+                    const response = await fetch('/payment/history', {
+                        headers: {
+                            'Authorization': accessToken
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('결제 내역을 불러오는데 실패했습니다.');
+                    }
+
+                    const purchases = await response.json();
+                    const purchaseSelect = document.getElementById('purchaseHistory');
+
+                    // 결제 내역이 있는 경우에만 옵션 추가
+                    if (purchases.length > 0) {
+                        purchaseSelect.innerHTML = `
+    <option value="">결제 내역을 선택해주세요</option>
+    ${purchases.map(purchase => {
+                            const isDisabled = purchase.isRefunded || purchase.usedDiamonds > 0;
+                            const disabledReason = purchase.isRefunded ? ' (환불완료)' :
+                                purchase.usedDiamonds > 0 ? ` (${purchase.usedDiamonds}개 사용됨)` : '';
+
+                            return `
+    <option value="${purchase.paymentKey}" data-purchase='${JSON.stringify({
+                                amount: purchase.amount,
+                                remainingDiamonds: purchase.remainingDiamonds,
+                                usedDiamonds: purchase.usedDiamonds
+                            })}' ${isDisabled ? 'disabled' : ''}>
+        ${purchase.itemName} - ${new Date(purchase.createdAt).toLocaleDateString()}
+        ${disabledReason}
+    </option>
+    `;
+                        }).join('')}
+    `;
+                    } else {
+                        purchaseSelect.innerHTML = '<option value="">환불 가능한 결제 내역이 없습니다.</option>';
+                    }
+                } catch (error) {
+                    console.error('결제 내역 로드 실패:', error);
+                }
+            }
+
+            inquiryType.addEventListener('change', () => {
+                const isRefundType = inquiryType.value === 'refund';
+                refundFields.style.display = isRefundType ? 'block' : 'none';
+
+                // 환불 요청 시 첨부파일 필드 숨김
+                const attachmentField = document.getElementById('attachmentField');
+                attachmentField.style.display = isRefundType ? 'none' : 'block';
+
+                // 환불 관련 필드들의 required 속성 동적 처리
+                const purchaseHistorySelect = document.getElementById('purchaseHistory');
+                const refundReasonSelect = document.getElementById('refundReason');
+
+                purchaseHistorySelect.required = isRefundType;
+                refundReasonSelect.required = isRefundType;
+
+                if (isRefundType) {
+                    loadPurchaseHistory();
+                    // 환불 요청 시 첨부파일 비우기
+                    document.getElementById('attachment').value = '';
+                }
+            });
+
+            // URL에서 결제 키 가져오기
+            const urlParams = new URLSearchParams(window.location.search);
+            const paymentKey = urlParams.get('paymentKey');
+            if (paymentKey) {
+                inquiryType.value = 'refund';
+                refundFields.style.display = 'block';
+
+                // 환불 요청 시 첨부파일 필드 숨김
+                const attachmentField = document.getElementById('attachmentField');
+                attachmentField.style.display = 'none';
+
+                loadPurchaseHistory().then(() => {
+                    const purchaseSelect = document.getElementById('purchaseHistory');
+                    purchaseSelect.value = paymentKey;
+                });
+            }
+
+            // 문의하기 폼 제출
+            const inquiryForm = document.getElementById('inquiryForm');
+            inquiryForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                try {
+                    const data = {
+                        type: inquiryType.value,
+                        title: document.getElementById('title').value,
+                        content: document.getElementById('content').value
+                    };
+
+                    if (inquiryType.value === 'refund') {
+                        const purchaseSelect = document.getElementById('purchaseHistory');
+                        const refundReasonSelect = document.getElementById('refundReason');
+
+                        if (!purchaseSelect.value) {
+                            throw new Error('환불할 결제 내역을 선택해주세요.');
+                        }
+                        if (!refundReasonSelect.value) {
+                            throw new Error('환불 사유를 선택해주세요.');
+                        }
+
+                        const selectedOption = purchaseSelect.options[purchaseSelect.selectedIndex];
+                        if (!selectedOption || !selectedOption.dataset.purchase) {
+                            throw new Error('선택된 결제 내역 정보를 찾을 수 없습니다.');
+                        }
+
+                        try {
+                            const purchaseData = JSON.parse(selectedOption.dataset.purchase);
+                            if (!purchaseData.amount || typeof purchaseData.amount !== 'number') {
+                                throw new Error('유효하지 않은 결제 금액입니다.');
+                            }
+
+                            // 다이아몬드 사용 여부 확인
+                            if (purchaseData.usedDiamonds > 0) {
+                                throw new Error(`이미 ${purchaseData.usedDiamonds}개의 다이아몬드가 사용되어 환불이 불가능합니다.`);
+                            }
+
+                            data.paymentKey = purchaseSelect.value;
+                            data.refundReason = refundReasonSelect.value;
+                            data.amount = purchaseData.amount;
+                            data.remainingDiamonds = purchaseData.remainingDiamonds;
+                        } catch (error) {
+                            console.error('결제 데이터 파싱 실패:', error);
+                            throw new Error('결제 정보 처리 중 오류가 발생했습니다.');
+                        }
+                    }
+
+                    // 환불 요청 여부 확인
+                    const isRefundType = inquiryType.value === 'refund';
+
+                    // 첨부파일이 있고 환불 요청이 아닌 경우에만 FormData 사용
+                    const attachment = document.getElementById('attachment').files[0];
+                    if (attachment && !isRefundType) {
+                        const formData = new FormData();
+                        // 일반 데이터 추가
+                        formData.append('type', data.type);
+                        formData.append('title', data.title);
+                        formData.append('content', data.content);
+
+                        // 첨부파일 추가
+                        formData.append('attachment', attachment);
+
+                        const response = await fetch('/inquiry', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': accessToken
+                            },
+                            body: formData
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || '문의 등록에 실패했습니다.');
+                        }
+                    } else {
+                        // 첨부파일이 없거나 환불 요청인 경우 JSON으로 전송
+
+                        // 환불 요청인 경우 환불 관련 데이터 추가
+                        let requestData = { ...data }; // data 객체 복사
+
+                        const response = await fetch('/inquiry', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': accessToken,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(requestData)
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || '문의 등록에 실패했습니다.');
+                        }
+                    }
+
+                    alert('문의가 등록되었습니다.');
+                    inquiryForm.reset();
+                    loadInquiries(); // 문의 내역 새로고침
+                } catch (error) {
+                    console.error('문의 등록 실패:', error);
+                    alert(error.message || '문의 등록에 실패했습니다.');
+                }
+            });
+
+            // 문의 내역 로드
+            async function loadInquiries() {
+                try {
+                    const response = await fetch('/inquiry/my', {
+                        headers: {
+                            'Authorization': accessToken
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || '문의 내역을 불러오는데 실패했습니다.');
+                    }
+
+                    const inquiries = await response.json();
+                    const inquiryList = document.getElementById('inquiryList');
+                    inquiryList.innerHTML = inquiries.map(inquiry => `
+    <div class="inquiry-item">
+        <span class="inquiry-status ${inquiry.status === 'pending' ? 'status-pending' : 'status-completed'}">
+            ${inquiry.status === 'pending' ? '처리중' : '답변완료'}
+        </span>
+        <h3>${inquiry.title}</h3>
+        <p>${inquiry.content.length > 100 ? inquiry.content.substring(0, 100) + '...' : inquiry.content}</p>
+        <small>${new Date(inquiry.createdAt).toLocaleDateString()}</small>
+        <div style="text-align: right;">
+            <button class="detail-button" onclick='openModal(${JSON.stringify(inquiry)})'>
+                상세보기
+            </button>
+        </div>
+    </div>
+    `).join('');
+                } catch (error) {
+                    console.error('문의 내역 로드 실패:', error);
+                    alert(error.message || '문의 내역을 불러오는데 실패했습니다.');
+                }
+            }
+
+            // 초기 문의 내역 로드
+            loadInquiries();
+        });
+
+    </script>
+</body>
+
+</html>

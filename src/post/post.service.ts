@@ -13,17 +13,15 @@ export class PostService {
     private readonly postRepository: PostRepository,
     private readonly s3Service: S3Service,
     private readonly valkeyService: ValkeyService,
-  ) {
-    // 기존의 S3 객체 생성 코드 제거
-  }
+  ) {}
 
   async createPost(
     user_id: number,
     createPostDto: CreatePostDto,
-    files: Express.Multer.File[], // 여러 파일을 받도록 수정
+    files: Express.Multer.File[],
   ) {
     const { title, content } = createPostDto;
-    const imageUrls = await this.s3Service.uploadFiles(files); // S3Service 사용
+    const imageUrls = await this.s3Service.uploadFiles(files);
 
     await this.valkeyService.del(`posts:`);
     return await this.postRepository.createPost(
@@ -78,7 +76,7 @@ export class PostService {
     user_id: number,
     id: number,
     updatePostDto: UpdatePostDto,
-    files?: Express.Multer.File[], // 파일을 선택적으로 받도록 수정
+    files?: Express.Multer.File[],
   ): Promise<void> {
     const { title, content } = updatePostDto;
     await this.verifyMessage(id, user_id);
@@ -109,7 +107,10 @@ export class PostService {
       post_image: imageUrls,
     });
 
+    // 캐시 삭제 (전체 목록과 개별 게시글 모두)
     await this.valkeyService.del(`posts:`);
+    await this.valkeyService.del(`post:${id}`);
+
     return updatedPost;
   }
 

@@ -1,18 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { ValkeyService } from '../valkey/valkey.service';
+import { Injectable } from '@nestjs/common';
 import { AchievementPService } from '../achievement-p/achievement-p.service';
-import { CompareDirection } from './dto/compare-direction.dto';
-import { getDistance, isPointWithinRadius } from 'geolib';
-import axios, { all } from 'axios'; // HTTP 요청을 보내기 위한 클라이언트 라이브러리
+import axios from 'axios'; // HTTP 요청을 보내기 위한 클라이언트 라이브러리
 import { DirectionGateway } from './/direction.gateway';
 import { Socket } from 'socket.io';
-import { number } from 'joi';
 import { GeoService } from '../geo/geo.service';
 
 @Injectable()
 export class DirectionService {
   constructor(
-    private readonly valkeyService: ValkeyService,
     private readonly geoService: GeoService,
     private readonly APService: AchievementPService,
     private readonly directionGateway: DirectionGateway,
@@ -60,6 +55,7 @@ export class DirectionService {
     user_id: number,
     latitude: number,
     longitude: number,
+
     client: Socket,
   ) {
     // 🏆 서브업적

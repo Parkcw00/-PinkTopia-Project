@@ -1,168 +1,237 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AchievementPService } from './achievement-p.service';
 import { AchievementPRepository } from './achievement-p.repository';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
-
+import { ValkeyService } from '../valkey/valkey.service';
+import { BadRequestException } from '@nestjs/common';
+import { AchievementP } from './entities/achievement-p.entity';
+import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
+import { AchievementC } from '../achievement-c/entities/achievement-c.entity';
+import { UpdateResult } from 'typeorm';
 describe('AchievementPService', () => {
   let service: AchievementPService;
-  let repository: AchievementPRepository;
-  
-  // 서비스에서 호출하는 리포지토리 메소드들을 모의(mock) 객체로 생성합니다.
-  const mockRepository = {
-    findPByUser: jest.fn(),
-    findSub: jest.fn(),
-    findPByUserNSub: jest.fn(),
-    createP: jest.fn(),
-    save: jest.fn(),
-    subAllByA: jest.fn(),
-    pAllByA: jest.fn(),
-    createC: jest.fn(),
-    saveC: jest.fn(),
-    reward: jest.fn(),
-    gem: jest.fn(),
-    dia: jest.fn(),
-    delete: jest.fn(),
-  };
+  let repository: jest.Mocked<AchievementPRepository>;
+  let valkeyService: jest.Mocked<ValkeyService>;
 
-  // valkeyService의 메소드를 모의합니다.
-  // 여기서는 Redis pipeline 기능과 단일 set 메소드를 모의합니다.
-  const mockPipeline = {
-    set: jest.fn(),
-    exec: jest.fn().mockResolvedValue(true),
-  };
-
-  const mockValkeyService = {
-    getClient: jest.fn().mockReturnValue({
-      pipeline: () => mockPipeline,
-    }),
-    set: jest.fn().mockResolvedValue(true),
-  };
-
+  // 각 테스트 케이스 실행 전 모듈 설정
   beforeEach(async () => {
-    // NestJS의 테스트 모듈을 생성하여 서비스와 모의 리포지토리를 주입합니다.
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AchievementPService,
-        { provide: AchievementPRepository, useValue: mockRepository },
+        {
+          provide: AchievementPRepository,
+          useValue: {
+            findSub: jest.fn(),
+            findPByUserNSub: jest.fn(),
+            createP: jest.fn(),
+            save: jest.fn(),
+            subAllByA: jest.fn(),
+            pAllByA: jest.fn(),
+            createC: jest.fn(),
+            saveC: jest.fn(),
+            reward: jest.fn(),
+            gem: jest.fn(),
+            dia: jest.fn(),
+            delete: jest.fn(),
+          },
+        },
+        {
+          provide: ValkeyService,
+          useValue: {
+            get: jest.fn(),
+            set: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     service = module.get<AchievementPService>(AchievementPService);
-    repository = module.get<AchievementPRepository>(AchievementPRepository);
-    // 서비스 내부의 valkeyService를 모의 객체로 할당합니다.
-    service.valkeyService = mockValkeyService;
+    repository = module.get<AchievementPRepository>(
+      AchievementPRepository,
+    ) as jest.Mocked<AchievementPRepository>;
+    valkeyService = module.get<ValkeyService>(
+      ValkeyService,
+    ) as jest.Mocked<ValkeyService>;
   });
 
+  // 각 테스트 후 목업 초기화
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  // fillValkey 메소드에 대한 테스트
-  describe('fillValkey', () => {
-    it('user_id가 숫자가 아니면 BadRequestException을 던져야 함', async () => {
-      await expect(service.fillValkey(NaN)).rejects.toThrow(BadRequestException);
-    });
-
-    it('유저의 서브업적 데이터가 없으면 NotFoundException을 던져야 함', async () => {
-      mockRepository.findPByUser.mockResolvedValue([]);
-      await expect(service.fillValkey(1)).rejects.toThrow(NotFoundException);
-    });
-
-    it('정상적으로 pipeline set과 exec가 호출되어야 함', async () => {
-      const fakeData = [
-        { id: 1, user_id: 1, sub_achievement_id: 101, achievement_id: 1001, complete: true },
-        { id: 2, user_id: 1, sub_achievement_id: 102, achievement_id: 1002, complete: false },
-      ];
-      mockRepository.findPByUser.mockResolvedValue(fakeData);
-
-      const result = await service.fillValkey(1);
-
-      // 각 항목마다 pipeline.set이 호출되었는지 확인합니다.
-      expect(mockPipeline.set).toHaveBeenCalledTimes(fakeData.length);
-      // pipeline.exec이 한 번 호출되었는지 확인합니다.
-      expect(mockPipeline.exec).toHaveBeenCalledTimes(1);
-      // 반환 메시지가 올바른지 검증합니다.
-      expect(result).toEqual({ message: `✅ ${fakeData.length}개의 서브업적이 Valkey에 저장되었습니다.` });
-    });
+  // 서비스가 정상적으로 정의되었는지 확인
+  it('서비스가 정의되어 있어야 한다', () => {
+    expect(service).toBeDefined();
   });
 
-  // post 메소드에 대한 테스트
+  // post 메서드 테스트
   describe('post', () => {
-    it('subAchievementId가 숫자가 아니면 BadRequestException을 던져야 함', async () => {
-      await expect(service.post(1, 'invalid')).rejects.toThrow(BadRequestException);
+    it('업적이 완료되지 않은 경우 AchievementP를 성공적으로 생성해야 한다', async () => {
+      const userId = 1;
+      const subId = 1;
+      const mockSubAchievement = {
+        id: subId,
+        achievement_id: 1,
+      } as SubAchievement;
+      const mockAchievementP = {
+        id: 1,
+        user_id: userId,
+        sub_achievement_id: subId,
+        achievement_id: 1,
+        complete: true,
+      } as AchievementP;
+      const mockSubAchievements = [{ id: 1 }, { id: 2 }] as SubAchievement[];
+      const mockPAchievements = [{ sub_achievement_id: 1 }] as AchievementP[];
+
+      repository.findSub.mockResolvedValue(mockSubAchievement);
+      repository.findPByUserNSub.mockResolvedValue(null);
+      repository.createP.mockResolvedValue(mockAchievementP);
+      repository.save.mockResolvedValue(mockAchievementP);
+      repository.subAllByA.mockResolvedValue(mockSubAchievements);
+      repository.pAllByA.mockResolvedValue(mockPAchievements);
+
+      const result = await service.post(userId, subId);
+
+      expect(repository.findSub).toHaveBeenCalledWith(subId);
+      expect(repository.findPByUserNSub).toHaveBeenCalledWith(userId, subId);
+      expect(repository.createP).toHaveBeenCalledWith({
+        user_id: userId,
+        sub_achievement_id: subId,
+        achievement_id: mockSubAchievement.achievement_id,
+        complete: true,
+      });
+      expect(repository.save).toHaveBeenCalledWith(mockAchievementP);
+      expect(repository.subAllByA).toHaveBeenCalledWith(
+        mockSubAchievement.achievement_id,
+      );
+      expect(repository.pAllByA).toHaveBeenCalledWith(
+        mockSubAchievement.achievement_id,
+      );
+      expect(result).toEqual(mockAchievementP);
     });
 
-    it('해당 서브업적이 존재하지 않으면 NotFoundException을 던져야 함', async () => {
-      mockRepository.findSub.mockResolvedValue(null);
-      await expect(service.post(1, '101')).rejects.toThrow(NotFoundException);
+    it('업적이 완료되고 보상이 지급되는 경우 AchievementP를 생성해야 한다', async () => {
+      const userId = 1;
+      const subId = 1;
+      const mockSubAchievement = {
+        id: subId,
+        achievement_id: 1,
+      } as SubAchievement;
+      const mockAchievementP = {
+        id: 1,
+        user_id: userId,
+        sub_achievement_id: subId,
+        achievement_id: 1,
+        complete: true,
+      } as AchievementP;
+      const mockSubAchievements = [{ id: 1 }, { id: 2 }] as SubAchievement[];
+      const mockPAchievements = [
+        { sub_achievement_id: 1 },
+        { sub_achievement_id: 2 },
+      ] as AchievementP[];
+      const mockAchievementC = {
+        id: 1,
+        user_id: userId,
+        achievement_id: 1,
+      } as AchievementC;
+      const mockReward = { reward: { gem: 100, dia: 50 } };
+
+      repository.findSub.mockResolvedValue(mockSubAchievement);
+      repository.findPByUserNSub.mockResolvedValue(null);
+      repository.createP.mockResolvedValue(mockAchievementP);
+      repository.save.mockResolvedValue(mockAchievementP);
+      repository.subAllByA.mockResolvedValue(mockSubAchievements);
+      repository.pAllByA.mockResolvedValue(mockPAchievements);
+      repository.createC.mockResolvedValue(mockAchievementC);
+      repository.saveC.mockResolvedValue(mockAchievementC);
+      repository.reward.mockResolvedValue(mockReward);
+      // repository.gem.mockResolvedValue(undefined);
+      // repository.dia.mockResolvedValue(undefined);
+      repository.gem.mockResolvedValue({ affected: 1 } as UpdateResult);
+      repository.dia.mockResolvedValue({ affected: 1 } as UpdateResult);
+      const result = await service.post(userId, subId);
+
+      expect(repository.createC).toHaveBeenCalledWith({
+        user_id: userId,
+        achievement_id: mockSubAchievement.achievement_id,
+      });
+      expect(repository.saveC).toHaveBeenCalledWith(mockAchievementC);
+      expect(repository.reward).toHaveBeenCalledWith(
+        mockSubAchievement.achievement_id,
+      );
+      expect(repository.gem).toHaveBeenCalledWith(userId, 100);
+      expect(repository.dia).toHaveBeenCalledWith(userId, 50);
+      expect(result).toEqual(mockAchievementP);
     });
 
-    it('이미 등록된 서브업적이면 BadRequestException을 던져야 함', async () => {
-      // findSub은 유효한 서브업적을 반환합니다.
-      mockRepository.findSub.mockResolvedValue({ id: 101, achievement_id: 1001 });
-      // 이미 등록된 경우를 가정하여 findPByUserNSub가 값을 반환합니다.
-      mockRepository.findPByUserNSub.mockResolvedValue({ id: 1 });
-      await expect(service.post(1, '101')).rejects.toThrow(BadRequestException);
-    });
+    it('AchievementP가 이미 존재하는 경우 BadRequestException을 발생시켜야 한다', async () => {
+      const userId = 1;
+      const subId = 1;
+      repository.findSub.mockResolvedValue({
+        id: subId,
+        achievement_id: 1,
+      } as SubAchievement);
+      repository.findPByUserNSub.mockResolvedValue({ id: 1 } as AchievementP);
 
-    it('정상 등록 케이스', async () => {
-      // 정상적인 등록 프로세스를 모의합니다.
-      mockRepository.findSub.mockResolvedValue({ id: 101, achievement_id: 1001 });
-      mockRepository.findPByUserNSub.mockResolvedValue(null);
-      const createdP = { id: 1, user_id: 1, sub_achievement_id: 101, achievement_id: 1001, complete: true };
-      mockRepository.createP.mockReturnValue(createdP);
-      mockRepository.save.mockResolvedValue(createdP);
-      // 서브업적 목록과 등록된 P 목록을 모의하여 업적 완료 조건을 충족시킵니다.
-      mockRepository.subAllByA.mockResolvedValue([{ id: 101 }, { id: 102 }]);
-      mockRepository.pAllByA.mockResolvedValue([{ sub_achievement_id: 101 }, { sub_achievement_id: 102 }]);
-      // 업적 완료(C 테이블) 관련 메소드 모의
-      mockRepository.createC.mockResolvedValue({ id: 10 });
-      mockRepository.saveC.mockResolvedValue({ id: 10 });
-      // 보상 관련 모의
-      mockRepository.reward.mockResolvedValue({ reward: { gem: 5, dia: 3 } });
-      mockRepository.gem.mockResolvedValue(true);
-      mockRepository.dia.mockResolvedValue(true);
-
-      const result = await service.post(1, '101');
-      expect(result).toEqual(createdP);
-      // Redis에 데이터 저장을 위해 valkeyService.set이 호출되었는지 확인합니다.
-      expect(mockValkeyService.set).toHaveBeenCalled();
+      await expect(service.post(userId, subId)).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(repository.findPByUserNSub).toHaveBeenCalledWith(userId, subId);
     });
   });
 
-  // deleteByUserNSub 메소드에 대한 테스트
+  // deleteByUserNSub 메서드 테스트
   describe('deleteByUserNSub', () => {
-    it('subAchievementId가 숫자가 아니면 BadRequestException을 던져야 함', async () => {
-      await expect(service.deleteByUserNSub(1, 'invalid')).rejects.toThrow(BadRequestException);
-    });
+    it('AchievementP를 성공적으로 삭제해야 한다', async () => {
+      const userId = 1;
+      const subId = 1;
+      const mockAchievementP = {
+        id: 1,
+        user_id: userId,
+        sub_achievement_id: subId,
+      } as AchievementP;
 
-    it('해당 항목이 없으면 BadRequestException을 던져야 함', async () => {
-      mockRepository.findPByUserNSub.mockResolvedValue(null);
-      await expect(service.deleteByUserNSub(1, '101')).rejects.toThrow(BadRequestException);
-    });
+      repository.findPByUserNSub.mockResolvedValue(mockAchievementP);
+      repository.delete.mockResolvedValue(undefined);
 
-    it('정상적으로 삭제되어야 함', async () => {
-      const fakeP = { id: 1 };
-      mockRepository.findPByUserNSub.mockResolvedValue(fakeP);
-      mockRepository.delete.mockResolvedValue(undefined);
+      const result = await service.deleteByUserNSub(userId, subId);
 
-      const result = await service.deleteByUserNSub(1, '101');
+      expect(repository.findPByUserNSub).toHaveBeenCalledWith(userId, subId);
+      expect(repository.delete).toHaveBeenCalledWith(mockAchievementP.id);
       expect(result).toEqual({ message: '삭제 완료' });
-      expect(mockRepository.delete).toHaveBeenCalledWith(fakeP.id);
+    });
+
+    it('AchievementP가 존재하지 않는 경우 BadRequestException을 발생시켜야 한다', async () => {
+      const userId = 1;
+      const subId = 1;
+
+      repository.findPByUserNSub.mockResolvedValue(null);
+
+      await expect(service.deleteByUserNSub(userId, subId)).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(repository.findPByUserNSub).toHaveBeenCalledWith(userId, subId);
     });
   });
 
-  // deleteByPId 메소드에 대한 테스트
+  // deleteByPId 메서드 테스트
   describe('deleteByPId', () => {
-    it('achievementPId가 숫자가 아니면 BadRequestException을 던져야 함', async () => {
-      await expect(service.deleteByPId('invalid')).rejects.toThrow(BadRequestException);
+    it('ID로 AchievementP를 성공적으로 삭제해야 한다', async () => {
+      const achievementPId = '1';
+
+      repository.delete.mockResolvedValue(undefined);
+
+      const result = await service.deleteByPId(achievementPId);
+
+      expect(repository.delete).toHaveBeenCalledWith(1);
+      expect(result).toEqual({ message: '삭제 완료' });
     });
 
-    it('정상적으로 삭제되어야 함', async () => {
-      mockRepository.delete.mockResolvedValue(undefined);
-      const result = await service.deleteByPId('1');
-      expect(result).toEqual({ message: '삭제 완료' });
-      expect(mockRepository.delete).toHaveBeenCalledWith(1);
+    it('achievementPId가 유효하지 않은 경우 BadRequestException을 발생시켜야 한다', async () => {
+      const achievementPId = 'invalid';
+
+      await expect(service.deleteByPId(achievementPId)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 });

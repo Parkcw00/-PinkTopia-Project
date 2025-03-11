@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { StoreItem } from './entities/store-item.entity';
 import { StoreItemRepository } from './store-item.repository';
 import { S3Service } from '../s3/s3.service';
-import { ValkeyService } from '../valkey/valkey.service'; // Valkey 추가
+import { ValkeyService } from '../valkey/valkey.service';
 import { ValkeyModule } from '../valkey/valkey.module';
 
 @Module({

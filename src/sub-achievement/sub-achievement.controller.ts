@@ -1,18 +1,12 @@
 import {
   Controller,
   Get,
-  Res,
-  Request,
   Post,
   Body,
   Patch,
   Param,
   UseGuards,
   Delete,
-  Query,
-  BadRequestException,
-  NotFoundException,
-  ParseIntPipe,
   UseInterceptors,
   UploadedFiles,
 } from '@nestjs/common';
@@ -47,14 +41,12 @@ export class SubAchievementController {
   }
 
   // 유저 전체에 새로고침.
-  // 유저 전체에 새로고침.
   // P에 없는 항목은 false로 업데이트 하기
   // 완료되지 않은 서브업적이 있는 업적은 컴플리트에서 삭제하기
 
   // 세부조회 <- 지도에 위치, 정보 보이게 추가하기
   @Get('/:subAchievementId')
   async findOne(@Param('subAchievementId') subAchievementId: string) {
-    return await this.service.findOne(subAchievementId);
     return await this.service.findOne(subAchievementId);
   }
 
@@ -70,7 +62,6 @@ export class SubAchievementController {
     @Body() updateSubAchievementDto: UpdateSubAchievementDto,
   ) {
     return await this.service.update(subAchievementId, updateSubAchievementDto);
-    return await this.service.update(subAchievementId, updateSubAchievementDto);
   }
 
   // 삭제
@@ -78,7 +69,6 @@ export class SubAchievementController {
   @UseGuards(UserGuard, AdminGuard)
   @Delete('/:subAchievementId')
   async remove(@Param('subAchievementId') subAchievementId: string) {
-    return await this.service.softDelete(subAchievementId);
     return await this.service.softDelete(subAchievementId);
   }
 }

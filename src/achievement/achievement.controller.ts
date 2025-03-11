@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Res,
   Request,
   Post,
   Body,
@@ -10,12 +9,8 @@ import {
   UseGuards,
   Delete,
   Query,
-  BadRequestException,
-  NotFoundException,
-  ParseIntPipe,
   UploadedFiles,
   UseInterceptors,
-  UploadedFile,
 } from '@nestjs/common';
 import { UserGuard } from '../user/guards/user-guard';
 import { AdminGuard } from '../user/guards/admin.guard';
@@ -44,21 +39,24 @@ export class AchievementController {
   }
 
   // 조회
+  @UseGuards(UserGuard)
   @Get()
-  async findAll() {
+  async findAll(@Request() req) {
+    const userId = req.user.id;
     return await this.achievementService.findAll();
   }
   // + 완료 목록 조회
+  @UseGuards(UserGuard)
   @Get('/done')
-  async findAllDone() {
-    return await this.achievementService.findAllDone();
+  async findAllDone(@Request() req) {
+    const userId = req.user.id;
+    return await this.achievementService.findAllDone(userId);
   }
   // 활성화 목록 조회
   @Get('/active')
   async findAllActive() {
     return await this.achievementService.findAllActive();
   }
-
   // 카테고리별 조회
   // 'achievement/?category=OOO'
   @Get('by-category')
@@ -72,6 +70,21 @@ export class AchievementController {
   async findOne(@Param('achievementId') achievementId: string) {
     console.log('상세조회', achievementId);
     return await this.achievementService.findOne(achievementId);
+  }
+
+  // 상세 조회 (완료 상태 포함)
+  @UseGuards(UserGuard)
+  @Get('/achievementId/:achievementId/withStatus')
+  async findOneWithStatus(
+    @Param('achievementId') achievementId: string,
+    @Request() req,
+  ) {
+    const userId = req.user.id;
+    console.log('상세조회 (완료 상태 포함)', achievementId, '사용자:', userId);
+    return await this.achievementService.getAchievementWithSubAchievements(
+      achievementId,
+      userId,
+    );
   }
 
   // 수정

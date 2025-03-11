@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>문의 관리 | PinkTopia</title>
+    <style>
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .inquiry-list {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .inquiry-item {
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .inquiry-item:last-child {
+        border-bottom: none;
+      }
+
+      .inquiry-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .inquiry-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .inquiry-meta {
+        display: flex;
+        gap: 15px;
+        color: #666;
+        font-size: 14px;
+      }
+
+      .inquiry-content {
+        margin: 15px 0;
+        color: #444;
+        line-height: 1.6;
+      }
+
+      .inquiry-status {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+
+      .status-pending {
+        background-color: #ffd700;
+        color: #000;
+      }
+
+      .status-completed {
+        background-color: #90ee90;
+        color: #000;
+      }
+
+      .answer-form {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+      }
+
+      .answer-form textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        min-height: 100px;
+      }
+
+      .submit-button {
+        background-color: #ff69b4;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .submit-button:hover {
+        background-color: #ff4da6;
+      }
+
+      .filter-section {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 10px;
+      }
+
+      .filter-select {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .filter-button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .filter-button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>문의 관리</h1>
+
+      <div class="filter-section">
+        <select id="statusFilter" class="filter-select">
+          <option value="">전체 상태</option>
+          <option value="pending">처리중</option>
+          <option value="completed">답변완료</option>
+        </select>
+        <select id="typeFilter" class="filter-select">
+          <option value="">전체 유형</option>
+          <option value="refund">환불 요청</option>
+          <option value="payment">결제 문의</option>
+          <option value="bug">버그 신고</option>
+          <option value="suggestion">기능 제안</option>
+          <option value="other">기타 문의</option>
+        </select>
+        <button id="applyFilter" class="filter-button">필터 적용</button>
+      </div>
+
+      <div id="inquiryList" class="inquiry-list">
+        <!-- 문의 목록이 여기에 동적으로 추가됨 -->
+      </div>
+    </div>
+
+    <script>
+      // 사용자 권한 확인 함수
+      async function checkUserRole() {
+        try {
+          const accessToken = localStorage.getItem('accessToken');
+          if (!accessToken) {
+            throw new Error('로그인이 필요합니다.');
+          }
+
+          const response = await fetch('/user/me', {
+            headers: {
+              Authorization: `${accessToken}`,
+            },
+          });
+
+          if (!response.ok) {
+            throw new Error('사용자 정보를 가져오는데 실패했습니다.');
+          }
+
+          const userData = await response.json();
+          console.log('사용자 정보:', userData); // 디버깅용 로그 추가
+
+          // role이 undefined인 경우도 처리
+          const userRole = userData.role === undefined ? 0 : userData.role;
+          if (userRole !== 1) {
+            throw new Error('관리자만 접근할 수 있습니다.');
+          }
+
+          return true;
+        } catch (error) {
+          console.error('권한 확인 실패:', error); // 디버깅용 로그 추가
+          alert(error.message);
+          window.location.href = '/public/log-in.html';
+          return false;
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        // 페이지 로드 시 사용자 권한 확인
+        if (!(await checkUserRole())) {
+          return;
+        }
+
+        const accessToken = localStorage.getItem('accessToken');
+
+        // 문의 목록 로드
+        async function loadInquiries() {
+          try {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+
+            let url = '/inquiry/admin';
+            const params = new URLSearchParams();
+            if (statusFilter) params.append('status', statusFilter);
+            if (typeFilter) params.append('type', typeFilter);
+            if (params.toString()) url += '?' + params.toString();
+
+            const response = await fetch(url, {
+              headers: {
+                Authorization: `${accessToken}`,
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error('문의 목록을 불러오는데 실패했습니다.');
+            }
+
+            const inquiries = await response.json();
+            const inquiryList = document.getElementById('inquiryList');
+            inquiryList.innerHTML = inquiries
+              .map(
+                (inquiry) => `
+                        <div class="inquiry-item">
+                            <div class="inquiry-header">
+                                <div class="inquiry-title">${inquiry.title}</div>
+                                <div class="inquiry-meta">
+                                    <span>${inquiry.type}</span>
+                                    <span>${new Date(inquiry.createdAt).toLocaleDateString()}</span>
+                                    <span class="inquiry-status ${inquiry.status === 'pending' ? 'status-pending' : 'status-completed'}">
+                                        ${inquiry.status === 'pending' ? '처리중' : '답변완료'}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="inquiry-content">${inquiry.content}</div>
+                            ${
+                              inquiry.attachmentUrl
+                                ? `
+                                <div class="attachment">
+                                    <strong>첨부 이미지:</strong>
+                                    <img src="${inquiry.attachmentUrl}" alt="첨부 이미지" style="max-width: 300px; margin-top: 10px;">
+                                </div>
+                            `
+                                : ''
+                            }
+                            ${
+                              inquiry.orderNumber
+                                ? `
+                                <div class="inquiry-meta">
+                                    <span>주문번호: ${inquiry.orderNumber}</span>
+                                    <span>결제일자: ${new Date(inquiry.paymentDate).toLocaleDateString()}</span>
+                                </div>
+                            `
+                                : ''
+                            }
+                            ${
+                              inquiry.type === 'refund'
+                                ? `
+                                <div class="refund-info">
+                                    <strong>환불 정보:</strong>
+                                    <p>결제 키: ${inquiry.paymentKey}</p>
+                                    <p>환불 사유: ${inquiry.refundReason}</p>
+                                    ${
+                                      inquiry.status === 'pending'
+                                        ? `
+                                        <div class="refund-actions" style="margin-top: 10px;">
+                                            <button onclick="processRefund(${inquiry.id}, '${inquiry.paymentKey}', ${inquiry.amount}, true)" class="submit-button" style="background-color: #4CAF50; margin-right: 10px;">
+                                                환불 승인
+                                            </button>
+                                            <button onclick="processRefund(${inquiry.id}, '${inquiry.paymentKey}', ${inquiry.amount}, false)" class="submit-button" style="background-color: #f44336;">
+                                                환불 거절
+                                            </button>
+                                        </div>
+                                    `
+                                        : ''
+                                    }
+                                </div>
+                            `
+                                : ''
+                            }
+                            ${
+                              inquiry.answer
+                                ? `
+                                <div class="answer">
+                                    <strong>답변:</strong>
+                                    <p>${inquiry.answer}</p>
+                                </div>
+                            `
+                                : ''
+                            }
+                            ${
+                              inquiry.status === 'pending'
+                                ? `
+                                <div class="answer-form">
+                                    <textarea 
+                                        id="answer-${inquiry.id}" 
+                                        name="answer"
+                                        placeholder="답변을 입력해주세요"
+                                        required
+                                    ></textarea>
+                                    <button onclick="submitAnswer(${inquiry.id})" class="submit-button">답변하기</button>
+                                </div>
+                            `
+                                : ''
+                            }
+                        </div>
+                    `,
+              )
+              .join('');
+          } catch (error) {
+            console.error('문의 목록 로드 실패:', error);
+            alert(error.message);
+          }
+        }
+
+        // 답변 제출
+        window.submitAnswer = async (inquiryId) => {
+          try {
+            const answer = document.getElementById(`answer-${inquiryId}`).value;
+            if (!answer.trim()) {
+              alert('답변 내용을 입력해주세요.');
+              return;
+            }
+
+            const answerResponse = await fetch(`/inquiry/${inquiryId}/answer`, {
+              method: 'PUT',
+              headers: {
+                Authorization: `${accessToken}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                answer: answer,
+                content: answer,
+                attachmentUrl: 'none',
+              }),
+            });
+
+            if (!answerResponse.ok) {
+              const errorText = await answerResponse.text();
+              console.log('답변 등록 실패 응답:', errorText);
+              throw new Error('답변 등록에 실패했습니다.');
+            }
+
+            alert('답변이 등록되었습니다.');
+            loadInquiries(); // 목록 새로고침
+          } catch (error) {
+            console.error('답변 등록 실패:', error);
+            alert(error.message);
+          }
+        };
+
+        // 환불 처리
+        window.processRefund = async (
+          inquiryId,
+          paymentKey,
+          amount,
+          isApproved,
+        ) => {
+          try {
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+              throw new Error('로그인이 필요합니다.');
+            }
+
+            // 환불 거절 시 답변 입력 확인
+            if (!isApproved) {
+              const answer = document.getElementById(
+                `answer-${inquiryId}`,
+              ).value;
+              if (!answer.trim()) {
+                alert('환불 거절 사유를 답변란에 입력해주세요.');
+                return;
+              }
+            }
+
+            let isRefundSuccessful = false;
+
+            if (isApproved) {
+              // 환불 승인 처리
+              const refundData = {
+                paymentKey,
+                amount: amount,
+                cancelReason: '고객 환불 요청',
+              };
+
+              console.log('환불 요청 데이터:', refundData);
+
+              const refundResponse = await fetch('/payment/refund', {
+                method: 'POST',
+                headers: {
+                  Authorization: `${accessToken}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(refundData),
+              });
+
+              const responseText = await refundResponse.text();
+              console.log('환불 응답:', responseText);
+
+              let refundResult;
+              try {
+                refundResult = JSON.parse(responseText);
+                console.log('환불 처리 결과:', refundResult);
+              } catch (e) {
+                console.log('환불 응답이 JSON이 아닙니다:', responseText);
+              }
+
+              if (!refundResponse.ok) {
+                // 이미 환불된 결제인 경우 답변만 등록
+                if (refundResult?.message === '이미 환불된 결제입니다.') {
+                  console.log('이미 환불된 결제입니다. 답변만 등록합니다.');
+                  isRefundSuccessful = true;
+                } else {
+                  throw new Error('환불 처리에 실패했습니다. ' + responseText);
+                }
+              } else {
+                isRefundSuccessful = true;
+              }
+            }
+
+            // 답변 등록
+            const adminAnswer = document.getElementById(
+              `answer-${inquiryId}`,
+            ).value;
+
+            // 환불 상태 메시지 (필요한 경우 추가)
+            let refundMessage = '';
+            if (isApproved) {
+              refundMessage = isRefundSuccessful
+                ? '\n\n[시스템 메시지] 환불이 승인되었습니다. 영업일 기준 3-5일 내에 결제하신 수단으로 환불됩니다.'
+                : '\n\n[시스템 메시지] 환불 처리 중 오류가 발생했습니다. 관리자에게 문의해주세요.';
+            }
+
+            // 관리자 답변과 시스템 메시지 결합
+            const answer = adminAnswer + refundMessage;
+
+            const answerResponse = await fetch(`/inquiry/${inquiryId}/answer`, {
+              method: 'PUT',
+              headers: {
+                Authorization: `${accessToken}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                answer: answer,
+                content: answer,
+                attachmentUrl: 'none',
+              }),
+            });
+
+            if (!answerResponse.ok) {
+              const errorText = await answerResponse.text();
+              console.log('답변 등록 실패 응답:', errorText);
+              throw new Error('답변 등록에 실패했습니다.');
+            }
+
+            alert(
+              isApproved
+                ? isRefundSuccessful
+                  ? '환불이 승인되었습니다.'
+                  : '환불 처리 중 오류가 발생했습니다.'
+                : '환불이 거절되었습니다.',
+            );
+            loadInquiries(); // 목록 새로고침
+          } catch (error) {
+            console.error('환불 처리 실패:', error);
+            alert(error.message);
+          }
+        };
+
+        // 필터 적용
+        document
+          .getElementById('applyFilter')
+          .addEventListener('click', loadInquiries);
+
+        // 초기 목록 로드
+        loadInquiries();
+
+        // 15분마다 자동으로 토큰 갱신
+        setInterval(
+          async () => {
+            try {
+              const response = await fetch('/user/auth/refresh', {
+                method: 'POST',
+                headers: {
+                  Authorization: `${accessToken}`,
+                },
+              });
+
+              if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem('accessToken', data.accessToken);
+                console.log('토큰이 갱신되었습니다.');
+              } else {
+                throw new Error('토큰 갱신에 실패했습니다.');
+              }
+            } catch (error) {
+              console.error('토큰 갱신 실패:', error);
+              alert('세션이 만료되었습니다. 다시 로그인해주세요.');
+              window.location.href = '/public/log-in.html';
+            }
+          },
+          15 * 60 * 1000,
+        ); // 15분
+      });
+    </script>
+  </body>
+</html>
