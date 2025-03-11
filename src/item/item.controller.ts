@@ -1,9 +1,7 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseGuards,
@@ -30,11 +28,6 @@ export class ItemController {
     return this.itemService.purchaseItem(userId, createItemDto);
   }
 
-  // 아이템 수정인데 나중에 필요하면 추가
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateItemDto: UpdateItemDto) {
-  //   return this.itemService.update(+id, updateItemDto);
-  // }
 
   @ApiOperation({ summary: '아이템 판매' })
   @UseGuards(UserGuard)

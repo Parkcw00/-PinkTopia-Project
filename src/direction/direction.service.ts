@@ -58,8 +58,8 @@ export class DirectionService {
 
   async compareBookmark(
     user_id: number,
-    latitude: number,
     longitude: number,
+    latitude: number,
     client: Socket,
   ) {
     // 🏆 서브업적

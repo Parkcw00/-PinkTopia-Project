@@ -81,6 +81,7 @@ export class PinkmongAppearLocationService {
     return updatedLocation;
   }
   async deleteLocation(id: number): Promise<void> {
+    console.log('S - 삭제!!!', id);
     return this.repository.deleteLocation(id);
   }
 }

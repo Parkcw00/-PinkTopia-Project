@@ -55,7 +55,7 @@ export class PinkmongAppearLocationController {
 
   @Delete()
   async deleteLocation(@Query('id') id: number): Promise<void> {
-    console.log('삭제!!!');
+    console.log('C - 삭제!!!', id);
     return this.service.deleteLocation(id);
   }
 }

@@ -5,19 +5,16 @@ import { S3Service } from '../s3/s3.service';
 import { ValkeyService } from '../valkey/valkey.service';
 import { NotFoundException } from '@nestjs/common';
 
-// 엔티티 모킹
 jest.mock('./entities/store-item.entity', () => ({
   StoreItem: class MockStoreItem {}
 }));
 
-// S3Service 모킹
 jest.mock('../s3/s3.service', () => ({
   S3Service: jest.fn().mockImplementation(() => ({
     uploadFile: jest.fn().mockResolvedValue('mocked-image-url.jpg'),
   }))
 }));
 
-// ValkeyService 모킹
 jest.mock('../valkey/valkey.service', () => ({
   ValkeyService: jest.fn().mockImplementation(() => ({
     get: jest.fn(),

@@ -54,13 +54,13 @@ export class StoreItemController {
 
   @ApiOperation({ summary: '상점 아이템 수정' })
   @UseGuards(UserGuard, AdminGuard)
-  @UseInterceptors(FileInterceptor('file')) // 🔹 파일 업로드 지원
+  @UseInterceptors(FileInterceptor('file'))   
   @Patch(':id')
   update(
     @Request() req,
     @Param('id') id: number,
     @Body() updateStoreItemDto: UpdateStoreItemDto,
-    @UploadedFile() file?: Express.Multer.File, // 🔹 파일 추가
+    @UploadedFile() file?: Express.Multer.File,
   ) {
     return this.storeItemService.updateStoreItem(
       req.user,
