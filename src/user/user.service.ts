@@ -281,7 +281,7 @@ export class UserService {
 
     res.cookie('refreshToken', refreshToken, {
       maxAge: 1000 * 60 * 60 * 24 * refreshTokenDays,
-      httpOnly: false,
+      httpOnly: true,
       secure: false,
       sameSite: 'lax',
       path: '/',
@@ -366,7 +366,7 @@ export class UserService {
         pink_dia: myInfo.pink_dia,
         appearance: myInfo.appearance,
         birthday: myInfo.birthday,
-        role: myInfo.role === true ? 1 : 0
+        role: myInfo.role === true ? 1 : 0,
       };
       return filteredInfo;
     } catch (err) {
@@ -525,7 +525,7 @@ export class UserService {
       }
 
       const updateData: UpdateUserDto = {
-        pink_dia: user.pink_dia - amount
+        pink_dia: user.pink_dia - amount,
       };
       await this.userRepository.updateUser(userId, updateData);
 
@@ -540,10 +540,12 @@ export class UserService {
       return {
         success: true,
         message: `${amount} 다이아가 차감되었습니다.`,
-        currentDiamond: user.pink_dia - amount
+        currentDiamond: user.pink_dia - amount,
       };
     } catch (error) {
-      throw new InternalServerErrorException('다이아 차감 중 오류가 발생했습니다.');
+      throw new InternalServerErrorException(
+        '다이아 차감 중 오류가 발생했습니다.',
+      );
     }
   }
 
