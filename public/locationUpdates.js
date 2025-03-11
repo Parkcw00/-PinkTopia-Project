@@ -164,7 +164,10 @@ socket.on('showPopup', (data) => {
 });
 document.getElementById('confirmButton').onclick = function () {
   // 확인 버튼 클릭 시 현재 시각 기록 후 catch_pinkmong 페이지로 이동
-  localStorage.setItem('lastCatchAttempt', new Date().getTime().toString());
+  const now = new Date().getTime();
+  localStorage.setItem('lastCatchAttempt', now.toString());
+  // 인증 토큰 설정 - 이 토큰이 있어야만 catch_pinkmong 페이지에서 포획 가능
+  localStorage.setItem('pinkmongEncounterAuth', now.toString());
   window.location.href = '/public/catch_pinkmong.html';
 };
 
