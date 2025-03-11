@@ -351,12 +351,7 @@
         };
 
         // 환불 처리
-        window.processRefund = async (
-          inquiryId,
-          paymentKey,
-          amount,
-          isApproved,
-        ) => {
+        window.processRefund = async (inquiryId, paymentKey, amount, isApproved) => {
           try {
             const accessToken = localStorage.getItem('accessToken');
             if (!accessToken) {
@@ -365,9 +360,7 @@
 
             // 환불 거절 시 답변 입력 확인
             if (!isApproved) {
-              const answer = document.getElementById(
-                `answer-${inquiryId}`,
-              ).value;
+              const answer = document.getElementById(`answer-${inquiryId}`).value;
               if (!answer.trim()) {
                 alert('환불 거절 사유를 답변란에 입력해주세요.');
                 return;
@@ -377,11 +370,12 @@
             let isRefundSuccessful = false;
 
             if (isApproved) {
-              // 환불 승인 처리
+              // 환불 승인 처리 - isAdminRequest 플래그 추가
               const refundData = {
                 paymentKey,
                 amount: amount,
                 cancelReason: '고객 환불 요청',
+                isAdminRequest: true  // 관리자 요청임을 나타내는 플래그 추가
               };
 
               console.log('환불 요청 데이터:', refundData);
