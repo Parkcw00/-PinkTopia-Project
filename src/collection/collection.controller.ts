@@ -20,12 +20,6 @@ import { userInfo } from 'os';
 export class CollectionController {
   constructor(private readonly collectionService: CollectionService) {}
 
-  // @Post('collections')
-  // @UseGuards(UserGuard, AdminGuard)
-  // create(@Body() createCollectionDto: CreateCollectionDto) {
-  //   return this.collectionService.createCollection(createCollectionDto);
-  // }
-
   @Get('collections')
   @UseGuards(UserGuard)
   findAll(@Request() req) {
@@ -37,20 +31,11 @@ export class CollectionController {
   @Get('status')
   @UseGuards(UserGuard)
   async getCollectionStatus(@Request() req) {
-    const result = await this.collectionService.getCollectionStatus(req.user.id);
+    const result = await this.collectionService.getCollectionStatus(
+      req.user.id,
+    );
     return result;
   }
-
-  // @Patch('collections/:collectionId')
-  // update(
-  //   @Param('collectionId') collectionId: string,
-  //   @Body() updateCollectionDto: UpdateCollectionDto,
-  // ) {
-  //   return this.collectionService.updateCollection(
-  //     Number(collectionId),
-  //     updateCollectionDto,
-  //   );
-  // }
 
   @Delete('collections/:collectionId')
   remove(@Param('collectionId') collectionId: string) {
