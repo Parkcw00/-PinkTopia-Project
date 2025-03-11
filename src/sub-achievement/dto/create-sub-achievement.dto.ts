@@ -2,13 +2,10 @@ import { Type, Transform } from 'class-transformer';
 import { PickType } from '@nestjs/mapped-types'; // 타입 가져오기
 import {
   IsInt,
-  IsNotEmpty,
   IsOptional,
   IsNumber,
-  IsISO8601,
   IsString,
   IsEnum,
-  IsDateString,
   Min,
   Max,
   IsDate,

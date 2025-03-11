@@ -1,19 +1,12 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Patch,
-  Param,
-  Delete,
   UseGuards,
   Request,
-  UseInterceptors,
-  UploadedFiles,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { DirectionService } from './direction.service';
-import { CompareDirection } from './dto/compare-direction.dto';
 import { UserGuard } from 'src/user/guards/user-guard';
 import { Socket } from 'socket.io';
 import { ConnectedSocket } from '@nestjs/websockets';
@@ -34,7 +27,7 @@ export class DirectionController {
     @Request() req,
     @Body()
     compareDirection: {
-      user_direction: { latitude: number, longitude: number };
+      user_direction: { latitude: number; longitude: number };
     },
     @ConnectedSocket() client: Socket,
   ) {
@@ -46,7 +39,4 @@ export class DirectionController {
       client,
     );
   }
-  //user_direction, bookmark_direction[]
-
-  // 지도에 북마커 표시
 }

@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>핑크몽 포획 | PinkTopia</title>
-    <link rel="stylesheet" href="/public/styles.css" />
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -17,6 +16,7 @@
       .nav {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         background-color: #ff69b4;
         padding: 15px;
         color: white;
@@ -25,6 +25,7 @@
         width: 100%;
         top: 0;
         z-index: 1000;
+        box-sizing: border-box;
       }
 
       .nav a {
@@ -59,6 +60,70 @@
         }
       }
 
+      @media (max-width: 480px) {
+        .inventory-grid {
+          grid-template-columns: repeat(1, 1fr) !important;
+        }
+
+        .inventory-item {
+          max-width: 80px;
+          /* 모바일에서 아이템 크기 줄이기 */
+        }
+
+        .pinkmong {
+          top: 35% !important;
+          /* 🔥 모바일에서 더 위로 배치 */
+          width: 180px;
+          /* 📌 필요하면 크기도 조정 */
+          height: 180px;
+        }
+
+        .nav {
+          padding: 15px 10px;
+        }
+
+        .nav > div:first-child {
+          font-size: 0.9em;
+        }
+
+        #authMenu {
+          text-align: right;
+        }
+
+        #authMenu a {
+          margin-left: 5px;
+          font-size: 0.9em;
+          padding: 5px 10px;
+          background-color: rgba(255, 255, 255, 0.2);
+          border-radius: 15px;
+          display: inline-block;
+        }
+      }
+
+      /* 아주 작은 화면을 위한 추가 스타일 */
+      @media (max-width: 360px) {
+        .inventory-grid {
+          grid-template-columns: repeat(1, 1fr);
+          margin: 0 auto;
+        }
+
+        .inventory-item {
+          width: 70px !important;
+          height: 85px !important;
+          justify-content: center;
+        }
+
+        .inventory-item img {
+          width: 35px;
+          height: 35px;
+        }
+
+        .inventory-item-name {
+          font-size: 0.7em;
+          max-width: 65px;
+        }
+      }
+
       .pinkmong {
         width: 200px;
         height: 200px;
@@ -85,13 +150,16 @@
 
       .controls {
         background: rgba(255, 255, 255, 0.9);
-        padding: 20px;
+        padding: 15px;
         border-radius: 15px;
         width: 90%;
-        max-width: 500px;
+        max-width: 400px;
         margin-bottom: 20px;
         position: relative;
         z-index: 3;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
 
       .inventory-select {
@@ -99,76 +167,66 @@
       }
 
       .inventory-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        gap: 10px;
-        margin-bottom: 15px;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        gap: 10px !important;
+        overflow-x: auto !important;
+        width: 100%;
+        max-width: 100% !important;
+        padding: 10px 5px;
+        justify-content: flex-start;
       }
 
       .inventory-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        flex: 0 0 auto !important;
+        width: 100px !important;
+        height: 120px !important;
         padding: 10px;
         border: 2px solid #ff69b4;
-        border-radius: 10px;
+        border-radius: 8px;
         background-color: white;
         cursor: pointer;
         transition: all 0.3s ease;
-      }
-
-      .inventory-item.selected {
-        background-color: #ffe6f2;
-        transform: scale(1.05);
-        box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
       }
 
       .inventory-item img {
         width: 50px;
         height: 50px;
-        border-radius: 8px;
-        margin-bottom: 8px;
+        border-radius: 5px;
+        margin-bottom: 10px;
       }
 
       .inventory-item-info {
         text-align: center;
-        width: 100%;
       }
 
       .inventory-item-name {
-        font-size: 0.9em;
-        margin-bottom: 4px;
-        color: #333;
-      }
-
-      .inventory-item-count {
-        color: #666;
         font-size: 0.8em;
-      }
-
-      .inventory-item {
-        display: flex;
-        align-items: center;
-        padding: 5px;
-      }
-
-      .inventory-item img {
-        width: 30px;
-        height: 30px;
-        margin-right: 10px;
-        border-radius: 5px;
-      }
-
-      .inventory-item-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
+        margin-bottom: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 80px;
+        text-align: center;
       }
 
       .inventory-item-count {
-        color: #666;
-        font-size: 0.9em;
+        font-size: 0.7em;
+      }
+
+      .status {
+        color: #ff69b4;
+        font-weight: bold;
+        font-size: 16px;
+
+        padding: 10px;
+        border-radius: 5px;
       }
 
       .catch-button {
@@ -213,12 +271,37 @@
         transform: scale(0.95);
       }
 
-      .status {
-        text-align: center;
-        color: white;
-        font-size: 1.2em;
-        margin-bottom: 10px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      /* 모바일 화면용 스타일을 더 강화 */
+      @media (max-width: 480px) {
+        .controls {
+          padding: 12px;
+          width: 95%;
+          max-width: 330px;
+        }
+
+        .inventory-grid {
+          gap: 5px !important;
+        }
+
+        .inventory-item {
+          width: 70px !important;
+          height: 90px !important;
+        }
+
+        .inventory-item img {
+          width: 35px;
+          height: 35px;
+        }
+
+        .button-container {
+          margin-top: 10px;
+        }
+
+        .catch-button,
+        .escape-button {
+          padding: 10px 15px;
+          font-size: 0.9em;
+        }
       }
     </style>
   </head>
@@ -272,7 +355,6 @@
 
         if (accessToken) {
           authMenu.innerHTML = `
-            <a href="mypage.html">마이페이지</a>
             <a href="#" onclick="logout()">로그아웃</a>
           `;
           // 핑크몽 등장 API 호출
@@ -289,7 +371,6 @@
           window.location.href = '/public/log-in.html';
           return;
         }
-
         try {
           const response = await fetch('/catch-pinkmong/catchpinkmong', {
             method: 'POST',
@@ -298,12 +379,35 @@
               'Content-Type': 'application/json',
             },
           });
-
           if (response.ok) {
             const result = await response.json();
-            document.querySelector('.status').textContent = result.message;
-            console.log(result);
-
+            const statusElement = document.querySelector('.status');
+            const message = result.message;
+            // 등급별 색상 정의
+            const gradeColors = {
+              common: '#808080', // 회색
+              rare: '#00BFFF', // 하늘색
+              epic: '#9933FF', // 보라색
+              legendary: '#FFD700', // 금색
+            };
+            // 정규식으로 등급 찾기 (공백 유무 허용
+            const gradeRegex = /\(등급:\s*(common|rare|epic|legendary)\)/i;
+            const match = message.match(gradeRegex);
+            if (match) {
+              const fullGradeText = match[0]; // 전체 텍스트 (예: "(등급: common)")
+              const grade = match[1].toLowerCase(); // 등급 이름만 (예: "common")
+              // 새 HTML 생성 (색상 적용)
+              const coloredGradeText = `<span style="color: ${gradeColors[grade]};">${fullGradeText}</span>`;
+              // 메시지에서 해당 부분만 교체
+              statusElement.innerHTML = message.replace(
+                fullGradeText,
+                coloredGradeText,
+              );
+            } else {
+              // 등급을 찾지 못한 경우 원본 그대로 표시
+              statusElement.textContent = message;
+              console.log('등급을 찾지 못했습니다');
+            }
             // 핑크몽 이미지 업데이트
             if (result.pinkmongImage) {
               const pinkmongElement = document.querySelector('.pinkmong');
@@ -322,6 +426,7 @@
             '오류가 발생했습니다.';
         }
       }
+
       async function loadInventoryItems() {
         const accessToken = localStorage.getItem('accessToken');
         try {
