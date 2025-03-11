@@ -4,16 +4,6 @@ import Redis from 'ioredis';
 export class ValkeyService implements OnModuleDestroy {
   private readonly client: Redis;
 
-  // createQueryBuilder(arg0: string) {
-  //   throw new Error('Method not implemented.');
-  // }
-
-  // findOne(arg0: { where: { user_id: any }; order: { timestamp: string } }) {
-  //   throw new Error('Method not implemented.');
-  // }
-  // pipeline() {
-  //   throw new Error('Method not implemented.');
-  // }
   constructor() {
     this.client = new Redis({
       host: 'localhost', // Docker 컨테이너와 같은 네트워크일 경우 'valkey' 사용 가능
@@ -58,66 +48,7 @@ export class ValkeyService implements OnModuleDestroy {
     return result ? JSON.parse(result) : null; // JSON 문자열을 객체로 변환
   }
 
-  async hgetall(key: string): Promise<any | null> {
-    const data = await this.client.hgetall(key);
-    return data && Object.keys(data).length > 0 ? data : null; // 데이터가 있으면 반환, 없으면 null
-  }
-  // async scan([newCursor, foundKeys, pattern]: [string, string[], string]) {
-  //   const keys = [];
-  //   let cursor = '0';
-  //   await this.client.scan(cursor, 'MATCH', pattern, 'COUNT', 100);
-  // }
-
-  // async getKeysByPattern(
-  //   pattern: string,
-  //   count: number = 100,
-  // ): Promise<string[]> {
-  //   let cursor = '0';
-  //   let keys: string[] = [];
-
-  //   do {
-  //     const [newCursor, foundKeys]: [string, string[]] = await this.client.scan(
-  //       cursor,
-  //       'MATCH',
-  //       pattern,
-  //       'COUNT',
-  //       count.toString(),
-  //     );
-
-  //     cursor = newCursor;
-  //     if (Array.isArray(foundKeys)) {
-  //       keys = keys.concat(foundKeys);
-  //     }
-  //   } while (cursor !== '0');
-
-  //   return keys;
-  // }
-
   onModuleDestroy() {
     this.client.quit();
   }
-  // // ✅ Pipeline 전용 메서드 추가
-  // createPipeline() {
-  //   return this.client.pipeline();
-  // }
-
-  // // ✅ 클라이언트 접근을 위한 public 메서드 추가
-  // getClient(): Redis {
-  //   return this.client;
-  // }
-
-  // // type 메서드 구현
-  // async type(key: string): Promise<string> {
-  //   return this.client.type(key); // Redis 'type' 명령어 사용
-  // }
-
-  // async getString(key: string): Promise<string | null> {
-  //   try {
-  //     const value = await this.client.get(key);
-  //     return value;
-  //   } catch (error) {
-  //     console.error(`Redis GET Error: ${error.message}`);
-  //     throw error;
-  //   }
-  // }
 }
