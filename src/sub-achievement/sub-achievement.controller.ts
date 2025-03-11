@@ -1,18 +1,12 @@
 import {
   Controller,
   Get,
-  Res,
-  Request,
   Post,
   Body,
   Patch,
   Param,
   UseGuards,
   Delete,
-  Query,
-  BadRequestException,
-  NotFoundException,
-  ParseIntPipe,
   UseInterceptors,
   UploadedFiles,
 } from '@nestjs/common';
@@ -46,7 +40,6 @@ export class SubAchievementController {
     return await await this.service.create(createSubAchievementDto, files);
   }
 
-  // 유저 전체에 새로고침.
   // 유저 전체에 새로고침.
   // P에 없는 항목은 false로 업데이트 하기
   // 완료되지 않은 서브업적이 있는 업적은 컴플리트에서 삭제하기

@@ -8,9 +8,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { LocationHistoryService } from './location-history.service';
 import { UpdateLocationHistoryDto } from './dto/update-location-history.dto';
-
 import { DirectionService } from '../direction/direction.service';
-import { CompareDirection } from '../direction/dto/compare-direction.dto';
 
 @WebSocketGateway({
   namespace: '/location',
@@ -48,13 +46,7 @@ export class LocationHistoryGateway {
       latitude: data.latitude,
       longitude: data.longitude,
     };
-    // [추가됨]: CompareDirection 객체 생성 (CoordinatesDto 포함)
-    /* const compareDirection: CompareDirection = {
-      user_direction: {
-        latitude: data.latitude,
-        longitude: data.longitude,
-      },
-    };*/
+
     await this.locationHistoryService.updateValkey(data.userId, updateDto);
     await this.directionService.compareBookmark(
       data.userId,

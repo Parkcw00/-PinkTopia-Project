@@ -11,23 +11,17 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
     this.client = new Redis(); // Redis 클라이언트 초기화
   }
 
-  /**
-   * 모듈이 초기화될 때 실행됩니다.
-   */
+  //모듈이 초기화될 때 실행.
   onModuleInit() {
     // 필요 시 초기화 로직 추가
   }
 
-  /**
-   * 모듈이 종료될 때 실행됩니다.
-   */
+  // 모듈이 종료될 때 실행.
   onModuleDestroy() {
     this.client.quit(); // Redis 연결 종료
   }
 
-  /**
-   * Redis에 여러 작업을 일괄 처리하는 파이프라인 생성
-   */
+  // Redis에 여러 작업을 일괄 처리하는 파이프라인 생성
   multi() {
     return this.client.multi(); // multi()는 Redis의 파이프라인 메서드
   }
@@ -100,7 +94,6 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
       region_theme: data.region_theme,
     });
   }
-  //////////////////////////////
 
   // geo 읽어서 맵에 북마커 추가하기
   // 🔹 특정 키의 모든 Geo 데이터를 조회
@@ -162,9 +155,7 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
     // 1. GEO에서 반경 5m 내의 북마크 ID 목록 가져오기
     const nearbyIds = (await this.client.georadius(
       this.S_GEO_KEY,
-
       longitude, // 경도먼저
-
       latitude,
       5,
       'm',
@@ -198,9 +189,7 @@ export class GeoService implements OnModuleInit, OnModuleDestroy {
     const nearestIds = (await this.client.geosearch(
       this.P_GEO_KEY,
       'FROMLONLAT',
-
       longitude, // 경도먼저
-
       latitude,
       'BYRADIUS',
       5,
