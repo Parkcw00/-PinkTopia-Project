@@ -7,6 +7,160 @@
     <link rel="stylesheet" href="/public/styles.css" />
     <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
     <style>
+      /* 기본 스타일 개선 */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 15px;
+      }
+      
+      /* 채팅방 카드 스타일 개선 */
+      .room-item {
+        padding: 12px;
+        border: 1px solid #ddd;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      
+      .room-item h3 {
+        font-size: 18px;
+        margin: 0 0 8px 0;
+        word-break: break-word;
+      }
+      
+      .room-item p {
+        font-size: 14px;
+        margin: 0 0 8px 0;
+        color: #666;
+      }
+
+      /* 버튼 기본 스타일 개선 */
+      .button {
+        padding: 8px 15px;
+        background-color: #ff69b4;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-bottom: 5px;
+        white-space: nowrap;
+      }
+
+      /* 채팅방 입장 폼 개선 */
+      .join-room-form {
+        margin-bottom: 15px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .join-room-form input {
+        flex: 1;
+        min-width: 200px;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+
+      /* 채팅방 내부 버튼 정리 */
+      .room-actions {
+        margin-top: 8px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      /* 모바일 화면 대응 추가 */
+      @media (max-width: 480px) {
+        .container {
+          padding: 10px;
+        }
+        
+        h1 {
+          font-size: 20px;
+        }
+        
+        .button {
+          padding: 10px 12px;
+          font-size: 14px;
+          flex-grow: 1;
+          text-align: center;
+          min-width: 70px;
+        }
+        
+        .room-item {
+          padding: 10px;
+        }
+        
+        .room-item h3 {
+          font-size: 16px;
+        }
+        
+        .room-actions {
+          justify-content: space-between;
+        }
+        
+        .join-room-form {
+          flex-direction: column;
+        }
+        
+        .join-room-form input {
+          width: 100%;
+          min-width: unset;
+        }
+        
+        .create-room {
+          margin-bottom: 15px;
+        }
+        
+        .create-room .button {
+          width: 100%;
+        }
+        
+        .modal-content {
+          width: 90%;
+          margin: 30% auto;
+          padding: 15px;
+        }
+      }
+      
+      /* 더 작은 모바일 화면용 */
+      @media (max-width: 360px) {
+        .room-actions {
+          flex-direction: column;
+        }
+        
+        .button {
+          width: 100%;
+        }
+        
+        .nav {
+          padding: 10px;
+          height: 40px;
+        }
+        
+        .logo-text {
+          font-size: 18px;
+        }
+      }
+
       .container {
         max-width: 800px;
         margin: 0 auto;
@@ -68,22 +222,6 @@
       }
 
       .join-room-form button:hover {
-        background-color: #ff4da6;
-      }
-
-      /* 채팅방 내부 버튼 정리 */
-      .room-actions {
-        margin-top: 10px;
-        display: flex;
-        gap: 10px;
-      }
-
-      /* 초대 링크 공유 버튼 */
-      .share-btn {
-        background-color: #ff85c0;
-      }
-
-      .share-btn:hover {
         background-color: #ff4da6;
       }
 
