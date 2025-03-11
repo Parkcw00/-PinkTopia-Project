@@ -65,31 +65,57 @@
         margin-bottom: 5px;
       }
 
+      /* 메시지 버블 스타일 개선 */
       .message {
         margin-bottom: 10px;
         clear: both;
+        max-width: 80%;
       }
 
-      .message-content {
-        padding: 8px 12px;
-        border-radius: 12px;
-        max-width: 70%;
-        display: inline-block;
-      }
-
-      /* 내 메시지 색상 변경 */
       .my-message {
         float: right;
       }
 
-      .my-message .message-content {
-        background-color: #ffb3d9;
+      .message-content {
+        padding: 8px;
+        border-radius: 15px;
+        display: inline-block;
+        position: relative;
+        overflow: hidden;
       }
 
-      /* 상대방 메시지 색상 변경 */
+      .my-message .message-content {
+        background-color: #ffb3d9;
+        margin-right: 10px;
+      }
+
       .message:not(.my-message) .message-content {
         background-color: #ffe6f2;
         float: left;
+      }
+
+      /* 이미지 스타일 수정 */
+      .message-content img {
+        max-width: 160px;
+        max-height: 160px;
+        border-radius: 8px;
+        display: block;
+        margin: 0 auto;
+        object-fit: cover;
+      }
+
+      /* 이미지 메시지 특별 처리 */
+      .message-content.image-message {
+        padding: 5px;
+        background-color: transparent;
+      }
+
+      .my-message .message-content.image-message img {
+        border: 2px solid #ffb3d9;
+      }
+
+      .message:not(.my-message) .message-content.image-message img {
+        border: 2px solid #ffe6f2;
       }
 
       .nickname {
@@ -146,6 +172,11 @@
         .input-area {
           gap: 6px;
         }
+        
+        .message-content img {
+          max-width: 150px;
+          max-height: 150px;
+        }
       }
 
       /* 버튼 hover 색상 변경 */
@@ -158,13 +189,6 @@
         content: '';
         display: table;
         clear: both;
-      }
-
-      .message-content img {
-        max-width: 200px;
-        border-radius: 8px;
-        margin: 5px 0;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
     </style>
   </head>
