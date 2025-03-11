@@ -34,12 +34,14 @@
 
       /* 버튼 기본 스타일 */
       .button {
-        padding: 10px 20px;
+        padding: 8px 12px;
         background-color: #ff69b4;
         color: white;
         border: none;
         border-radius: 4px;
         cursor: pointer;
+        white-space: nowrap;
+        font-size: 14px;
       }
 
       /* 버튼 hover 색상 */
@@ -75,7 +77,8 @@
       .room-actions {
         margin-top: 10px;
         display: flex;
-        gap: 10px;
+        flex-wrap: wrap;
+        gap: 5px;
       }
 
       /* 초대 링크 공유 버튼 */
@@ -263,6 +266,30 @@
         font-size: 36px;
         cursor: pointer;
         color: white;
+      }
+
+      /* 모바일 화면에서 버튼 스타일 */
+      @media (max-width: 480px) {
+        .button {
+          padding: 6px 10px;
+          font-size: 12px;
+        }
+
+        /* 채팅방 목록 아이템 내 레이아웃 조정 */
+        .room-item {
+          padding: 10px;
+        }
+
+        /* 방 이름과 참여자 정보 조정 */
+        .room-item h3 {
+          margin: 5px 0;
+          font-size: 16px;
+        }
+
+        .room-item p {
+          margin: 5px 0;
+          font-size: 14px;
+        }
       }
     </style>
   </head>
