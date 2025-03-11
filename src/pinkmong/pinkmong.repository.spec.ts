@@ -33,7 +33,7 @@ describe('PinkmongRepository', () => {
     expect(pinkmongRepository).toBeDefined();
   });
 
-  // 1️⃣ **특정 핑크몽 조회**
+  // **특정 핑크몽 조회**
   describe('findById(ID로 핑크몽 조회)', () => {
     it('핑크몽이 존재할 경우 반환해야 한다.', async () => {
       const pinkmong: Pinkmong = {
@@ -68,7 +68,7 @@ describe('PinkmongRepository', () => {
     });
   });
 
-  // 2️⃣ **모든 핑크몽 조회**
+  // **모든 핑크몽 조회**
   describe('findAll', () => {
     it('데이터베이스에 저장된 모든 핑크몽을 반환해야 한다.', async () => {
       const pinkmongs: Pinkmong[] = [
@@ -111,7 +111,7 @@ describe('PinkmongRepository', () => {
     });
   });
 
-  // 3️⃣ **핑크몽 생성**
+  // **핑크몽 생성**
   describe('createPinkmong', () => {
     it('핑크몽을 생성하고 반환해야 한다.', async () => {
       const pinkmongData = {
@@ -144,7 +144,7 @@ describe('PinkmongRepository', () => {
     });
   });
 
-  // 4️⃣ **핑크몽 업데이트**
+  // **핑크몽 업데이트**
   describe('updatePinkmong', () => {
     it('핑크몽을 수정하고 수정된 핑크몽을 반환해야 한다.', async () => {
       const pinkmong: Pinkmong = {
@@ -171,7 +171,7 @@ describe('PinkmongRepository', () => {
     });
   });
 
-  // 5️⃣ **핑크몽 삭제**
+  // **핑크몽 삭제**
   describe('deletePinkmong', () => {
     it('핑크몽을 삭제해야 한다.', async () => {
       const pinkmong: Pinkmong = {

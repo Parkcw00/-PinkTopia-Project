@@ -3,13 +3,9 @@ import {
   NotFoundException,
   BadRequestException,
   ConflictException,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { format } from 'date-fns'; // npm install date-fns
-import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository, DeleteResult, MoreThan } from 'typeorm';
 import { S3Service } from '../s3/s3.service';
-import { parseISO } from 'date-fns';
 import { AchievementCategory } from './enums/achievement-category.enum'; // ENUM 경로 확인
 import { SubAchievement } from '../sub-achievement/entities/sub-achievement.entity';
 import { CreateAchievementDto } from './dto/create-achievement.dto';
@@ -60,7 +56,9 @@ export class AchievementService {
     }
 
     // expiration_date를 Date 객체로 변환
-    const expirationAt = expiration_at ? format(expiration_at, 'yyyy-MM-dd HH:mm:ss') : undefined;
+    const expirationAt = expiration_at
+      ? format(expiration_at, 'yyyy-MM-dd HH:mm:ss')
+      : undefined;
 
     const achievement = await this.repository.create({
       title,
@@ -215,22 +213,25 @@ export class AchievementService {
 
     // 사용자가 완료한 서브업적 목록 조회
     // achievement_p 테이블에서 user_id와 achievement_id가 일치하고 complete=1인 항목을 조회
-    const completedSubAchievements = await this.repository.findCompletedSubAchievements(userId, idA);
-    
+    const completedSubAchievements =
+      await this.repository.findCompletedSubAchievements(userId, idA);
+
     // 완료된 서브업적 ID 목록 생성
-    const completedSubIds = completedSubAchievements.map(item => item.sub_achievement_id);
+    const completedSubIds = completedSubAchievements.map(
+      (item) => item.sub_achievement_id,
+    );
 
     // 완료 상태를 포함한 서브업적 목록 생성
-    const subAchievementsWithStatus = subAchievements.map(sub => ({
+    const subAchievementsWithStatus = subAchievements.map((sub) => ({
       ...sub,
-      completed: completedSubIds.includes(sub.id) // completed 속성 추가
+      completed: completedSubIds.includes(sub.id), // completed 속성 추가
     }));
 
     console.log('서브 업적 (완료 상태 포함): ', subAchievementsWithStatus);
-    
+
     return {
       title: achievement.title,
-      subAchievements: subAchievementsWithStatus
+      subAchievements: subAchievementsWithStatus,
     };
   }
 

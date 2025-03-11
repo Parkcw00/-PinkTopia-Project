@@ -26,14 +26,14 @@ describe('PinkmongController', () => {
           },
         },
         {
-          provide: InventoryService, // ✅ InventoryService Mock 추가
-          useValue: {}, // ✅ Mock 객체 제공
+          provide: InventoryService,
+          useValue: {},
         },
       ],
     })
-      .overrideGuard(UserGuard) // ✅ UserGuard를 Mock 처리
+      .overrideGuard(UserGuard)
       .useValue({})
-      .overrideGuard(AdminGuard) // ✅ AdminGuard를 Mock 처리
+      .overrideGuard(AdminGuard)
       .useValue({})
       .compile();
 

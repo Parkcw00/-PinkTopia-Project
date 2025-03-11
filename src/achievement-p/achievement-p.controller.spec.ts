@@ -3,8 +3,6 @@ import { AchievementPController } from './achievement-p.controller';
 import { AchievementPService } from './achievement-p.service';
 import { AchievementP } from './entities/achievement-p.entity';
 import { UserService } from '../user/user.service';
-import { UserModule } from '../user/user.module';
-import { UserGuard } from '../user/guards/user-guard';
 import { UserRepository } from '../user/user.repository';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';

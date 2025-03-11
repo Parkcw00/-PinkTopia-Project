@@ -1,7 +1,5 @@
-import { PickType } from '@nestjs/mapped-types'; // 타입 가져오기
-import { IsInt, IsNotEmpty, IsObject } from 'class-validator'; // 유효성 검사 데코레이터 추가
+import { IsNotEmpty, IsObject } from 'class-validator'; // 유효성 검사 데코레이터 추가
 import { ApiProperty } from '@nestjs/swagger'; // Swagger 문서화를 위한 데코레이터 추가
-import { AchievementP } from '../entities/achievement-p.entity'; // 엔티티 가져오기
 
 // Reward 인터페이스 정의
 export interface Reward {

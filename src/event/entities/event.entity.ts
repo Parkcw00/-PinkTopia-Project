@@ -6,11 +6,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-/**
- * Event 엔티티 정의
- *
- * 이벤트 정보를 저장하는 데이터 모델로, 제목, 내용, 이미지, 생성/수정 날짜 및 만료 날짜를 포함합니다.
- */
 @Entity({
   name: 'event',
 })

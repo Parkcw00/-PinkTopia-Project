@@ -81,8 +81,8 @@ export class LocationHistoryService {
             const parsedItem =
               typeof item === 'string' ? JSON.parse(item) : item;
             return {
-              latitude: parsedItem.latitude,
               longitude: parsedItem.longitude,
+              latitude: parsedItem.latitude, // ✅ userId를 제외
               timestamp:
                 parsedItem.timestamp &&
                 !isNaN(new Date(parsedItem.timestamp).getTime())
@@ -100,23 +100,23 @@ export class LocationHistoryService {
     if (records.length === 0) {
       // 최초 저장: 새로운 기록 생성
       records.push({
-        latitude: updateDto.latitude ?? null,
         longitude: updateDto.longitude ?? null,
+        latitude: updateDto.latitude ?? null,
         timestamp: updateDto.timestamp ?? new Date(),
       });
     } else if (records.length < 7) {
       // 7개 미만: 새 기록 추가
       records.push({
-        latitude: updateDto.latitude,
         longitude: updateDto.longitude,
+        latitude: updateDto.latitude,
         timestamp: updateDto.timestamp ?? new Date(),
       });
     } else {
       // 7개 이상: FIFO 방식으로 교체
       records.shift(); // 가장 오래된 기록 제거
       records.push({
-        latitude: updateDto.latitude,
         longitude: updateDto.longitude,
+        latitude: updateDto.latitude,
         timestamp: updateDto.timestamp ?? new Date(),
       });
     }
@@ -199,17 +199,16 @@ export class LocationHistoryService {
     let oldestHistory = await this.repository.findOldestByUserId(user_id);
     for (const updateDto of records) {
       if (oldestHistory) {
-        // 기존 레코드 업데이트
-        oldestHistory.latitude = updateDto.latitude;
         oldestHistory.longitude = updateDto.longitude;
+        oldestHistory.latitude = updateDto.latitude;
         oldestHistory.timestamp = updateDto.timestamp ?? new Date();
         await this.repository.save(oldestHistory);
       } else {
         // 새 레코드 생성
         oldestHistory = await this.repository.create7(
           user_id,
-          updateDto.latitude,
           updateDto.longitude,
+          updateDto.latitude,
           updateDto.timestamp ?? new Date(),
         );
       }
