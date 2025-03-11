@@ -223,10 +223,13 @@
         }
 
         .status {
-            color: #333;
-            text-shadow: none;
-            margin-bottom: 15px;
-        }
+        color: #ff69b4; 
+        font-weight: bold; 
+        font-size: 16px; 
+        
+        padding: 10px; 
+        border-radius: 5px; 
+      }
 
         .catch-button {
             background-color: #ff69b4;
@@ -348,45 +351,69 @@
         });
 
         async function appearPinkmong() {
-            const accessToken = localStorage.getItem('accessToken');
-            if (!accessToken) {
-                alert('로그인이 필요합니다.');
-                window.location.href = '/public/log-in.html';
-                return;
-            }
-
-            try {
-                const response = await fetch('/catch-pinkmong/catchpinkmong', {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `${accessToken}`,
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    document.querySelector('.status').textContent = result.message;
-                    console.log(result);
-
-                    // 핑크몽 이미지 업데이트
-                    if (result.pinkmongImage) {
-                        const pinkmongElement = document.querySelector('.pinkmong');
-                        pinkmongElement.style.backgroundImage = `url('${result.pinkmongImage}')`;
-                        pinkmongElement.style.backgroundSize = 'contain';
-                    } else {
-                        console.error('핑크몽 이미지 URL이 없습니다.');
-                    }
-                } else {
-                    document.querySelector('.status').textContent =
-                        '핑크몽 등장에 실패했습니다.';
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                document.querySelector('.status').textContent =
-                    '오류가 발생했습니다.';
-            }
+        const accessToken = localStorage.getItem('accessToken');
+        if (!accessToken) {
+          alert('로그인이 필요합니다.');
+          window.location.href = '/public/log-in.html';
+          return;
         }
+        try {
+          const response = await fetch('/catch-pinkmong/catchpinkmong', {
+            method: 'POST',
+            headers: {
+              Authorization: `${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          if (response.ok) {
+            const result = await response.json();
+            const statusElement = document.querySelector('.status');
+            const message = result.message;
+            // 등급별 색상 정의
+            const gradeColors = {
+              common: '#808080', // 회색
+              rare: '#00BFFF', // 하늘색
+              epic: '#9933FF', // 보라색
+              legendary: '#FFD700', // 금색
+            };
+            // 정규식으로 등급 찾기 (공백 유무 허용
+            const gradeRegex = /\(등급:\s*(common|rare|epic|legendary)\)/i;
+            const match = message.match(gradeRegex);
+            if (match) {
+              const fullGradeText = match[0]; // 전체 텍스트 (예: "(등급: common)")
+              const grade = match[1].toLowerCase(); // 등급 이름만 (예: "common")
+              // 새 HTML 생성 (색상 적용)
+              const coloredGradeText = `<span style="color: ${gradeColors[grade]};">${fullGradeText}</span>`;
+              // 메시지에서 해당 부분만 교체
+              statusElement.innerHTML = message.replace(
+                fullGradeText,
+                coloredGradeText,
+              );
+            } else {
+              // 등급을 찾지 못한 경우 원본 그대로 표시
+              statusElement.textContent = message;
+              console.log('등급을 찾지 못했습니다');
+            }
+            // 핑크몽 이미지 업데이트
+            if (result.pinkmongImage) {
+              const pinkmongElement = document.querySelector('.pinkmong');
+              pinkmongElement.style.backgroundImage = `url('${result.pinkmongImage}')`;
+              pinkmongElement.style.backgroundSize = 'contain';
+            } else {
+              console.error('핑크몽 이미지 URL이 없습니다.');
+            }
+          } else {
+            document.querySelector('.status').textContent =
+              '핑크몽 등장에 실패했습니다.';
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          document.querySelector('.status').textContent =
+            '오류가 발생했습니다.';
+        }
+      }
+        
+
         async function loadInventoryItems() {
             const accessToken = localStorage.getItem('accessToken');
             try {
