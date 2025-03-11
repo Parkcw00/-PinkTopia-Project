@@ -1,22 +1,15 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
   Patch,
-  Param,
-  Delete,
   UseGuards,
   Request,
-  UseInterceptors,
-  UploadedFiles,
   ParseIntPipe,
 } from '@nestjs/common';
 import { LocationHistoryService } from './location-history.service';
-import { CreateLocationHistoryDto } from './dto/create-location-history.dto';
 import { UpdateLocationHistoryDto } from './dto/update-location-history.dto';
 import { UserGuard } from '../user/guards/user-guard';
-import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('location-history')
 export class LocationHistoryController {

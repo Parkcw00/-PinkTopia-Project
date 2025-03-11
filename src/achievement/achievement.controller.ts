@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Res,
   Request,
   Post,
   Body,
@@ -10,12 +9,8 @@ import {
   UseGuards,
   Delete,
   Query,
-  BadRequestException,
-  NotFoundException,
-  ParseIntPipe,
   UploadedFiles,
   UseInterceptors,
-  UploadedFile,
 } from '@nestjs/common';
 import { UserGuard } from '../user/guards/user-guard';
 import { AdminGuard } from '../user/guards/admin.guard';
@@ -82,11 +77,14 @@ export class AchievementController {
   @Get('/achievementId/:achievementId/withStatus')
   async findOneWithStatus(
     @Param('achievementId') achievementId: string,
-    @Request() req
+    @Request() req,
   ) {
     const userId = req.user.id;
     console.log('상세조회 (완료 상태 포함)', achievementId, '사용자:', userId);
-    return await this.achievementService.getAchievementWithSubAchievements(achievementId, userId);
+    return await this.achievementService.getAchievementWithSubAchievements(
+      achievementId,
+      userId,
+    );
   }
 
   // 수정
