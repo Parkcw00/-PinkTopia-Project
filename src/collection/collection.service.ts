@@ -28,8 +28,6 @@ export class CollectionService {
   ) {}
   /**
    * 인증된 유저의 컬렉션에서 핑크몽 정보만 조회합니다.
-   * @param userId 조회할 유저의 ID
-   * @returns 해당 유저가 등록한 핑크몽 목록 (유저 정보는 제외)
    */
   async findCollectionsByUser(userId: number): Promise<Pinkmong[]> {
     // 유저 존재 여부 확인 (선택 사항)
