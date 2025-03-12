@@ -226,7 +226,7 @@
         padding: 10px;
         border: 2px solid #f575b5;
         border-radius: 8px;
-        font-size: 14px;
+        font-size: 13px;
         transition: border 0.3s ease-in-out;
       }
 
@@ -318,6 +318,13 @@
         /* ✅ 핑크 색상 */
         margin: 0;
         /* ✅ 기본 마진 제거 */
+      }
+
+      @media (max-width: 480px) {
+        .info-item span {
+          font-size: 12px;
+          /* 폰트 사이즈 줄이기 */
+        }
       }
     </style>
   </head>

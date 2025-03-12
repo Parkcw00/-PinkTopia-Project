@@ -1,520 +1,533 @@
 <!doctype html>
 <html lang="ko">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>핑크몽 도감</title>
-  <link rel="stylesheet" href="/public/styles.css" />
-  <style>
-    body {
-      background-color: #fdf1f1;
-      font-family: 'Arial', sans-serif;
-    }
-
-    .collection-header {
-      text-align: center;
-      padding: 20px;
-      background-color: white;
-      color: #ff69b4;
-      margin-bottom: 30px;
-    }
-
-    .collection-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 25px;
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .pinkmong-card {
-      background: white;
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .pinkmong-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .pinkmong-image {
-      width: 180px;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 50%;
-      margin: 0 auto 15px;
-      display: block;
-      border: 3px solid transparent;
-    }
-
-    .uncollected {
-      filter: blur(5px) brightness(0.8);
-      opacity: 0.7;
-    }
-
-    .grade-legendary .pinkmong-image {
-      border-color: #ffd700;
-    }
-
-    .grade-epic .pinkmong-image {
-      border-color: #f013cb;
-    }
-
-    .grade-rare .pinkmong-image {
-      border-color: #17c4f0;
-    }
-
-    .grade-common .pinkmong-image {
-      border-color: #a0a0a0;
-    }
-
-    .pinkmong-info {
-      text-align: center;
-    }
-
-    .pinkmong-name {
-      font-size: 1.4em;
-      font-weight: bold;
-      margin-bottom: 8px;
-      color: #333;
-    }
-
-    .pinkmong-grade {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 0.9em;
-      margin-bottom: 8px;
-    }
-
-    .grade-legendary .pinkmong-grade {
-      background-color: #fff7e6;
-      color: #ffa500;
-    }
-
-    .grade-epic .pinkmong-grade {
-      background-color: #fff7e6;
-      color: #f013cb;
-    }
-
-    .grade-rare .pinkmong-grade {
-      background-color: #f0e6ff;
-      color: #17c4f0;
-    }
-
-    .grade-common .pinkmong-grade {
-      background-color: #f0f0f0;
-      color: #666;
-    }
-
-    .pinkmong-region {
-      font-size: 0.9em;
-      color: #666;
-      margin-bottom: 12px;
-    }
-
-    .pinkmong-description {
-      font-size: 0.9em;
-      color: #777;
-      line-height: 1.4;
-    }
-
-    .not-collected {
-      background-color: #f8f8f8;
-      opacity: 0.8;
-    }
-
-    /* 네비게이션 바 스타일 */
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #ff69b4;
-      padding: 15px;
-      color: white;
-      font-weight: bold;
-      position: relative;
-      height: 50px;
-    }
-
-    /* 햄버거 메뉴 아이콘 스타일 */
-    .menu-icon {
-      position: absolute;
-      left: 15px;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      z-index: 2;
-    }
-
-    .menu-icon .hamburger {
-      width: 25px;
-      height: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .menu-icon .hamburger span {
-      display: block;
-      height: 3px;
-      width: 100%;
-      background-color: white;
-      border-radius: 3px;
-    }
-
-    /* 로고 컨테이너 위치 수정 */
-    .nav .logo-container {
-      position: absolute;
-      left: 50px;
-      height: 100%;
-      display: flex;
-      align-items: center;
-    }
-
-    .nav img {
-      width: 45px;
-      height: 45px;
-      border-radius: 0;
-      object-fit: cover;
-    }
-
-    /* 로고 텍스트 */
-    .nav .logo-text {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 24px;
-    }
-
-    .nav a {
-      color: white;
-      text-decoration: none;
-      margin: 0 15px;
-    }
-
-    /* 사이드바 스타일 */
-    .sidebar {
-      height: 100%;
-      width: 0;
-      position: fixed;
-      z-index: 1000;
-      top: 0;
-      left: 0;
-      background-color: #ff69b4;
-      overflow-x: hidden;
-      transition: 0.5s;
-      padding-top: 60px;
-      box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .sidebar a {
-      padding: 15px 25px;
-      text-decoration: none;
-      font-size: 18px;
-      color: white;
-      display: block;
-      transition: 0.3s;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .sidebar a:hover {
-      background-color: #ff4da6;
-    }
-
-    .close-sidebar {
-      position: absolute;
-      top: 15px;
-      right: 25px;
-      font-size: 36px;
-      cursor: pointer;
-      color: white;
-    }
-
-    .pagination {
-      margin: 20px 0;
-      text-align: center;
-    }
-
-    .pagination button {
-      padding: 8px 16px;
-      margin: 0 5px;
-      background-color: #ff69b4;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .pagination button:disabled {
-      background-color: #cccccc;
-      cursor: not-allowed;
-    }
-
-    .pagination span {
-      margin: 0 10px;
-      font-weight: bold;
-    }
-
-    .filter-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .filter-buttons .tab {
-      padding: 10px 20px;
-      background-color: #ddd;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-      border: none;
-      font-size: 16px;
-      transition: 0.3s;
-    }
-
-    .filter-buttons .tab.active {
-      background-color: #ff69b4;
-      color: white;
-    }
-
-    .empty-message-container {
-      position: absolute;
-      /* 화면에서 독립적으로 배치 */
-      top: 50%;
-      /* 화면 중앙 위치 */
-      left: 50%;
-      transform: translate(-50%, -50%);
-      /* 정확한 중앙 정렬 */
-      text-align: center;
-      /* 텍스트 가운데 정렬 */
-      width: 100%;
-      /* 필요 시 조절 가능 */
-    }
-  </style>
-</head>
-
-<body>
-  <div class="nav">
-    <div class="menu-icon" onclick="openSidebar()">
-      <div class="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-    </div>
-    <div class="logo-container">
-      <img src="/public/images/123.jpg" alt="PinkTopia Logo" />
-    </div>
-    <div class="logo-text">
-      <a href="/public/home.html" style="text-decoration: none; color: white">PinkTopia</a>
-    </div>
-  </div>
-
-  <!-- 사이드바 -->
-  <div id="sidebar" class="sidebar">
-    <div class="sidebar-header">
-      <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
-    </div>
-    <div class="sidebar-content">
-      <a href="/public/home.html">홈</a>
-      <a href="/public/event.html">이벤트</a>
-      <a href="/public/store-item.html">아이템샵</a>
-      <a href="/public/board.html">게시글 (커뮤니티)</a>
-      <a href="/public/ranking.html">랭킹</a>
-      <!-- 로그인 시 표시될 메뉴들 -->
-      <div id="loggedInMenu" style="display: none">
-        <a href="/public/chattingrooms.html">채팅</a>
-        <a href="/public/collection.html">핑크몽 개인 도감</a>
-        <a href="/public/inventory.html">인벤토리 아이템</a>
-        <a href="/public/achievements.html">업적</a>
-        <a href="/public/mypage.html">마이페이지</a>
-        <a href="/public/customer-service.html">고객 센터</a>
-        <a href="#" onclick="logout()">로그아웃</a>
-      </div>
-      <!-- 로그인 안 된 경우 표시될 메뉴들 -->
-      <div id="loggedOutMenu">
-        <a href="/public/log-in.html">로그인</a>
-        <a href="/public/sign-up.html">회원가입</a>
-      </div>
-    </div>
-  </div>
-
-  <div class="collection-header">
-    <h1>핑크몽 도감</h1>
-  </div>
-
-  <div class="filter-buttons">
-    <button class="tab active" onclick="filterCollection('all')">
-      전체조회
-    </button>
-    <button class="tab" onclick="filterCollection('owned')">발견</button>
-    <button class="tab" onclick="filterCollection('unowned')">미발견</button>
-  </div>
-
-  <div class="collection-grid" id="collectionGrid"></div>
-  <div class="pagination" style="text-align: center; margin: 20px 0">
-    <button id="prev-btn" onclick="changePage(-1)" disabled>이전</button>
-    <span id="page-info">1</span>
-    <button id="next-btn" onclick="changePage(1)">다음</button>
-  </div>
-
-  <script>
-    let currentPage = 1;
-    const itemsPerPage = 20;
-    let allPinkmongs = [];
-    let userCollections = new Set();
-    let filteredPinkmongs = [];
-
-    function openSidebar() {
-      document.getElementById('sidebar').style.width = '250px';
-    }
-
-    function closeSidebar() {
-      document.getElementById('sidebar').style.width = '0';
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-      const accessToken = localStorage.getItem('accessToken');
-
-      if (accessToken) {
-        document.getElementById('loggedInMenu').style.display = 'block';
-        document.getElementById('loggedOutMenu').style.display = 'none';
-      } else {
-        document.getElementById('loggedInMenu').style.display = 'none';
-        document.getElementById('loggedOutMenu').style.display = 'block';
-      }
-    });
-
-    function logout() {
-      localStorage.removeItem('accessToken');
-      window.location.reload();
-    }
-
-    // 로그인 체크
-    function checkLogin() {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        alert('로그인이 필요한 서비스입니다.');
-        window.location.href = '/public/log-in.html';
-        return false;
-      }
-      return true;
-    }
-
-    function filterCollection(type) {
-      if (type === 'all') {
-        filteredPinkmongs = [...allPinkmongs]; // 전체 핑크몽
-      } else if (type === 'owned') {
-        filteredPinkmongs = allPinkmongs.filter(pinkmong => {
-          const isOwned = userCollections.has(String(pinkmong.id));
-          console.log(`✔ ID ${pinkmong.id} - 발견됨:`, isOwned); // 🔍 디버깅용 로그
-          return isOwned;
-        }); // 보유한 핑크몽
-      } else if (type === 'unowned') {
-        filteredPinkmongs = allPinkmongs.filter(pinkmong => !userCollections.has(String(pinkmong.id))); // 미보유 핑크몽
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>핑크몽 도감</title>
+    <link rel="stylesheet" href="/public/styles.css" />
+    <style>
+      body {
+        background-color: #fdf1f1;
+        font-family: 'Arial', sans-serif;
       }
 
-      // 🔹 버튼 스타일 업데이트
-      document
-        .querySelectorAll('.filter-buttons .tab')
-        .forEach((tab) => tab.classList.remove('active'));
-      document
-        .querySelector(
-          `.filter-buttons .tab[onclick="filterCollection('${type}')"]`,
-        )
-        .classList.add('active');
+      .collection-header {
+        text-align: center;
+        padding: 20px;
+        background-color: white;
+        color: #ff69b4;
+        margin-bottom: 30px;
+      }
 
-      currentPage = 1;
-      displayPinkmongs();
-      updatePaginationButtons();
-    }
+      .collection-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 25px;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
 
-    async function loadCollection() {
-      if (!checkLogin()) return;
+      .pinkmong-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
 
-      try {
-        const pinkmongResponse = await fetch('/pinkmong/pinkmongs', {
-          credentials: 'include',
-          headers: {
-            Authorization: localStorage.getItem('accessToken'),
-          },
-        });
+      .pinkmong-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
 
-        if (!pinkmongResponse.ok) {
-          throw new Error(
-            '핑크몽 데이터 요청 실패: ' + pinkmongResponse.status,
-          );
+      .pinkmong-image {
+        width: 180px;
+        height: 180px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin: 0 auto 15px;
+        display: block;
+        border: 3px solid transparent;
+      }
+
+      .uncollected {
+        filter: blur(5px) brightness(0.8);
+        opacity: 0.7;
+      }
+
+      .grade-legendary .pinkmong-image {
+        border-color: #ffd700;
+      }
+
+      .grade-epic .pinkmong-image {
+        border-color: #f013cb;
+      }
+
+      .grade-rare .pinkmong-image {
+        border-color: #17c4f0;
+      }
+
+      .grade-common .pinkmong-image {
+        border-color: #a0a0a0;
+      }
+
+      .pinkmong-info {
+        text-align: center;
+      }
+
+      .pinkmong-name {
+        font-size: 1.4em;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #333;
+      }
+
+      .pinkmong-grade {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 0.9em;
+        margin-bottom: 8px;
+      }
+
+      .grade-legendary .pinkmong-grade {
+        background-color: #fff7e6;
+        color: #ffa500;
+      }
+
+      .grade-epic .pinkmong-grade {
+        background-color: #fff7e6;
+        color: #f013cb;
+      }
+
+      .grade-rare .pinkmong-grade {
+        background-color: #f0e6ff;
+        color: #17c4f0;
+      }
+
+      .grade-common .pinkmong-grade {
+        background-color: #f0f0f0;
+        color: #666;
+      }
+
+      .pinkmong-region {
+        font-size: 0.9em;
+        color: #666;
+        margin-bottom: 12px;
+      }
+
+      .pinkmong-description {
+        font-size: 0.9em;
+        color: #777;
+        line-height: 1.4;
+      }
+
+      .not-collected {
+        background-color: #f8f8f8;
+        opacity: 0.8;
+      }
+
+      /* 네비게이션 바 스타일 */
+      .nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #ff69b4;
+        padding: 15px;
+        color: white;
+        font-weight: bold;
+        position: relative;
+        height: 50px;
+      }
+
+      /* 햄버거 메뉴 아이콘 스타일 */
+      .menu-icon {
+        position: absolute;
+        left: 15px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        z-index: 2;
+      }
+
+      .menu-icon .hamburger {
+        width: 25px;
+        height: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .menu-icon .hamburger span {
+        display: block;
+        height: 3px;
+        width: 100%;
+        background-color: white;
+        border-radius: 3px;
+      }
+
+      /* 로고 컨테이너 위치 수정 */
+      .nav .logo-container {
+        position: absolute;
+        left: 50px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+      }
+
+      .nav img {
+        width: 45px;
+        height: 45px;
+        border-radius: 0;
+        object-fit: cover;
+      }
+
+      /* 로고 텍스트 */
+      .nav .logo-text {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 24px;
+      }
+
+      .nav a {
+        color: white;
+        text-decoration: none;
+        margin: 0 15px;
+      }
+
+      /* 사이드바 스타일 */
+      .sidebar {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+        background-color: #ff69b4;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+        box-shadow: 3px 0 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .sidebar a {
+        padding: 15px 25px;
+        text-decoration: none;
+        font-size: 18px;
+        color: white;
+        display: block;
+        transition: 0.3s;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .sidebar a:hover {
+        background-color: #ff4da6;
+      }
+
+      .close-sidebar {
+        position: absolute;
+        top: 15px;
+        right: 25px;
+        font-size: 36px;
+        cursor: pointer;
+        color: white;
+      }
+
+      .pagination {
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .pagination button {
+        padding: 8px 16px;
+        margin: 0 5px;
+        background-color: #ff69b4;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .pagination button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+      }
+
+      .pagination span {
+        margin: 0 10px;
+        font-weight: bold;
+      }
+
+      .filter-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .filter-buttons .tab {
+        padding: 10px 20px;
+        background-color: #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        border: none;
+        font-size: 16px;
+        transition: 0.3s;
+      }
+
+      .filter-buttons .tab.active {
+        background-color: #ff69b4;
+        color: white;
+      }
+
+      .empty-message-container {
+        position: absolute;
+        /* 화면에서 독립적으로 배치 */
+        top: 50%;
+        /* 화면 중앙 위치 */
+        left: 50%;
+        transform: translate(-50%, -50%);
+        /* 정확한 중앙 정렬 */
+        text-align: center;
+        /* 텍스트 가운데 정렬 */
+        width: 100%;
+        /* 필요 시 조절 가능 */
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="nav">
+      <div class="menu-icon" onclick="openSidebar()">
+        <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+      <div class="logo-container">
+        <img src="/public/images/123.jpg" alt="PinkTopia Logo" />
+      </div>
+      <div class="logo-text">
+        <a href="/public/home.html" style="text-decoration: none; color: white"
+          >PinkTopia</a
+        >
+      </div>
+    </div>
+
+    <!-- 사이드바 -->
+    <div id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
+      </div>
+      <div class="sidebar-content">
+        <a href="/public/home.html">홈</a>
+        <a href="/public/event.html">이벤트</a>
+        <a href="/public/store-item.html">아이템샵</a>
+        <a href="/public/board.html">게시글 (커뮤니티)</a>
+        <a href="/public/ranking.html">랭킹</a>
+        <!-- 로그인 시 표시될 메뉴들 -->
+        <div id="loggedInMenu" style="display: none">
+          <a href="/public/chattingrooms.html">채팅</a>
+          <a href="/public/collection.html">핑크몽 개인 도감</a>
+          <a href="/public/inventory.html">인벤토리 아이템</a>
+          <a href="/public/achievements.html">업적</a>
+          <a href="/public/mypage.html">마이페이지</a>
+          <a href="/public/customer-service.html">고객 센터</a>
+          <a href="#" onclick="logout()">로그아웃</a>
+        </div>
+        <!-- 로그인 안 된 경우 표시될 메뉴들 -->
+        <div id="loggedOutMenu">
+          <a href="/public/log-in.html">로그인</a>
+          <a href="/public/sign-up.html">회원가입</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="collection-header">
+      <h1>핑크몽 도감</h1>
+    </div>
+
+    <div class="filter-buttons">
+      <button class="tab active" onclick="filterCollection('all')">
+        전체조회
+      </button>
+      <button class="tab" onclick="filterCollection('owned')">발견</button>
+      <button class="tab" onclick="filterCollection('unowned')">미발견</button>
+    </div>
+
+    <div class="collection-grid" id="collectionGrid"></div>
+    <div class="pagination" style="text-align: center; margin: 20px 0">
+      <button id="prev-btn" onclick="changePage(-1)" disabled>이전</button>
+      <span id="page-info">1</span>
+      <button id="next-btn" onclick="changePage(1)">다음</button>
+    </div>
+
+    <script>
+      let currentPage = 1;
+      const itemsPerPage = 20;
+      let allPinkmongs = [];
+      let userCollections = new Set();
+      let filteredPinkmongs = [];
+
+      function openSidebar() {
+        document.getElementById('sidebar').style.width = '250px';
+      }
+
+      function closeSidebar() {
+        document.getElementById('sidebar').style.width = '0';
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const accessToken = localStorage.getItem('accessToken');
+
+        if (accessToken) {
+          document.getElementById('loggedInMenu').style.display = 'block';
+          document.getElementById('loggedOutMenu').style.display = 'none';
+        } else {
+          document.getElementById('loggedInMenu').style.display = 'none';
+          document.getElementById('loggedOutMenu').style.display = 'block';
+        }
+      });
+
+      function logout() {
+        localStorage.removeItem('accessToken');
+        window.location.reload();
+      }
+
+      // 로그인 체크
+      function checkLogin() {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          alert('로그인이 필요한 서비스입니다.');
+          window.location.href = '/public/log-in.html';
+          return false;
+        }
+        return true;
+      }
+
+      function filterCollection(type) {
+        if (type === 'all') {
+          filteredPinkmongs = [...allPinkmongs]; // 전체 핑크몽
+        } else if (type === 'owned') {
+          filteredPinkmongs = allPinkmongs.filter((pinkmong) =>
+            userCollections.has(String(pinkmong.id)),
+          ); // 보유한 핑크몽
+        } else if (type === 'unowned') {
+          filteredPinkmongs = allPinkmongs.filter(
+            (pinkmong) => !userCollections.has(String(pinkmong.id)),
+          ); // 미보유 핑크몽
         }
 
-        const pinkmongResult = await pinkmongResponse.json();
-        allPinkmongs = pinkmongResult.pinkmongs;
+        // ✅ 정렬 추가 (등급 순서: 레전더리 → 에픽 → 레어 → 커먼)
+        const gradeOrder = { legendary: 1, epic: 2, rare: 3, common: 4 };
 
-        const collectionResponse = await fetch('http://localhost:3000/collection/collections', {
-          credentials: 'include',
-          headers: {
-            'Authorization': localStorage.getItem('accessToken')
-          }
+        filteredPinkmongs.sort((a, b) => {
+          const gradeA = gradeOrder[a.grade?.toLowerCase()] || 99;
+          const gradeB = gradeOrder[b.grade?.toLowerCase()] || 99;
+          return gradeA - gradeB;
         });
-        if (!collectionResponse.ok) {
-          throw new Error('컬렉션 데이터 요청 실패: ' + collectionResponse.status);
-        }
-        const collectionResult = await collectionResponse.json();
-        // 🛠 유저가 보유한 핑크몽 ID를 확인 (String 변환)
-        userCollections = new Set(collectionResult.map(col => String(col.id)));
-        filteredPinkmongs = [...allPinkmongs];
+
+        // 🔹 버튼 스타일 업데이트
+        document
+          .querySelectorAll('.filter-buttons .tab')
+          .forEach((tab) => tab.classList.remove('active'));
+        document
+          .querySelector(
+            `.filter-buttons .tab[onclick="filterCollection('${type}')"]`,
+          )
+          .classList.add('active');
+
+        currentPage = 1;
         displayPinkmongs();
         updatePaginationButtons();
-      } catch (error) {
-        console.error('도감 데이터를 불러오는데 실패했습니다:', error);
       }
-    }
 
+      async function loadCollection() {
+        if (!checkLogin()) return;
 
-    function displayPinkmongs() {
-      const grid = document.getElementById('collectionGrid');
-      grid.innerHTML = '';
+        try {
+          const pinkmongResponse = await fetch('/pinkmong/pinkmongs', {
+            credentials: 'include',
+            headers: {
+              Authorization: localStorage.getItem('accessToken'),
+            },
+          });
 
-      if (filteredPinkmongs.length === 0) {
-        grid.innerHTML = `
+          if (!pinkmongResponse.ok) {
+            throw new Error(
+              '핑크몽 데이터 요청 실패: ' + pinkmongResponse.status,
+            );
+          }
+
+          const pinkmongResult = await pinkmongResponse.json();
+          allPinkmongs = pinkmongResult.pinkmongs;
+
+          const collectionResponse = await fetch('/collection/collections', {
+            credentials: 'include',
+            headers: {
+              Authorization: localStorage.getItem('accessToken'),
+            },
+          });
+          if (!collectionResponse.ok) {
+            throw new Error(
+              '컬렉션 데이터 요청 실패: ' + collectionResponse.status,
+            );
+          }
+          const collectionResult = await collectionResponse.json();
+          // 🛠 유저가 보유한 핑크몽 ID를 확인 (String 변환)
+          userCollections = new Set(
+            collectionResult.map((col) => String(col.id)),
+          );
+          filterCollection('all');
+          displayPinkmongs();
+          updatePaginationButtons();
+        } catch (error) {
+          console.error('도감 데이터를 불러오는데 실패했습니다:', error);
+        }
+      }
+
+      function displayPinkmongs() {
+        const grid = document.getElementById('collectionGrid');
+        grid.innerHTML = '';
+
+        if (filteredPinkmongs.length === 0) {
+          grid.innerHTML = `
         <div class="empty-message-container">
             <p style="font-size: 1.5em; font-weight: bold; color: #666;">친구가 된 핑크몽이 없습니다!</p>
             <p style="font-size: 1em; color: #999;">핑크몽과 친구가 되어 도감을 채워보세요!</p>
         </div>
     `;
 
-        // 🔹 페이지네이션 버튼 숨기기
-        document.getElementById('prev-btn').style.display = 'none';
-        document.getElementById('next-btn').style.display = 'none';
-        document.getElementById('page-info').style.display = 'none';
+          // 🔹 페이지네이션 버튼 숨기기
+          document.getElementById('prev-btn').style.display = 'none';
+          document.getElementById('next-btn').style.display = 'none';
+          document.getElementById('page-info').style.display = 'none';
 
-        return;
-      }
+          return;
+        }
 
-      // 🔹 핑크몽이 있을 경우 페이지네이션 버튼 다시 보이게 설정
-      document.getElementById('prev-btn').style.display = 'inline-block';
-      document.getElementById('next-btn').style.display = 'inline-block';
-      document.getElementById('page-info').style.display = 'inline-block';
+        // 🔹 핑크몽이 있을 경우 페이지네이션 버튼 다시 보이게 설정
+        document.getElementById('prev-btn').style.display = 'inline-block';
+        document.getElementById('next-btn').style.display = 'inline-block';
+        document.getElementById('page-info').style.display = 'inline-block';
 
-      const startIndex = (currentPage - 1) * itemsPerPage;
-      const endIndex = startIndex + itemsPerPage;
-      const currentPinkmongs = filteredPinkmongs.slice(startIndex, endIndex); // ✅ `filteredPinkmongs` 사용
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const currentPinkmongs = filteredPinkmongs.slice(startIndex, endIndex); // ✅ `filteredPinkmongs` 사용
 
-      currentPinkmongs.forEach((pinkmong) => {
-        const isCollected = userCollections.has(String(pinkmong.id));
-        const card = document.createElement('div');
-        card.className = `pinkmong-card ${!isCollected ? 'not-collected' : ''} grade-${pinkmong.grade?.toLowerCase() || 'unknown'}`;
+        currentPinkmongs.forEach((pinkmong) => {
+          const isCollected = userCollections.has(String(pinkmong.id));
+          const card = document.createElement('div');
+          card.className = `pinkmong-card ${!isCollected ? 'not-collected' : ''} grade-${pinkmong.grade?.toLowerCase() || 'unknown'}`;
 
-        card.innerHTML = `
+          card.innerHTML = `
             <img class="pinkmong-image ${!isCollected ? 'uncollected' : ''}" 
                 src="${pinkmong.pinkmong_image}" 
                 alt="${isCollected ? pinkmong.name : '???'}">
@@ -526,75 +539,74 @@
             </div>
         `;
 
-        grid.appendChild(card);
-      });
+          grid.appendChild(card);
+        });
 
-      // document.getElementById('page-info').textContent = currentPage;
-      updatePaginationButtons();
-    }
-
-    function updatePaginationButtons(disableAll = false) {
-      const prevBtn = document.getElementById('prev-btn');
-      const nextBtn = document.getElementById('next-btn');
-      const pageInfo = document.getElementById('page-info');
-
-      if (disableAll || filteredPinkmongs.length === 0) {
-        prevBtn.disabled = true;
-        nextBtn.disabled = true;
-        pageInfo.textContent = `1 / 1`;
-        return;
+        // document.getElementById('page-info').textContent = currentPage;
+        updatePaginationButtons();
       }
 
-      const maxPage = Math.ceil(filteredPinkmongs.length / itemsPerPage);
-      prevBtn.disabled = currentPage === 1;
-      nextBtn.disabled = currentPage >= maxPage;
-      pageInfo.textContent = `${currentPage} / ${maxPage}`;
-    }
+      function updatePaginationButtons(disableAll = false) {
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const pageInfo = document.getElementById('page-info');
 
-    function changePage(delta) {
-      currentPage += delta;
-      displayPinkmongs();
-      updatePaginationButtons();
-    }
-
-    window.onload = () => {
-      loadCollection();
-    };
-
-    async function logout() {
-      try {
-        const accessToken = localStorage.getItem('accessToken');
-        if (!accessToken) {
-          console.warn('🚨 로그아웃 시도: 이미 로그아웃된 상태');
-          window.location.href = '/public/log-in.html';
+        if (disableAll || filteredPinkmongs.length === 0) {
+          prevBtn.disabled = true;
+          nextBtn.disabled = true;
+          pageInfo.textContent = `1 / 1`;
           return;
         }
 
-        // 🔹 서버에 로그아웃 요청 보내기
-        const response = await fetch('/user/auth/logout', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: accessToken,
-          },
-          credentials: 'include', // 쿠키도 함께 보내기
-        });
-
-        if (!response.ok) {
-          throw new Error('서버에서 로그아웃 처리 실패');
-        }
-
-        // ✅ 로그아웃 성공 후, 토큰 삭제
-        localStorage.removeItem('accessToken');
-
-        console.log('✅ 로그아웃 성공! 페이지 이동');
-        window.location.href = '/'; //
-      } catch (error) {
-        console.error('❌ 로그아웃 실패:', error);
-        alert('로그아웃 중 오류가 발생했습니다.');
+        const maxPage = Math.ceil(filteredPinkmongs.length / itemsPerPage);
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage >= maxPage;
+        pageInfo.textContent = `${currentPage} / ${maxPage}`;
       }
-    }
-  </script>
-</body>
 
+      function changePage(delta) {
+        currentPage += delta;
+        displayPinkmongs();
+        updatePaginationButtons();
+      }
+
+      window.onload = () => {
+        loadCollection();
+      };
+
+      async function logout() {
+        try {
+          const accessToken = localStorage.getItem('accessToken');
+          if (!accessToken) {
+            console.warn('🚨 로그아웃 시도: 이미 로그아웃된 상태');
+            window.location.href = '/public/log-in.html';
+            return;
+          }
+
+          // 🔹 서버에 로그아웃 요청 보내기
+          const response = await fetch('/user/auth/logout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: accessToken,
+            },
+            credentials: 'include', // 쿠키도 함께 보내기
+          });
+
+          if (!response.ok) {
+            throw new Error('서버에서 로그아웃 처리 실패');
+          }
+
+          // ✅ 로그아웃 성공 후, 토큰 삭제
+          localStorage.removeItem('accessToken');
+
+          console.log('✅ 로그아웃 성공! 페이지 이동');
+          window.location.href = '/'; //
+        } catch (error) {
+          console.error('❌ 로그아웃 실패:', error);
+          alert('로그아웃 중 오류가 발생했습니다.');
+        }
+      }
+    </script>
+  </body>
 </html>
