@@ -7,10 +7,56 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>결제 완료 | PinkTopia</title>
+    <style>
+      /* 모바일 최적화 스타일 추가 */
+      @media (max-width: 768px) {
+        .box_section {
+          width: 95% !important;
+          max-width: 600px !important;
+          padding: 25px 15px !important;
+          margin: 10px auto !important;
+        }
+        
+        h2 {
+          font-size: 22px !important;
+        }
+        
+        .typography--p {
+          font-size: 16px !important;
+        }
+        
+        .button {
+          width: 100% !important;
+          padding: 15px 10px !important;
+          font-size: 16px !important;
+          margin-top: 10px !important;
+        }
+        
+        .p-grid {
+          margin-top: 20px !important;
+        }
+      }
+      
+      /* 추가 스타일 */
+      .box_section {
+        width: 90%;
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 30px;
+        box-sizing: border-box;
+      }
+      
+      .button {
+        height: auto;
+        min-height: 45px;
+        border-radius: 8px;
+        font-weight: bold;
+      }
+    </style>
   </head>
 
   <body>
-    <div class="box_section" style="width: 600px">
+    <div class="box_section">
       <img width="100px" src="https://static.toss.im/illusts/check-blue-spot-ending-frame.png" />
       <h2 id="successTitle">결제를 완료했어요</h2>
 
@@ -125,7 +171,7 @@
         }
 
         // 고객센터로 이동하면서 결제 키 전달
-        window.location.href = `/customer-service.html?paymentKey=${paymentKey}`;
+        window.location.href = `/public/customer-service.html?paymentKey=${paymentKey}`;
       }
     </script>
   </body>
