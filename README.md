@@ -13,7 +13,7 @@
 ![](https://teamsparta.notion.site/image/attachment%3Ae4577e95-f16b-4bb1-9b0b-87b78c69c60e%3Apinktopia.png?table=block&id=1b42dc3e-f514-8052-9d51-d0e7c7987d3c&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=480&userId=&cache=v2).
 **Logo / Mascot**
 
-![브로셔 이미지 2.png](attachment:48ed8530-2517-4060-bfe8-a0b8dcf0b22d:브로셔_이미지_2.png)
+![브로셔 이미지 2.png]([attachment:48ed8530-2517-4060-bfe8-a0b8dcf0b22d:브로셔_이미지_2.png](https://www.notion.so/image/attachment%3A52a0331a-4f7a-4e0d-87d7-56c5af564207%3A%EB%B8%8C%EB%A1%9C%EC%85%94_%EC%9D%B4%EB%AF%B8%EC%A7%801.png?table=block&id=1a82dc3e-f514-808c-b6d9-e062d1528fb4&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=2000&userId=046f83da-8e42-4184-aab0-c3039fa4f93e&cache=v2))
  [타이틀](링크)
  [타이틀](링크)
 **핑토피아 사이트**: [https://pinktopia.site/](https://pinktopia.site/)
