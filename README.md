@@ -10,7 +10,7 @@
 ---
 
 ## 프로젝트 소개
-(https://teamsparta.notion.site/image/attachment%3Ae4577e95-f16b-4bb1-9b0b-87b78c69c60e%3Apinktopia.png?table=block&id=1b42dc3e-f514-8052-9d51-d0e7c7987d3c&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=480&userId=&cache=v2).
+![](https://teamsparta.notion.site/image/attachment%3Ae4577e95-f16b-4bb1-9b0b-87b78c69c60e%3Apinktopia.png?table=block&id=1b42dc3e-f514-8052-9d51-d0e7c7987d3c&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=480&userId=&cache=v2).
 **Logo / Mascot**
 
 ![브로셔 이미지 2.png](attachment:48ed8530-2517-4060-bfe8-a0b8dcf0b22d:브로셔_이미지_2.png)
