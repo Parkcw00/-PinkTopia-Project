@@ -109,8 +109,13 @@
 | **Sentry**  | 실시간 에러 모니터링 및 빠른 대응, Slack 연동으로 장애 대응 시간 단축    |
 
 📁GIT
-📦GITHUB
-🛠️AWS(EC2, ECS, ALB, SNS, Lambda, Cloud Watch) 🐋Docker
+📦GITHUB 🖥️EC2 
+📦ECS 
+⚖️ALB 
+📢SNS 
+⚡Lambda 
+👀CloudWatch 
+🛠️AWS 🐋Docker
 🐬MYSQL 🪲Sentry
 ---
 
