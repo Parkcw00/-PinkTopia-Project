@@ -1,7 +1,7 @@
 ---
 # PinkTopia (5조)
 
-닌텐도는 혁신적인 게임 경험을 선사하는 회사로, 오랜 시간 동안 전 세계 팬들에게 사랑받아왔습니다. **커비게임**은 귀여운 핑크색 캐릭터 커비와 그의 독특한 능력 흡수 플레이로 창의적이고 즐거운 모험을 제공하며, 닌텐도의 매력을 잘 보여줍니다. 무엇보다, **포켓몬Go!**는 현실과 가상 세계를 연결해 플레이어들이 밖으로 나와 포켓몬을 잡고 친구들과 소통하게 하며, 건강한 재미를 선물합니다. 이들은 모두 닌텐도의 독창성과 끝없는 즐거움을 상징하는 보물 같은 존재입니다!
+닌텐도는 혁신적인 게임 경험을 선사하는 회사로, 오랜 시간 동안 전 세계 팬들에게 사랑받아왔습니다. **커비게임**은 귀여운 핑크색 캐릭터 커비와 그의 독특한 능력 흡수 플레이로 창의적이고 즐거운 모험을 제공하며, 닌텐도의 매력을 잘 보여줍니다. 무엇보다, 포켓몬Go!는 현실과 가상 세계를 연결해 플레이어들이 밖으로 나와 포켓몬을 잡고 친구들과 소통하게 하며, 건강한 재미를 선물합니다. 이들은 모두 닌텐도의 독창성과 끝없는 즐거움을 상징하는 보물 같은 존재입니다!
 
 ---
 
@@ -49,9 +49,9 @@
 > **핵심 목표**: 건강한 라이프스타일, 즐거운 소통, 지역사회 활성화를 동시에 추구하며, 사용자에게 의미 있는 경험을 선사합니다.
 
 <div align="center">
-  <img src="https://www.notion.so/image/attachment%3A018218f3-1733-4fae-b412-775c5ca4c8ff%3Aimage.png?table=block&id=1b32dc3e-f514-8024-b91f-c11e94bde268&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=540&userId=&cache=v2" hight="80" alt="핑크군단"/>  
+  <img src="https://www.notion.so/image/attachment%3A018218f3-1733-4fae-b412-775c5ca4c8ff%3Aimage.png?table=block&id=1b32dc3e-f514-8024-b91f-c11e94bde268&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=540&userId=&cache=v2" height="80" alt="핑크군단"/>  
   
-  <img src="https://www.notion.so/image/attachment%3A951655ff-f48a-4a38-ae9f-74b9e81bcaee%3Aimage.png?table=block&id=1b32dc3e-f514-8037-91e9-f407e9b7cc2a&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=190&userId=&cache=v2" hight="80" alt="핑크몽"/>  
+  <img src="https://www.notion.so/image/attachment%3A951655ff-f48a-4a38-ae9f-74b9e81bcaee%3Aimage.png?table=block&id=1b32dc3e-f514-8037-91e9-f407e9b7cc2a&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=190&userId=&cache=v2" height="80" alt="핑크몽"/>  
   
 </div>
 
@@ -59,13 +59,13 @@
 
 ## ✨ 서비스 핵심 기능
 
-- **길찾기 기능**: 출발지와 도착지 간 경로 제공  
-- **핑크몽 포획 & 아이템 샵**: 핑크몽 수집과 아이템 구매  
-- **결제/환불/고객 센터**: 결제 관리 및 고객 지원  
-- **핑크몽 도감 & 업적**: 수집 기록과 업적 확인  
-- **커뮤니티**: 게시글 작성과 단체 채팅  
-- **로그인/회원가입**: 사용자 인증  
-- **마이페이지**: 프로필 수정  
+- [**길찾기 기능** : 출발지와 도착지 간 경로 제공](https://www.notion.so/teamsparta/1b32dc3ef5148020b8b7ceceb2ec61fc)   
+- [**핑크몽 포획, 아이템 샵** : 핑크몽 수집과 아이템 구매](https://www.notion.so/teamsparta/1b32dc3ef514809d9d2cd3ee0a93fded)  
+- [**결제/ 환불/ 고객 센터** : 결제 관리 및 고객 지원](https://www.notion.so/teamsparta/1b32dc3ef51480d09bd3ea9b4014a12b)  
+- [**핑크몽 도감, 업적** : 수집 기록과 업적 확인](https://www.notion.so/teamsparta/1b32dc3ef514800396f9d3ef54a44652)    
+- [**커뮤니티 기능 - 게시글/ 단체 채팅방** : 게시글 작성과 단체 채팅](https://www.notion.so/teamsparta/1b32dc3ef5148085a761d185fcd0a9da)  
+- [**로그인/회원가입** : 사용자 인증](https://www.notion.so/teamsparta/1b32dc3ef514807d9c29d13772d7d421)   
+- [**마이페이지 - 프로필 수정** : 프로필 수정](https://www.notion.so/teamsparta/1b32dc3ef51480a489aac8d33303e909)   
 
 ---
 
@@ -107,10 +107,10 @@
 
 ## ⚠️ 트러블 슈팅
 
-- **유저 위치 북마커 추가**: 버튼으로 위치 기반 마커 생성  
-- **환불 문제**: 환불 프로세스 개선  
-- **Geolocation**: 위치 데이터 오류 해결  
-- **Geolib**: 경로 계산 문제 해결  
+- [**유저 위치 북마커 추가**: 버튼으로 위치 기반 마커 생성](https://www.notion.so/1b42dc3ef514806eb0e5f4b6cde1f674?pvs=21)
+- [**환불 문제**: 환불 프로세스 개선](https://www.notion.so/1b42dc3ef51480a6bca2caaa4fab00f1?pvs=21)
+- [**Geolocation**: 위치 데이터 오류 해결](https://www.notion.so/Geolocation-1b42dc3ef514804d82c1d5cf1f47df42?pvs=21)
+- [**Geolib**: 경로 계산 문제 해결  ](https://www.notion.so/Geolib-1b42dc3ef51480f4b3d6d35ba5699748?pvs=21)
 
 ---
 
