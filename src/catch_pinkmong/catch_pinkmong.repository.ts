@@ -1,9 +1,5 @@
 // catch_pinkmong.repository.ts
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CatchPinkmong } from 'src/catch_pinkmong/entities/catch_pinkmong.entity';
@@ -154,5 +150,9 @@ export class CatchPinkmongRepository {
       pinkmong_id: pinkmong.id,
     });
     return await this.collectionRepo.save(collection);
+  }
+
+  async updateUserCollectionPoint(user: User): Promise<User> {
+    return this.userRepo.save(user);
   }
 }

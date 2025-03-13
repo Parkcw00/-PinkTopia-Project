@@ -86,9 +86,12 @@ export class ChattingRoomService {
 
     // 관리자인 경우에만 관리자 위임 처리
     if (isMember.admin === true) {
-      const members = await this.chattingRoomRepository.findAllChatMembers(chattingRoomId);
-      if (members.length > 1) {  
-        const otherMembers = members.filter(member => member.user_id !== user.id);
+      const members =
+        await this.chattingRoomRepository.findAllChatMembers(chattingRoomId);
+      if (members.length > 1) {
+        const otherMembers = members.filter(
+          (member) => member.user_id !== user.id,
+        );
         const randomNumber = Math.floor(Math.random() * otherMembers.length);
         const newAdmin = otherMembers[randomNumber].user_id;
         await this.chattingRoomRepository.getAdmin(chattingRoomId, newAdmin);
@@ -159,7 +162,8 @@ export class ChattingRoomService {
       throw new BadRequestException('당신은 해당 채팅방의 멤버가 아닙니다.');
     }
 
-    const isExist = await this.chattingRoomRepository.findByNickname(receiveUserId);
+    const isExist =
+      await this.chattingRoomRepository.findByNickname(receiveUserId);
     if (!isExist) {
       throw new BadRequestException('존재하지 않는 유저입니다.');
     }
@@ -246,7 +250,7 @@ export class ChattingRoomService {
     });
 
     // 초대 링크 형식 수정 (서버 포트로 변경)
-    const inviteUrl = `${process.env.BASE_URL || 'http://localhost:3000'}/public/invite.html?roomId=${chattingRoomId}`;
+    const inviteUrl = `${process.env.BASE_URL || 'https://pinktopia.site'}/public/invite.html?roomId=${chattingRoomId}`;
 
     const mailOptions = {
       from: NODEMAILER_USER,
@@ -264,9 +268,10 @@ export class ChattingRoomService {
       console.log('멤버 확인 서비스 시작:', { userId, chattingRoomId });
 
       // 채팅방이 존재하는지 먼저 확인
-      const chattingRoom = await this.chattingRoomRepository.checkChattingRoom(chattingRoomId);
+      const chattingRoom =
+        await this.chattingRoomRepository.checkChattingRoom(chattingRoomId);
       console.log('채팅방 확인 결과:', chattingRoom);
-      
+
       if (!chattingRoom) {
         throw new BadRequestException('존재하지 않는 채팅방입니다.');
       }
@@ -283,7 +288,8 @@ export class ChattingRoomService {
       }
 
       // 채팅방의 모든 멤버 정보 조회
-      const allMembers = await this.chattingRoomRepository.findAllChatMembers(chattingRoomId);
+      const allMembers =
+        await this.chattingRoomRepository.findAllChatMembers(chattingRoomId);
       console.log('전체 멤버 조회 결과:', allMembers);
 
       const response = {
@@ -291,13 +297,13 @@ export class ChattingRoomService {
         data: {
           member: {
             id: isMember.user_id,
-            isAdmin: isMember.admin
+            isAdmin: isMember.admin,
           },
-          allMembers: allMembers.map(member => ({
+          allMembers: allMembers.map((member) => ({
             id: member.user_id,
-            isAdmin: member.admin
-          }))
-        }
+            isAdmin: member.admin,
+          })),
+        },
       };
 
       console.log('최종 응답:', response);
@@ -308,14 +314,15 @@ export class ChattingRoomService {
         throw error;
       }
       throw new InternalServerErrorException(
-        `채팅 멤버 확인 중 오류가 발생했습니다: ${error.message}`
+        `채팅 멤버 확인 중 오류가 발생했습니다: ${error.message}`,
       );
     }
   }
 
   // 특정 채팅방 조회
   async findChattingRoomById(id: number) {
-    const chattingRoom = await this.chattingRoomRepository.findChattingRoomById(id);
+    const chattingRoom =
+      await this.chattingRoomRepository.findChattingRoomById(id);
     if (!chattingRoom) {
       throw new NotFoundException('존재하지 않는 채팅방입니다.');
     }

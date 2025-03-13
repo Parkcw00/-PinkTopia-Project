@@ -701,7 +701,7 @@
         if (!dateString) return '날짜 없음';
 
         const date = new Date(dateString);
-        date.setHours(date.getHours() + 9); // UTC -> KST 변환
+        date.setHours(date.getHours() - 9); // UTC -> KST 변환
 
         return date.toLocaleString('ko-KR', {
           year: 'numeric',

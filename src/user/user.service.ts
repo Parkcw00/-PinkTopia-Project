@@ -285,7 +285,7 @@ export class UserService {
       secure: false,
       sameSite: 'lax',
       path: '/',
-      domain: 'localhost',
+      domain: 'pinktopia.site',
     });
     if (this.logOutUsers[existEmail.id]) {
       delete this.logOutUsers[existEmail.id];
@@ -432,7 +432,7 @@ export class UserService {
       },
     });
 
-    let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let characters = '0123456789';
     characters = characters + characters.slice(26).repeat(2);
     let verificationCode = '';
 
