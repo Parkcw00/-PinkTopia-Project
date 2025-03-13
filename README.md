@@ -78,8 +78,7 @@
 ## 🛠️ 기술 스택 및 기술적 의사결정
 
 ### **Backend**
-🟢Node.js 🚀Nest.js 🗄️TypeOrm
-💻Typescript ⚡WebSocket 🚩Redis Pub/Sub 🔀Bull Queue
+🟢Node.js 🚀Nest.js 🗄️TypeOrm 💻Typescript ⚡WebSocket 🔀Bull Queue 📁GIT 📦GITHUB
 | 기술 스택    | 선택 이유                                                                 |
 |--------------|--------------------------------------------------------------------------|
 | **NestJS**   | 모듈화된 아키텍처와 타입스크립트 기반으로 유지보수성과 확장성이 뛰어남    |
@@ -88,13 +87,13 @@
 | **TypeORM**  | 타입 명시로 코드 오류 감소                                               |
 
 ### **Frontend**
-📄HTML 🎨CSS ⚙️Javascript
+📄HTML 🎨CSS ⚙️Javascript 📢SNS 
 | 기술 스택            | 선택 이유                                                                 |
 |----------------------|--------------------------------------------------------------------------|
 | **HTML/CSS/JS**      | 직관적인 UI, 모바일 디자인 조정, 실시간 데이터 업데이트 및 동적 기능 추가 |
 
 ### **Database**
-🛢️AWS RDS-MYSQL 🔴REDIS
+🗃️AWS S3 🔑Valkey 🖥️EC2🐬MYSQL
 | 기술 스택   | 선택 이유                                                                 |
 |-------------|--------------------------------------------------------------------------|
 | **AWS S3**  | 이미지 데이터의 안전한 저장과 백업 관리                                  |
@@ -102,21 +101,14 @@
 | **Valkey**  | 고속 데이터 처리로 실시간 기능 속도 향상 및 DB 부하 감소                 |
 
 ### **DevOps / Infra**
-☁️AWS Lambda ⏱️AWS Cloud-watch 🔔AWS SNS 🚨Sentry ⚖️AWS ALB 🐳AWS ECS 🗃️AWS S3 🔒AWS HTTPS
+⏱️AWS Cloud-watch  🚨Sentry ⚖️AWS ALB  
 | 기술 스택   | 선택 이유                                                                 |
 |-------------|--------------------------------------------------------------------------|
 | **Docker**  | 배포 효율성, 환경 일관성 유지, 수평 확장 가능                           |
 | **Sentry**  | 실시간 에러 모니터링 및 빠른 대응, Slack 연동으로 장애 대응 시간 단축    |
 
-📁GIT
-📦GITHUB 🖥️EC2 
-📦ECS 
-⚖️ALB 
-📢SNS 
-⚡Lambda 
-👀CloudWatch 
-🛠️AWS 🐋Docker
-🐬MYSQL 🪲Sentry
+
+
 ---
 
 ## ⚠️ 트러블 슈팅
