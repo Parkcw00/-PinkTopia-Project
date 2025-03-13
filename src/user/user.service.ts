@@ -432,8 +432,7 @@ export class UserService {
       },
     });
 
-    let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    characters = characters + characters.slice(26).repeat(2);
+    let characters = '0123456789';
     let verificationCode = '';
 
     for (let i = 0; i < 6; i++) {

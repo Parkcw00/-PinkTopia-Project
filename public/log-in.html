@@ -237,6 +237,67 @@
           </div>
           <button type="submit" class="btn btn-pink w-100">로그인</button>
         </form>
+
+        <!-- 인증 필요한 사용자용 섹션 -->
+        <div
+          id="verificationSection"
+          style="
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3f8;
+            border-radius: 8px;
+          "
+        >
+          <p style="color: #ff69b4; margin-bottom: 15px">
+            🎗️ 이메일 인증이 완료되지 않았습니다. 아래에서 인증 코드를 재전송
+            받거나 입력해주세요.
+          </p>
+
+          <button
+            id="resendCodeBtn"
+            class="btn btn-outline-pink w-100 mb-3"
+            style="border-color: #ff69b4; color: #ff69b4"
+          >
+            인증 코드 재전송
+          </button>
+
+          <form id="verifyForm">
+            <div class="mb-3">
+              <label for="verificationCode" class="form-label">인증 코드</label>
+              <input
+                type="text"
+                class="form-control"
+                id="verificationCode"
+                placeholder="이메일로 전송된 6자리 코드 입력"
+                required
+              />
+            </div>
+            <button type="submit" class="btn btn-pink w-100">인증 완료</button>
+          </form>
+        </div>
+        <div
+          id="verificationSection"
+          style="display: none; margin-top: 15px; text-align: center"
+        >
+          <p style="color: #ff69b4; margin-bottom: 10px">
+            📨 인증 메일이 도착하지 않았나요?
+          </p>
+          <button
+            id="resendVerification"
+            style="
+              background: #ff4da6;
+              color: white;
+              border: none;
+              padding: 8px 20px;
+              border-radius: 5px;
+              cursor: pointer;
+            "
+            onclick="resendVerificationEmail()"
+          >
+            인증 메일 재전송
+          </button>
+        </div>
         <div class="signup-link">
           <span>계정이 없으신가요? </span>
           <a href="/public/sign-up.html">회원가입</a>
@@ -244,7 +305,32 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+    >
+      async function resendVerificationEmail() {
+        try {
+          const email = localStorage.getItem('tempEmail');
+          const response = await fetch('/api/auth/resend-verification', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email })
+          });
+
+          const result = await response.json();
+          if (response.ok) {
+            alert('✅ 인증 메일이 재전송되었습니다. 이메일을 확인해주세요!');
+          } else {
+            alert(`❌ 오류 발생: ${result.message}`);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('⚠️ 서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
+        }
+      }
+    </script>
     <script>
       function openSidebar() {
         document.getElementById('sidebar').style.width = '250px';
@@ -329,13 +415,129 @@
               alert('환영합니다!');
               window.location.href = '/public/home.html';
             } else {
-              alert(data.message || '로그인에 실패했습니다.');
+              if (data.message === '이메일 인증을 진행해 주세요') {
+                document.getElementById('verificationSection').style.display =
+                  'block';
+                localStorage.setItem('pendingEmail', email);
+                localStorage.setItem('pendingPassword', password);
+              }
+              // document.getElementById('verificationSection').style.display = 'block';
             }
           } catch (error) {
             console.error('Error:', error);
             alert('로그인 중 오류가 발생했습니다.');
           }
         });
+
+      // 인증 코드 재전송 처리
+      document
+        .getElementById('resendCodeBtn')
+        .addEventListener('click', async (e) => {
+          e.preventDefault();
+          const email = localStorage.getItem('pendingEmail');
+          const password = localStorage.getItem('pendingPassword');
+
+          if (!email || !password) {
+            alert('먼저 로그인을 시도해주세요.');
+            return;
+          }
+
+          try {
+            const response = await fetch('/user/auth/send-code', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+              alert('인증 코드가 재전송되었습니다. 이메일을 확인해주세요.');
+            } else {
+              alert(data.message || '인증 코드 전송에 실패했습니다.');
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            alert('인증 코드 재전송 중 오류가 발생했습니다.');
+          }
+        });
+
+      // 인증 코드 검증 처리
+      document
+        .getElementById('verifyForm')
+        .addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const code = document.getElementById('verificationCode').value;
+          const email = localStorage.getItem('pendingEmail');
+          const password = localStorage.getItem('pendingPassword');
+
+          if (!code || !email || !password) {
+            alert('모든 정보를 입력해주세요.');
+            return;
+          }
+
+          try {
+            const response = await fetch('/user/auth/verify-code', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                email: email,
+                verificationCode: code,
+                password: password,
+              }),
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+              alert('인증이 완료되었습니다. 자동으로 로그인됩니다.');
+              // 인증 성공 후 로그인 재시도
+              const loginResponse = await fetch('/user/auth/login', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+                credentials: 'include',
+              });
+
+              if (loginResponse.ok) {
+                const token = loginResponse.headers.get('Authorization');
+                if (token) localStorage.setItem('accessToken', token);
+                window.location.href = '/public/home.html';
+              }
+            } else {
+              alert(data.message || '인증 코드 검증에 실패했습니다.');
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            alert('인증 처리 중 오류가 발생했습니다.');
+          }
+        });
+      async function resendVerificationEmail() {
+        try {
+          const email = localStorage.getItem('tempEmail');
+          const response = await fetch('/api/auth/resend-verification', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email }),
+          });
+
+          const result = await response.json();
+          if (response.ok) {
+            alert('✅ 인증 메일이 재전송되었습니다. 이메일을 확인해주세요!');
+          } else {
+            alert(`❌ 오류 발생: ${result.message}`);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('⚠️ 서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
+        }
+      }
     </script>
   </body>
 </html>
