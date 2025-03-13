@@ -20,7 +20,7 @@
 **서비스 페이지**
 
 ***핑토피아 사이트***: [https://pinktopia.site/](https://pinktopia.site/)
-![](https://teamsparta.notion.site/image/attachment%3Ae4577e95-f16b-4bb1-9b0b-87b78c69c60e%3Apinktopia.png?table=block&id=1b42dc3e-f514-8052-9d51-d0e7c7987d3c&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=480&userId=&cache=v2).
+<img src="https://teamsparta.notion.site/image/attachment%3Ae4577e95-f16b-4bb1-9b0b-87b78c69c60e%3Apinktopia.png?table=block&id=1b42dc3e-f514-8052-9d51-d0e7c7987d3c&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=480&userId=&cache=v2  width="200" height="210"/>
 
 
 ### 게임 시나리오
