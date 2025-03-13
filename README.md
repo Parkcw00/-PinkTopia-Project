@@ -56,100 +56,13 @@
 
 ## 서비스 핵심 기능
 
-<details>
-<summary><b>길찾기 기능</b></summary>
-
-![길찾기 기능](attachment:43c7fefb-8607-45e6-843b-0e204e283088:image.png)  
-*PC 버전*
-
-- 출발 깃발과 도착 깃발을 활용하여 위도와 경도를 입력받고, **길찾기 버튼**을 누르면 카카오맵으로 이동하여 최적의 경로를 안내합니다.  
-- 현재 위치와 비교하여 가장 가까운 핑크몽에게 이동해보세요!  
-- 다양한 방식으로 핑크몽에게 접근하여 친구가 되어 보세요!
-
-</details>
-
-<details>
-<summary><b>핑크몽 포획 및 아이템 샵</b></summary>
-
-![핑크몽 포획](attachment:1527505e-c3ff-4985-9f5a-3b2c20ea9849:image_(14).png)
-
-- **“다양한 핑크몽을 만나고 친구가 되어보세요!!!”**  
-- 핑크몽 포획 기능은 랜덤하게 등장하는 핑크몽을 포획하는 시스템으로, 현재까지 76마리의 핑크몽이 등록되어 있습니다.  
-- 핑크몽이 생성된 위치에 도달하면 토글이 나타나며, 확인 버튼을 누르면 포획 페이지로 이동합니다.  
-
-![포획 시도](attachment:66142246-8d7b-48a5-bc69-92176d55cbf0:Screen_Recording_20250312_114921_Gallery_1.gif)  
-*핑크몽 포획 시도*
-
-- 사용자는 인벤토리의 먹이 아이템(예: 별쿠키 +15%, 젤리 빙수 +30%)을 사용하여 포획 확률을 높일 수 있습니다.  
-- 기본 포획 확률은 10%이며, 아이템 보너스가 적용되어 최종 확률이 결정됩니다. 최대 5번 시도 가능하며, 실패 시 핑크몽이 도망갑니다.  
-- 포획 성공 시 도감에 등록되며, 최초 포획 시 "최초 포획으로 도감에 등록되었습니다!" 메시지가 표시됩니다.
-
-</details>
-
-<details>
-<summary><b>핑크몽 도감</b></summary>
-
-![핑크몽 도감](attachment:f37130b4-e432-42ca-a459-04309f4dc4d2:Screenshot_20250312_120307_Chrome.jpg)
-
-- 포획된 핑크몽은 도감에 자동 등록되며, 미포획 핑크몽은 블러 처리되어 정보가 숨겨집니다.  
-- 전체 목록, 수집한 목록, 미수집 목록으로 구분되어 수집 현황을 한눈에 확인할 수 있습니다.
-
-</details>
-
-<details>
-<summary><b>결제/환불/고객 센터</b></summary>
-
-![고객 센터](attachment:bf8f5f6d-c486-4806-8ac6-c30e49c2c050:image.png)
-
-- **“유저의 건의사항을 운영자가 알 수 있도록 문의를 해주세요!”**  
-- 환불 요청, 결제 문의, 버그 신고, 기능 제안 등 다양한 문의 유형을 지원하며, 이미지 첨부로 문제점을 명확히 전달 가능합니다.  
-- 주의: 결제 후 다이아를 사용하면 환불이 불가능합니다.
-
-![환불 문의](attachment:287bbb33-246d-4cf3-9669-f44caacd4d18:KakaoTalk_20250312_105634851-ezgif.com-video-to-gif-converter_(1).gif)  
-*환불 문의 진행 중*
-
-![일반 문의](attachment:27b70ac2-4b26-4952-ab04-51b413c357b4:KakaoTalk_20250312_122926047-ezgif.com-video-to-gif-converter.gif)  
-*일반 문의 진행 중*
-
-- 운영자는 관리 페이지에서 문의를 확인하고 답변하며, 유저는 답변 완료 상태와 내용을 확인할 수 있습니다.  
-- **결제 시스템**: 무료 재화(GEM)와 유료 재화(DIA)를 통해 아이템 구매 가능. TossPayment를 활용해 다양한 결제 수단 지원.
-
-![결제](attachment:e86353dd-30e9-47e3-a9e2-b3323c9b9d5a:KakaoTalk_20250312_112238287-ezgif.com-video-to-gif-converter.gif)  
-*Toss 결제 장면*
-
-</details>
-
-<details>
-<summary><b>커뮤니티 기능 - 게시글/단체 채팅방</b></summary>
-
-![커뮤니티](attachment:bf8f5f6d-c486-4806-8ac6-c30e49c2c050:image.png)
-
-- **게시글**: 자유롭게 생성, 수정, 삭제 가능.  
-![게시글 작성](attachment:57a7e05c-7cb6-430e-aabe-b24d4563cef9:게시글_작성.gif)  
-- **채팅**: 채팅방 생성 및 이메일 초대 링크를 통해 멤버 초대 가능. 핑크몽 정보 공유와 친목 도모 지원.  
-![채팅방 생성](attachment:06569f14-574c-42c7-bb34-9dc32acb985e:채팅방_만들기.gif)
-
-</details>
-
-<details>
-<summary><b>로그인/회원가입</b></summary>
-
-![로그인](attachment:80624ce6-61b8-422b-bddb-98b65afcf363:image.png)
-
-- 닉네임, 이메일, 비밀번호 입력으로 회원가입 진행.  
-- Nodemailer를 통한 이메일 인증으로 보안 강화.
-
-</details>
-
-<details>
-<summary><b>마이페이지 - 프로필 수정</b></summary>
-
-![프로필 수정](attachment:d7908fb3-6abb-4895-8bd0-aaeb37aff79d:Screenshot_20250311_175350_Chrome.jpg)
-
-- 닉네임, 프로필 이미지, 비밀번호를 자유롭게 수정 가능.  
-- 개성을 표현하고 계정을 관리할 수 있는 직관적인 인터페이스 제공.
-
-</details>
+- [길찾기 기능](https://www.notion.so/teamsparta/1b32dc3ef5148020b8b7ceceb2ec61fc)  
+- [핑크몽 포획, 아이템 샵](https://www.notion.so/teamsparta/1b32dc3ef514809d9d2cd3ee0a93fded)  
+- [결제/ 환불/ 고객 센터](https://www.notion.so/teamsparta/1b32dc3ef51480d09bd3ea9b4014a12b)  
+- [핑크몽 도감, 업적](https://www.notion.so/teamsparta/1b32dc3ef514800396f9d3ef54a44652)  
+- [커뮤니티 기능 - 게시글/ 단체 채팅방](https://www.notion.so/teamsparta/1b32dc3ef5148085a761d185fcd0a9da)  
+- [로그인/회원가입](https://www.notion.so/teamsparta/1b32dc3ef514807d9c29d13772d7d421)  
+- [마이페이지 - 프로필 수정](https://www.notion.so/teamsparta/1b32dc3ef51480a489aac8d33303e909)  
 
 ---
 
