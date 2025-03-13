@@ -20,7 +20,7 @@
 **서비스 페이지**
 
 ***핑토피아 사이트***: [https://pinktopia.site/](https://pinktopia.site/)
-<img src="https://teamsparta.notion.site/image/attachment%3Ae4577e95-f16b-4bb1-9b0b-87b78c69c60e%3Apinktopia.png?table=block&id=1b42dc3e-f514-8052-9d51-d0e7c7987d3c&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=480&userId=&cache=v2  width="200" height="210"/>
+<img src="https://teamsparta.notion.site/image/attachment%3Ae4577e95-f16b-4bb1-9b0b-87b78c69c60e%3Apinktopia.png?table=block&id=1b42dc3e-f514-8052-9d51-d0e7c7987d3c&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=480&userId=&cache=v2" width="300" height="300"/>
 
 
 ### 게임 시나리오
@@ -46,10 +46,13 @@
 >
 > 이와 같이, 서비스는 건강한 라이프스타일과 즐거운 사회적 소통, 그리고 지역사회의 활성화를 동시에 추구하며, 사용자가 일상에서 벗어나 활동적이고 의미 있는 경험을 할 수 있도록 기획되었습니다.
 
-![핑크군단](https://www.notion.so/image/attachment%3A018218f3-1733-4fae-b412-775c5ca4c8ff%3Aimage.png?table=block&id=1b32dc3e-f514-8024-b91f-c11e94bde268&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=540&userId=&cache=v2)  
+<!--
+![핑크군단](https://www.notion.so/image/attachment%3A018218f3-1733-4fae-b412-775c5ca4c8ff%3Aimage.png?table=block&id=1b32dc3e-f514-8024-b91f-c11e94bde268&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=540&userId=&cache=v2)  -->
+<img src="https://www.notion.so/image/attachment%3A018218f3-1733-4fae-b412-775c5ca4c8ff%3Aimage.png?table=block&id=1b32dc3e-f514-8024-b91f-c11e94bde268&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=540&userId=&cache=v2" width="800" height="300" alt="핑크군단"/>
 *핑크군단*
-
-![핑크몽](https://www.notion.so/image/attachment%3A951655ff-f48a-4a38-ae9f-74b9e81bcaee%3Aimage.png?table=block&id=1b32dc3e-f514-8037-91e9-f407e9b7cc2a&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=190&userId=&cache=v2)  
+<!--
+![핑크몽](https://www.notion.so/image/attachment%3A951655ff-f48a-4a38-ae9f-74b9e81bcaee%3Aimage.png?table=block&id=1b32dc3e-f514-8037-91e9-f407e9b7cc2a&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=190&userId=&cache=v2)  -->
+<img src="https://www.notion.so/image/attachment%3A951655ff-f48a-4a38-ae9f-74b9e81bcaee%3Aimage.png?table=block&id=1b32dc3e-f514-8037-91e9-f407e9b7cc2a&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=190&userId=&cache=v2" width="300" height="300" alt="핑크몽"/>
 *핑크몽*
 
 ---
