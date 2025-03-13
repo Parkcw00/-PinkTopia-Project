@@ -48,12 +48,12 @@
 
 <!--
 ![핑크군단](https://www.notion.so/image/attachment%3A018218f3-1733-4fae-b412-775c5ca4c8ff%3Aimage.png?table=block&id=1b32dc3e-f514-8024-b91f-c11e94bde268&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=540&userId=&cache=v2)  -->
-<img src="https://www.notion.so/image/attachment%3A018218f3-1733-4fae-b412-775c5ca4c8ff%3Aimage.png?table=block&id=1b32dc3e-f514-8024-b91f-c11e94bde268&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=540&userId=&cache=v2" width="800" height="300" alt="핑크군단"/>
-*핑크군단*
+<img src="https://www.notion.so/image/attachment%3A018218f3-1733-4fae-b412-775c5ca4c8ff%3Aimage.png?table=block&id=1b32dc3e-f514-8024-b91f-c11e94bde268&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=540&userId=&cache=v2" width="600" height="150" alt="핑크군단"/>
+핑크군단
 <!--
 ![핑크몽](https://www.notion.so/image/attachment%3A951655ff-f48a-4a38-ae9f-74b9e81bcaee%3Aimage.png?table=block&id=1b32dc3e-f514-8037-91e9-f407e9b7cc2a&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=190&userId=&cache=v2)  -->
-<img src="https://www.notion.so/image/attachment%3A951655ff-f48a-4a38-ae9f-74b9e81bcaee%3Aimage.png?table=block&id=1b32dc3e-f514-8037-91e9-f407e9b7cc2a&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=190&userId=&cache=v2" width="300" height="300" alt="핑크몽"/>
-*핑크몽*
+<img src="https://www.notion.so/image/attachment%3A951655ff-f48a-4a38-ae9f-74b9e81bcaee%3Aimage.png?table=block&id=1b32dc3e-f514-8037-91e9-f407e9b7cc2a&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=190&userId=&cache=v2" width="150" height="150" alt="핑크몽"/>
+핑크몽
 
 ---
 
