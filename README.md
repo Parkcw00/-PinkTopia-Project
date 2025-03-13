@@ -1,99 +1,249 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+---
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+# PinkTopia (5조) - README.md
 
-## Description
+## 닌텐도 찬양
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+닌텐도는 혁신적인 게임 경험을 선사하는 회사로, 오랜 시간 동안 전 세계 팬들에게 사랑받아왔습니다. **커비게임**은 귀여운 핑크색 캐릭터 커비와 그의 독특한 능력 흡수 플레이로 창의적이고 즐거운 모험을 제공하며, 닌텐도의 매력을 잘 보여줍니다. 무엇보다, **포켓몬Go!**는 현실과 가상 세계를 연결해 플레이어들이 밖으로 나와 포켓몬을 잡고 친구들과 소통하게 하며, 건강한 재미를 선물합니다. 이들은 모두 닌텐도의 독창성과 끝없는 즐거움을 상징하는 보물 같은 존재입니다!
 
-## Project setup
+---
 
-```bash
-$ npm install
-```
+## 프로젝트 소개
 
-## Compile and run the project
+**Logo / Mascot**
 
-```bash
-# development
-$ npm run start
+![브로셔 이미지 2.png](attachment:48ed8530-2517-4060-bfe8-a0b8dcf0b22d:브로셔_이미지_2.png)
 
-# watch mode
-$ npm run start:dev
+**핑토피아 사이트**: [https://pinktopia.site/](https://pinktopia.site/)
 
-# production mode
-$ npm run start:prod
-```
+**GitHub**: [GitHub - Parkcw00/-PinkTopia-Project](https://github.com/Parkcw00/-PinkTopia-Project)
 
-## Run tests
+**서비스 페이지**
 
-```bash
-# unit tests
-$ npm run test
+![pinktopia.png](attachment:e4577e95-f16b-4bb1-9b0b-87b78c69c60e:pinktopia.png)
 
-# e2e tests
-$ npm run test:e2e
+### 게임 시나리오
 
-# test coverage
-$ npm run test:cov
-```
+> 어느 날, 먼 은하계에서 전해지던 전설 속 생명체들 — 핑크 빛을 띤 '핑크몽'들이 예기치 못한 위기를 피해 지구에 발을 들여놓았다. 그들의 존재는 신비로움 그 자체였으나, 인간과는 전혀 다른 언어와 문화로 인해 소통의 벽이 높았다. 그럼에도 불구하고, 핑크몽들의 순수한 마음과 독특한 매력은 한국의 한 시민 단체에게 깊은 감동을 주었다. 이 단체는 바로 ‘**핑크 군단**’. 핑크몽들이 새로운 환경에 적응하고 안전하게 지낼 수 있도록 정성껏 음식을 제공하며 돌보는 일을 자처한다. 핑크 군단은 단순한 도움을 넘어, 서로 다른 두 존재가 진정한 우정을 나눌 수 있다는 믿음 아래, 인간과 핑크몽 사이의 다리를 놓고자 한다. 이제, 당신은 핑크 군단의 일원으로서 핑크몽들에게 따뜻한 관심과 사랑을 전하며, 그들과 함께 조화로운 미래를 만들어 나가는 모험에 동참하게 된다.
 
-## Deployment
+### 서비스 기획 의도
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+> 본 서비스는 운동이 부족한 **청소년과 청년들**에게 **집 밖의 다양한 즐거움을 제공**하여, 자연스럽게 **외출과 활동을 유도하는 것을 목표**로 합니다. 구체적인 기획 의도는 다음과 같습니다:
+>
+> 1. **건강 증진 및 외출 유도**  
+>    - 사용자가 집 밖으로 나와 다양한 목적지를 탐색하게 함으로써, **일상 속에서 자연스럽게 운동을 실천**할 수 있도록 돕습니다.  
+>    - 미리 설정된 출발-도착 마커 기능을 활용하여, 길 찾기의 어려움 없이 안전하게 이동할 수 있도록 지원합니다.  
+> 2. **게임 요소를 통한 흥미 유발**  
+>    - 다양한 퀘스트와 귀여운 핑크몽 캐릭터 수집 요소를 도입해, 단순한 산책이 아닌 목표를 가지고 즐길 수 있는 모험을 제공합니다.  
+>    - 퀘스트 수행 과정에서 자연스럽게 **문제 해결 능력과 도전 정신을 기를 수 있도록 설계**되었습니다.  
+> 3. **사회적 소통 및 커뮤니티 형성**  
+>    - 채팅 기능을 통해 사용자들끼리 경험과 진행 상황을 공유함으로써, **소통 능력을 향상**시키고 커뮤니티 형성에 기여합니다.  
+>    - 함께 목표를 달성하며 서로 격려하고 도움을 주고받는 과정을 통해 **사회적 유대감을 강화**합니다.  
+> 4. **지역사회 활성화**  
+>    - 다양한 목적지를 제시함으로써, **지역사회의 명소나 문화적 특색을 경험**할 수 있는 기회를 제공합니다.  
+>    - 사용자들이 지역의 다양한 즐거움을 누리며, **새로운 장소에 대한 관심과 방문을 촉진**합니다.  
+>
+> 이와 같이, 서비스는 건강한 라이프스타일과 즐거운 사회적 소통, 그리고 지역사회의 활성화를 동시에 추구하며, 사용자가 일상에서 벗어나 활동적이고 의미 있는 경험을 할 수 있도록 기획되었습니다.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+![핑크군단](attachment:018218f3-1733-4fae-b412-775c5ca4c8ff:image.png)  
+*핑크군단*
 
-```bash
-$ npm install -g mau
-$ mau deploy
-```
+![핑크몽](attachment:951655ff-f48a-4a38-ae9f-74b9e81bcaee:image.png)  
+*핑크몽*
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## 서비스 핵심 기능
 
-Check out a few resources that may come in handy when working with NestJS:
+<details>
+<summary><b>길찾기 기능</b></summary>
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+![길찾기 기능](attachment:43c7fefb-8607-45e6-843b-0e204e283088:image.png)  
+*PC 버전*
 
-## Support
+- 출발 깃발과 도착 깃발을 활용하여 위도와 경도를 입력받고, **길찾기 버튼**을 누르면 카카오맵으로 이동하여 최적의 경로를 안내합니다.  
+- 현재 위치와 비교하여 가장 가까운 핑크몽에게 이동해보세요!  
+- 다양한 방식으로 핑크몽에게 접근하여 친구가 되어 보세요!
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+</details>
 
-## Stay in touch
+<details>
+<summary><b>핑크몽 포획 및 아이템 샵</b></summary>
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+![핑크몽 포획](attachment:1527505e-c3ff-4985-9f5a-3b2c20ea9849:image_(14).png)
 
-## License
+- **“다양한 핑크몽을 만나고 친구가 되어보세요!!!”**  
+- 핑크몽 포획 기능은 랜덤하게 등장하는 핑크몽을 포획하는 시스템으로, 현재까지 76마리의 핑크몽이 등록되어 있습니다.  
+- 핑크몽이 생성된 위치에 도달하면 토글이 나타나며, 확인 버튼을 누르면 포획 페이지로 이동합니다.  
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+![포획 시도](attachment:66142246-8d7b-48a5-bc69-92176d55cbf0:Screen_Recording_20250312_114921_Gallery_1.gif)  
+*핑크몽 포획 시도*
+
+- 사용자는 인벤토리의 먹이 아이템(예: 별쿠키 +15%, 젤리 빙수 +30%)을 사용하여 포획 확률을 높일 수 있습니다.  
+- 기본 포획 확률은 10%이며, 아이템 보너스가 적용되어 최종 확률이 결정됩니다. 최대 5번 시도 가능하며, 실패 시 핑크몽이 도망갑니다.  
+- 포획 성공 시 도감에 등록되며, 최초 포획 시 "최초 포획으로 도감에 등록되었습니다!" 메시지가 표시됩니다.
+
+</details>
+
+<details>
+<summary><b>핑크몽 도감</b></summary>
+
+![핑크몽 도감](attachment:f37130b4-e432-42ca-a459-04309f4dc4d2:Screenshot_20250312_120307_Chrome.jpg)
+
+- 포획된 핑크몽은 도감에 자동 등록되며, 미포획 핑크몽은 블러 처리되어 정보가 숨겨집니다.  
+- 전체 목록, 수집한 목록, 미수집 목록으로 구분되어 수집 현황을 한눈에 확인할 수 있습니다.
+
+</details>
+
+<details>
+<summary><b>결제/환불/고객 센터</b></summary>
+
+![고객 센터](attachment:bf8f5f6d-c486-4806-8ac6-c30e49c2c050:image.png)
+
+- **“유저의 건의사항을 운영자가 알 수 있도록 문의를 해주세요!”**  
+- 환불 요청, 결제 문의, 버그 신고, 기능 제안 등 다양한 문의 유형을 지원하며, 이미지 첨부로 문제점을 명확히 전달 가능합니다.  
+- 주의: 결제 후 다이아를 사용하면 환불이 불가능합니다.
+
+![환불 문의](attachment:287bbb33-246d-4cf3-9669-f44caacd4d18:KakaoTalk_20250312_105634851-ezgif.com-video-to-gif-converter_(1).gif)  
+*환불 문의 진행 중*
+
+![일반 문의](attachment:27b70ac2-4b26-4952-ab04-51b413c357b4:KakaoTalk_20250312_122926047-ezgif.com-video-to-gif-converter.gif)  
+*일반 문의 진행 중*
+
+- 운영자는 관리 페이지에서 문의를 확인하고 답변하며, 유저는 답변 완료 상태와 내용을 확인할 수 있습니다.  
+- **결제 시스템**: 무료 재화(GEM)와 유료 재화(DIA)를 통해 아이템 구매 가능. TossPayment를 활용해 다양한 결제 수단 지원.
+
+![결제](attachment:e86353dd-30e9-47e3-a9e2-b3323c9b9d5a:KakaoTalk_20250312_112238287-ezgif.com-video-to-gif-converter.gif)  
+*Toss 결제 장면*
+
+</details>
+
+<details>
+<summary><b>커뮤니티 기능 - 게시글/단체 채팅방</b></summary>
+
+![커뮤니티](attachment:bf8f5f6d-c486-4806-8ac6-c30e49c2c050:image.png)
+
+- **게시글**: 자유롭게 생성, 수정, 삭제 가능.  
+![게시글 작성](attachment:57a7e05c-7cb6-430e-aabe-b24d4563cef9:게시글_작성.gif)  
+- **채팅**: 채팅방 생성 및 이메일 초대 링크를 통해 멤버 초대 가능. 핑크몽 정보 공유와 친목 도모 지원.  
+![채팅방 생성](attachment:06569f14-574c-42c7-bb34-9dc32acb985e:채팅방_만들기.gif)
+
+</details>
+
+<details>
+<summary><b>로그인/회원가입</b></summary>
+
+![로그인](attachment:80624ce6-61b8-422b-bddb-98b65afcf363:image.png)
+
+- 닉네임, 이메일, 비밀번호 입력으로 회원가입 진행.  
+- Nodemailer를 통한 이메일 인증으로 보안 강화.
+
+</details>
+
+<details>
+<summary><b>마이페이지 - 프로필 수정</b></summary>
+
+![프로필 수정](attachment:d7908fb3-6abb-4895-8bd0-aaeb37aff79d:Screenshot_20250311_175350_Chrome.jpg)
+
+- 닉네임, 프로필 이미지, 비밀번호를 자유롭게 수정 가능.  
+- 개성을 표현하고 계정을 관리할 수 있는 직관적인 인터페이스 제공.
+
+</details>
+
+---
+
+## 서비스 아키텍처
+
+![아키텍처](attachment:88f3c0da-a4f7-4dd5-b1f3-1a67d6050423:image.png)
+
+---
+
+## 기술 스택 및 기술적 의사결정
+
+### **Backend**
+| 기술 스택 | 선택 이유 |
+|-----------|------------|
+| NestJS    | 모듈화된 아키텍처와 타입스크립트 기반으로 유지보수성과 확장성 우수. |
+| Socket.IO | 실시간 채팅과 위치 정보 업데이트를 위한 빠르고 효율적인 통신 제공. |
+| Geolocation | 현재 위치 기반 서비스를 신속하고 정확하게 구현. |
+| TypeORM   | 타입 명시로 코드 오류 감소 및 데이터 관리 효율성 증대. |
+
+### **Frontend**
+| 기술 스택 | 적용 이유 |
+|-----------|------------|
+| HTML, CSS, JavaScript | 직관적인 UI와 동적 기능 구현, 유지보수 및 확장성 향상. |
+
+### **Database**
+| 기술 스택 | 적용 이유 |
+|-----------|------------|
+| AWS S3    | 이미지 데이터의 안전한 저장 및 백업 관리. |
+| MySQL     | 간단한 설정, NestJS와의 쉬운 연동, 비용 효율성. |
+| Valkey    | 고속 데이터 처리로 실시간 기능 최적화. |
+
+### **DevOps / Infra**
+| 기술 스택 | 적용 이유 |
+|-----------|------------|
+| Docker    | 배포 효율성과 환경 일관성 유지, 수평 확장 가능. |
+| Sentry    | 실시간 오류 모니터링 및 빠른 대응으로 안정성 강화. |
+
+---
+
+## 트러블 슈팅
+
+- [유저 위치로 북마커 추가 버튼 만들기](https://www.notion.so/1b42dc3ef514806eb0e5f4b6cde1f674?pvs=21)
+- [환불 트러블 슈팅](https://www.notion.so/1b42dc3ef51480a6bca2caaa4fab00f1?pvs=21)
+- [Geolocation 문제 해결](https://www.notion.so/Geolocation-1b42dc3ef514804d82c1d5cf1f47df42?pvs=21)
+- [Geolib 문제 해결](https://www.notion.so/Geolib-1b42dc3ef51480f4b3d6d35ba5699748?pvs=21)
+- [Nginx 예시](https://www.notion.so/Nginx-1a82dc3ef51481f99181c2658180e943?pvs=21)
+
+---
+
+## 추후 기술적 도전 계획
+
+- **CI/CD**: 배포 자동화로 속도와 품질 향상, 오류 감소.  
+- **ELK 스택**: 로그 관리와 실시간 모니터링 강화 (현재 Sentry로 대체).  
+- **오토스케일링**: 트래픽 변화에 따른 자동 리소스 조정으로 비용 절감 및 성능 유지.
+
+---
+
+## 유저 테스트 결과 분석
+
+### 긍정 평가
+- 깔끔한 UI와 76종의 다양한 핑크몽, 포획 시스템의 참신함.  
+- 고객센터를 통한 소통 창구 제공.
+
+### 부정 평가
+- 초기 맵 로드 시 전체 지도 표시로 확대 필요, 10초마다 위치 이동 불편.  
+- 카카오맵 의존성으로 앱 설치 요구.  
+- 채팅방 입장 후 재로그인 필요.
+
+### 새로운 의견
+- 주소를 입력해 출발/도착지 설정 가능하도록 개선 요청.  
+- 아이템 종류 다양화로 재미 증대.
+
+---
+
+## 유저 피드백 개선 방향 및 계획
+
+- 지도 UI 수정: ‘현재위치’ 버튼 클릭 시에만 맵 이동, 기본은 마지막 위치 유지.  
+- 출발/도착 마커 우선 표시.  
+- 새로운 먹이 아이템 추가.  
+- 채팅방 입장 시 access 토큰 자동 갱신.
+
+---
+
+## 팀 구성
+
+| 이름    | MBTI | 블로그 주소                       | GitHub 주소                  |
+|---------|------|-----------------------------------|-----------------------------|
+| 박찬우  | ENFP | [링크](https://parkcw0325.tistory.com/) | [링크](https://github.com/Parkcw00) |
+| 오혜성  | INFP | [링크](https://ohs020105.tistory.com/) | [링크](https://github.com/ohhyeseong) |
+| 유재은  | INFP | [링크](https://jaeoun0238.tistory.com/) | [링크](https://github.com/jaeeun0238) |
+| 강나연  | ISTP | [링크](https://ny0206.tistory.com/) | [링크](https://github.com/nayeon0206) |
+| 김지웅  | INFP | [링크](https://zera1004.github.io/) | [링크](https://github.com/zera1004) |
+| 이경민  | ISTP | [링크](https://github.com/users/lgm-7/projects/1) | [링크](https://github.com/lgm-7) |
+| 윤예원  | INTP | [링크](https://ashen99.tistory.com/) | [링크](https://github.com/BlueStrobus) |
+
+---
+
