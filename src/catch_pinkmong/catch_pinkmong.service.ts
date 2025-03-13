@@ -139,9 +139,9 @@ export class CatchPinkmongService {
     }
 
     // 4. 포획 확률 계산
-    const baseCatchRate = 0.1;
-    const getChanceIncrease = { 2: 0.15, 3: 0.3 };
-    const bonus = getChanceIncrease[item.id] || 0;
+    const baseCatchRate = 0.2;
+    const getChanceIncrease = { 2: 0.05, 3: 0.15 };
+    const bonus = getChanceIncrease[item.store_item_id] || 0;
     const finalCatchRate = baseCatchRate + bonus;
 
     // 5. 포획 실패 시 처리
@@ -162,24 +162,33 @@ export class CatchPinkmongService {
       }
     }
 
-    // ✅ 6. 포획 성공 (도감 등록)
+    // ✅ 6. 포획 성공 (도감 등록 및 포인트 추가)
     await this.catchRepo.removeCatchPinkmong(catchRecord);
     await this.valkeyService.del(`pinkmong_battle:${userId}`); // ✅ Valkey에서 삭제
+    const pinkmongPoint = pinkmong.point || 0;
+    user.collection_point += pinkmongPoint;
+    await this.catchRepo.updateUserCollectionPoint(user);
+    let pointMessage = pinkmongPoint > 0 ? ` (+${pinkmongPoint} 포인트)` : '';
 
+    // 먼저 이미 컬렉션에 등록되어 있는지 확인
     const existingCollection = await this.catchRepo.getCollection(
       user.id,
       pinkmong.id,
     );
 
-    if (existingCollection) {
+    // 최초 포획 시에만 포인트 추가 및 컬렉션 생성
+    if (!existingCollection) {
+      // 컬렉션에 추가
+      await this.catchRepo.createCollection(user, pinkmong);
+
       return {
-        message: `${pinkmong.name}을(를) 잡았습니다!`,
+        message: `${pinkmong.name}을(를) 잡았습니다! 최초 포획으로 도감에 등록되었습니다!${pointMessage}`,
         success: true,
       };
     } else {
-      await this.catchRepo.createCollection(user, pinkmong);
+      // 이미 컬렉션에 있는 경우
       return {
-        message: `${pinkmong.name}을(를) 잡았습니다! 최초 포획으로 도감에 등록되었습니다!`,
+        message: `${pinkmong.name}을(를) 잡았습니다! (이미 도감에 등록된 핑크몽입니다${pointMessage})`,
         success: true,
       };
     }

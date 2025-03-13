@@ -486,20 +486,38 @@
 
         let myRank = null;
 
-        data.forEach((user, index) => {
+        // 최대 10개만 표시하도록 제한
+        const displayLimit = Math.min(data.length, 10);
+
+        for (let index = 0; index < displayLimit; index++) {
+          const user = data[index];
           const row = document.createElement('tr');
           row.innerHTML = `
             <td class="rank">${index + 1}</td>
             <td>${user.nickname}</td>
             <td>${user[scoreField]}</td>
-        `;
+          `;
           tbody.appendChild(row);
 
           if (myNickname && user.nickname === myNickname) {
             myRank = index + 1;
             console.log(`📌 ${myNickname}의 ${tableId} 순위:`, myRank);
           }
-        });
+        }
+
+        // 내 순위가 10위 밖이라면 내 순위를 찾기
+        if (!myRank && myNickname) {
+          for (let index = 10; index < data.length; index++) {
+            if (data[index].nickname === myNickname) {
+              myRank = index + 1;
+              console.log(
+                `📌 ${myNickname}의 ${tableId} 순위(10위 밖):`,
+                myRank,
+              );
+              break;
+            }
+          }
+        }
 
         return myRank;
       }
