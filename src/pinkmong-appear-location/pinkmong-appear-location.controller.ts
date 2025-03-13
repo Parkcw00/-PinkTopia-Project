@@ -31,6 +31,22 @@ export class PinkmongAppearLocationController {
   ): Promise<PinkmongAppearLocation> {
     return this.service.createLocation(dto);
   }
+  @Post('add1000')
+  async createLocation2() {
+    try {
+      for (let i = 0; i < 1000; i++) {
+        let dto = {
+          title: `test핑크몽2${i}`,
+          latitude: 35.1961088 + 0.0 * 0.0 * 0.0 * 0.0 * 0.0 * 0.0 * 0.0 * i,
+          longitude: 128.12288,
+          region_theme: 'ocean',
+        };
+        await this.service.createLocation(dto);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   @Get()
   async getAllLocations(): Promise<PinkmongAppearLocation[]> {
