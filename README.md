@@ -1,8 +1,7 @@
 ---
-
 # PinkTopia (5조)
 
-> 닌텐도는 혁신적인 게임 경험을 선사하는 회사로, 오랜 시간 동안 전 세계 팬들에게 사랑받아왔습니다. **커비게임**은 귀여운 핑크색 캐릭터 커비와 그의 독특한 능력 흡수 플레이로 창의적이고 즐거운 모험을 제공하며, 닌텐도의 매력을 잘 보여줍니다. 무엇보다, **포켓몬Go!**는 현실과 가상 세계를 연결해 플레이어들이 밖으로 나와 포켓몬을 잡고 친구들과 소통하게 하며, 건강한 재미를 선물합니다. 이들은 모두 닌텐도의 독창성과 끝없는 즐거움을 상징하는 보물 같은 존재입니다!
+닌텐도는 혁신적인 게임 경험을 선사하는 회사로, 오랜 시간 동안 전 세계 팬들에게 사랑받아왔습니다. **커비게임**은 귀여운 핑크색 캐릭터 커비와 그의 독특한 능력 흡수 플레이로 창의적이고 즐거운 모험을 제공하며, 닌텐도의 매력을 잘 보여줍니다. 무엇보다, **포켓몬Go!**는 현실과 가상 세계를 연결해 플레이어들이 밖으로 나와 포켓몬을 잡고 친구들과 소통하게 하며, 건강한 재미를 선물합니다. 이들은 모두 닌텐도의 독창성과 끝없는 즐거움을 상징하는 보물 같은 존재입니다!
 
 ---
 
@@ -50,10 +49,10 @@
 > **핵심 목표**: 건강한 라이프스타일, 즐거운 소통, 지역사회 활성화를 동시에 추구하며, 사용자에게 의미 있는 경험을 선사합니다.
 
 <div align="center">
-  <img src="https://www.notion.so/image/attachment%3A018218f3-1733-4fae-b412-775c5ca4c8ff%3Aimage.png?table=block&id=1b32dc3e-f514-8024-b91f-c11e94bde268&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=540&userId=&cache=v2" width="400" alt="핑크군단"/>  
-  <b>핑크군단</b>  
-  <img src="https://www.notion.so/image/attachment%3A951655ff-f48a-4a38-ae9f-74b9e81bcaee%3Aimage.png?table=block&id=1b32dc3e-f514-8037-91e9-f407e9b7cc2a&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=190&userId=&cache=v2" width="100" alt="핑크몽"/>  
-  <b>핑크몽</b>
+  <img src="https://www.notion.so/image/attachment%3A018218f3-1733-4fae-b412-775c5ca4c8ff%3Aimage.png?table=block&id=1b32dc3e-f514-8024-b91f-c11e94bde268&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=540&userId=&cache=v2" hight="80" alt="핑크군단"/>  
+  
+  <img src="https://www.notion.so/image/attachment%3A951655ff-f48a-4a38-ae9f-74b9e81bcaee%3Aimage.png?table=block&id=1b32dc3e-f514-8037-91e9-f407e9b7cc2a&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=190&userId=&cache=v2" hight="80" alt="핑크몽"/>  
+  
 </div>
 
 ---
