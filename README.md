@@ -20,6 +20,7 @@
 **서비스 페이지**
 
 ***핑토피아 사이트***: [https://pinktopia.site/](https://pinktopia.site/)
+
 <img src="https://teamsparta.notion.site/image/attachment%3Ae4577e95-f16b-4bb1-9b0b-87b78c69c60e%3Apinktopia.png?table=block&id=1b42dc3e-f514-8052-9d51-d0e7c7987d3c&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=480&userId=&cache=v2" width="300" height="300"/>
 
 
@@ -32,6 +33,7 @@
 인간과는 전혀 다른 언어와 문화로 인해 소통의 벽이 높았다.
 그럼에도 불구하고, 핑크몽들의 순수한 마음과 독특한 매력은 한국의 한 시민 단체에게
 깊은 감동을 주었다.
+
 
 이 단체는 바로 ‘**핑크 군단**’ 핑크몽들이 새로운 환경에 적응하고 안전하게 지낼 수 있도록 정성껏 음식을 제공하며 돌보는 일을 자처한다. 핑크 군단은 단순한 도움을 넘어, 서로 다른 두 존재가 진정한 우정을 나눌 수 있다는 믿음 아래, 인간과 핑크몽 사이의 다리를 놓고자 한다.
 
