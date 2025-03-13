@@ -158,7 +158,13 @@ export class PaymentService {
     return parseInt(diamondMatch[1]);
   }
 
-  async refundPayment(paymentKey: string, cancelReason: string, userId: number, amount: number) {
+  async refundPayment(
+    paymentKey: string, 
+    cancelReason: string, 
+    userId: number, 
+    amount: number, 
+    isAdminRequest?: boolean
+  ) {
     // 1. 결제 정보 조회
     const payment = await this.paymentRepository.findOne({
       where: { paymentKey }
@@ -180,7 +186,10 @@ export class PaymentService {
     }
 
     // 4. 사용자 정보 조회
-    const user = await this.userService.findById(userId);
+    // 관리자 요청인 경우 결제 소유자의 ID를 사용
+    const targetUserId = isAdminRequest ? payment.userId : userId;
+    const user = await this.userService.findById(targetUserId);
+    
     if (!user) {
       throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
@@ -189,7 +198,7 @@ export class PaymentService {
     // 모든 환불되지 않은 결제 조회 (오래된 순)
     const allPayments = await this.paymentRepository.find({
       where: { 
-        userId, 
+        userId: targetUserId, 
         isRefunded: false 
       },
       order: { createdAt: 'ASC' }
@@ -229,7 +238,7 @@ export class PaymentService {
     // 테스트 결제인 경우 바로 환불 처리
     if (paymentKey.startsWith('tgen_')) {
       // 다이아몬드 차감
-      await this.userService.deductDiamond(userId, diamondAmount);
+      await this.userService.deductDiamond(targetUserId, diamondAmount);
 
       // 결제 상태 업데이트
       await this.paymentRepository.update(

@@ -445,43 +445,27 @@
       <div class="sidebar-header">
         <span class="close-sidebar" onclick="closeSidebar()">&times;</span>
       </div>
-      <div class="sidebar-content" id="sidebarContent">
-        <a href="/public/home.html">홈</a>
-        <a href="/public/event.html">이벤트</a>
-        <a href="/public/store-item.html">아이템샵</a>
-        <a href="/public/board.html">게시글 (커뮤니티)</a>
-        <a href="/public/ranking.html">랭킹</a>
-        <a href="/public/customer-service.html">문의센터</a>
-        <!-- 로그인 시 표시될 메뉴들 -->
-        <div id="loggedInMenu" style="display: none">
-          <a href="/public/chattingrooms.html">채팅</a>
-          <a href="/public/collection.html">핑크몽 개인 도감</a>
-          <a href="/public/inventory.html">인벤토리 아이템</a>
-          <a href="/public/achievements.html" class="active">업적</a>
-          <a href="/public/mypage.html">마이페이지</a>
-          <a href="#" onclick="logout()">로그아웃</a>
-        </div>
         <div class="sidebar-content" id="sidebarContent">
-            <a href="/public/home.html">홈</a>
-            <a href="/public/event.html">이벤트</a>
-            <a href="/public/store-item.html">아이템샵</a>
-            <a href="/public/board.html">게시글 (커뮤니티)</a>
-            <a href="/public/ranking.html">랭킹</a>
-            <!-- 로그인 시 표시될 메뉴들 -->
-            <div id="loggedInMenu" style="display: none;">
-                <a href="/public/chattingrooms.html">채팅</a>
-                <a href="/public/collection.html">핑크몽 개인 도감</a>
-                <a href="/public/inventory.html">인벤토리 아이템</a>
-                <a href="/public/achievements.html" class="active">업적</a>
-                <a href="/public/mypage.html">마이페이지</a>
-                <a href="/public/customer-service.html">고객센터</a>
-                <a href="#" onclick="logout()">로그아웃</a>
-            </div>
-            <!-- 로그인 안 된 경우 표시될 메뉴들 -->
-            <div id="loggedOutMenu">
-                <a href="/public/log-in.html">로그인</a>
-                <a href="/public/sign-up.html">회원가입</a>
-            </div>
+          <a href="/public/home.html">홈</a>
+          <a href="/public/event.html">이벤트</a>
+          <a href="/public/store-item.html">아이템샵</a>
+          <a href="/public/board.html">게시글 (커뮤니티)</a>
+          <a href="/public/ranking.html">랭킹</a>
+          <!-- 로그인 시 표시될 메뉴들 -->
+          <div id="loggedInMenu" style="display: none">
+            <a href="/public/chattingrooms.html">채팅</a>
+            <a href="/public/collection.html">핑크몽 개인 도감</a>
+            <a href="/public/inventory.html">인벤토리 아이템</a>
+            <a href="/public/achievements.html" class="active">업적</a>
+            <a href="/public/mypage.html">마이페이지</a>
+            <a href="/public/customer-service.html">고객센터</a>
+            <a href="#" onclick="logout()">로그아웃</a>
+          </div>
+          <!-- 로그인 안 된 경우 표시될 메뉴들 -->
+          <div id="loggedOutMenu">
+            <a href="/public/log-in.html">로그인</a>
+            <a href="/public/sign-up.html">회원가입</a>
+          </div>
         </div>
       </div>
     </div>
@@ -585,21 +569,6 @@
             pink_gem: userData.pink_gem,
             pink_dia: userData.pink_dia,
           };
-
-          // 사이드바에 사용자 닉네임 표시 (선택적)
-          if (userData.nickname) {
-            // 사이드바 최상단에 사용자 정보 추가
-            const userInfoHTML = `
-                        <div style="padding: 15px 25px; color: white; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
-                            <p style="margin: 0; font-weight: bold;">${userData.nickname}</p>
-                            <p style="margin: 5px 0 0 0; font-size: 14px;">레벨 ${userData.level || 1}</p>
-                        </div>
-                    `;
-
-            // 사이드바 첫 번째 항목 앞에 삽입
-            const sidebarContent = document.getElementById('sidebarContent');
-            sidebarContent.innerHTML = userInfoHTML + sidebarContent.innerHTML;
-          }
         } catch (error) {
           console.error('유저 데이터 로드 실패:', error);
           // 오류 발생 시 로그아웃 처리

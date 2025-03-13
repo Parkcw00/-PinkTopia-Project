@@ -340,22 +340,20 @@
               ">
                         길찾기
                     </button>
-                    <div class="mb-3" , style="margin-top: 30px;">
+                    <div class="mb-3" , style="margin-top: 30px">
                         <label for="start" class="form-label">유저 위치로 핑크몽출현</label>
                         <button class="route-button" onclick="pinkmongAppearByUserLocation()" style="
-                    width: 30%;
-                    padding: 10px;
-                    background: #ff69b4;
-                    color: white;
-                    border: none;
-                    border-radius: 5px;
-                    cursor: pointer;
-                  ">출현
+                  width: 30%;
+                  padding: 10px;
+                  background: #ff69b4;
+                  color: white;
+                  border: none;
+                  border-radius: 5px;
+                  cursor: pointer;
+                ">
+                            출현
                         </button>
                     </div>
-
-
-
                 </div>
                 <div id="route-result" style="margin-top: 20px">
                     <!-- 길찾기 결과가 여기에 표시됩니다 -->
@@ -520,96 +518,113 @@
                     // 유저 위치로 핑크몽 출현위치 추가하기
                     function pinkmongAppearByUserLocation() {
                         if (navigator.geolocation) {
-                            navigator.geolocation.getCurrentPosition(async function (position) {
-                                const accessToken = localStorage.getItem('accessToken');
-                                if (!accessToken) {
-                                    alert('로그인이 필요한 서비스입니다.');
-                                    return;
-                                }
-                                // 토큰 풀기
-                                const decodedToken = parseJwt(accessToken);
-                                console.log('토큰 : ', { decodedToken });
-
-                                try {
-                                    console.log('유저 이메일 : ', decodedToken.email);
-
-                                    // 유저 이메일로 검색 - 동일한 북마커가 이미 있는 지 확인 
-                                    const response = await fetch(`/pinkmong-appear-location/getOne/?user_email=${encodeURIComponent(decodedToken.email)}`, {
-                                        method: 'GET',
-                                        headers: {
-                                            'Content-Type': 'application/json'
-                                        }
-                                    });
-
-                                    if (!response.ok) {
-                                        throw new Error('유저 이메일로 북마커 검색 실패');
+                            navigator.geolocation.getCurrentPosition(
+                                async function (position) {
+                                    const accessToken = localStorage.getItem('accessToken');
+                                    if (!accessToken) {
+                                        alert('로그인이 필요한 서비스입니다.');
+                                        return;
                                     }
+                                    // 토큰 풀기
+                                    const decodedToken = parseJwt(accessToken);
+                                    console.log('토큰 : ', { decodedToken });
 
-                                    const idByEmail = await response.json(); // JSON 응답을 파싱합니다.
-                                    console.log('가져온 id : ', idByEmail.id);
+                                    try {
+                                        console.log('유저 이메일 : ', decodedToken.email);
 
-                                    // 있는 경우 삭제 
-                                    if (idByEmail.id) {
-                                        console.log('중복된 타이틀 있음');
-                                        const deleteResponse = await fetch(`/pinkmong-appear-location?id=${encodeURIComponent(idByEmail.id)}`, {
-                                            method: 'DELETE',
-                                            headers: {
-                                                'Content-Type': 'application/json'
+                                        // 유저 이메일로 검색 - 동일한 북마커가 이미 있는 지 확인
+                                        const response = await fetch(
+                                            `/pinkmong-appear-location/getOne/?user_email=${encodeURIComponent(decodedToken.email)}`,
+                                            {
+                                                method: 'GET',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                },
+                                            },
+                                        );
+
+                                        if (!response.ok) {
+                                            throw new Error('유저 이메일로 북마커 검색 실패');
+                                        }
+
+                                        const idByEmail = await response.json(); // JSON 응답을 파싱합니다.
+                                        console.log('가져온 id : ', idByEmail.id);
+
+                                        // 있는 경우 삭제
+                                        if (idByEmail.id) {
+                                            console.log('중복된 타이틀 있음');
+                                            const deleteResponse = await fetch(
+                                                `/pinkmong-appear-location?id=${encodeURIComponent(idByEmail.id)}`,
+                                                {
+                                                    method: 'DELETE',
+                                                    headers: {
+                                                        'Content-Type': 'application/json',
+                                                    },
+                                                },
+                                            );
+
+                                            if (!deleteResponse.ok) {
+                                                throw new Error('북마커 삭제 실패');
                                             }
-                                        });
 
-                                        if (!deleteResponse.ok) {
-                                            throw new Error('북마커 삭제 실패');
+                                            console.log(
+                                                '삭제할 북마커 id : ',
+                                                idByEmail.id,
+                                                ' 삭제',
+                                            );
+                                        } else {
+                                            console.log('기존의 북마커 없음');
+                                        }
+                                    } catch (error) {
+                                        console.log(error);
+                                    }
+
+                                    try {
+                                        // 북마커 추가. 이 아래는 정상작동 확인함.
+                                        const response = await fetch(
+                                            '/pinkmong-appear-location',
+                                            {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    Authorization: `${accessToken}`, // 백틱을 사용하여 문자열 템플릿으로 수정
+                                                },
+                                                body: JSON.stringify({
+                                                    title: decodedToken.email,
+                                                    latitude: position.coords.latitude,
+                                                    longitude: position.coords.longitude,
+                                                    region_theme: 'city',
+                                                }),
+                                            },
+                                        );
+
+                                        if (!response.ok) {
+                                            throw new Error(
+                                                `HTTP error! Status: ${response.status}`,
+                                            ); // 백틱을 사용하여 문자열 템플릿으로 수정
                                         }
 
-                                        console.log('삭제할 북마커 id : ', idByEmail.id, ' 삭제');
-                                    } else {
-                                        console.log('기존의 북마커 없음');
-                                    }
-                                } catch (error) { console.log(error) }
+                                        const result = await response.json();
+                                        console.log('✅ 핑크몽 출현 위치 추가 성공:', result);
 
-                                try { // 북마커 추가. 이 아래는 정상작동 확인함.
-                                    const response = await fetch('/pinkmong-appear-location', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'Authorization': `${accessToken}` // 백틱을 사용하여 문자열 템플릿으로 수정
-                                        },
-                                        body: JSON.stringify({
-                                            title: decodedToken.email,
-                                            latitude: position.coords.latitude,
-                                            longitude: position.coords.longitude,
-                                            region_theme: 'city'
-                                        })
-                                    });
+                                        // 발키에 북마커 추가
+                                        await fetch('/pinkmong-appear-location/fill-valkey', {
+                                            method: 'POST',
+                                        });
+                                        console.log('발키에 북마커 추가 완료');
 
-                                    if (!response.ok) {
-                                        throw new Error(`HTTP error! Status: ${response.status}`); // 백틱을 사용하여 문자열 템플릿으로 수정
-                                    }
-
-                                    const result = await response.json();
-                                    console.log('✅ 핑크몽 출현 위치 추가 성공:', result);
-
-                                    // 발키에 북마커 추가
-                                    await fetch('/pinkmong-appear-location/fill-valkey', {
-                                        method: 'POST'
-                                    });
-                                    console.log('발키에 북마커 추가 완료');
-
-                                    // 북마커 새로고침
-                                    geoBookmark();
-
-                                } catch (error) {
-                                    console.error('핑크몽 출현 위치 추가 실패:', error);
-                                    alert('핑크몽 출현 위치 추가에 실패했습니다.');
-                                } // try 블록의 끝
-                            }
-                            )
+                                        // 북마커 새로고침
+                                        geoBookmark();
+                                    } catch (error) {
+                                        console.error('핑크몽 출현 위치 추가 실패:', error);
+                                        alert('핑크몽 출현 위치 추가에 실패했습니다.');
+                                    } // try 블록의 끝
+                                },
+                            );
                         } else {
                             alert('이 브라우저에서는 위치 정보를 지원하지 않습니다.');
                         } // 522번줄의 if 블록의 끝
                     }
-
 
                     /////////////////////////////////////////
                     // 입력창의 주소를 검색하여 마커 이동 및 좌표 저장
@@ -730,7 +745,7 @@
                                             ),
                                             imageUrl:
                                                 bookmark.sub_achievement_images ||
-                                                'https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FbnZWDr%2FbtsMxEa1tat%2Fd4s5w26JdYrq0b7Qp9wDt1%2Fimg.png',
+                                                'https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FN5k03%2FbtsMn0l4BNf%2F0Lk5if43ncFTjl9rzKCE61%2Fimg.png',
                                             size: new kakao.maps.Size(40, 40),
                                             info: bookmark.title || '이름 없음',
                                             draggable: false,
