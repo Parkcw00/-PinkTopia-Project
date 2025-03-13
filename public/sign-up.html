@@ -541,28 +541,12 @@
             const data = await response.json();
 
             if (response.ok) {
-              // 회원가입 성공 시 이메일 인증 코드 전송
-              const verificationResponse = await fetch('/user/auth/send-code', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-              });
-
-              if (verificationResponse.ok) {
+              
                 // 이메일 인증 모달 표시
                 const verificationModal = new bootstrap.Modal(
                   document.getElementById('verificationModal'),
                 );
-                verificationModal.show();
-              } else {
-                const verificationData = await verificationResponse.json();
-                alert(
-                  verificationData.message ||
-                    '이메일 인증 코드 전송에 실패했습니다.',
-                );
-              }
+                verificationModal.show();           
             } else {
               alert(data.message || '회원가입에 실패했습니다.');
             }
