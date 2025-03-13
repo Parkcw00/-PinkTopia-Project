@@ -13,7 +13,7 @@
 
 **Logo / Mascot**
 
-![브로셔 이미지 2.png](https://www.notion.so/image/attachment%3A52a0331a-4f7a-4e0d-87d7-56c5af564207%3A%EB%B8%8C%EB%A1%9C%EC%85%94_%EC%9D%B4%EB%AF%B8%EC%A7%801.png?table=block&id=1a82dc3e-f514-808c-b6d9-e062d1528fb4&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=2000&userId=046f83da-8e42-4184-aab0-c3039fa4f93e&cache=v2)
+![브로셔 이미지 2.png](https://www.notion.so/image/attachment%3A48ed8530-2517-4060-bfe8-a0b8dcf0b22d%3A%EB%B8%8C%EB%A1%9C%EC%85%94_%EC%9D%B4%EB%AF%B8%EC%A7%80_2.png?table=block&id=1b32dc3e-f514-8068-b78b-cce18aa5e949&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=660&userId=&cache=v2))](https://www.notion.so/image/attachment%3A48ed8530-2517-4060-bfe8-a0b8dcf0b22d%3A%EB%B8%8C%EB%A1%9C%EC%85%94_%EC%9D%B4%EB%AF%B8%EC%A7%80_2.png?table=block&id=1b32dc3e-f514-8068-b78b-cce18aa5e949&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=660&userId=&cache=v2)
 
 **핑토피아 사이트**: [https://pinktopia.site/](https://pinktopia.site/)
 
@@ -71,7 +71,7 @@
 
 ## 서비스 아키텍처
 
-![아키텍처](attachment:88f3c0da-a4f7-4dd5-b1f3-1a67d6050423:image.png)
+![아키텍처](https://www.notion.so/image/attachment%3A88f3c0da-a4f7-4dd5-b1f3-1a67d6050423%3Aimage.png?table=block&id=1b32dc3e-f514-802d-ad54-fcfb614c634a&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=1420&userId=&cache=v2)
 
 ---
 
