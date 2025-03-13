@@ -13,16 +13,13 @@
 
 **Logo / Mascot**
 
-![브로셔 이미지 2.png](https://www.notion.so/image/attachment%3A48ed8530-2517-4060-bfe8-a0b8dcf0b22d%3A%EB%B8%8C%EB%A1%9C%EC%85%94_%EC%9D%B4%EB%AF%B8%EC%A7%80_2.png?table=block&id=1b32dc3e-f514-8068-b78b-cce18aa5e949&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=660&userId=&cache=v2))](https://www.notion.so/image/attachment%3A48ed8530-2517-4060-bfe8-a0b8dcf0b22d%3A%EB%B8%8C%EB%A1%9C%EC%85%94_%EC%9D%B4%EB%AF%B8%EC%A7%80_2.png?table=block&id=1b32dc3e-f514-8068-b78b-cce18aa5e949&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=660&userId=&cache=v2)
-
-**핑토피아 사이트**: [https://pinktopia.site/](https://pinktopia.site/)
+![브로셔 이미지 2.png](https://www.notion.so/image/attachment%3A48ed8530-2517-4060-bfe8-a0b8dcf0b22d%3A%EB%B8%8C%EB%A1%9C%EC%85%94_%EC%9D%B4%EB%AF%B8%EC%A7%80_2.png?table=block&id=1b32dc3e-f514-8068-b78b-cce18aa5e949&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=660&userId=&cache=v2)
 
 **PinkTopia Project Brochure**: [PinkTopia (핑크군단 - 5조)](https://www.notion.so/teamsparta/PinkTopia-5-1a82dc3ef514808cb6d9e062d1528fb4)
 
 **서비스 페이지**
 
-![pinktopia.png](attachment:e4577e95-f16b-4bb1-9b0b-87b78c69c60e:pinktopia.png)
-
+***핑토피아 사이트***: [https://pinktopia.site/](https://pinktopia.site/)
 ![](https://teamsparta.notion.site/image/attachment%3Ae4577e95-f16b-4bb1-9b0b-87b78c69c60e%3Apinktopia.png?table=block&id=1b42dc3e-f514-8052-9d51-d0e7c7987d3c&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=480&userId=&cache=v2).
 
 
@@ -49,10 +46,10 @@
 >
 > 이와 같이, 서비스는 건강한 라이프스타일과 즐거운 사회적 소통, 그리고 지역사회의 활성화를 동시에 추구하며, 사용자가 일상에서 벗어나 활동적이고 의미 있는 경험을 할 수 있도록 기획되었습니다.
 
-![핑크군단](attachment:018218f3-1733-4fae-b412-775c5ca4c8ff:image.png)  
+![핑크군단](https://www.notion.so/image/attachment%3A018218f3-1733-4fae-b412-775c5ca4c8ff%3Aimage.png?table=block&id=1b32dc3e-f514-8024-b91f-c11e94bde268&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=540&userId=&cache=v2)  
 *핑크군단*
 
-![핑크몽](attachment:951655ff-f48a-4a38-ae9f-74b9e81bcaee:image.png)  
+![핑크몽](https://www.notion.so/image/attachment%3A951655ff-f48a-4a38-ae9f-74b9e81bcaee%3Aimage.png?table=block&id=1b32dc3e-f514-8037-91e9-f407e9b7cc2a&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&width=190&userId=&cache=v2)  
 *핑크몽*
 
 ---
